@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake & Ladders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Start Screen -->
+  <div id="start-screen">
+    <div class="start-card">
+      <div class="start-title">🐍 Snake &amp; Ladders 🪜</div>
+      <div class="start-subtitle">Choose how to play!</div>
+      <button class="mode-btn btn-2p" onclick="startGame('2p')">👫 2 Players</button>
+      <button class="mode-btn btn-cpu" onclick="startGame('cpu')">🤖 vs Computer</button>
+    </div>
+  </div>
+
+  <!-- Confetti container -->
+  <div id="confetti-container"></div>
+
+  <!-- Win overlay -->
+  <div id="win-overlay" class="hidden">
+    <div id="win-card">
+      <div id="win-emoji">🎉</div>
+      <div id="win-text"></div>
+      <button class="action-btn" onclick="newGame()">🔄 Play Again!</button>
+    </div>
+  </div>
+
+  <!-- Main Game -->
+  <div id="game" class="hidden">
+    <h1 class="game-title">🐍 Snake &amp; Ladders 🪜</h1>
+
+    <!-- Player turn banner -->
+    <div id="turn-banner">
+      <span id="turn-text">Player 1's Turn 🔴</span>
+    </div>
+
+    <!-- Score display -->
+    <div id="scores">
+      <div class="score-box p1-box">
+        <span class="score-label">🔴 Player 1</span>
+        <span class="score-pos" id="p1-pos">Start</span>
+      </div>
+      <div class="score-box p2-box">
+        <span class="score-label" id="p2-label">🔵 Player 2</span>
+        <span class="score-pos" id="p2-pos">Start</span>
+      </div>
+    </div>
+
+    <!-- Board area -->
+    <div id="board-wrapper">
+      <div id="board-grid"></div>
+      <svg id="overlay-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="tokens-layer"></div>
+    </div>
+
+    <!-- Dice -->
+    <div id="dice-area">
+      <div id="dice" class="dice">
+        <div class="dot-grid" id="dot-grid"></div>
+      </div>
+      <div id="dice-result"></div>
+    </div>
+
+    <!-- Message box -->
+    <div id="message-box">Roll the dice to start!</div>
+
+    <!-- Buttons -->
+    <div id="btn-row">
+      <button id="roll-btn" class="action-btn roll-btn" onclick="rollDice()">🎲 Roll Dice!</button>
+      <button class="action-btn new-btn" onclick="newGame()">🔄 New Game</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
