@@ -417,3 +417,91 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 .logout-btn:hover { background: #ffcdd2; color: #e53935; }
+.stats-btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(12px, 2vw, 15px);
+  background: #ede7f6;
+  color: #5a2d82;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.stats-btn:hover { background: #d1c4e9; }
+
+/* ── STATS OVERLAY ── */
+#stats-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 300;
+  animation: fadeIn 0.2s ease;
+}
+#stats-card {
+  position: relative;
+  background: white;
+  border-radius: 28px;
+  padding: 36px 32px 28px;
+  max-width: 400px; width: 92%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  animation: bounceIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.stats-close-btn {
+  position: absolute; top: 16px; right: 20px;
+  background: #f5f5f5; border: none; border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: 18px; cursor: pointer; color: #888;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.stats-close-btn:hover { background: #ffcdd2; color: #e53935; }
+#stats-title {
+  font-size: 26px; color: #5a2d82;
+  margin-bottom: 20px; text-align: center;
+}
+#stats-summary {
+  display: flex; gap: 12px; justify-content: center;
+  margin-bottom: 24px;
+}
+.stat-item {
+  flex: 1;
+  background: #f3e5f5;
+  border-radius: 16px;
+  padding: 14px 8px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 32px; color: #5a2d82; line-height: 1;
+}
+.stat-lbl {
+  font-size: 13px; color: #888; margin-top: 4px;
+}
+.history-title {
+  font-size: 17px; color: #888;
+  margin-bottom: 10px; text-align: center;
+  border-top: 1px solid #f0f0f0; padding-top: 14px;
+}
+#history-list {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 220px; overflow-y: auto;
+}
+.history-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+.history-item.win  { background: #e8f5e9; }
+.history-item.loss { background: #ffebee; }
+.h-date  { color: #aaa; font-size: 13px; flex: 0 0 auto; }
+.h-mode  { color: #666; flex: 1; text-align: center; }
+.h-result { font-size: 15px; flex: 0 0 auto; }
+.no-history { color: #bbb; text-align: center; padding: 20px 0; font-size: 17px; }
+
+/* ── WIN STATS ── */
+.win-stats {
+  font-size: 17px; color: #888;
+  margin-bottom: 16px; text-align: center;
+  min-height: 24px;
+}

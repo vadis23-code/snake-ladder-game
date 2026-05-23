@@ -59,7 +59,32 @@
   <!-- User Bar (shown after auth) -->
   <div id="user-bar" class="hidden">
     <span id="user-name-display">👤 Guest</span>
+    <button id="stats-btn" class="stats-btn" onclick="showStats()">📊 Stats</button>
     <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Stats Overlay -->
+  <div id="stats-overlay" class="hidden">
+    <div id="stats-card">
+      <button class="stats-close-btn" onclick="hideStats()">✕</button>
+      <div id="stats-title">📊 Stats</div>
+      <div id="stats-summary">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-wins">0</div>
+          <div class="stat-lbl">Wins</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-losses">0</div>
+          <div class="stat-lbl">Losses</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-rate">—</div>
+          <div class="stat-lbl">Win Rate</div>
+        </div>
+      </div>
+      <div class="history-title">Recent Games</div>
+      <div id="history-list"></div>
+    </div>
   </div>
 
   <!-- Confetti container -->
@@ -70,6 +95,7 @@
     <div id="win-card">
       <div id="win-emoji">🎉</div>
       <div id="win-text"></div>
+      <div id="win-stats" class="win-stats"></div>
       <button class="action-btn" onclick="newGame()">🔄 Play Again!</button>
     </div>
   </div>
