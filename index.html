@@ -10,14 +10,56 @@
 </head>
 <body>
 
+  <!-- Auth Screen -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-title">🐍 Snake &amp; Ladders 🪜</div>
+      <div class="auth-subtitle">Sign in to play!</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <div id="form-login">
+        <input type="text" id="login-username" class="auth-input" placeholder="Username"
+               autocomplete="username" onkeydown="if(event.key==='Enter')authLogin()">
+        <input type="password" id="login-password" class="auth-input" placeholder="Password"
+               autocomplete="current-password" onkeydown="if(event.key==='Enter')authLogin()">
+        <div id="login-error" class="auth-error"></div>
+        <button class="auth-btn btn-primary" onclick="authLogin()">Sign In</button>
+      </div>
+
+      <div id="form-register" class="hidden">
+        <input type="text" id="reg-username" class="auth-input" placeholder="Username (3–20 chars)"
+               autocomplete="username" onkeydown="if(event.key==='Enter')authRegister()">
+        <input type="password" id="reg-password" class="auth-input" placeholder="Password (min 6 chars)"
+               autocomplete="new-password" onkeydown="if(event.key==='Enter')authRegister()">
+        <input type="password" id="reg-confirm" class="auth-input" placeholder="Confirm Password"
+               autocomplete="new-password" onkeydown="if(event.key==='Enter')authRegister()">
+        <div id="reg-error" class="auth-error"></div>
+        <button class="auth-btn btn-primary" onclick="authRegister()">Create Account</button>
+      </div>
+
+      <div class="auth-divider">── or ──</div>
+      <button class="auth-btn btn-guest" onclick="authGuest()">👤 Play as Guest</button>
+    </div>
+  </div>
+
   <!-- Start Screen -->
-  <div id="start-screen">
+  <div id="start-screen" class="hidden">
     <div class="start-card">
       <div class="start-title">🐍 Snake &amp; Ladders 🪜</div>
       <div class="start-subtitle">Choose how to play!</div>
       <button class="mode-btn btn-2p" onclick="startGame('2p')">👫 2 Players</button>
       <button class="mode-btn btn-cpu" onclick="startGame('cpu')">🤖 vs Computer</button>
     </div>
+  </div>
+
+  <!-- User Bar (shown after auth) -->
+  <div id="user-bar" class="hidden">
+    <span id="user-name-display">👤 Guest</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <!-- Confetti container -->
@@ -44,7 +86,7 @@
     <!-- Score display -->
     <div id="scores">
       <div class="score-box p1-box">
-        <span class="score-label">🔴 Player 1</span>
+        <span class="score-label" id="p1-label">🔴 Player 1</span>
         <span class="score-pos" id="p1-pos">Start</span>
       </div>
       <div class="score-box p2-box">

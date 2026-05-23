@@ -9,6 +9,7 @@ let gameMode      = '2p';
 let currentPlayer = 1;
 let positions     = [0, 0];
 let busy          = false;
+let currentUser   = null; // null means guest
 
 // ── DOM ────────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -28,6 +29,90 @@ const confettiCont = $('confetti-container');
 const boardGrid    = $('board-grid');
 const overlaySvg   = $('overlay-svg');
 const tokensLayer  = $('tokens-layer');
+
+// ── AUTH ───────────────────────────────────────────────────────────────────
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('snl_users') || '{}'); } catch { return {}; }
+}
+
+function saveUsers(users) {
+  localStorage.setItem('snl_users', JSON.stringify(users));
+}
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+  document.getElementById('form-register').classList.toggle('hidden', isLogin);
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('reg-error').textContent = '';
+}
+
+function authLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+  if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+  const users = getUsers();
+  if (!users[username])                       { errEl.textContent = 'Username not found.';   return; }
+  if (users[username].password !== password)  { errEl.textContent = 'Incorrect password.';   return; }
+  currentUser = username;
+  enterGame();
+}
+
+function authRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+  const errEl    = document.getElementById('reg-error');
+  if (!username || !password || !confirm) { errEl.textContent = 'Please fill in all fields.'; return; }
+  if (username.length < 3 || username.length > 20) { errEl.textContent = 'Username must be 3–20 characters.'; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(username))  { errEl.textContent = 'Letters, numbers and _ only.'; return; }
+  if (password.length < 6)                { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (password !== confirm)               { errEl.textContent = 'Passwords do not match.'; return; }
+  const users = getUsers();
+  if (users[username]) { errEl.textContent = 'Username already taken.'; return; }
+  users[username] = { password };
+  saveUsers(users);
+  currentUser = username;
+  enterGame();
+}
+
+function authGuest() {
+  currentUser = null;
+  enterGame();
+}
+
+function enterGame() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  const nameDisplay = document.getElementById('user-name-display');
+  nameDisplay.textContent = currentUser ? `👤 ${currentUser}` : '👤 Guest';
+  document.getElementById('user-bar').classList.remove('hidden');
+  $('start-screen').classList.remove('hidden');
+}
+
+function logout() {
+  currentUser = null;
+  $('game').classList.add('hidden');
+  $('start-screen').classList.add('hidden');
+  winOverlay.classList.add('hidden');
+  confettiCont.innerHTML = '';
+  ['login-username', 'login-password', 'reg-username', 'reg-password', 'reg-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('reg-error').textContent = '';
+  switchTab('login');
+  document.getElementById('user-bar').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+}
+
+function getPlayerName(playerIdx) {
+  if (playerIdx === 0) return currentUser || 'Player 1';
+  return gameMode === 'cpu' ? 'Computer' : 'Player 2';
+}
 
 // ── BOARD MATH ─────────────────────────────────────────────────────────────
 // Board numbering: bottom row = 1-10 (L→R), next row = 11-20 (R→L), alternating.
@@ -299,7 +384,7 @@ function updateScores() {
 
 function updateTurnBanner() {
   const isP1 = currentPlayer === 1;
-  const name = isP1 ? 'Player 1 🔴' : (gameMode === 'cpu' ? 'Computer 🤖' : 'Player 2 🔵');
+  const name = isP1 ? `${getPlayerName(0)} 🔴` : (gameMode === 'cpu' ? 'Computer 🤖' : 'Player 2 🔵');
   turnText.textContent = `${name}'s Turn!`;
   $('turn-banner').style.background = isP1 ? '#ffebee' : '#e3f2fd';
 }
@@ -320,7 +405,7 @@ async function stepToken(playerIdx, steps) {
 
 async function handleSpecial(playerIdx) {
   const pos  = positions[playerIdx];
-  const name = playerIdx === 0 ? 'Player 1' : (gameMode === 'cpu' ? 'Computer' : 'Player 2');
+  const name = getPlayerName(playerIdx);
 
   if (SNAKES[pos] !== undefined) {
     const dest = SNAKES[pos];
@@ -352,10 +437,11 @@ function checkWin(playerIdx) {
 function triggerWin(playerIdx) {
   const isP1    = playerIdx === 0;
   const isCpu   = !isP1 && gameMode === 'cpu';
+  const name    = getPlayerName(playerIdx);
   winEmoji.textContent = isCpu ? '🤖' : (isP1 ? '🎉' : '🎊');
   winText.textContent  = isCpu
     ? 'Computer WINS!\nBetter luck next time!'
-    : `Player ${playerIdx + 1} WINS!\nAmazing job! 🌟`;
+    : `${name} WINS!\nAmazing job! 🌟`;
   winOverlay.classList.remove('hidden');
   playSound('win');
   launchConfetti();
@@ -386,7 +472,7 @@ async function rollDice() {
   rollBtn.disabled = true;
 
   const playerIdx = currentPlayer - 1;
-  const name      = playerIdx === 0 ? 'Player 1' : (gameMode === 'cpu' ? 'Computer' : 'Player 2');
+  const name      = getPlayerName(playerIdx);
   const roll      = Math.ceil(Math.random() * 6);
 
   // Dice animation
@@ -420,7 +506,7 @@ async function rollDice() {
   currentPlayer = currentPlayer === 1 ? 2 : 1;
   updateTurnBanner();
 
-  const nextName = currentPlayer === 1 ? 'Player 1' : (gameMode === 'cpu' ? 'Computer' : 'Player 2');
+  const nextName = getPlayerName(currentPlayer - 1);
 
   if (gameMode === '2p' || currentPlayer === 1) {
     showMessage(`${nextName}'s turn — press Roll Dice! 🎲`);
@@ -450,6 +536,8 @@ function initGame() {
   busy             = false;
   diceResult.textContent = '';
   dotGrid.innerHTML      = '';
+  const p1Label = document.getElementById('p1-label');
+  if (p1Label) p1Label.textContent = `🔴 ${currentUser || 'Player 1'}`;
 
   buildBoard();
   createTokens();
