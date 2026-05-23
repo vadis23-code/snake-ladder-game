@@ -84,10 +84,86 @@ function authGuest() {
   enterGame();
 }
 
+function getUserStats() {
+  if (!currentUser) return null;
+  const users = getUsers();
+  return users[currentUser]?.stats || { wins: 0, losses: 0, history: [] };
+}
+
+function recordGameResult(playerIdx) {
+  if (!currentUser) return;
+  const users = getUsers();
+  const user  = users[currentUser];
+  if (!user) return;
+  if (!user.stats) user.stats = { wins: 0, losses: 0, history: [] };
+
+  const userWon = playerIdx === 0;
+  if (userWon) {
+    user.stats.wins++;
+  } else {
+    user.stats.losses++;
+  }
+
+  const entry = {
+    date:   new Date().toLocaleDateString(),
+    mode:   gameMode === 'cpu' ? 'vs CPU' : '2 Players',
+    result: userWon ? 'win' : 'loss',
+  };
+  user.stats.history.unshift(entry);
+  if (user.stats.history.length > 10) user.stats.history.length = 10;
+
+  users[currentUser] = user;
+  saveUsers(users);
+  updateUserBar();
+}
+
+function updateUserBar() {
+  const nameDisplay = document.getElementById('user-name-display');
+  if (!currentUser) {
+    nameDisplay.textContent = '👤 Guest';
+    return;
+  }
+  const stats = getUserStats();
+  const hasGames = stats && (stats.wins > 0 || stats.losses > 0);
+  nameDisplay.textContent = hasGames
+    ? `👤 ${currentUser} · ${stats.wins}W ${stats.losses}L`
+    : `👤 ${currentUser}`;
+}
+
+function showStats() {
+  if (!currentUser) return;
+  const stats = getUserStats();
+  const total  = stats.wins + stats.losses;
+  const rate   = total > 0 ? Math.round((stats.wins / total) * 100) + '%' : '—';
+
+  document.getElementById('stats-title').textContent   = `📊 ${currentUser}'s Stats`;
+  document.getElementById('stat-wins').textContent     = stats.wins;
+  document.getElementById('stat-losses').textContent   = stats.losses;
+  document.getElementById('stat-rate').textContent     = rate;
+
+  const listEl = document.getElementById('history-list');
+  if (stats.history.length === 0) {
+    listEl.innerHTML = '<div class="no-history">No games played yet!</div>';
+  } else {
+    listEl.innerHTML = stats.history.map(g => `
+      <div class="history-item ${g.result}">
+        <span class="h-date">${g.date}</span>
+        <span class="h-mode">${g.mode}</span>
+        <span class="h-result">${g.result === 'win' ? '🏆 Win' : '💔 Loss'}</span>
+      </div>`).join('');
+  }
+  document.getElementById('stats-overlay').classList.remove('hidden');
+}
+
+function hideStats() {
+  document.getElementById('stats-overlay').classList.add('hidden');
+}
+
 function enterGame() {
   document.getElementById('auth-screen').classList.add('hidden');
-  const nameDisplay = document.getElementById('user-name-display');
-  nameDisplay.textContent = currentUser ? `👤 ${currentUser}` : '👤 Guest';
+  const statsBtn = document.getElementById('stats-btn');
+  if (statsBtn) statsBtn.style.display = currentUser ? '' : 'none';
+  updateUserBar();
   document.getElementById('user-bar').classList.remove('hidden');
   $('start-screen').classList.remove('hidden');
 }
@@ -435,13 +511,26 @@ function checkWin(playerIdx) {
 }
 
 function triggerWin(playerIdx) {
-  const isP1    = playerIdx === 0;
-  const isCpu   = !isP1 && gameMode === 'cpu';
-  const name    = getPlayerName(playerIdx);
+  const isP1  = playerIdx === 0;
+  const isCpu = !isP1 && gameMode === 'cpu';
+  const name  = getPlayerName(playerIdx);
+
+  recordGameResult(playerIdx);
+
   winEmoji.textContent = isCpu ? '🤖' : (isP1 ? '🎉' : '🎊');
   winText.textContent  = isCpu
     ? 'Computer WINS!\nBetter luck next time!'
     : `${name} WINS!\nAmazing job! 🌟`;
+
+  // Show updated record for the logged-in user
+  const winStatsEl = document.getElementById('win-stats');
+  if (currentUser) {
+    const s = getUserStats();
+    winStatsEl.textContent = `Record: ${s.wins}W – ${s.losses}L`;
+  } else {
+    winStatsEl.textContent = '';
+  }
+
   winOverlay.classList.remove('hidden');
   playSound('win');
   launchConfetti();
