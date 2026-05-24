@@ -3,1021 +3,1085 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Pickup Scorekeeper 🏀</title>
+  <meta name="theme-color" content="#07070F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CourtCall 🏀</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ── RESET ──────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── DESIGN SYSTEM ─────────────────────────────────────────────── */
+:root {
+  --bg:        #07070F;
+  --s1:        #0E0E1C;
+  --s2:        #161628;
+  --s3:        #1E1E38;
+  --border:    rgba(255,255,255,0.07);
+  --text:      #E0E0F0;
+  --muted:     #606080;
+  --muted2:    #3A3A60;
+  --gold:      #FFB300;
+  --danger:    #FF1744;
+  --success:   #00E676;
+  /* Dynamic — set by JS */
+  --ca:        #FF5722;
+  --cb:        #2979FF;
+  --ga:        rgba(255,87,34,0.35);
+  --gb:        rgba(41,121,255,0.35);
+  --r1: 8px; --r2: 14px; --r3: 22px; --r4: 32px;
+  --t1: 0.12s ease; --t2: 0.25s ease; --t3: 0.5s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  min-height: 100dvh; background: var(--bg); color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent; overflow-x: hidden;
+}
+.hidden { display: none !important; }
+.screen { display: none; flex-direction: column; align-items: stretch; min-height: 100dvh; }
+.screen.active { display: flex; }
 
-    :root {
-      --orange:      #FF6B35;
-      --orange-dark: #E04F1A;
-      --orange-glow: rgba(255,107,53,0.35);
-      --navy:        #0F0F23;
-      --navy-mid:    #1A1A2E;
-      --navy-light:  #16213E;
-      --gold:        #FFD700;
-      --gold-glow:   rgba(255,215,0,0.3);
-      --white:       #F0F0F0;
-      --muted:       #7A7A9A;
-      --danger:      #E53935;
-      --radius-sm:   10px;
-      --radius-md:   16px;
-      --radius-lg:   24px;
-      --radius-xl:   32px;
-      --shadow-btn:  0 5px 0 rgba(0,0,0,0.45);
-      --t:           0.14s ease;
-    }
+/* ── HUB ────────────────────────────────────────────────────────── */
+#s-hub {
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(255,87,34,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(41,121,255,0.10) 0%, transparent 55%),
+    var(--bg);
+  align-items: center; padding: 0 20px 40px;
+}
+.hub-logo {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px 0 32px;
+}
+.hub-ball { font-size: 72px; animation: ballBounce 1.4s ease-in-out infinite; display: block; }
+@keyframes ballBounce {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  45% { transform: translateY(-22px) rotate(12deg); }
+  65% { transform: translateY(-8px) rotate(-5deg); }
+}
+.hub-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(42px, 12vw, 64px);
+  letter-spacing: 0.06em; color: var(--text); margin-top: 10px; line-height: 1;
+}
+.hub-sub { font-size: 13px; color: var(--muted); margin-top: 6px; letter-spacing: 0.06em; }
 
-    html, body { height: 100%; }
+.hub-cta { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; }
+.btn-cta-primary {
+  background: linear-gradient(135deg, #FF5722, #FF8A50);
+  color: #fff; border: none; border-radius: var(--r3);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px; letter-spacing: 0.1em;
+  padding: 22px; cursor: pointer; width: 100%; min-height: 68px;
+  box-shadow: 0 8px 32px rgba(255,87,34,0.4), 0 2px 0 rgba(0,0,0,0.3);
+  transition: transform var(--t1), box-shadow var(--t1);
+}
+.btn-cta-primary:active { transform: translateY(4px); box-shadow: 0 2px 16px rgba(255,87,34,0.3); }
+.btn-cta-secondary {
+  background: rgba(255,255,255,0.04);
+  color: var(--muted); border: 1px solid var(--border); border-radius: var(--r3);
+  font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
+  padding: 18px; cursor: pointer; min-height: 58px;
+  transition: all var(--t1);
+}
+.btn-cta-secondary:active { background: rgba(255,255,255,0.08); }
 
-    body {
-      min-height: 100dvh;
-      background: var(--navy);
-      color: var(--white);
-      font-family: 'Inter', system-ui, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      overflow-x: hidden;
-    }
+.recent-section { width: 100%; max-width: 440px; margin-top: 32px; }
+.recent-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+}
+.recent-list { display: flex; flex-direction: column; gap: 8px; }
+.recent-card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 14px 16px; cursor: pointer; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; transition: background var(--t1);
+}
+.recent-card:active { background: var(--s2); }
+.rc-teams { display: flex; gap: 8px; align-items: center; font-weight: 700; font-size: 15px; }
+.rc-score { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); }
+.rc-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rc-right { text-align: right; }
+.recent-empty { font-size: 13px; color: var(--muted2); text-align: center; padding: 16px 0; }
 
-    .hidden { display: none !important; }
+/* ── SETUP ──────────────────────────────────────────────────────── */
+#s-setup {
+  background: var(--bg); overflow-y: auto;
+  align-items: center; padding: 0 16px 40px;
+}
+.setup-nav {
+  width: 100%; max-width: 480px; display: flex; align-items: center;
+  padding: 12px 0 4px;
+}
+.btn-back {
+  background: transparent; border: none; color: var(--muted);
+  font: 700 14px 'Inter', sans-serif; cursor: pointer;
+  padding: 8px 4px; min-height: 44px; min-width: 72px;
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-back:active { color: var(--text); }
+.setup-head {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 0.08em; color: var(--text); margin: 4px 0 20px;
+}
+.setup-form { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+.setup-sec {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 16px;
+}
+.sec-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; display: block;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 10px 16px; border: 2px solid var(--border); border-radius: 50px;
+  background: rgba(255,255,255,0.03); color: var(--muted);
+  font: 600 13px 'Inter', sans-serif; cursor: pointer; min-height: 44px;
+  transition: all var(--t1);
+}
+.chip.on { border-color: var(--ca); background: var(--ca); color: #fff; }
+.chip:active { opacity: 0.75; }
 
-    /* ── SCREENS ─────────────────────────────────────────────────────── */
-    .screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100dvh;
-    }
-    .screen.active { display: flex; }
+.team-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: start; }
+.team-col { display: flex; flex-direction: column; gap: 8px; }
+.team-input {
+  background: rgba(255,255,255,0.06); border: 2px solid var(--border);
+  border-radius: var(--r1); color: var(--text);
+  font: 700 16px 'Inter', sans-serif; padding: 13px 12px;
+  text-align: center; outline: none; min-height: 50px; width: 100%;
+  transition: border-color var(--t1);
+}
+.team-input:focus { border-color: var(--ca); }
+.vs-sep { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--muted2); padding-top: 14px; text-align: center; }
+.color-row { display: flex; gap: 8px; justify-content: center; }
+.color-dot {
+  width: 30px; height: 30px; border-radius: 50%; border: 3px solid transparent;
+  cursor: pointer; transition: transform var(--t1), border-color var(--t1);
+}
+.color-dot.on { border-color: #fff; transform: scale(1.15); }
+.color-dot:active { transform: scale(0.9); }
 
-    /* ── SHARED BUTTON STYLES ────────────────────────────────────────── */
-    .btn-primary {
-      background: var(--orange);
-      color: var(--navy);
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: 22px;
-      letter-spacing: 0.08em;
-      padding: 18px 32px;
-      cursor: pointer;
-      box-shadow: var(--shadow-btn);
-      transition: transform var(--t), box-shadow var(--t);
-      width: 100%;
-      min-height: 60px;
-    }
-    .btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); }
+.custom-input {
+  display: none; margin-top: 12px; width: 110px;
+  background: rgba(255,255,255,0.06); border: 2px solid var(--ca);
+  border-radius: var(--r1); color: var(--text);
+  font: 700 18px 'Inter', sans-serif; padding: 10px 12px;
+  text-align: center; outline: none; min-height: 48px;
+}
+.custom-input.show { display: block; }
 
-    .btn-secondary {
-      background: transparent;
-      color: var(--muted);
-      border: 2px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius-md);
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 14px 24px;
-      cursor: pointer;
-      width: 100%;
-      min-height: 52px;
-      transition: all var(--t);
-    }
-    .btn-secondary:active { opacity: 0.7; }
+.setup-actions { width: 100%; max-width: 480px; margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.btn-start {
+  background: linear-gradient(135deg, var(--ca), color-mix(in srgb, var(--ca) 70%, #fff));
+  color: #fff; border: none; border-radius: var(--r2);
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em;
+  padding: 20px; cursor: pointer; min-height: 64px;
+  box-shadow: 0 6px 24px var(--ga), 0 2px 0 rgba(0,0,0,0.3);
+  transition: transform var(--t1), box-shadow var(--t1);
+}
+.btn-start:active { transform: translateY(4px); box-shadow: 0 2px 12px var(--ga); }
 
-    .btn-back {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 0 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      min-height: 44px;
-      min-width: 80px;
-    }
-    .btn-back:active { color: var(--white); }
+/* ── GAME ───────────────────────────────────────────────────────── */
+#s-game { background: var(--bg); padding: 0; justify-content: flex-start; position: relative; }
 
-    /* ════════════════════════════════════════════════════════════════
-       SCREEN 1: SETUP
-    ════════════════════════════════════════════════════════════════ */
-    #screen-setup {
-      background: radial-gradient(ellipse at top, #1e1e3c 0%, var(--navy) 70%);
-      padding: 20px 16px 40px;
-    }
+.game-nav {
+  width: 100%; background: var(--s1); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; height: 50px; flex-shrink: 0; z-index: 10;
+}
+.game-nav .btn-back { min-width: 70px; }
+.q-chip {
+  background: var(--s2); border: 1px solid var(--border); border-radius: 20px;
+  font: 700 13px 'Inter', sans-serif; color: var(--text); padding: 6px 14px;
+  cursor: pointer; transition: all var(--t1); display: flex; align-items: center; gap: 6px;
+}
+.q-chip:active { background: var(--s3); }
+.q-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ca); }
+.nav-mic {
+  background: transparent; border: none; font-size: 20px; cursor: pointer;
+  min-width: 44px; min-height: 44px; display: flex; align-items: center;
+  justify-content: center; border-radius: var(--r1); transition: background var(--t1);
+}
+.nav-mic.on { animation: micGlow 1.4s ease-in-out infinite; }
+@keyframes micGlow {
+  0%,100% { filter: drop-shadow(0 0 0 var(--ca)); }
+  50%      { filter: drop-shadow(0 0 8px var(--ca)); }
+}
 
-    .app-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px 0 24px;
-    }
-    .app-logo    { font-size: 48px; line-height: 1; }
-    .app-title   {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(30px, 8vw, 46px);
-      letter-spacing: 0.06em;
-      color: var(--orange);
-      margin-top: 6px;
-    }
-    .app-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+/* Momentum bar */
+.momentum-bar {
+  width: 100%; height: 5px; background: var(--s2); display: flex; flex-shrink: 0;
+}
+.m-fill-a {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ca), rgba(255,255,255,0.05));
+  transition: width 0.6s ease;
+}
+.m-fill-b {
+  height: 100%; flex: 1;
+  background: linear-gradient(270deg, var(--cb), rgba(255,255,255,0.05));
+}
 
-    .setup-form {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+/* Scoreboard */
+.scoreboard {
+  display: grid; grid-template-columns: 1fr 48px 1fr;
+  width: 100%; flex-shrink: 0;
+}
+.team-panel {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16px 10px 12px; gap: 4px; position: relative;
+  transition: box-shadow var(--t2);
+}
+.team-panel[data-t="a"] { --tc: var(--ca); --gc: var(--ga); }
+.team-panel[data-t="b"] { --tc: var(--cb); --gc: var(--gb); }
+.team-panel.leading { box-shadow: inset 0 -4px 0 var(--tc); }
+.team-panel.leading .t-score {
+  color: var(--tc); text-shadow: 0 0 40px var(--gc);
+}
 
-    .setup-section {
-      background: var(--navy-mid);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: var(--radius-md);
-      padding: 16px;
-    }
-    .section-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-      display: block;
-    }
+.t-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(16px, 4.5vw, 26px); letter-spacing: 0.06em;
+  color: var(--text); text-align: center; word-break: break-word; line-height: 1.1;
+}
+.t-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(76px, 20vw, 120px); line-height: 1;
+  color: var(--text); transition: color 0.3s, text-shadow 0.3s;
+}
+.t-score.pop { animation: scorePop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes scorePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.38); }
+  100% { transform: scale(1); }
+}
+.t-meta { display: flex; align-items: center; gap: 8px; }
+.foul-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--muted); background: var(--s2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 10px; cursor: pointer; transition: all var(--t1);
+  min-height: 26px; display: flex; align-items: center;
+}
+.foul-badge.warn { border-color: var(--danger); color: var(--danger); }
+.foul-badge:active { background: var(--s3); }
 
-    /* Chips */
-    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip {
-      padding: 10px 16px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: 50px;
-      background: rgba(255,255,255,0.04);
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--t);
-      min-height: 44px;
-    }
-    .chip.selected { border-color: var(--orange); background: var(--orange); color: var(--navy); }
-    .chip:active { opacity: 0.75; }
+/* Center column */
+.vs-col {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+  border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+}
+.vs-text { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: var(--muted2); }
+.poss-btn {
+  font-size: 20px; background: var(--s2); border: 1px solid var(--border);
+  border-radius: 50%; width: 34px; height: 34px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--t1); color: var(--gold);
+}
+.poss-btn:active { background: var(--s3); transform: scale(0.9); }
 
-    /* Team name inputs */
-    .team-name-row { display: flex; align-items: center; gap: 10px; }
-    .team-name-input {
-      flex: 1;
-      background: rgba(255,255,255,0.07);
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-sm);
-      color: var(--white);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 14px 12px;
-      text-align: center;
-      outline: none;
-      transition: border-color var(--t);
-      min-height: 52px;
-    }
-    .team-name-input:focus { border-color: var(--orange); }
-    .team-name-input::placeholder { color: var(--muted); font-weight: 400; }
-    .vs-label {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
+/* Run banner */
+.run-banner {
+  width: 100%; padding: 9px 16px; flex-shrink: 0;
+  font-family: 'Bebas Neue', sans-serif; font-size: clamp(16px, 4vw, 22px);
+  letter-spacing: 0.12em; text-align: center; color: #fff;
+  background: linear-gradient(90deg, var(--rc,var(--ca)) 0%, rgba(0,0,0,0) 100%);
+  animation: runPulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes runPulse { from { opacity: 0.85; } to { opacity: 1; } }
 
-    /* Custom inputs */
-    .custom-number-input {
-      margin-top: 12px;
-      width: 110px;
-      background: rgba(255,255,255,0.06);
-      border: 2px solid var(--orange);
-      border-radius: var(--radius-sm);
-      color: var(--white);
-      font-size: 18px;
-      font-weight: 700;
-      padding: 10px 12px;
-      text-align: center;
-      outline: none;
-      min-height: 48px;
-    }
+/* Status bar */
+.game-status {
+  width: 100%; background: var(--s1); border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); padding: 9px 16px;
+  text-align: center; font-size: 13px; font-weight: 700; color: var(--muted);
+  min-height: 38px; flex-shrink: 0;
+}
+.game-status.lead { color: var(--gold); }
 
-    .setup-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      max-width: 480px;
-      margin-top: 20px;
-    }
+/* Score pads */
+.score-zone {
+  display: grid; grid-template-columns: 1fr 1px 1fr;
+  width: 100%; flex-shrink: 0; background: var(--s1);
+  border-top: 1px solid var(--border);
+}
+.score-zone-divider { background: var(--border); }
+.score-pad {
+  display: flex; flex-direction: row; flex-wrap: wrap;
+  gap: 0; padding: 10px 8px;
+}
+.score-pad[data-t="a"] { --tc: var(--ca); --gc: var(--ga); }
+.score-pad[data-t="b"] { --tc: var(--cb); --gc: var(--gb); }
+.btn-score {
+  flex: 1; min-height: 80px; min-width: 0;
+  background: var(--s2); color: var(--tc); border: 2px solid color-mix(in srgb, var(--tc) 35%, transparent);
+  border-radius: var(--r1); margin: 3px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(26px, 7vw, 36px); letter-spacing: 0.04em;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.5), 0 0 14px var(--gc);
+  transition: transform var(--t1), box-shadow var(--t1), background var(--t1);
+}
+.btn-score:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.5), 0 0 20px var(--gc);
+  background: color-mix(in srgb, var(--tc) 20%, var(--s2));
+}
+.btn-score.flash { background: var(--tc) !important; color: #fff !important; }
 
-    /* ════════════════════════════════════════════════════════════════
-       SCREEN 2: GAME
-    ════════════════════════════════════════════════════════════════ */
-    #screen-game {
-      background: var(--navy);
-      padding: 0;
-      justify-content: flex-start;
-    }
+/* Controls bar */
+.controls-bar {
+  display: flex; gap: 8px; padding: 8px 12px;
+  width: 100%; flex-shrink: 0; background: var(--bg);
+}
+.ctrl {
+  flex: 1; background: var(--s1); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--r1);
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  padding: 6px 4px; cursor: pointer; min-height: 54px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; line-height: 1.2;
+  transition: all var(--t1);
+}
+.ctrl:active { background: var(--s2); transform: translateY(2px); }
+.ctrl-icon { font-size: 18px; }
+.ctrl-lbl { font-size: 11px; color: var(--muted); }
+.ctrl.mic-on {
+  background: var(--ca); color: #fff; border-color: var(--ca);
+  animation: micPulse 1.3s ease-in-out infinite;
+}
+.ctrl.mic-on .ctrl-lbl { color: rgba(255,255,255,0.8); }
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 0 var(--ga); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+.ctrl.danger { color: var(--danger); border-color: rgba(255,23,68,0.25); }
+.ctrl.danger:active { background: rgba(255,23,68,0.1); }
 
-    /* Top bar */
-    .game-topbar {
-      width: 100%;
-      background: var(--navy-mid);
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 8px;
-      height: 50px;
-      flex-shrink: 0;
-    }
-    .topbar-info {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.06em;
-      text-align: center;
-    }
-    .topbar-gametype {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 14px;
-      color: var(--orange);
-      letter-spacing: 0.1em;
-    }
-    .btn-topbar-mic {
-      background: transparent;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      transition: background var(--t);
-    }
-    .btn-topbar-mic:active { background: rgba(255,255,255,0.08); }
-    .btn-topbar-mic.mic-on { animation: topMicPulse 1.5s ease-in-out infinite; }
-    @keyframes topMicPulse {
-      0%, 100% { filter: drop-shadow(0 0 0px var(--orange)); }
-      50%       { filter: drop-shadow(0 0 6px var(--orange)); }
-    }
+/* Voice panel */
+.voice-panel {
+  width: 100%; padding: 0 12px 8px; flex-shrink: 0;
+}
+.voice-inner {
+  background: rgba(255,87,34,0.08); border: 1px solid rgba(255,87,34,0.3);
+  border-radius: var(--r2); padding: 12px 16px;
+}
+#v-heard { font-size: 12px; color: var(--muted); min-height: 16px; margin-bottom: 2px; }
+#v-action { font-size: 14px; font-weight: 700; color: var(--ca); min-height: 20px; }
+.voice-hint { font-size: 11px; color: var(--muted2); margin-top: 6px; line-height: 1.5; }
 
-    /* Game Point Banner */
-    .game-point-banner {
-      width: 100%;
-      background: linear-gradient(90deg, var(--orange), var(--orange-dark));
-      color: var(--navy);
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(17px, 4vw, 24px);
-      letter-spacing: 0.14em;
-      text-align: center;
-      padding: 9px;
-      animation: pulseBar 0.8s ease-in-out infinite alternate;
-      flex-shrink: 0;
-    }
-    @keyframes pulseBar {
-      from { opacity: 0.85; }
-      to   { opacity: 1; }
-    }
+/* Event feed */
+.feed-wrap {
+  width: 100%; flex: 1; min-height: 0;
+  display: flex; flex-direction: column; padding: 0 12px 16px; overflow: hidden;
+}
+.feed-head {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 0 8px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.feed-list {
+  list-style: none; overflow-y: auto; flex: 1;
+  display: flex; flex-direction: column; gap: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.feed-entry {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; background: var(--s1); border-radius: 8px;
+  font-size: 14px; animation: feSlide 0.2s ease;
+}
+@keyframes feSlide { from { opacity:0; transform: translateY(-5px); } to { opacity:1; transform: translateY(0); } }
+.fe-q { font-size: 10px; color: var(--muted2); font-weight: 700; letter-spacing: 0.08em; min-width: 22px; }
+.fe-team { flex: 1; font-weight: 700; }
+.fe-pts { font-family: 'Bebas Neue', sans-serif; font-size: 20px; }
+.fe-run { font-size: 13px; color: var(--gold); }
+.feed-divider {
+  text-align: center; font-size: 11px; color: var(--muted2);
+  letter-spacing: 0.1em; padding: 6px 0; font-weight: 700;
+}
+.feed-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 16px 0; }
 
-    /* Scoreboard */
-    #scoreboard {
-      display: grid;
-      grid-template-columns: 1fr 50px 1fr;
-      width: 100%;
-      flex-shrink: 0;
-    }
+/* ── POST-GAME OVERLAY ──────────────────────────────────────────── */
+.pg-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: radial-gradient(ellipse at center, #1a1a30 0%, var(--bg) 70%);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; overflow-y: auto; padding: 0 20px 40px;
+}
+.pg-nav {
+  width: 100%; display: flex; align-items: center; padding: 10px 0;
+  flex-shrink: 0;
+}
+.confetti-wrap {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.cp { position: absolute; top: -20px; border-radius: 2px; animation: cpFall linear forwards; }
+@keyframes cpFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+.pg-card {
+  background: var(--s1); border: 2px solid var(--gold); border-radius: var(--r4);
+  padding: 40px 28px 32px; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 80px rgba(255,179,0,0.2);
+  max-width: 420px; width: 100%; z-index: 1; position: relative;
+  animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  margin-top: 8px;
+}
+@keyframes bounceIn { from { opacity:0; transform: scale(0.7); } to { opacity:1; transform: scale(1); } }
+.pg-trophy { font-size: 60px; margin-bottom: 10px; }
+.pg-winner {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(34px, 10vw, 56px); color: var(--gold); letter-spacing: 0.04em; line-height: 1.1;
+}
+.pg-wins {
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+  color: var(--ca); letter-spacing: 0.2em; margin-bottom: 14px;
+}
+.pg-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 7vw, 44px); color: var(--text); margin-bottom: 6px;
+}
+.pg-meta { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 20px; }
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 24px;
+}
+.stat-cell {
+  background: var(--s2); border-radius: var(--r1);
+  padding: 12px; text-align: center;
+}
+.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); }
+.stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+.pg-actions { display: flex; flex-direction: column; gap: 10px; }
+.btn-pg-share {
+  background: linear-gradient(135deg, var(--ca), color-mix(in srgb, var(--ca) 70%, #fff));
+  color: #fff; border: none; border-radius: var(--r2);
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em;
+  padding: 18px; cursor: pointer; min-height: 60px;
+  box-shadow: 0 6px 24px var(--ga);
+  transition: transform var(--t1);
+}
+.btn-pg-share:active { transform: translateY(3px); }
+.btn-pg-2 {
+  background: var(--s2); color: var(--text); border: 1px solid var(--border);
+  border-radius: var(--r2); font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 700; padding: 14px; cursor: pointer; min-height: 52px;
+  transition: background var(--t1);
+}
+.btn-pg-2:active { background: var(--s3); }
 
-    .team-panel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px 10px 12px;
-      gap: 6px;
-      transition: box-shadow var(--t);
-    }
-    .team-panel.leading      { box-shadow: inset 0 -4px 0 var(--gold); }
-    .team-panel.leading .team-score {
-      color: var(--gold);
-      text-shadow: 0 0 24px var(--gold-glow);
-    }
-
-    .team-name {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(17px, 4.5vw, 26px);
-      letter-spacing: 0.06em;
-      text-align: center;
-      color: var(--white);
-      line-height: 1.1;
-      word-break: break-word;
-    }
-
-    .team-score {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(72px, 19vw, 120px);
-      line-height: 1;
-      color: var(--white);
-      transition: color 0.25s, text-shadow 0.25s;
-    }
-
-    /* Score buttons — horizontal row, big touch targets */
-    .score-buttons {
-      display: flex;
-      flex-direction: row;
-      gap: 6px;
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    .btn-score {
-      flex: 1;
-      background: var(--navy-light);
-      color: var(--white);
-      border: 2px solid rgba(255,107,53,0.4);
-      border-radius: var(--radius-sm);
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(22px, 5.5vw, 30px);
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      box-shadow: var(--shadow-btn);
-      transition: transform var(--t), box-shadow var(--t), background var(--t);
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-score:active { transform: translateY(5px); box-shadow: 0 0 0 rgba(0,0,0,0.4); }
-    .btn-score.pts-flash { background: var(--orange); color: var(--navy); border-color: var(--orange); }
-
-    /* Center column */
-    #vs-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border-left: 1px solid rgba(255,255,255,0.07);
-      border-right: 1px solid rgba(255,255,255,0.07);
-    }
-    .vs-text {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 14px;
-      color: rgba(255,255,255,0.2);
-      letter-spacing: 0.1em;
-    }
-    .lead-arrow {
-      font-size: 22px;
-      color: var(--gold);
-      transition: opacity 0.3s;
-    }
-
-    /* Status bar */
-    #status-bar {
-      width: 100%;
-      background: var(--navy-mid);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 10px 16px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      min-height: 42px;
-      flex-shrink: 0;
-    }
-    #status-bar.leading-msg { color: var(--gold); }
-
-    /* Action row */
-    #action-row {
-      display: flex;
-      gap: 10px;
-      padding: 10px 14px;
-      width: 100%;
-      flex-shrink: 0;
-    }
-
-    .btn-action {
-      flex: 1;
-      background: var(--navy-mid);
-      color: var(--white);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius-sm);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 0 8px;
-      cursor: pointer;
-      transition: all var(--t);
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 2px;
-      line-height: 1.2;
-    }
-    .btn-action:active { transform: translateY(2px); opacity: 0.85; }
-
-    .btn-voice-off { color: var(--muted); }
-    .btn-voice-on  {
-      background: var(--orange);
-      color: var(--navy);
-      border-color: var(--orange);
-      animation: micPulse 1.3s ease-in-out infinite;
-    }
-    @keyframes micPulse {
-      0%, 100% { box-shadow: 0 0 0 0 var(--orange-glow); }
-      50%       { box-shadow: 0 0 0 8px transparent; }
-    }
-
-    .btn-danger { color: var(--danger); border-color: rgba(229,57,53,0.25); }
-    .btn-action-icon { font-size: 18px; }
-    .btn-action-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
-
-    /* Voice card */
-    #voice-card {
-      width: 100%;
-      padding: 0 14px 10px;
-      flex-shrink: 0;
-    }
-    .voice-inner {
-      background: rgba(255,107,53,0.09);
-      border: 1px solid rgba(255,107,53,0.35);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-    }
-    #voice-heard  {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 3px;
-      min-height: 16px;
-    }
-    #voice-action {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--orange);
-      min-height: 20px;
-    }
-    .voice-hint {
-      font-size: 11px;
-      color: rgba(255,255,255,0.25);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-
-    /* History */
-    #history-panel {
-      width: 100%;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 0 14px 16px;
-      min-height: 0;
-      overflow: hidden;
-    }
-    .history-header {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 10px 0 8px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      flex-shrink: 0;
-    }
-    .history-list {
-      list-style: none;
-      overflow-y: auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .history-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      background: rgba(255,255,255,0.035);
-      border-radius: 8px;
-      font-size: 14px;
-      animation: slideIn 0.2s ease;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .h-team { flex: 1; font-weight: 600; }
-    .h-pts  { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); }
-    .h-new  { font-size: 9px; color: var(--orange); font-weight: 700; letter-spacing: 0.08em; }
-    .history-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 16px 0; }
-
-    /* ════════════════════════════════════════════════════════════════
-       SCREEN 3: WINNER
-    ════════════════════════════════════════════════════════════════ */
-    #screen-winner {
-      background: radial-gradient(ellipse at center, #1e1e3c 0%, var(--navy) 70%);
-      justify-content: flex-start;
-      align-items: center;
-      padding: 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .winner-topbar {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 6px 8px;
-      flex-shrink: 0;
-      z-index: 2;
-      position: relative;
-    }
-
-    .confetti-container {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .confetti-piece {
-      position: absolute;
-      top: -20px;
-      border-radius: 2px;
-      animation: confettiFall linear forwards;
-    }
-    @keyframes confettiFall {
-      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-      80%  { opacity: 1; }
-      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-    }
-
-    .winner-content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 1;
-      position: relative;
-      width: 100%;
-    }
-
-    #winner-card {
-      background: var(--navy-mid);
-      border: 3px solid var(--gold);
-      border-radius: var(--radius-xl);
-      padding: 40px 28px 32px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 80px var(--gold-glow);
-      max-width: 400px;
-      width: 100%;
-      animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes bounceIn {
-      from { opacity: 0; transform: scale(0.7); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
-    .winner-trophy   { font-size: 64px; line-height: 1; margin-bottom: 10px; }
-    .winner-name     {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(34px, 10vw, 56px);
-      color: var(--gold);
-      letter-spacing: 0.04em;
-      line-height: 1.1;
-    }
-    .winner-subtitle {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: 20px;
-      color: var(--orange);
-      letter-spacing: 0.2em;
-      margin-bottom: 14px;
-    }
-    .winner-score {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(26px, 7vw, 42px);
-      color: var(--white);
-      margin-bottom: 6px;
-    }
-    .winner-meta    { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 28px; }
-    .winner-actions { display: flex; flex-direction: column; gap: 10px; }
-
-    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
-    @media (max-width: 360px) {
-      .team-score { font-size: 64px; }
-      .btn-score  { min-height: 62px; }
-      .game-topbar { height: 46px; }
-    }
-    @media (max-height: 700px) {
-      .team-score { font-size: 68px; }
-      .btn-score  { min-height: 60px; }
-      .team-panel { padding: 10px 8px 8px; gap: 4px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
-    }
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .t-score { font-size: 68px; }
+  .btn-score { min-height: 68px; }
+  .vs-col { display: none; }
+  .scoreboard { grid-template-columns: 1fr 1fr; }
+}
+@media (max-height: 700px) {
+  .t-score { font-size: 64px; }
+  .btn-score { min-height: 66px; }
+  .team-panel { padding: 10px 8px 8px; }
+  .score-pad { padding: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:0s!important; transition-duration:0s!important; }
+}
   </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 1: SETUP
-════════════════════════════════════════════════════════ -->
-<div id="screen-setup" class="screen active">
-  <div class="app-header">
-    <div class="app-logo">🏀</div>
-    <h1 class="app-title">Pickup Scorekeeper</h1>
-    <p class="app-subtitle">No login · No install · Just play</p>
+<!-- ════════════ SCREEN: HUB ════════════ -->
+<div id="s-hub" class="screen active">
+  <div class="hub-logo">
+    <span class="hub-ball">🏀</span>
+    <div class="hub-title">CourtCall</div>
+    <div class="hub-sub">Your pickup game, tracked.</div>
   </div>
-
-  <div class="setup-form">
-
-    <section class="setup-section">
-      <label class="section-label">Game Type</label>
-      <div class="chip-group" id="chips-game-type">
-        <button class="chip selected" data-value="3v3" onclick="selectChip('chips-game-type','3v3',this)">3-on-3</button>
-        <button class="chip" data-value="4v4" onclick="selectChip('chips-game-type','4v4',this)">4-on-4</button>
-        <button class="chip" data-value="5v5" onclick="selectChip('chips-game-type','5v5',this)">5-on-5</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-game-type','custom',this)">Custom</button>
-      </div>
-    </section>
-
-    <section class="setup-section">
-      <label class="section-label">Team Names</label>
-      <div class="team-name-row">
-        <input id="input-team-a" class="team-name-input" type="text" maxlength="14" placeholder="Team A" autocomplete="off">
-        <span class="vs-label">VS</span>
-        <input id="input-team-b" class="team-name-input" type="text" maxlength="14" placeholder="Team B" autocomplete="off">
-      </div>
-    </section>
-
-    <section class="setup-section">
-      <label class="section-label">Win Score</label>
-      <div class="chip-group" id="chips-win-score">
-        <button class="chip" data-value="11" onclick="selectChip('chips-win-score','11',this)">11</button>
-        <button class="chip" data-value="15" onclick="selectChip('chips-win-score','15',this)">15</button>
-        <button class="chip selected" data-value="21" onclick="selectChip('chips-win-score','21',this)">21</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-win-score','custom',this);toggleWinCustom()">Custom</button>
-      </div>
-      <input id="input-win-custom" class="custom-number-input hidden" type="number" min="2" max="999" placeholder="e.g. 30">
-    </section>
-
-    <section class="setup-section">
-      <label class="section-label">Scoring Rule</label>
-      <div class="chip-group" id="chips-scoring">
-        <button class="chip selected" data-value="1s2s" onclick="selectChip('chips-scoring','1s2s',this);updateScoringUI()">1s &amp; 2s</button>
-        <button class="chip" data-value="2s3s" onclick="selectChip('chips-scoring','2s3s',this);updateScoringUI()">2s &amp; 3s</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-scoring','custom',this);updateScoringUI()">Custom</button>
-      </div>
-      <div id="custom-scoring-form" class="hidden" style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <label style="font-size:13px;color:var(--muted);flex:1;">Small basket</label>
-          <input id="input-pts-small" type="number" min="1" max="9" value="1" class="custom-number-input" style="width:80px;margin:0;">
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <label style="font-size:13px;color:var(--muted);flex:1;">Large basket</label>
-          <input id="input-pts-large" type="number" min="1" max="9" value="2" class="custom-number-input" style="width:80px;margin:0;">
-        </div>
-      </div>
-    </section>
-
+  <div class="hub-cta">
+    <button class="btn-cta-primary" onclick="goSetup()">▶ &nbsp;START GAME</button>
+    <button class="btn-cta-secondary" id="btn-hub-resume" onclick="handleResume()" style="display:none">↩ &nbsp;Resume Last Game</button>
   </div>
-
-  <div class="setup-actions">
-    <button class="btn-primary" onclick="handleStartGame()">Start Game</button>
-    <button id="btn-resume" class="btn-secondary hidden" onclick="handleResume()">▶ Resume Last Game</button>
+  <div class="recent-section">
+    <div class="recent-title">Recent Games</div>
+    <div class="recent-list" id="recent-list"></div>
   </div>
 </div>
 
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 2: GAME
-════════════════════════════════════════════════════════ -->
-<div id="screen-game" class="screen">
+<!-- ════════════ SCREEN: SETUP ════════════ -->
+<div id="s-setup" class="screen">
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+    <div class="setup-nav">
+      <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
+    </div>
+    <div class="setup-head">New Game</div>
+    <div class="setup-form">
 
-  <!-- Top bar -->
-  <div class="game-topbar">
+      <div class="setup-sec">
+        <span class="sec-label">Game Type</span>
+        <div class="chip-row" id="cr-type">
+          <button class="chip on" data-v="3v3" onclick="pickChip('cr-type',this)">3-on-3</button>
+          <button class="chip" data-v="4v4" onclick="pickChip('cr-type',this)">4-on-4</button>
+          <button class="chip" data-v="5v5" onclick="pickChip('cr-type',this)">5-on-5</button>
+          <button class="chip" data-v="custom" onclick="pickChip('cr-type',this)">Custom</button>
+        </div>
+      </div>
+
+      <div class="setup-sec">
+        <span class="sec-label">Teams</span>
+        <div class="team-row">
+          <div class="team-col">
+            <input id="inp-a" class="team-input" type="text" maxlength="14" placeholder="Team A" autocomplete="off">
+            <div class="color-row" id="cr-ca">
+              <button class="color-dot on" data-k="orange" style="background:#FF5722" onclick="pickColor('a','orange',this)"></button>
+              <button class="color-dot" data-k="red"    style="background:#F44336" onclick="pickColor('a','red',this)"></button>
+              <button class="color-dot" data-k="green"  style="background:#43A047" onclick="pickColor('a','green',this)"></button>
+              <button class="color-dot" data-k="purple" style="background:#9C27B0" onclick="pickColor('a','purple',this)"></button>
+            </div>
+          </div>
+          <div class="vs-sep">VS</div>
+          <div class="team-col">
+            <input id="inp-b" class="team-input" type="text" maxlength="14" placeholder="Team B" autocomplete="off">
+            <div class="color-row" id="cr-cb">
+              <button class="color-dot on" data-k="blue" style="background:#2979FF" onclick="pickColor('b','blue',this)"></button>
+              <button class="color-dot" data-k="teal" style="background:#00BCD4" onclick="pickColor('b','teal',this)"></button>
+              <button class="color-dot" data-k="gold" style="background:#FFB300" onclick="pickColor('b','gold',this)"></button>
+              <button class="color-dot" data-k="pink" style="background:#E91E63" onclick="pickColor('b','pink',this)"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-sec">
+        <span class="sec-label">Win Score</span>
+        <div class="chip-row" id="cr-win">
+          <button class="chip" data-v="11" onclick="pickChip('cr-win',this)">11</button>
+          <button class="chip" data-v="15" onclick="pickChip('cr-win',this)">15</button>
+          <button class="chip on" data-v="21" onclick="pickChip('cr-win',this)">21</button>
+          <button class="chip" data-v="custom" onclick="pickChip('cr-win',this);toggleCustomWin()">Custom</button>
+        </div>
+        <input id="inp-win" class="custom-input" type="number" min="2" max="999" placeholder="e.g. 30">
+      </div>
+
+      <div class="setup-sec">
+        <span class="sec-label">Scoring Rule</span>
+        <div class="chip-row" id="cr-rule">
+          <button class="chip on" data-v="1s2s" onclick="pickChip('cr-rule',this);updateRule()">1s &amp; 2s</button>
+          <button class="chip" data-v="2s3s" onclick="pickChip('cr-rule',this);updateRule()">2s &amp; 3s</button>
+          <button class="chip" data-v="custom" onclick="pickChip('cr-rule',this);updateRule()">Custom</button>
+        </div>
+        <div id="custom-rule-form" style="display:none;margin-top:12px;display:none;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:13px;color:var(--muted);flex:1;">Small basket</label>
+            <input id="inp-sm" type="number" min="1" max="9" value="1" class="custom-input show" style="width:80px;margin:0;">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:13px;color:var(--muted);flex:1;">Large basket</label>
+            <input id="inp-lg" type="number" min="1" max="9" value="2" class="custom-input show" style="width:80px;margin:0;">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="setup-actions">
+      <button class="btn-start" onclick="handleStartGame()">Start Game</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════ SCREEN: GAME ════════════ -->
+<div id="s-game" class="screen">
+
+  <div class="game-nav">
     <button class="btn-back" onclick="handleBackFromGame()">← Setup</button>
-    <div class="topbar-info">
-      <span class="topbar-gametype" id="topbar-gametype">3v3</span>
-      <span id="topbar-target" style="font-size:11px;">First to 21</span>
-    </div>
-    <button class="btn-topbar-mic" id="btn-topbar-mic" onclick="toggleVoice()" title="Voice scoring">🎤</button>
+    <button class="q-chip" id="q-chip" onclick="nextQuarter()">
+      <span class="q-dot"></span>
+      <span id="q-label">Q1</span>
+    </button>
+    <button class="nav-mic" id="nav-mic" onclick="toggleVoice()">🎤</button>
   </div>
 
-  <!-- Game Point Banner -->
-  <div id="banner-game-point" class="game-point-banner hidden"></div>
+  <div class="momentum-bar">
+    <div class="m-fill-a" id="m-fill-a" style="width:50%"></div>
+    <div class="m-fill-b" id="m-fill-b"></div>
+  </div>
 
-  <!-- Scoreboard -->
-  <div id="scoreboard">
+  <div class="run-banner hidden" id="run-banner"></div>
 
-    <div id="team-a-panel" class="team-panel">
-      <div id="team-a-name" class="team-name">Team A</div>
-      <div id="team-a-score" class="team-score">0</div>
-      <div class="score-buttons" id="score-btns-a"></div>
+  <div class="scoreboard" id="scoreboard">
+    <div class="team-panel" id="tp-a" data-t="a">
+      <div class="t-name" id="t-name-a">Team A</div>
+      <div class="t-score" id="t-score-a">0</div>
+      <div class="t-meta">
+        <span class="foul-badge" id="foul-a" onclick="addFoul('a')">F: 0</span>
+      </div>
     </div>
-
-    <div id="vs-col">
+    <div class="vs-col">
       <span class="vs-text">VS</span>
-      <span class="lead-arrow" id="lead-arrow">—</span>
+      <button class="poss-btn" id="poss-btn" onclick="togglePossession()">◀</button>
     </div>
-
-    <div id="team-b-panel" class="team-panel">
-      <div id="team-b-name" class="team-name">Team B</div>
-      <div id="team-b-score" class="team-score">0</div>
-      <div class="score-buttons" id="score-btns-b"></div>
-    </div>
-
-  </div>
-
-  <!-- Status bar -->
-  <div id="status-bar">—</div>
-
-  <!-- Action row -->
-  <div id="action-row">
-    <button id="btn-undo" class="btn-action" onclick="undoLastScore()">
-      <span class="btn-action-icon">↩</span>
-      <span class="btn-action-label">Undo</span>
-    </button>
-    <button id="btn-voice" class="btn-action btn-voice-off" onclick="toggleVoice()">
-      <span class="btn-action-icon" id="mic-icon">🎤</span>
-      <span class="btn-action-label" id="mic-label">Mic Off</span>
-    </button>
-    <button class="btn-action btn-danger" onclick="handleEndGame()">
-      <span class="btn-action-icon">🏁</span>
-      <span class="btn-action-label">End Game</span>
-    </button>
-  </div>
-
-  <!-- Voice card (shown when mic is on) -->
-  <div id="voice-card" class="hidden">
-    <div class="voice-inner">
-      <div id="voice-heard"></div>
-      <div id="voice-action">🎤 Listening… say a command</div>
-      <div class="voice-hint">
-        Try: "Team A two" · "Nets scores three" · "Undo" · "Score check"
+    <div class="team-panel" id="tp-b" data-t="b">
+      <div class="t-name" id="t-name-b">Team B</div>
+      <div class="t-score" id="t-score-b">0</div>
+      <div class="t-meta">
+        <span class="foul-badge" id="foul-b" onclick="addFoul('b')">F: 0</span>
       </div>
     </div>
   </div>
 
-  <!-- History -->
-  <div id="history-panel">
-    <div class="history-header">Score History</div>
-    <ul id="history-list" class="history-list">
-      <li class="history-empty">No scores yet</li>
+  <div class="game-status" id="game-status">—</div>
+
+  <div class="score-zone" id="score-zone">
+    <div class="score-pad" id="pad-a" data-t="a"></div>
+    <div class="score-zone-divider"></div>
+    <div class="score-pad" id="pad-b" data-t="b"></div>
+  </div>
+
+  <div class="controls-bar">
+    <button class="ctrl" id="ctrl-undo" onclick="undoScore()">
+      <span class="ctrl-icon">↩</span><span class="ctrl-lbl">Undo</span>
+    </button>
+    <button class="ctrl" id="ctrl-mic" onclick="toggleVoice()">
+      <span class="ctrl-icon" id="mic-icon">🎤</span><span class="ctrl-lbl" id="mic-lbl">Mic Off</span>
+    </button>
+    <button class="ctrl" onclick="addFoul('a')" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)">
+      <span class="ctrl-icon">➕</span><span class="ctrl-lbl">Foul A</span>
+    </button>
+    <button class="ctrl" onclick="addFoul('b')" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)">
+      <span class="ctrl-icon">➕</span><span class="ctrl-lbl">Foul B</span>
+    </button>
+    <button class="ctrl danger" onclick="handleEndGame()">
+      <span class="ctrl-icon">🏁</span><span class="ctrl-lbl">End</span>
+    </button>
+  </div>
+
+  <div class="voice-panel hidden" id="voice-panel">
+    <div class="voice-inner">
+      <div id="v-heard"></div>
+      <div id="v-action">🎤 Listening… say a command</div>
+      <div class="voice-hint">Try: "Blazers two" · "Team B scores three" · "Undo" · "Score check" · "Next quarter"</div>
+    </div>
+  </div>
+
+  <div class="feed-wrap">
+    <div class="feed-head">Live Feed</div>
+    <ul class="feed-list" id="feed-list">
+      <li class="feed-empty">Game starts when first point is scored</li>
     </ul>
   </div>
 
 </div>
 
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 3: WINNER
-════════════════════════════════════════════════════════ -->
-<div id="screen-winner" class="screen">
-
-  <div class="winner-topbar">
-    <button class="btn-back" onclick="handleNewSetup()">← New Game</button>
+<!-- ════════════ POST-GAME OVERLAY ════════════ -->
+<div class="pg-overlay hidden" id="pg-overlay">
+  <div class="confetti-wrap" id="pg-confetti"></div>
+  <div class="pg-nav">
+    <button class="btn-back" onclick="closePG()">← Back</button>
   </div>
-
-  <div class="confetti-container" id="winner-confetti"></div>
-
-  <div class="winner-content">
-    <div id="winner-card">
-      <div class="winner-trophy">🏆</div>
-      <div class="winner-name" id="winner-team-name"></div>
-      <div class="winner-subtitle">WINS!</div>
-      <div class="winner-score" id="winner-final-score"></div>
-      <div class="winner-meta" id="winner-meta"></div>
-      <div class="winner-actions">
-        <button id="btn-play-again" class="btn-primary" onclick="handlePlayAgain()">Play Again</button>
-        <button class="btn-secondary" onclick="handleNewSetup()">Change Settings</button>
-      </div>
+  <div class="pg-card" id="pg-card">
+    <div class="pg-trophy">🏆</div>
+    <div class="pg-winner" id="pg-winner"></div>
+    <div class="pg-wins">WINS!</div>
+    <div class="pg-score" id="pg-score"></div>
+    <div class="pg-meta" id="pg-meta"></div>
+    <div class="stats-grid">
+      <div class="stat-cell"><div class="stat-val" id="st-dur">—</div><div class="stat-lbl">Duration</div></div>
+      <div class="stat-cell"><div class="stat-val" id="st-lead">—</div><div class="stat-lbl">Biggest Lead</div></div>
+      <div class="stat-cell"><div class="stat-val" id="st-fa">0</div><div class="stat-lbl" id="st-fa-lbl">Fouls A</div></div>
+      <div class="stat-cell"><div class="stat-val" id="st-fb">0</div><div class="stat-lbl" id="st-fb-lbl">Fouls B</div></div>
+    </div>
+    <div class="pg-actions">
+      <button class="btn-pg-share" onclick="shareScore()">📤 &nbsp;Share Score</button>
+      <button class="btn-pg-2" onclick="playAgain()">▶ Play Again</button>
+      <button class="btn-pg-2" onclick="newGame()">⚙ New Game</button>
     </div>
   </div>
-
 </div>
 
 
 <script>
-/* ════════════════════════════════════════════════════════════
-   PICKUP SCOREKEEPER
-   Screens: setup → game → winner
-   Voice: new SpeechRecognition instance on every startListening()
-          to avoid the InvalidStateError / silent-fail on restart.
-════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════
+   CourtCall — sports-grade pickup basketball tracker
+   v2: team colors · momentum · run detection · quarters ·
+       fouls · possession · post-game stats · share
+════════════════════════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'pickup_scorekeeper_v2';
+/* ── CONSTANTS ──────────────────────────────────────────────── */
+const STATE_KEY   = 'courtcall_v1';
+const HISTORY_KEY = 'courtcall_games';
 
-/* ── STATE ──────────────────────────────────────────────── */
-let state = {
-  gameType:    '3v3',
-  teamA:       { name: 'Team A', score: 0 },
-  teamB:       { name: 'Team B', score: 0 },
-  winScore:    21,
-  ptsSmall:    1,
-  ptsLarge:    2,
-  history:     [],
-  voiceActive: false,
-  gameOver:    false,
+const COLORS = {
+  orange: { hex: '#FF5722', glow: 'rgba(255,87,34,0.35)' },
+  red:    { hex: '#F44336', glow: 'rgba(244,67,54,0.35)' },
+  green:  { hex: '#43A047', glow: 'rgba(67,160,71,0.35)' },
+  purple: { hex: '#9C27B0', glow: 'rgba(156,39,176,0.35)' },
+  blue:   { hex: '#2979FF', glow: 'rgba(41,121,255,0.35)' },
+  teal:   { hex: '#00BCD4', glow: 'rgba(0,188,212,0.35)' },
+  gold:   { hex: '#FFB300', glow: 'rgba(255,179,0,0.35)' },
+  pink:   { hex: '#E91E63', glow: 'rgba(233,30,99,0.35)' },
 };
 
-/* ── PERSISTENCE ────────────────────────────────────────── */
-function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, voiceActive: false })); } catch (_) {}
-}
-function loadState() {
-  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch (_) { return null; }
-}
-function clearState() { localStorage.removeItem(STORAGE_KEY); }
+const QUARTERS = [1, 2, 3, 4, 'OT'];
 
-/* ── NAVIGATION ─────────────────────────────────────────── */
+/* ── STATE ──────────────────────────────────────────────────── */
+let state = freshState();
+
+function freshState() {
+  return {
+    gameType: '3v3', winScore: 21, ptsSmall: 1, ptsLarge: 2,
+    teamA: { name: 'Team A', score: 0, fouls: 0, colorKey: 'orange' },
+    teamB: { name: 'Team B', score: 0, fouls: 0, colorKey: 'blue' },
+    quarter: 1, possession: 'a',
+    history: [],   // { team, pts, quarter }
+    maxLead: { a: 0, b: 0 },
+    voiceActive: false, gameOver: false, startTime: null,
+  };
+}
+
+/* ── PERSISTENCE ────────────────────────────────────────────── */
+function save() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify({ ...state, voiceActive: false })); } catch (_) {}
+}
+function load() {
+  try { const r = localStorage.getItem(STATE_KEY); return r ? JSON.parse(r) : null; } catch (_) { return null; }
+}
+function clearSave() { localStorage.removeItem(STATE_KEY); }
+
+function saveToHistory(entry) {
+  try {
+    const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    list.unshift(entry);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, 5)));
+  } catch (_) {}
+}
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (_) { return []; }
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
 function showScreen(name) {
-  ['setup', 'game', 'winner'].forEach(s => {
-    const el = document.getElementById(`screen-${s}`);
-    el.classList.toggle('active', s === name);
-    el.classList.toggle('hidden', s !== name);
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.toggle('active', s.id === `s-${name}`);
+    s.classList.toggle('hidden', s.id !== `s-${name}`);
   });
 }
 
-/* ── SETUP ──────────────────────────────────────────────── */
-let chips = { 'chips-game-type': '3v3', 'chips-win-score': '21', 'chips-scoring': '1s2s' };
+/* ── HUB ────────────────────────────────────────────────────── */
+function renderHub() {
+  const saved  = load();
+  const canRes = saved && !saved.gameOver && saved.history && saved.history.length > 0;
+  document.getElementById('btn-hub-resume').style.display = canRes ? 'block' : 'none';
 
-function selectChip(groupId, value, el) {
-  chips[groupId] = value;
-  document.querySelectorAll(`#${groupId} .chip`).forEach(c =>
-    c.classList.toggle('selected', c.dataset.value === value)
-  );
-}
-
-function toggleWinCustom() {
-  const inp = document.getElementById('input-win-custom');
-  const on  = chips['chips-win-score'] === 'custom';
-  inp.classList.toggle('hidden', !on);
-  if (on) inp.focus();
-}
-
-function updateScoringUI() {
-  document.getElementById('custom-scoring-form')
-    .classList.toggle('hidden', chips['chips-scoring'] !== 'custom');
-}
-
-function handleStartGame() {
-  const nameA = document.getElementById('input-team-a').value.trim() || 'Team A';
-  const nameB = document.getElementById('input-team-b').value.trim() || 'Team B';
-
-  let winScore = parseInt(chips['chips-win-score'], 10);
-  if (chips['chips-win-score'] === 'custom')
-    winScore = parseInt(document.getElementById('input-win-custom').value, 10) || 21;
-
-  let ptsSmall = 1, ptsLarge = 2;
-  if (chips['chips-scoring'] === '2s3s')    { ptsSmall = 2; ptsLarge = 3; }
-  if (chips['chips-scoring'] === 'custom') {
-    ptsSmall = parseInt(document.getElementById('input-pts-small').value, 10) || 1;
-    ptsLarge = parseInt(document.getElementById('input-pts-large').value, 10) || 2;
+  const games = loadHistory();
+  const list  = document.getElementById('recent-list');
+  if (!games.length) {
+    list.innerHTML = '<div class="recent-empty">No games yet — start your first game!</div>';
+    return;
   }
+  list.innerHTML = games.map(g => `
+    <div class="recent-card" onclick="rematch(${escAttr(g)})">
+      <div>
+        <div class="rc-teams">
+          <span>${escHtml(g.winner)}</span>
+          <span style="color:var(--muted2)">vs</span>
+          <span>${escHtml(g.loser)}</span>
+        </div>
+        <div class="rc-meta">${g.gameType} · First to ${g.winScore}</div>
+      </div>
+      <div class="rc-right">
+        <div class="rc-score">${g.scoreW}–${g.scoreL}</div>
+        <div class="rc-meta">${g.date}</div>
+      </div>
+    </div>`).join('');
+}
 
-  state = { gameType: chips['chips-game-type'], teamA: { name: nameA, score: 0 },
-            teamB: { name: nameB, score: 0 }, winScore, ptsSmall, ptsLarge,
-            history: [], voiceActive: false, gameOver: false };
-  saveState();
-  renderGame();
-  showScreen('game');
+function escAttr(g) {
+  return `'${JSON.stringify(g).replace(/'/g, "\\'")}'`;
+}
+
+function rematch(g) {
+  document.getElementById('inp-a').value  = g.nameA || g.winner;
+  document.getElementById('inp-b').value  = g.nameB || g.loser;
+  goSetup();
+}
+
+function goSetup() {
+  applySetupColors();
+  showScreen('setup');
 }
 
 function handleResume() {
-  const saved = loadState();
+  const saved = load();
   if (!saved) return;
   Object.assign(state, saved);
   state.voiceActive = false;
+  applyTeamColors();
   renderGame();
   showScreen('game');
+}
+
+/* ── SETUP HELPERS ──────────────────────────────────────────── */
+let cx = { 'cr-type': '3v3', 'cr-win': '21', 'cr-rule': '1s2s' };
+let teamColors = { a: 'orange', b: 'blue' };
+
+function pickChip(rowId, btn) {
+  cx[rowId] = btn.dataset.v;
+  document.querySelectorAll(`#${rowId} .chip`).forEach(c => c.classList.toggle('on', c === btn));
+}
+
+function pickColor(team, key, btn) {
+  teamColors[team] = key;
+  const rowId = `cr-c${team}`;
+  document.querySelectorAll(`#${rowId} .color-dot`).forEach(d => d.classList.toggle('on', d === btn));
+  applySetupColors();
+}
+
+function applySetupColors() {
+  const ca = COLORS[teamColors.a] || COLORS.orange;
+  const cb = COLORS[teamColors.b] || COLORS.blue;
+  document.documentElement.style.setProperty('--ca', ca.hex);
+  document.documentElement.style.setProperty('--ga', ca.glow);
+  document.documentElement.style.setProperty('--cb', cb.hex);
+  document.documentElement.style.setProperty('--gb', cb.glow);
+}
+
+function toggleCustomWin() {
+  const inp = document.getElementById('inp-win');
+  inp.classList.toggle('show', cx['cr-win'] === 'custom');
+  if (cx['cr-win'] === 'custom') inp.focus();
+}
+
+function updateRule() {
+  const f = document.getElementById('custom-rule-form');
+  f.style.display = cx['cr-rule'] === 'custom' ? 'flex' : 'none';
+}
+
+function handleStartGame() {
+  const nameA = document.getElementById('inp-a').value.trim() || 'Team A';
+  const nameB = document.getElementById('inp-b').value.trim() || 'Team B';
+
+  let winScore = parseInt(cx['cr-win'], 10);
+  if (cx['cr-win'] === 'custom') winScore = parseInt(document.getElementById('inp-win').value, 10) || 21;
+
+  let ptsSmall = 1, ptsLarge = 2;
+  if (cx['cr-rule'] === '2s3s') { ptsSmall = 2; ptsLarge = 3; }
+  if (cx['cr-rule'] === 'custom') {
+    ptsSmall = parseInt(document.getElementById('inp-sm').value, 10) || 1;
+    ptsLarge = parseInt(document.getElementById('inp-lg').value, 10) || 2;
+  }
+
+  state = {
+    ...freshState(),
+    gameType: cx['cr-type'], winScore, ptsSmall, ptsLarge,
+    teamA: { name: nameA, score: 0, fouls: 0, colorKey: teamColors.a },
+    teamB: { name: nameB, score: 0, fouls: 0, colorKey: teamColors.b },
+    startTime: Date.now(),
+  };
+
+  applyTeamColors();
+  save();
+  renderGame();
+  showScreen('game');
+}
+
+function applyTeamColors() {
+  const ca = COLORS[state.teamA.colorKey] || COLORS.orange;
+  const cb = COLORS[state.teamB.colorKey] || COLORS.blue;
+  const r  = document.documentElement;
+  r.style.setProperty('--ca', ca.hex); r.style.setProperty('--ga', ca.glow);
+  r.style.setProperty('--cb', cb.hex); r.style.setProperty('--gb', cb.glow);
 }
 
 function handleBackFromGame() {
   if (state.history.length > 0 && !state.gameOver) {
-    if (!confirm('Go back to setup? Your game is saved — tap Resume to continue.')) return;
+    if (!confirm('Go back to setup? Progress saved — Resume to continue.')) return;
   }
   stopVoice();
   showScreen('setup');
-  document.getElementById('btn-resume').classList.toggle('hidden',
-    state.gameOver || state.history.length === 0);
+  document.getElementById('btn-hub-resume').style.display =
+    (state.history.length > 0 && !state.gameOver) ? 'block' : 'none';
 }
 
-/* ── RENDER ─────────────────────────────────────────────── */
+/* ── GAME RENDER ────────────────────────────────────────────── */
 function renderGame() {
-  document.getElementById('team-a-name').textContent = state.teamA.name;
-  document.getElementById('team-b-name').textContent = state.teamB.name;
-  document.getElementById('team-a-score').textContent = state.teamA.score;
-  document.getElementById('team-b-score').textContent = state.teamB.score;
-  document.getElementById('topbar-gametype').textContent = state.gameType;
-  document.getElementById('topbar-target').textContent   = `First to ${state.winScore}`;
-  renderScoreButtons();
-  updateLeadingUI();
-  updateGamePointBanner();
-  renderHistory();
+  const { teamA: a, teamB: b } = state;
+
+  document.getElementById('t-name-a').textContent  = a.name;
+  document.getElementById('t-name-b').textContent  = b.name;
+  document.getElementById('t-score-a').textContent = a.score;
+  document.getElementById('t-score-b').textContent = b.score;
+
+  document.getElementById('foul-a').textContent = `F: ${a.fouls}`;
+  document.getElementById('foul-b').textContent = `F: ${b.fouls}`;
+  document.getElementById('foul-a').classList.toggle('warn', a.fouls >= 4);
+  document.getElementById('foul-b').classList.toggle('warn', b.fouls >= 4);
+
+  const qLabel = typeof state.quarter === 'number' ? `Q${state.quarter}` : state.quarter;
+  document.getElementById('q-label').textContent = qLabel;
+
+  document.getElementById('poss-btn').textContent = state.possession === 'a' ? '◀' : '▶';
+
+  renderScorePads();
+  updateLeadUI();
+  updateMomentumBar();
+  updateRunBanner();
+  renderFeed();
 }
 
-function renderScoreButtons() {
-  const pts = validPoints();
-  ['a', 'b'].forEach(team => {
-    document.getElementById(`score-btns-${team}`).innerHTML =
-      pts.map(p => `<button class="btn-score" data-team="${team}" data-pts="${p}">+${p}</button>`).join('');
+function renderScorePads() {
+  const pts = state.ptsSmall === state.ptsLarge ? [state.ptsSmall] : [state.ptsSmall, state.ptsLarge];
+  ['a', 'b'].forEach(t => {
+    document.getElementById(`pad-${t}`).innerHTML =
+      pts.map(p => `<button class="btn-score" data-t="${t}" data-p="${p}">+${p}</button>`).join('');
   });
-  attachScoreListeners();
+  wireScorePads();
 }
 
-function validPoints() {
-  const { ptsSmall, ptsLarge } = state;
-  return ptsSmall === ptsLarge ? [ptsSmall] : [ptsSmall, ptsLarge];
-}
-
-let _scoreBoardWired = false;
-function attachScoreListeners() {
-  if (_scoreBoardWired) return;
-  _scoreBoardWired = true;
-  document.getElementById('scoreboard').addEventListener('click', e => {
-    const btn = e.target.closest('.btn-score');
-    if (!btn) return;
-    addScore(btn.dataset.team, parseInt(btn.dataset.pts, 10));
-    btn.classList.add('pts-flash');
-    setTimeout(() => btn.classList.remove('pts-flash'), 180);
+let _padWired = false;
+function wireScorePads() {
+  if (_padWired) return; _padWired = true;
+  document.getElementById('score-zone').addEventListener('click', e => {
+    const b = e.target.closest('.btn-score');
+    if (!b || state.gameOver) return;
+    addScore(b.dataset.t, parseInt(b.dataset.p, 10));
+    b.classList.add('flash');
+    setTimeout(() => b.classList.remove('flash'), 200);
   });
 }
 
-function updateLeadingUI() {
-  const a = state.teamA.score, b = state.teamB.score;
-  document.getElementById('team-a-panel').classList.toggle('leading', a > b);
-  document.getElementById('team-b-panel').classList.toggle('leading', b > a);
+function updateLeadUI() {
+  const a = state.teamA.score, bv = state.teamB.score;
+  const tpa = document.getElementById('tp-a'), tpb = document.getElementById('tp-b');
+  const bar = document.getElementById('game-status');
 
-  const arrow = document.getElementById('lead-arrow');
-  const bar   = document.getElementById('status-bar');
+  tpa.classList.toggle('leading', a > bv);
+  tpb.classList.toggle('leading', bv > a);
 
-  if (a === b) {
-    arrow.textContent = '—';
-    bar.textContent   = 'Game is tied';
-    bar.className     = '';
-  } else if (a > b) {
-    arrow.textContent = '◀';
-    bar.textContent   = `${state.teamA.name} leads by ${a - b}`;
-    bar.className     = 'leading-msg';
+  if (a === bv) {
+    bar.textContent = `TIED — First to ${state.winScore}`; bar.className = 'game-status';
   } else {
-    arrow.textContent = '▶';
-    bar.textContent   = `${state.teamB.name} leads by ${b - a}`;
-    bar.className     = 'leading-msg';
+    const leader = a > bv ? state.teamA.name : state.teamB.name;
+    const diff   = Math.abs(a - bv);
+    bar.textContent = `${leader.toUpperCase()} LEADS BY ${diff}`;
+    bar.className = 'game-status lead';
   }
 }
 
-function updateGamePointBanner() {
-  const banner = document.getElementById('banner-game-point');
-  const { teamA: { score: a }, teamB: { score: b }, winScore: w, ptsSmall: ps, gameOver } = state;
-  const gpA = a + ps >= w, gpB = b + ps >= w;
-  if ((gpA || gpB) && !gameOver) {
-    let msg = gpA && gpB ? '🔥 GAME POINT — BOTH TEAMS!'
-            : gpA       ? `🔥 GAME POINT — ${state.teamA.name.toUpperCase()}!`
-                        : `🔥 GAME POINT — ${state.teamB.name.toUpperCase()}!`;
-    banner.textContent = msg;
+function updateMomentumBar() {
+  const recent = state.history.slice(0, 8);
+  const mo = recent.length ? recent.filter(e => e.team === 'a').length / recent.length : 0.5;
+  document.getElementById('m-fill-a').style.width = `${Math.round(mo * 100)}%`;
+}
+
+function getCurrentRun() {
+  if (!state.history.length) return null;
+  const team = state.history[0].team;
+  let pts = 0;
+  for (const e of state.history) {
+    if (e.team !== team) break;
+    pts += e.pts;
+  }
+  return pts >= 4 ? { team, pts } : null;
+}
+
+function updateRunBanner() {
+  const run    = getCurrentRun();
+  const banner = document.getElementById('run-banner');
+  if (run && !state.gameOver) {
+    const name = run.team === 'a' ? state.teamA.name : state.teamB.name;
+    const col  = run.team === 'a' ? COLORS[state.teamA.colorKey].hex : COLORS[state.teamB.colorKey].hex;
+    banner.textContent = `🔥 ${name.toUpperCase()} ON A ${run.pts}-0 RUN`;
+    banner.style.setProperty('--rc', col);
     banner.classList.remove('hidden');
   } else {
     banner.classList.add('hidden');
   }
 }
 
-/* ── SCORING ────────────────────────────────────────────── */
+function renderFeed() {
+  const list = document.getElementById('feed-list');
+  if (!state.history.length) {
+    list.innerHTML = '<li class="feed-empty">Game starts when first point is scored</li>';
+    return;
+  }
+  let lastQ = null;
+  const items = [];
+  const run   = getCurrentRun();
+  const chronological = [...state.history].reverse();
+
+  chronological.forEach((e, idx) => {
+    const qLabel = typeof e.quarter === 'number' ? `Q${e.quarter}` : e.quarter;
+    if (e.quarter !== lastQ) {
+      items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);
+      lastQ = e.quarter;
+    }
+    const name  = e.team === 'a' ? state.teamA.name : state.teamB.name;
+    const col   = e.team === 'a' ? 'var(--ca)' : 'var(--cb)';
+    const isRun = run && e.team === run.team && idx >= state.history.length - run.count;
+    items.push(`<li class="feed-entry">
+      <span class="fe-q">${qLabel}</span>
+      <span class="fe-team" style="color:${col}">${escHtml(name)}</span>
+      <span class="fe-pts" style="color:${col}">+${e.pts}</span>
+      ${isRun ? '<span class="fe-run">🔥</span>' : ''}
+    </li>`);
+  });
+
+  list.innerHTML = items.reverse().join('');
+  list.scrollTop = 0;
+}
+
+/* ── SCORING ────────────────────────────────────────────────── */
 function addScore(team, pts) {
   if (state.gameOver) return;
-  state[`team${team.toUpperCase()}`].score += pts;
-  state.history.unshift({ team, pts });
-  saveState();
+  const T = `team${team.toUpperCase()}`;
+  state[T].score += pts;
+  state.history.unshift({ team, pts, quarter: state.quarter });
+
+  const lead = Math.abs(state.teamA.score - state.teamB.score);
+  if (state.teamA.score > state.teamB.score) state.maxLead.a = Math.max(state.maxLead.a, lead);
+  else if (state.teamB.score > state.teamA.score) state.maxLead.b = Math.max(state.maxLead.b, lead);
+
+  // Pop animation
+  const el = document.getElementById(`t-score-${team}`);
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+
+  save();
   renderGame();
   checkWin();
 }
 
-function undoLastScore() {
+function undoScore() {
   if (!state.history.length) return;
   const last = state.history.shift();
-  const t    = `team${last.team.toUpperCase()}`;
-  state[t].score = Math.max(0, state[t].score - last.pts);
-  saveState();
-  renderGame();
-  setVoiceAction('↩ Last score removed.');
+  const T    = `team${last.team.toUpperCase()}`;
+  state[T].score = Math.max(0, state[T].score - last.pts);
+  save(); renderGame();
+  setVAction('↩ Last score removed.');
+}
+
+function addFoul(team) {
+  state[`team${team.toUpperCase()}`].fouls = Math.min(10, state[`team${team.toUpperCase()}`].fouls + 1);
+  save();
+  const el = document.getElementById(`foul-${team}`);
+  el.textContent = `F: ${state[`team${team.toUpperCase()}`].fouls}`;
+  el.classList.toggle('warn', state[`team${team.toUpperCase()}`].fouls >= 4);
+}
+
+function nextQuarter() {
+  const idx = QUARTERS.indexOf(state.quarter);
+  state.quarter = QUARTERS[(idx + 1) % QUARTERS.length];
+  save(); renderGame();
+}
+
+function togglePossession() {
+  state.possession = state.possession === 'a' ? 'b' : 'a';
+  document.getElementById('poss-btn').textContent = state.possession === 'a' ? '◀' : '▶';
+  save();
 }
 
 function checkWin() {
@@ -1026,78 +1090,102 @@ function checkWin() {
   if (!aWon && !bWon) return;
   state.gameOver = true;
   stopVoice();
-  saveState();
+  save();
+
   const winner = aWon ? state.teamA : state.teamB;
   const loser  = aWon ? state.teamB : state.teamA;
-  document.getElementById('winner-team-name').textContent  = winner.name;
-  document.getElementById('winner-final-score').textContent = `${winner.score} – ${loser.score}`;
-  document.getElementById('winner-meta').textContent        = `${state.gameType} · First to ${state.winScore}`;
-  launchConfetti();
-  showScreen('winner');
+
+  saveToHistory({
+    winner: winner.name, loser: loser.name,
+    nameA: state.teamA.name, nameB: state.teamB.name,
+    scoreW: winner.score, scoreL: loser.score,
+    gameType: state.gameType, winScore: state.winScore,
+    date: new Date().toLocaleDateString(),
+  });
+
+  showPostGame(winner, loser);
 }
 
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  if (!state.history.length) {
-    list.innerHTML = '<li class="history-empty">No scores yet</li>';
-    return;
-  }
-  list.innerHTML = state.history.slice(0, 40).map((e, i) => {
-    const name = e.team === 'a' ? state.teamA.name : state.teamB.name;
-    return `<li class="history-item">
-      ${i === 0 ? '<span class="h-new">NEW</span>' : ''}
-      <span class="h-team">${escHtml(name)}</span>
-      <span class="h-pts">+${e.pts}</span>
-    </li>`;
-  }).join('');
-}
-
-function escHtml(s) {
-  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-/* ── END / RESET ────────────────────────────────────────── */
 function handleEndGame() {
   if (!confirm('End game now?')) return;
   state.gameOver = true;
-  stopVoice();
-  saveState();
+  stopVoice(); save();
   const winner = state.teamA.score >= state.teamB.score ? state.teamA : state.teamB;
   const loser  = state.teamA.score >= state.teamB.score ? state.teamB : state.teamA;
-  document.getElementById('winner-team-name').textContent  = winner.name;
-  document.getElementById('winner-final-score').textContent = `${winner.score} – ${loser.score}`;
-  document.getElementById('winner-meta').textContent        = `${state.gameType} · First to ${state.winScore}`;
-  launchConfetti();
-  showScreen('winner');
+  saveToHistory({
+    winner: winner.name, loser: loser.name,
+    nameA: state.teamA.name, nameB: state.teamB.name,
+    scoreW: winner.score, scoreL: loser.score,
+    gameType: state.gameType, winScore: state.winScore,
+    date: new Date().toLocaleDateString(),
+  });
+  showPostGame(winner, loser);
 }
 
-function handlePlayAgain() {
-  state.teamA.score = 0;
-  state.teamB.score = 0;
-  state.history     = [];
-  state.gameOver    = false;
+/* ── POST-GAME ──────────────────────────────────────────────── */
+function showPostGame(winner, loser) {
+  document.getElementById('pg-winner').textContent = winner.name;
+  document.getElementById('pg-score').textContent  = `${winner.score} – ${loser.score}`;
+  document.getElementById('pg-meta').textContent   = `${state.gameType} · First to ${state.winScore}`;
+  document.getElementById('pg-wins').style.color   = COLORS[winner === state.teamA ? state.teamA.colorKey : state.teamB.colorKey].hex;
+
+  const dur = state.startTime
+    ? (() => { const ms = Date.now() - state.startTime; return `${Math.floor(ms/60000)}m ${Math.floor((ms%60000)/1000)}s`; })()
+    : '—';
+  const bigLead = Math.max(state.maxLead.a, state.maxLead.b);
+
+  document.getElementById('st-dur').textContent   = dur;
+  document.getElementById('st-lead').textContent  = bigLead ? `+${bigLead}` : '—';
+  document.getElementById('st-fa').textContent    = state.teamA.fouls;
+  document.getElementById('st-fb').textContent    = state.teamB.fouls;
+  document.getElementById('st-fa-lbl').textContent = `${state.teamA.name} Fouls`;
+  document.getElementById('st-fb-lbl').textContent = `${state.teamB.name} Fouls`;
+
+  launchConfetti('pg-confetti');
+  document.getElementById('pg-overlay').classList.remove('hidden');
+}
+
+function closePG() {
+  document.getElementById('pg-overlay').classList.add('hidden');
+}
+
+function playAgain() {
+  document.getElementById('pg-overlay').classList.add('hidden');
+  state.teamA.score = 0; state.teamB.score = 0;
+  state.teamA.fouls = 0; state.teamB.fouls = 0;
+  state.history = []; state.maxLead = { a: 0, b: 0 };
+  state.quarter = 1; state.possession = 'a';
+  state.gameOver = false; state.startTime = Date.now();
   state.voiceActive = false;
-  saveState();
-  renderGame();
-  showScreen('game');
+  save(); renderGame(); showScreen('game');
 }
 
-function handleNewSetup() {
-  clearState();
-  stopVoice();
-  showScreen('setup');
+function newGame() {
+  document.getElementById('pg-overlay').classList.add('hidden');
+  clearSave(); stopVoice();
+  renderHub(); showScreen('hub');
 }
 
-/* ── CONFETTI ───────────────────────────────────────────── */
-function launchConfetti() {
-  const c      = document.getElementById('winner-confetti');
-  c.innerHTML  = '';
-  const colors = ['#FF6B35','#FFD700','#F0F0F0','#0F3460','#E04F1A','#C9A227'];
+async function shareScore() {
+  const text = `🏀 CourtCall\n${state.teamA.name} ${state.teamA.score} — ${state.teamB.name} ${state.teamB.score}\n${state.gameType} · First to ${state.winScore}\n\nTracked with CourtCall`;
+  try {
+    if (navigator.share) { await navigator.share({ text }); return; }
+    await navigator.clipboard.writeText(text);
+    document.getElementById('pg-winner').textContent = 'Copied!';
+    setTimeout(() => document.getElementById('pg-winner').textContent = state.teamA.score >= state.teamB.score ? state.teamA.name : state.teamB.name, 1500);
+  } catch (_) {}
+}
+
+/* ── CONFETTI ───────────────────────────────────────────────── */
+function launchConfetti(containerId) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  const cols = [COLORS[state.teamA.colorKey].hex, COLORS[state.teamB.colorKey].hex, '#FFB300', '#FFFFFF', '#FF8A50'];
   for (let i = 0; i < 90; i++) {
     const p  = document.createElement('div');
     const sz = 8 + Math.random() * 10;
-    p.className  = 'confetti-piece';
-    p.style.cssText = `left:${Math.random()*100}vw;background:${colors[i%colors.length]};`
+    p.className = 'cp';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${cols[i%cols.length]};`
       + `width:${sz}px;height:${sz*(0.4+Math.random()*0.6)}px;`
       + `animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*1.8}s;`;
     c.appendChild(p);
@@ -1105,203 +1193,157 @@ function launchConfetti() {
   setTimeout(() => { c.innerHTML = ''; }, 6200);
 }
 
-/* ════════════════════════════════════════════════════════
-   VOICE — robust implementation
-   A fresh SpeechRecognition instance is created on every
-   startListening() call. Reusing an ended instance causes
-   InvalidStateError which is silently swallowed, leaving
-   the UI showing "Mic ON" with nothing actually listening.
-════════════════════════════════════════════════════════ */
-
-const voiceSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-let recognition      = null;
-let restartTimer     = null;
+/* ════════════════════════════════════════════════════════════
+   VOICE ENGINE — fresh SpeechRecognition per startListening()
+════════════════════════════════════════════════════════════ */
+const voiceOK   = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+let recognition = null;
+let restartTmr  = null;
 
 function startListening() {
-  if (!voiceSupported || !state.voiceActive || state.gameOver) return;
-  clearTimeout(restartTimer);
-
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!voiceOK || !state.voiceActive || state.gameOver) return;
+  clearTimeout(restartTmr);
+  const SR    = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.continuous      = false;
-  recognition.interimResults  = false;
-  recognition.lang            = 'en-US';
-  recognition.maxAlternatives = 3;
+  recognition.continuous = false; recognition.interimResults = false;
+  recognition.lang = 'en-US'; recognition.maxAlternatives = 3;
 
   recognition.onresult = e => {
-    let handled = false;
-    for (let i = 0; i < e.results[0].length && !handled; i++) {
-      const text = e.results[0][i].transcript.trim();
-      setVoiceHeard(`Heard: "${text}"`);
-      handled = parseVoiceCommand(text.toLowerCase());
+    let ok = false;
+    for (let i = 0; i < e.results[0].length && !ok; i++) {
+      const txt = e.results[0][i].transcript.trim();
+      setVHeard(`Heard: "${txt}"`);
+      ok = parseVoiceCmd(txt.toLowerCase());
     }
-    if (!handled) setVoiceAction('Didn\'t catch that — try: "Team A two" or "Nets three"');
+    if (!ok) setVAction('Didn\'t catch that — try "Blazers two" or "Team B three"');
   };
-
   recognition.onend = () => {
-    if (state.voiceActive && !state.gameOver) {
-      restartTimer = setTimeout(startListening, 600);
-    }
+    if (state.voiceActive && !state.gameOver) restartTmr = setTimeout(startListening, 600);
   };
-
   recognition.onerror = e => {
-    if (e.error === 'no-speech') return;
-    if (e.error === 'aborted')   return;
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      state.voiceActive = false;
-      updateVoiceUI();
-      setVoiceAction('❌ Mic access denied — allow mic in Chrome settings');
+    if (['no-speech','aborted'].includes(e.error)) return;
+    if (['not-allowed','service-not-allowed'].includes(e.error)) {
+      state.voiceActive = false; updateVoiceUI();
+      setVAction('❌ Mic denied — allow in Chrome settings');
       return;
     }
-    if (e.error === 'network') {
-      setVoiceAction('❌ Network error — voice needs internet on Chrome');
-    }
+    if (e.error === 'network') setVAction('❌ Network error — voice needs internet');
   };
 
-  try {
-    recognition.start();
-  } catch (err) {
-    state.voiceActive = false;
-    updateVoiceUI();
-    setVoiceAction('❌ Could not start mic — tap Mic to retry');
+  try { recognition.start(); } catch (_) {
+    state.voiceActive = false; updateVoiceUI();
+    setVAction('❌ Could not start mic — tap Mic to retry');
   }
 }
 
 function toggleVoice() {
-  if (!voiceSupported) {
-    document.getElementById('voice-card').classList.remove('hidden');
-    setVoiceAction('❌ Voice not supported — open in Chrome or Edge');
+  if (!voiceOK) {
+    document.getElementById('voice-panel').classList.remove('hidden');
+    setVAction('❌ Voice not supported — open in Chrome or Edge');
     return;
   }
   state.voiceActive = !state.voiceActive;
   if (state.voiceActive) {
-    document.getElementById('voice-card').classList.remove('hidden');
-    setVoiceHeard('');
-    setVoiceAction('🎤 Listening… say a command');
+    document.getElementById('voice-panel').classList.remove('hidden');
+    setVHeard(''); setVAction('🎤 Listening… say a command');
     startListening();
   } else {
-    clearTimeout(restartTimer);
+    clearTimeout(restartTmr);
     try { if (recognition) recognition.abort(); } catch (_) {}
-    document.getElementById('voice-card').classList.add('hidden');
+    document.getElementById('voice-panel').classList.add('hidden');
   }
   updateVoiceUI();
 }
 
 function stopVoice() {
   state.voiceActive = false;
-  clearTimeout(restartTimer);
+  clearTimeout(restartTmr);
   try { if (recognition) recognition.abort(); } catch (_) {}
   updateVoiceUI();
 }
 
 function updateVoiceUI() {
-  const btn      = document.getElementById('btn-voice');
-  const icon     = document.getElementById('mic-icon');
-  const label    = document.getElementById('mic-label');
-  const topBtn   = document.getElementById('btn-topbar-mic');
-  const on       = state.voiceActive;
-
-  if (btn)    { btn.classList.toggle('btn-voice-on', on); btn.classList.toggle('btn-voice-off', !on); }
-  if (icon)   icon.textContent  = on ? '🔴' : '🎤';
-  if (label)  label.textContent = on ? 'Mic ON' : 'Mic Off';
-  if (topBtn) { topBtn.textContent = on ? '🔴' : '🎤'; topBtn.classList.toggle('mic-on', on); }
+  const on = state.voiceActive;
+  ['ctrl-mic','nav-mic'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'ctrl-mic') { el.classList.toggle('mic-on', on); }
+    if (id === 'nav-mic')  { el.classList.toggle('on', on); el.textContent = on ? '🔴' : '🎤'; }
+  });
+  const lbl = document.getElementById('mic-lbl');
+  const ico = document.getElementById('mic-icon');
+  if (lbl) lbl.textContent = on ? 'Mic ON' : 'Mic Off';
+  if (ico) ico.textContent = on ? '🔴' : '🎤';
 }
 
-function setVoiceHeard(text) {
-  const el = document.getElementById('voice-heard');
-  if (el) el.textContent = text;
+function setVHeard(t) { const e = document.getElementById('v-heard'); if (e) e.textContent = t; }
+function setVAction(t) {
+  const e = document.getElementById('v-action'); if (e) e.textContent = t;
+  if (state.voiceActive) document.getElementById('voice-panel').classList.remove('hidden');
 }
 
-function setVoiceAction(text) {
-  const el = document.getElementById('voice-action');
-  if (el) el.textContent = text;
-  // Also show the card if voice is on and we have something to say
-  if (state.voiceActive) {
-    document.getElementById('voice-card').classList.remove('hidden');
-  }
-}
-
-/* ── VOICE COMMAND PARSING ──────────────────────────────── */
+/* ── VOICE PARSING ──────────────────────────────────────────── */
 function resolveTeam(t) {
-  const a = state.teamA.name.toLowerCase();
-  const b = state.teamB.name.toLowerCase();
+  const a = state.teamA.name.toLowerCase(), b = state.teamB.name.toLowerCase();
   if (a && t.includes(a)) return 'a';
   if (b && t.includes(b)) return 'b';
-  if (/\b(team\s*a|team\s*1|first\s*team|red\s*team|left\s*team)\b/.test(t))  return 'a';
-  if (/\b(team\s*b|team\s*2|second\s*team|blue\s*team|right\s*team)\b/.test(t)) return 'b';
+  if (/\b(team\s*a|team\s*1|first|left|red|light)\b/.test(t)) return 'a';
+  if (/\b(team\s*b|team\s*2|second|right|blue|dark)\b/.test(t)) return 'b';
   return null;
 }
 
-function extractPoints(t) {
-  const map = { one:1, two:2, three:3, 1:1, 2:2, 3:3 };
+function extractPts(t) {
+  const map = { one:1,two:2,three:3,'1':1,'2':2,'3':3 };
   const m   = t.match(/\b(one|two|three|1|2|3)\b/i);
   return m ? (map[m[1].toLowerCase()] || null) : null;
 }
 
 function speakScore() {
   const msg = `${state.teamA.name} ${state.teamA.score}, ${state.teamB.name} ${state.teamB.score}`;
-  setVoiceAction(msg);
+  setVAction(msg);
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(msg);
-    u.rate = 0.95;
+    const u = new SpeechSynthesisUtterance(msg); u.rate = 0.95;
     window.speechSynthesis.speak(u);
   }
 }
 
-function parseVoiceCommand(t) {
-
-  // Undo
-  if (/\b(undo|cancel|mistake|take\s*it\s*back|remove\s*last)\b/.test(t)) {
-    undoLastScore();
-    return true;
+function parseVoiceCmd(t) {
+  if (/\b(undo|cancel|mistake|take\s*it\s*back)\b/.test(t)) { undoScore(); return true; }
+  if (/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)) { speakScore(); return true; }
+  if (/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)) { nextQuarter(); setVAction(`Now ${typeof state.quarter === 'number' ? 'Q' + state.quarter : state.quarter}`); return true; }
+  if (/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)) { handleEndGame(); return true; }
+  if (/\b(reset\s*game|reset|start\s*over)\b/.test(t)) { if (confirm('Reset scores?')) { playAgain(); setVAction('Reset!'); } return true; }
+  if (/\b(foul|foul\s*on)\b/.test(t)) {
+    const tm = resolveTeam(t);
+    if (tm) { addFoul(tm); setVAction(`Foul on ${tm === 'a' ? state.teamA.name : state.teamB.name}`); return true; }
   }
-
-  // Score check — requires "check", "what", or "current" — not bare "score"
-  // so "Team A scores two" does NOT trigger this
-  if (/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)) {
-    speakScore();
-    return true;
-  }
-
-  // Game over
-  if (/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done|finish\s*game)\b/.test(t)) {
-    handleEndGame();
-    return true;
-  }
-
-  // Reset
-  if (/\b(reset\s*game|reset|start\s*over)\b/.test(t)) {
-    if (confirm('Reset scores?')) { handlePlayAgain(); setVoiceAction('Game reset!'); }
-    return true;
-  }
-
-  // Scoring — must identify both team AND points
   const team = resolveTeam(t);
   if (!team) return false;
-
-  const pts = extractPoints(t);
+  const pts = extractPts(t);
   if (!pts) return false;
-
   addScore(team, pts);
-  const name = team === 'a' ? state.teamA.name : state.teamB.name;
-  setVoiceAction(`+${pts} to ${name} ✓`);
+  setVAction(`+${pts} to ${team === 'a' ? state.teamA.name : state.teamB.name} ✓`);
   return true;
 }
 
-/* ── INIT ───────────────────────────────────────────────── */
+/* ── UTILS ──────────────────────────────────────────────────── */
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ── INIT ───────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  const saved     = loadState();
-  const canResume = saved && !saved.gameOver && saved.history && saved.history.length > 0;
-
-  document.getElementById('btn-resume').classList.toggle('hidden', !canResume);
-
+  const saved = load();
   if (saved) {
-    if (saved.teamA?.name && saved.teamA.name !== 'Team A')
-      document.getElementById('input-team-a').value = saved.teamA.name;
-    if (saved.teamB?.name && saved.teamB.name !== 'Team B')
-      document.getElementById('input-team-b').value = saved.teamB.name;
+    if (saved.teamA?.colorKey) teamColors.a = saved.teamA.colorKey;
+    if (saved.teamB?.colorKey) teamColors.b = saved.teamB.colorKey;
+    if (saved.teamA?.name && saved.teamA.name !== 'Team A') document.getElementById('inp-a').value = saved.teamA.name;
+    if (saved.teamB?.name && saved.teamB.name !== 'Team B') document.getElementById('inp-b').value = saved.teamB.name;
   }
+  applySetupColors();
+  renderHub();
 });
 </script>
 </body>
