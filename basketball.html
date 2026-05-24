@@ -7,33 +7,30 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
-    /* ── RESET & ROOT ─────────────────────────────────────────────── */
+    /* ── RESET ──────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --orange:       #FF6B35;
-      --orange-dark:  #E04F1A;
-      --orange-glow:  rgba(255,107,53,0.35);
-      --navy:         #0F0F23;
-      --navy-mid:     #1A1A2E;
-      --navy-light:   #16213E;
-      --navy-card:    #0D1B2A;
-      --gold:         #FFD700;
-      --gold-dim:     #C9A227;
-      --gold-glow:    rgba(255,215,0,0.3);
-      --white:        #F0F0F0;
-      --muted:        #7A7A9A;
-      --danger:       #E53935;
-      --success:      #43A047;
-      --radius-sm:    10px;
-      --radius-md:    16px;
-      --radius-lg:    24px;
-      --radius-xl:    32px;
-      --shadow-btn:   0 5px 0 rgba(0,0,0,0.4);
-      --transition:   0.14s ease;
+      --orange:      #FF6B35;
+      --orange-dark: #E04F1A;
+      --orange-glow: rgba(255,107,53,0.35);
+      --navy:        #0F0F23;
+      --navy-mid:    #1A1A2E;
+      --navy-light:  #16213E;
+      --gold:        #FFD700;
+      --gold-glow:   rgba(255,215,0,0.3);
+      --white:       #F0F0F0;
+      --muted:       #7A7A9A;
+      --danger:      #E53935;
+      --radius-sm:   10px;
+      --radius-md:   16px;
+      --radius-lg:   24px;
+      --radius-xl:   32px;
+      --shadow-btn:  0 5px 0 rgba(0,0,0,0.45);
+      --t:           0.14s ease;
     }
 
-    html { height: 100%; }
+    html, body { height: 100%; }
 
     body {
       min-height: 100dvh;
@@ -46,7 +43,7 @@
 
     .hidden { display: none !important; }
 
-    /* ── SCREENS ──────────────────────────────────────────────────── */
+    /* ── SCREENS ─────────────────────────────────────────────────────── */
     .screen {
       display: none;
       flex-direction: column;
@@ -55,129 +52,7 @@
     }
     .screen.active { display: flex; }
 
-    /* ── SETUP SCREEN ─────────────────────────────────────────────── */
-    #screen-setup {
-      background: radial-gradient(ellipse at top, #1e1e3c 0%, var(--navy) 70%);
-      padding: 24px 20px 40px;
-      gap: 0;
-    }
-
-    .app-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 0 28px;
-    }
-    .app-logo { font-size: 52px; line-height: 1; }
-    .app-title {
-      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(32px, 8vw, 48px);
-      letter-spacing: 0.06em;
-      color: var(--orange);
-      margin-top: 8px;
-    }
-    .app-subtitle {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 4px;
-      letter-spacing: 0.04em;
-    }
-
-    .setup-form {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .setup-section {
-      background: var(--navy-mid);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius-md);
-      padding: 18px;
-    }
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    /* Chip groups */
-    .chip-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chip {
-      padding: 10px 18px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: 50px;
-      background: rgba(255,255,255,0.04);
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .chip:hover { border-color: var(--orange); color: var(--white); }
-    .chip.selected {
-      border-color: var(--orange);
-      background: var(--orange);
-      color: var(--navy);
-    }
-
-    /* Team name inputs */
-    .team-name-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .team-name-input {
-      flex: 1;
-      background: rgba(255,255,255,0.06);
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-sm);
-      color: var(--white);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 12px 14px;
-      text-align: center;
-      outline: none;
-      transition: border-color var(--transition);
-    }
-    .team-name-input:focus { border-color: var(--orange); }
-    .team-name-input::placeholder { color: var(--muted); font-weight: 400; }
-    .vs-divider {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
-    /* Custom number input */
-    .custom-number-input {
-      margin-top: 12px;
-      width: 120px;
-      background: rgba(255,255,255,0.06);
-      border: 2px solid var(--orange);
-      border-radius: var(--radius-sm);
-      color: var(--white);
-      font-size: 18px;
-      font-weight: 700;
-      padding: 10px 14px;
-      text-align: center;
-      outline: none;
-    }
-
-    /* Start button */
+    /* ── SHARED BUTTON STYLES ────────────────────────────────────────── */
     .btn-primary {
       background: var(--orange);
       color: var(--navy);
@@ -189,17 +64,16 @@
       padding: 18px 32px;
       cursor: pointer;
       box-shadow: var(--shadow-btn);
-      transition: transform var(--transition), box-shadow var(--transition);
+      transition: transform var(--t), box-shadow var(--t);
       width: 100%;
-      -webkit-tap-highlight-color: transparent;
+      min-height: 60px;
     }
     .btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); }
-    .btn-primary:hover { background: var(--orange-dark); }
 
     .btn-secondary {
       background: transparent;
       color: var(--muted);
-      border: 2px solid rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.12);
       border-radius: var(--radius-md);
       font-family: 'Inter', sans-serif;
       font-size: 15px;
@@ -207,10 +81,135 @@
       padding: 14px 24px;
       cursor: pointer;
       width: 100%;
-      transition: all var(--transition);
-      -webkit-tap-highlight-color: transparent;
+      min-height: 52px;
+      transition: all var(--t);
     }
-    .btn-secondary:hover { border-color: var(--orange); color: var(--white); }
+    .btn-secondary:active { opacity: 0.7; }
+
+    .btn-back {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 44px;
+      min-width: 80px;
+    }
+    .btn-back:active { color: var(--white); }
+
+    /* ════════════════════════════════════════════════════════════════
+       SCREEN 1: SETUP
+    ════════════════════════════════════════════════════════════════ */
+    #screen-setup {
+      background: radial-gradient(ellipse at top, #1e1e3c 0%, var(--navy) 70%);
+      padding: 20px 16px 40px;
+    }
+
+    .app-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0 24px;
+    }
+    .app-logo    { font-size: 48px; line-height: 1; }
+    .app-title   {
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
+      font-size: clamp(30px, 8vw, 46px);
+      letter-spacing: 0.06em;
+      color: var(--orange);
+      margin-top: 6px;
+    }
+    .app-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .setup-form {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .setup-section {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* Chips */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 10px 16px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t);
+      min-height: 44px;
+    }
+    .chip.selected { border-color: var(--orange); background: var(--orange); color: var(--navy); }
+    .chip:active { opacity: 0.75; }
+
+    /* Team name inputs */
+    .team-name-row { display: flex; align-items: center; gap: 10px; }
+    .team-name-input {
+      flex: 1;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 12px;
+      text-align: center;
+      outline: none;
+      transition: border-color var(--t);
+      min-height: 52px;
+    }
+    .team-name-input:focus { border-color: var(--orange); }
+    .team-name-input::placeholder { color: var(--muted); font-weight: 400; }
+    .vs-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* Custom inputs */
+    .custom-number-input {
+      margin-top: 12px;
+      width: 110px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid var(--orange);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: center;
+      outline: none;
+      min-height: 48px;
+    }
 
     .setup-actions {
       display: flex;
@@ -218,13 +217,63 @@
       gap: 12px;
       width: 100%;
       max-width: 480px;
+      margin-top: 20px;
     }
 
-    /* ── GAME SCREEN ──────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       SCREEN 2: GAME
+    ════════════════════════════════════════════════════════════════ */
     #screen-game {
       background: var(--navy);
       padding: 0;
       justify-content: flex-start;
+    }
+
+    /* Top bar */
+    .game-topbar {
+      width: 100%;
+      background: var(--navy-mid);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      height: 50px;
+      flex-shrink: 0;
+    }
+    .topbar-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+    .topbar-gametype {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+    }
+    .btn-topbar-mic {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: background var(--t);
+    }
+    .btn-topbar-mic:active { background: rgba(255,255,255,0.08); }
+    .btn-topbar-mic.mic-on { animation: topMicPulse 1.5s ease-in-out infinite; }
+    @keyframes topMicPulse {
+      0%, 100% { filter: drop-shadow(0 0 0px var(--orange)); }
+      50%       { filter: drop-shadow(0 0 6px var(--orange)); }
     }
 
     /* Game Point Banner */
@@ -233,115 +282,107 @@
       background: linear-gradient(90deg, var(--orange), var(--orange-dark));
       color: var(--navy);
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(18px, 4vw, 26px);
+      font-size: clamp(17px, 4vw, 24px);
       letter-spacing: 0.14em;
       text-align: center;
-      padding: 10px;
-      animation: pulseBar 0.9s ease-in-out infinite alternate;
+      padding: 9px;
+      animation: pulseBar 0.8s ease-in-out infinite alternate;
+      flex-shrink: 0;
     }
     @keyframes pulseBar {
-      from { opacity: 0.8; }
+      from { opacity: 0.85; }
       to   { opacity: 1; }
     }
 
     /* Scoreboard */
     #scoreboard {
       display: grid;
-      grid-template-columns: 1fr 60px 1fr;
+      grid-template-columns: 1fr 50px 1fr;
       width: 100%;
-      min-height: 52vh;
-      align-items: stretch;
+      flex-shrink: 0;
     }
 
     .team-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 12px 16px;
-      gap: 8px;
-      transition: box-shadow var(--transition);
-      position: relative;
+      padding: 16px 10px 12px;
+      gap: 6px;
+      transition: box-shadow var(--t);
     }
-    .team-panel.leading {
-      box-shadow: inset 0 -4px 0 var(--gold);
-    }
+    .team-panel.leading      { box-shadow: inset 0 -4px 0 var(--gold); }
     .team-panel.leading .team-score {
       color: var(--gold);
-      text-shadow: 0 0 30px var(--gold-glow);
+      text-shadow: 0 0 24px var(--gold-glow);
     }
 
     .team-name {
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(18px, 4.5vw, 28px);
+      font-size: clamp(17px, 4.5vw, 26px);
       letter-spacing: 0.06em;
       text-align: center;
       color: var(--white);
-      min-height: 36px;
       line-height: 1.1;
       word-break: break-word;
     }
 
     .team-score {
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(80px, 20vw, 130px);
+      font-size: clamp(72px, 19vw, 120px);
       line-height: 1;
       color: var(--white);
-      transition: color 0.3s ease, text-shadow 0.3s ease;
+      transition: color 0.25s, text-shadow 0.25s;
     }
 
+    /* Score buttons — horizontal row, big touch targets */
     .score-buttons {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      flex-direction: row;
+      gap: 6px;
       width: 100%;
+      margin-top: 4px;
     }
 
     .btn-score {
+      flex: 1;
       background: var(--navy-light);
       color: var(--white);
       border: 2px solid rgba(255,107,53,0.4);
       border-radius: var(--radius-sm);
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: 22px;
-      letter-spacing: 0.06em;
-      padding: 14px 8px;
+      font-size: clamp(22px, 5.5vw, 30px);
+      letter-spacing: 0.04em;
       cursor: pointer;
       box-shadow: var(--shadow-btn);
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
-      -webkit-tap-highlight-color: transparent;
-      min-height: 56px;
+      transition: transform var(--t), box-shadow var(--t), background var(--t);
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .btn-score:hover { background: var(--navy-card); border-color: var(--orange); }
-    .btn-score:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); }
-    .btn-score.pts-flash {
-      background: var(--orange);
-      color: var(--navy);
-    }
+    .btn-score:active { transform: translateY(5px); box-shadow: 0 0 0 rgba(0,0,0,0.4); }
+    .btn-score.pts-flash { background: var(--orange); color: var(--navy); border-color: var(--orange); }
 
     /* Center column */
-    #center-column {
+    #vs-col {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       border-left: 1px solid rgba(255,255,255,0.07);
       border-right: 1px solid rgba(255,255,255,0.07);
     }
-
-    .target-score {
+    .vs-text {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      text-align: center;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
+      font-size: 14px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.1em;
     }
-
     .lead-arrow {
-      font-size: 24px;
-      transition: transform 0.3s ease;
+      font-size: 22px;
+      color: var(--gold);
+      transition: opacity 0.3s;
     }
 
     /* Status bar */
@@ -353,66 +394,90 @@
       padding: 10px 16px;
       text-align: center;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--muted);
-      min-height: 40px;
+      min-height: 42px;
+      flex-shrink: 0;
     }
     #status-bar.leading-msg { color: var(--gold); }
-    #status-bar.tied-msg    { color: var(--muted); }
 
     /* Action row */
     #action-row {
       display: flex;
       gap: 10px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       width: 100%;
+      flex-shrink: 0;
     }
 
     .btn-action {
       flex: 1;
       background: var(--navy-mid);
       color: var(--white);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: var(--radius-sm);
       font-family: 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 700;
-      padding: 14px 8px;
+      padding: 0 8px;
       cursor: pointer;
-      transition: all var(--transition);
-      -webkit-tap-highlight-color: transparent;
-      min-height: 52px;
+      transition: all var(--t);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.2;
     }
-    .btn-action:hover  { border-color: rgba(255,255,255,0.3); }
-    .btn-action:active { transform: translateY(2px); }
+    .btn-action:active { transform: translateY(2px); opacity: 0.85; }
 
     .btn-voice-off { color: var(--muted); }
     .btn-voice-on  {
       background: var(--orange);
       color: var(--navy);
       border-color: var(--orange);
-      animation: micPulse 1.2s ease-in-out infinite;
+      animation: micPulse 1.3s ease-in-out infinite;
     }
     @keyframes micPulse {
       0%, 100% { box-shadow: 0 0 0 0 var(--orange-glow); }
-      50%       { box-shadow: 0 0 0 10px transparent; }
+      50%       { box-shadow: 0 0 0 8px transparent; }
     }
 
-    .btn-danger { color: var(--danger); border-color: rgba(229,57,53,0.3); }
-    .btn-danger:hover { background: rgba(229,57,53,0.1); }
+    .btn-danger { color: var(--danger); border-color: rgba(229,57,53,0.25); }
+    .btn-action-icon { font-size: 18px; }
+    .btn-action-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
 
-    /* Voice feedback */
-    #voice-feedback {
-      margin: 0 16px;
-      background: rgba(255,107,53,0.08);
-      border: 1px solid rgba(255,107,53,0.3);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      font-size: 13px;
-      width: calc(100% - 32px);
+    /* Voice card */
+    #voice-card {
+      width: 100%;
+      padding: 0 14px 10px;
+      flex-shrink: 0;
     }
-    #voice-heard  { color: var(--muted); margin-bottom: 4px; }
-    #voice-action { color: var(--orange); font-weight: 700; }
+    .voice-inner {
+      background: rgba(255,107,53,0.09);
+      border: 1px solid rgba(255,107,53,0.35);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+    }
+    #voice-heard  {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 3px;
+      min-height: 16px;
+    }
+    #voice-action {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--orange);
+      min-height: 20px;
+    }
+    .voice-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
 
     /* History */
     #history-panel {
@@ -420,54 +485,68 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 0 16px 16px;
+      padding: 0 14px 16px;
       min-height: 0;
+      overflow: hidden;
     }
     .history-header {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--muted);
-      padding: 12px 0 8px;
+      padding: 10px 0 8px;
       border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
     }
     .history-list {
       list-style: none;
       overflow-y: auto;
       flex: 1;
-      max-height: 160px;
       display: flex;
       flex-direction: column;
       gap: 4px;
+      -webkit-overflow-scrolling: touch;
     }
     .history-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 10px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 6px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.035);
+      border-radius: 8px;
       font-size: 14px;
       animation: slideIn 0.2s ease;
     }
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-6px); }
+      from { opacity: 0; transform: translateY(-5px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .h-team { flex: 1; font-weight: 600; }
-    .h-pts  { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--orange); }
-    .h-dot  { font-size: 10px; color: var(--muted); }
-    .history-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 12px 0; }
+    .h-pts  { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); }
+    .h-new  { font-size: 9px; color: var(--orange); font-weight: 700; letter-spacing: 0.08em; }
+    .history-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 16px 0; }
 
-    /* ── WINNER SCREEN ────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       SCREEN 3: WINNER
+    ════════════════════════════════════════════════════════════════ */
     #screen-winner {
       background: radial-gradient(ellipse at center, #1e1e3c 0%, var(--navy) 70%);
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      padding: 24px;
+      padding: 0;
       position: relative;
       overflow: hidden;
+    }
+
+    .winner-topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      flex-shrink: 0;
+      z-index: 2;
+      position: relative;
     }
 
     .confetti-container {
@@ -484,22 +563,31 @@
       animation: confettiFall linear forwards;
     }
     @keyframes confettiFall {
-      0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
       80%  { opacity: 1; }
       100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .winner-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1;
+      position: relative;
+      width: 100%;
     }
 
     #winner-card {
       background: var(--navy-mid);
       border: 3px solid var(--gold);
       border-radius: var(--radius-xl);
-      padding: 48px 32px 40px;
+      padding: 40px 28px 32px;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 80px var(--gold-glow);
       max-width: 400px;
       width: 100%;
-      z-index: 1;
-      position: relative;
       animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     @keyframes bounceIn {
@@ -507,10 +595,10 @@
       to   { opacity: 1; transform: scale(1); }
     }
 
-    .winner-trophy { font-size: 72px; line-height: 1; margin-bottom: 12px; }
-    .winner-name {
+    .winner-trophy   { font-size: 64px; line-height: 1; margin-bottom: 10px; }
+    .winner-name     {
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(36px, 10vw, 60px);
+      font-size: clamp(34px, 10vw, 56px);
       color: var(--gold);
       letter-spacing: 0.04em;
       line-height: 1.1;
@@ -520,33 +608,28 @@
       font-size: 20px;
       color: var(--orange);
       letter-spacing: 0.2em;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .winner-score {
       font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-      font-size: clamp(28px, 7vw, 44px);
+      font-size: clamp(26px, 7vw, 42px);
       color: var(--white);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
-    .winner-meta {
-      font-size: 13px;
-      color: var(--muted);
-      letter-spacing: 0.06em;
-      margin-bottom: 32px;
-    }
-    .winner-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .winner-meta    { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 28px; }
+    .winner-actions { display: flex; flex-direction: column; gap: 10px; }
 
-    /* ── RESPONSIVE ───────────────────────────────────────────────── */
-    @media (max-width: 380px) {
-      .team-score { font-size: 70px; }
-      .btn-score { min-height: 48px; font-size: 19px; padding: 10px 6px; }
-      #scoreboard { grid-template-columns: 1fr 44px 1fr; }
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 360px) {
+      .team-score { font-size: 64px; }
+      .btn-score  { min-height: 62px; }
+      .game-topbar { height: 46px; }
     }
-
+    @media (max-height: 700px) {
+      .team-score { font-size: 68px; }
+      .btn-score  { min-height: 60px; }
+      .team-panel { padding: 10px 8px 8px; gap: 4px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
     }
@@ -561,71 +644,67 @@
   <div class="app-header">
     <div class="app-logo">🏀</div>
     <h1 class="app-title">Pickup Scorekeeper</h1>
-    <p class="app-subtitle">Track your pickup game · No login needed</p>
+    <p class="app-subtitle">No login · No install · Just play</p>
   </div>
 
   <div class="setup-form">
 
-    <!-- Game Type -->
     <section class="setup-section">
       <label class="section-label">Game Type</label>
       <div class="chip-group" id="chips-game-type">
-        <button class="chip selected" data-value="3v3" onclick="selectChip('chips-game-type', '3v3', this)">3-on-3</button>
-        <button class="chip" data-value="4v4" onclick="selectChip('chips-game-type', '4v4', this)">4-on-4</button>
-        <button class="chip" data-value="5v5" onclick="selectChip('chips-game-type', '5v5', this)">5-on-5</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-game-type', 'custom', this)">Custom</button>
+        <button class="chip selected" data-value="3v3" onclick="selectChip('chips-game-type','3v3',this)">3-on-3</button>
+        <button class="chip" data-value="4v4" onclick="selectChip('chips-game-type','4v4',this)">4-on-4</button>
+        <button class="chip" data-value="5v5" onclick="selectChip('chips-game-type','5v5',this)">5-on-5</button>
+        <button class="chip" data-value="custom" onclick="selectChip('chips-game-type','custom',this)">Custom</button>
       </div>
     </section>
 
-    <!-- Team Names -->
     <section class="setup-section">
       <label class="section-label">Team Names</label>
       <div class="team-name-row">
-        <input id="input-team-a" class="team-name-input" type="text" maxlength="16" placeholder="Team A" autocomplete="off">
-        <span class="vs-divider">VS</span>
-        <input id="input-team-b" class="team-name-input" type="text" maxlength="16" placeholder="Team B" autocomplete="off">
+        <input id="input-team-a" class="team-name-input" type="text" maxlength="14" placeholder="Team A" autocomplete="off">
+        <span class="vs-label">VS</span>
+        <input id="input-team-b" class="team-name-input" type="text" maxlength="14" placeholder="Team B" autocomplete="off">
       </div>
     </section>
 
-    <!-- Win Score -->
     <section class="setup-section">
       <label class="section-label">Win Score</label>
       <div class="chip-group" id="chips-win-score">
-        <button class="chip" data-value="11" onclick="selectChip('chips-win-score', '11', this)">11</button>
-        <button class="chip" data-value="15" onclick="selectChip('chips-win-score', '15', this)">15</button>
-        <button class="chip selected" data-value="21" onclick="selectChip('chips-win-score', '21', this)">21</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-win-score', 'custom', this); toggleWinCustom()">Custom</button>
+        <button class="chip" data-value="11" onclick="selectChip('chips-win-score','11',this)">11</button>
+        <button class="chip" data-value="15" onclick="selectChip('chips-win-score','15',this)">15</button>
+        <button class="chip selected" data-value="21" onclick="selectChip('chips-win-score','21',this)">21</button>
+        <button class="chip" data-value="custom" onclick="selectChip('chips-win-score','custom',this);toggleWinCustom()">Custom</button>
       </div>
       <input id="input-win-custom" class="custom-number-input hidden" type="number" min="2" max="999" placeholder="e.g. 30">
     </section>
 
-    <!-- Scoring Rule -->
     <section class="setup-section">
       <label class="section-label">Scoring Rule</label>
       <div class="chip-group" id="chips-scoring">
-        <button class="chip selected" data-value="1s2s" onclick="selectChip('chips-scoring', '1s2s', this); updateScoringRule()">1s &amp; 2s</button>
-        <button class="chip" data-value="2s3s" onclick="selectChip('chips-scoring', '2s3s', this); updateScoringRule()">2s &amp; 3s</button>
-        <button class="chip" data-value="custom" onclick="selectChip('chips-scoring', 'custom', this); updateScoringRule()">Custom</button>
+        <button class="chip selected" data-value="1s2s" onclick="selectChip('chips-scoring','1s2s',this);updateScoringUI()">1s &amp; 2s</button>
+        <button class="chip" data-value="2s3s" onclick="selectChip('chips-scoring','2s3s',this);updateScoringUI()">2s &amp; 3s</button>
+        <button class="chip" data-value="custom" onclick="selectChip('chips-scoring','custom',this);updateScoringUI()">Custom</button>
       </div>
-      <div id="custom-scoring-form" class="hidden" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <label style="font-size:14px; color:var(--muted); flex:1;">Small basket</label>
-          <input id="input-pts-small" type="number" min="1" max="9" value="1" class="custom-number-input" style="width:80px; margin:0;">
+      <div id="custom-scoring-form" class="hidden" style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="font-size:13px;color:var(--muted);flex:1;">Small basket</label>
+          <input id="input-pts-small" type="number" min="1" max="9" value="1" class="custom-number-input" style="width:80px;margin:0;">
         </div>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <label style="font-size:14px; color:var(--muted); flex:1;">Large basket</label>
-          <input id="input-pts-large" type="number" min="1" max="9" value="2" class="custom-number-input" style="width:80px; margin:0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="font-size:13px;color:var(--muted);flex:1;">Large basket</label>
+          <input id="input-pts-large" type="number" min="1" max="9" value="2" class="custom-number-input" style="width:80px;margin:0;">
         </div>
       </div>
     </section>
 
-  </div><!-- /.setup-form -->
-
-  <div class="setup-actions" style="margin-top:24px;">
-    <button id="btn-start-game" class="btn-primary" onclick="handleStartGame()">Start Game</button>
-    <button id="btn-resume" class="btn-secondary hidden" onclick="handleResume()">Resume Last Game</button>
   </div>
-</div><!-- /#screen-setup -->
+
+  <div class="setup-actions">
+    <button class="btn-primary" onclick="handleStartGame()">Start Game</button>
+    <button id="btn-resume" class="btn-secondary hidden" onclick="handleResume()">▶ Resume Last Game</button>
+  </div>
+</div>
 
 
 <!-- ════════════════════════════════════════════════════
@@ -633,52 +712,69 @@
 ════════════════════════════════════════════════════════ -->
 <div id="screen-game" class="screen">
 
+  <!-- Top bar -->
+  <div class="game-topbar">
+    <button class="btn-back" onclick="handleBackFromGame()">← Setup</button>
+    <div class="topbar-info">
+      <span class="topbar-gametype" id="topbar-gametype">3v3</span>
+      <span id="topbar-target" style="font-size:11px;">First to 21</span>
+    </div>
+    <button class="btn-topbar-mic" id="btn-topbar-mic" onclick="toggleVoice()" title="Voice scoring">🎤</button>
+  </div>
+
   <!-- Game Point Banner -->
   <div id="banner-game-point" class="game-point-banner hidden"></div>
 
   <!-- Scoreboard -->
   <div id="scoreboard">
 
-    <!-- Team A -->
     <div id="team-a-panel" class="team-panel">
       <div id="team-a-name" class="team-name">Team A</div>
       <div id="team-a-score" class="team-score">0</div>
-      <div class="score-buttons" id="score-btns-a">
-        <!-- rendered by renderScoreButtons() -->
-      </div>
+      <div class="score-buttons" id="score-btns-a"></div>
     </div>
 
-    <!-- Center -->
-    <div id="center-column">
-      <div class="target-score" id="target-display">FIRST TO 21</div>
-      <div class="lead-arrow" id="lead-arrow">—</div>
+    <div id="vs-col">
+      <span class="vs-text">VS</span>
+      <span class="lead-arrow" id="lead-arrow">—</span>
     </div>
 
-    <!-- Team B -->
     <div id="team-b-panel" class="team-panel">
       <div id="team-b-name" class="team-name">Team B</div>
       <div id="team-b-score" class="team-score">0</div>
-      <div class="score-buttons" id="score-btns-b">
-        <!-- rendered by renderScoreButtons() -->
-      </div>
+      <div class="score-buttons" id="score-btns-b"></div>
     </div>
 
-  </div><!-- /#scoreboard -->
-
-  <!-- Status Bar -->
-  <div id="status-bar">—</div>
-
-  <!-- Action Row -->
-  <div id="action-row">
-    <button id="btn-undo" class="btn-action" onclick="undoLastScore()" title="Undo last score">↩ Undo</button>
-    <button id="btn-voice" class="btn-action btn-voice-off" onclick="toggleVoice()">🎤 Mic</button>
-    <button class="btn-action btn-danger" onclick="handleEndGame()">End Game</button>
   </div>
 
-  <!-- Voice Feedback -->
-  <div id="voice-feedback" class="hidden">
-    <div id="voice-heard"></div>
-    <div id="voice-action"></div>
+  <!-- Status bar -->
+  <div id="status-bar">—</div>
+
+  <!-- Action row -->
+  <div id="action-row">
+    <button id="btn-undo" class="btn-action" onclick="undoLastScore()">
+      <span class="btn-action-icon">↩</span>
+      <span class="btn-action-label">Undo</span>
+    </button>
+    <button id="btn-voice" class="btn-action btn-voice-off" onclick="toggleVoice()">
+      <span class="btn-action-icon" id="mic-icon">🎤</span>
+      <span class="btn-action-label" id="mic-label">Mic Off</span>
+    </button>
+    <button class="btn-action btn-danger" onclick="handleEndGame()">
+      <span class="btn-action-icon">🏁</span>
+      <span class="btn-action-label">End Game</span>
+    </button>
+  </div>
+
+  <!-- Voice card (shown when mic is on) -->
+  <div id="voice-card" class="hidden">
+    <div class="voice-inner">
+      <div id="voice-heard"></div>
+      <div id="voice-action">🎤 Listening… say a command</div>
+      <div class="voice-hint">
+        Try: "Team A two" · "Nets scores three" · "Undo" · "Score check"
+      </div>
+    </div>
   </div>
 
   <!-- History -->
@@ -689,39 +785,48 @@
     </ul>
   </div>
 
-</div><!-- /#screen-game -->
+</div>
 
 
 <!-- ════════════════════════════════════════════════════
      SCREEN 3: WINNER
 ════════════════════════════════════════════════════════ -->
 <div id="screen-winner" class="screen">
+
+  <div class="winner-topbar">
+    <button class="btn-back" onclick="handleNewSetup()">← New Game</button>
+  </div>
+
   <div class="confetti-container" id="winner-confetti"></div>
-  <div id="winner-card">
-    <div class="winner-trophy">🏆</div>
-    <div class="winner-name" id="winner-team-name"></div>
-    <div class="winner-subtitle">WINS!</div>
-    <div class="winner-score" id="winner-final-score"></div>
-    <div class="winner-meta" id="winner-meta"></div>
-    <div class="winner-actions">
-      <button class="btn-primary" onclick="handlePlayAgain()">Play Again</button>
-      <button class="btn-secondary" onclick="handleNewSetup()">Change Settings</button>
+
+  <div class="winner-content">
+    <div id="winner-card">
+      <div class="winner-trophy">🏆</div>
+      <div class="winner-name" id="winner-team-name"></div>
+      <div class="winner-subtitle">WINS!</div>
+      <div class="winner-score" id="winner-final-score"></div>
+      <div class="winner-meta" id="winner-meta"></div>
+      <div class="winner-actions">
+        <button id="btn-play-again" class="btn-primary" onclick="handlePlayAgain()">Play Again</button>
+        <button class="btn-secondary" onclick="handleNewSetup()">Change Settings</button>
+      </div>
     </div>
   </div>
-</div><!-- /#screen-winner -->
+
+</div>
 
 
 <script>
-/* ════════════════════════════════════════════════════════
-   PICKUP SCOREKEEPER — core logic
-   ──────────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   PICKUP SCOREKEEPER
    Screens: setup → game → winner
-   State is persisted to localStorage on every change.
-════════════════════════════════════════════════════════ */
+   Voice: new SpeechRecognition instance on every startListening()
+          to avoid the InvalidStateError / silent-fail on restart.
+════════════════════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'pickup_scorekeeper_v1';
+const STORAGE_KEY = 'pickup_scorekeeper_v2';
 
-/* ── STATE ─────────────────────────────────────────── */
+/* ── STATE ──────────────────────────────────────────────── */
 let state = {
   gameType:    '3v3',
   teamA:       { name: 'Team A', score: 0 },
@@ -734,98 +839,64 @@ let state = {
   gameOver:    false,
 };
 
-/* ── PERSISTENCE ────────────────────────────────────── */
+/* ── PERSISTENCE ────────────────────────────────────────── */
 function saveState() {
-  try {
-    const toSave = Object.assign({}, state, { voiceActive: false });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch (_) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, voiceActive: false })); } catch (_) {}
 }
-
 function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (_) { return null; }
+  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch (_) { return null; }
 }
+function clearState() { localStorage.removeItem(STORAGE_KEY); }
 
-function clearState() {
-  localStorage.removeItem(STORAGE_KEY);
-}
-
-/* ── SCREEN NAVIGATION ──────────────────────────────── */
+/* ── NAVIGATION ─────────────────────────────────────────── */
 function showScreen(name) {
   ['setup', 'game', 'winner'].forEach(s => {
     const el = document.getElementById(`screen-${s}`);
-    if (s === name) {
-      el.classList.add('active');
-      el.classList.remove('hidden');
-    } else {
-      el.classList.remove('active');
-      el.classList.add('hidden');
-    }
+    el.classList.toggle('active', s === name);
+    el.classList.toggle('hidden', s !== name);
   });
 }
 
-/* ── SETUP SCREEN LOGIC ─────────────────────────────── */
-// chip-group state tracked in data-selected attribute
-let chipSelections = {
-  'chips-game-type':  '3v3',
-  'chips-win-score':  '21',
-  'chips-scoring':    '1s2s',
-};
+/* ── SETUP ──────────────────────────────────────────────── */
+let chips = { 'chips-game-type': '3v3', 'chips-win-score': '21', 'chips-scoring': '1s2s' };
 
 function selectChip(groupId, value, el) {
-  chipSelections[groupId] = value;
-  document.querySelectorAll(`#${groupId} .chip`).forEach(c => {
-    c.classList.toggle('selected', c.dataset.value === value);
-  });
+  chips[groupId] = value;
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c =>
+    c.classList.toggle('selected', c.dataset.value === value)
+  );
 }
 
 function toggleWinCustom() {
   const inp = document.getElementById('input-win-custom');
-  const isCustom = chipSelections['chips-win-score'] === 'custom';
-  inp.classList.toggle('hidden', !isCustom);
-  if (isCustom) inp.focus();
+  const on  = chips['chips-win-score'] === 'custom';
+  inp.classList.toggle('hidden', !on);
+  if (on) inp.focus();
 }
 
-function updateScoringRule() {
-  const rule = chipSelections['chips-scoring'];
-  document.getElementById('custom-scoring-form').classList.toggle('hidden', rule !== 'custom');
-  // update display immediately if we're already in-game (for resume scenario)
-  if (!document.getElementById('screen-game').classList.contains('hidden')) {
-    renderScoreButtons();
-  }
+function updateScoringUI() {
+  document.getElementById('custom-scoring-form')
+    .classList.toggle('hidden', chips['chips-scoring'] !== 'custom');
 }
 
 function handleStartGame() {
   const nameA = document.getElementById('input-team-a').value.trim() || 'Team A';
   const nameB = document.getElementById('input-team-b').value.trim() || 'Team B';
 
-  let winScore = parseInt(chipSelections['chips-win-score'], 10);
-  if (chipSelections['chips-win-score'] === 'custom') {
+  let winScore = parseInt(chips['chips-win-score'], 10);
+  if (chips['chips-win-score'] === 'custom')
     winScore = parseInt(document.getElementById('input-win-custom').value, 10) || 21;
-  }
 
   let ptsSmall = 1, ptsLarge = 2;
-  if (chipSelections['chips-scoring'] === '2s3s') { ptsSmall = 2; ptsLarge = 3; }
-  else if (chipSelections['chips-scoring'] === 'custom') {
+  if (chips['chips-scoring'] === '2s3s')    { ptsSmall = 2; ptsLarge = 3; }
+  if (chips['chips-scoring'] === 'custom') {
     ptsSmall = parseInt(document.getElementById('input-pts-small').value, 10) || 1;
     ptsLarge = parseInt(document.getElementById('input-pts-large').value, 10) || 2;
   }
 
-  state = {
-    gameType:    chipSelections['chips-game-type'],
-    teamA:       { name: nameA,  score: 0 },
-    teamB:       { name: nameB,  score: 0 },
-    winScore,
-    ptsSmall,
-    ptsLarge,
-    history:     [],
-    voiceActive: false,
-    gameOver:    false,
-  };
-
+  state = { gameType: chips['chips-game-type'], teamA: { name: nameA, score: 0 },
+            teamB: { name: nameB, score: 0 }, winScore, ptsSmall, ptsLarge,
+            history: [], voiceActive: false, gameOver: false };
   saveState();
   renderGame();
   showScreen('game');
@@ -834,205 +905,168 @@ function handleStartGame() {
 function handleResume() {
   const saved = loadState();
   if (!saved) return;
-  state = saved;
+  Object.assign(state, saved);
   state.voiceActive = false;
   renderGame();
   showScreen('game');
 }
 
-/* ── GAME SCREEN RENDER ─────────────────────────────── */
+function handleBackFromGame() {
+  if (state.history.length > 0 && !state.gameOver) {
+    if (!confirm('Go back to setup? Your game is saved — tap Resume to continue.')) return;
+  }
+  stopVoice();
+  showScreen('setup');
+  document.getElementById('btn-resume').classList.toggle('hidden',
+    state.gameOver || state.history.length === 0);
+}
+
+/* ── RENDER ─────────────────────────────────────────────── */
 function renderGame() {
-  // Names
   document.getElementById('team-a-name').textContent = state.teamA.name;
   document.getElementById('team-b-name').textContent = state.teamB.name;
-
-  // Scores
   document.getElementById('team-a-score').textContent = state.teamA.score;
   document.getElementById('team-b-score').textContent = state.teamB.score;
-
-  // Target
-  document.getElementById('target-display').textContent = `FIRST TO ${state.winScore}`;
-
-  // Score buttons
+  document.getElementById('topbar-gametype').textContent = state.gameType;
+  document.getElementById('topbar-target').textContent   = `First to ${state.winScore}`;
   renderScoreButtons();
-
-  // Leading highlight & status
   updateLeadingUI();
-
-  // Game point banner
   updateGamePointBanner();
-
-  // History
   renderHistory();
 }
 
 function renderScoreButtons() {
   const pts = validPoints();
   ['a', 'b'].forEach(team => {
-    const container = document.getElementById(`score-btns-${team}`);
-    container.innerHTML = pts.map(p =>
-      `<button class="btn-score" data-team="${team}" data-pts="${p}">+${p}</button>`
-    ).join('');
+    document.getElementById(`score-btns-${team}`).innerHTML =
+      pts.map(p => `<button class="btn-score" data-team="${team}" data-pts="${p}">+${p}</button>`).join('');
   });
-  // Re-attach delegated listener
-  rewireScoreButtons();
+  attachScoreListeners();
 }
 
 function validPoints() {
   const { ptsSmall, ptsLarge } = state;
-  // Always show both scoring options; if equal, show just one
-  if (ptsSmall === ptsLarge) return [ptsSmall];
-  return [ptsSmall, ptsLarge];
+  return ptsSmall === ptsLarge ? [ptsSmall] : [ptsSmall, ptsLarge];
 }
 
-let scoreBoardListening = false;
-function rewireScoreButtons() {
-  const board = document.getElementById('scoreboard');
-  if (scoreBoardListening) return; // delegated — only attach once
-  scoreBoardListening = true;
-  board.addEventListener('click', e => {
+let _scoreBoardWired = false;
+function attachScoreListeners() {
+  if (_scoreBoardWired) return;
+  _scoreBoardWired = true;
+  document.getElementById('scoreboard').addEventListener('click', e => {
     const btn = e.target.closest('.btn-score');
     if (!btn) return;
     addScore(btn.dataset.team, parseInt(btn.dataset.pts, 10));
-    flashButton(btn);
+    btn.classList.add('pts-flash');
+    setTimeout(() => btn.classList.remove('pts-flash'), 180);
   });
 }
 
-function flashButton(btn) {
-  btn.classList.add('pts-flash');
-  setTimeout(() => btn.classList.remove('pts-flash'), 200);
-}
-
 function updateLeadingUI() {
-  const aPanel = document.getElementById('team-a-panel');
-  const bPanel = document.getElementById('team-b-panel');
-  const arrow  = document.getElementById('lead-arrow');
-  const bar    = document.getElementById('status-bar');
-  const a = state.teamA.score;
-  const b = state.teamB.score;
+  const a = state.teamA.score, b = state.teamB.score;
+  document.getElementById('team-a-panel').classList.toggle('leading', a > b);
+  document.getElementById('team-b-panel').classList.toggle('leading', b > a);
 
-  aPanel.classList.toggle('leading', a > b);
-  bPanel.classList.toggle('leading', b > a);
+  const arrow = document.getElementById('lead-arrow');
+  const bar   = document.getElementById('status-bar');
 
   if (a === b) {
     arrow.textContent = '—';
-    bar.textContent = 'Game is tied';
-    bar.className = 'tied-msg';
+    bar.textContent   = 'Game is tied';
+    bar.className     = '';
   } else if (a > b) {
     arrow.textContent = '◀';
-    bar.textContent = `${state.teamA.name} leads by ${a - b}`;
-    bar.className = 'leading-msg';
+    bar.textContent   = `${state.teamA.name} leads by ${a - b}`;
+    bar.className     = 'leading-msg';
   } else {
     arrow.textContent = '▶';
-    bar.textContent = `${state.teamB.name} leads by ${b - a}`;
-    bar.className = 'leading-msg';
+    bar.textContent   = `${state.teamB.name} leads by ${b - a}`;
+    bar.className     = 'leading-msg';
   }
 }
 
 function updateGamePointBanner() {
   const banner = document.getElementById('banner-game-point');
-  const a = state.teamA.score;
-  const b = state.teamB.score;
-  const w = state.winScore;
-  const ps = state.ptsSmall;
-
-  let gpTeam = null;
-  if (a + ps >= w && b + ps < w) gpTeam = state.teamA.name;
-  else if (b + ps >= w && a + ps < w) gpTeam = state.teamB.name;
-  else if (a + ps >= w && b + ps >= w) gpTeam = 'Both Teams';
-
-  if (gpTeam && !state.gameOver) {
+  const { teamA: { score: a }, teamB: { score: b }, winScore: w, ptsSmall: ps, gameOver } = state;
+  const gpA = a + ps >= w, gpB = b + ps >= w;
+  if ((gpA || gpB) && !gameOver) {
+    let msg = gpA && gpB ? '🔥 GAME POINT — BOTH TEAMS!'
+            : gpA       ? `🔥 GAME POINT — ${state.teamA.name.toUpperCase()}!`
+                        : `🔥 GAME POINT — ${state.teamB.name.toUpperCase()}!`;
+    banner.textContent = msg;
     banner.classList.remove('hidden');
-    banner.textContent = gpTeam === 'Both Teams'
-      ? '🔥 GAME POINT — BOTH TEAMS!'
-      : `🔥 GAME POINT — ${gpTeam.toUpperCase()}!`;
   } else {
     banner.classList.add('hidden');
   }
 }
 
-/* ── SCORING ────────────────────────────────────────── */
+/* ── SCORING ────────────────────────────────────────────── */
 function addScore(team, pts) {
   if (state.gameOver) return;
   state[`team${team.toUpperCase()}`].score += pts;
-  state.history.unshift({ team, pts, timestamp: Date.now() });
+  state.history.unshift({ team, pts });
   saveState();
   renderGame();
-  checkWinCondition();
+  checkWin();
 }
 
 function undoLastScore() {
-  if (state.history.length === 0) return;
+  if (!state.history.length) return;
   const last = state.history.shift();
-  state[`team${last.team.toUpperCase()}`].score -= last.pts;
-  if (state[`team${last.team.toUpperCase()}`].score < 0)
-    state[`team${last.team.toUpperCase()}`].score = 0;
+  const t    = `team${last.team.toUpperCase()}`;
+  state[t].score = Math.max(0, state[t].score - last.pts);
   saveState();
   renderGame();
-  showVoiceFeedback('', 'Last score removed.');
+  setVoiceAction('↩ Last score removed.');
 }
 
-function checkWinCondition() {
+function checkWin() {
   const aWon = state.teamA.score >= state.winScore;
   const bWon = state.teamB.score >= state.winScore;
   if (!aWon && !bWon) return;
-
   state.gameOver = true;
   stopVoice();
   saveState();
-
   const winner = aWon ? state.teamA : state.teamB;
   const loser  = aWon ? state.teamB : state.teamA;
-
   document.getElementById('winner-team-name').textContent  = winner.name;
   document.getElementById('winner-final-score').textContent = `${winner.score} – ${loser.score}`;
-  document.getElementById('winner-meta').textContent =
-    `${state.gameType} · First to ${state.winScore}`;
-
+  document.getElementById('winner-meta').textContent        = `${state.gameType} · First to ${state.winScore}`;
   launchConfetti();
   showScreen('winner');
 }
 
-/* ── HISTORY ────────────────────────────────────────── */
 function renderHistory() {
   const list = document.getElementById('history-list');
-  if (state.history.length === 0) {
+  if (!state.history.length) {
     list.innerHTML = '<li class="history-empty">No scores yet</li>';
     return;
   }
-  list.innerHTML = state.history.slice(0, 40).map((entry, i) => {
-    const name = entry.team === 'a' ? state.teamA.name : state.teamB.name;
-    const dot  = i === 0 ? '<span class="h-dot">●</span>' : '';
+  list.innerHTML = state.history.slice(0, 40).map((e, i) => {
+    const name = e.team === 'a' ? state.teamA.name : state.teamB.name;
     return `<li class="history-item">
-      ${dot}
+      ${i === 0 ? '<span class="h-new">NEW</span>' : ''}
       <span class="h-team">${escHtml(name)}</span>
-      <span class="h-pts">+${entry.pts}</span>
+      <span class="h-pts">+${e.pts}</span>
     </li>`;
   }).join('');
 }
 
-function escHtml(str) {
-  return str.replace(/[&<>"']/g, m =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+function escHtml(s) {
+  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-/* ── END GAME / RESET ───────────────────────────────── */
+/* ── END / RESET ────────────────────────────────────────── */
 function handleEndGame() {
-  if (!confirm('End game and declare a winner based on current score?')) return;
-  const aScore = state.teamA.score;
-  const bScore = state.teamB.score;
-
+  if (!confirm('End game now?')) return;
   state.gameOver = true;
   stopVoice();
   saveState();
-
-  const winner = aScore >= bScore ? state.teamA : state.teamB;
-  const loser  = aScore >= bScore ? state.teamB : state.teamA;
+  const winner = state.teamA.score >= state.teamB.score ? state.teamA : state.teamB;
+  const loser  = state.teamA.score >= state.teamB.score ? state.teamB : state.teamA;
   document.getElementById('winner-team-name').textContent  = winner.name;
   document.getElementById('winner-final-score').textContent = `${winner.score} – ${loser.score}`;
-  document.getElementById('winner-meta').textContent =
-    `${state.gameType} · First to ${state.winScore}`;
-
+  document.getElementById('winner-meta').textContent        = `${state.gameType} · First to ${state.winScore}`;
   launchConfetti();
   showScreen('winner');
 }
@@ -1040,8 +1074,8 @@ function handleEndGame() {
 function handlePlayAgain() {
   state.teamA.score = 0;
   state.teamB.score = 0;
-  state.history = [];
-  state.gameOver = false;
+  state.history     = [];
+  state.gameOver    = false;
   state.voiceActive = false;
   saveState();
   renderGame();
@@ -1052,191 +1086,197 @@ function handleNewSetup() {
   clearState();
   stopVoice();
   showScreen('setup');
-  document.getElementById('btn-resume').classList.add('hidden');
 }
 
-/* ── CONFETTI ───────────────────────────────────────── */
+/* ── CONFETTI ───────────────────────────────────────────── */
 function launchConfetti() {
-  const container = document.getElementById('winner-confetti');
-  container.innerHTML = '';
-  const colors = ['#FF6B35', '#FFD700', '#F0F0F0', '#0F3460', '#E04F1A', '#C9A227', '#FFFFFF'];
+  const c      = document.getElementById('winner-confetti');
+  c.innerHTML  = '';
+  const colors = ['#FF6B35','#FFD700','#F0F0F0','#0F3460','#E04F1A','#C9A227'];
   for (let i = 0; i < 90; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
-    const size = 8 + Math.random() * 10;
-    p.style.cssText = `
-      left: ${Math.random() * 100}vw;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      width: ${size}px;
-      height: ${size * (0.4 + Math.random() * 0.6)}px;
-      animation-duration: ${2 + Math.random() * 2}s;
-      animation-delay: ${Math.random() * 1.8}s;
-    `;
-    container.appendChild(p);
+    const p  = document.createElement('div');
+    const sz = 8 + Math.random() * 10;
+    p.className  = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${colors[i%colors.length]};`
+      + `width:${sz}px;height:${sz*(0.4+Math.random()*0.6)}px;`
+      + `animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*1.8}s;`;
+    c.appendChild(p);
   }
-  setTimeout(() => { container.innerHTML = ''; }, 6000);
+  setTimeout(() => { c.innerHTML = ''; }, 6200);
 }
 
-/* ── VOICE RECOGNITION ──────────────────────────────── */
-let recognition = null;
+/* ════════════════════════════════════════════════════════
+   VOICE — robust implementation
+   A fresh SpeechRecognition instance is created on every
+   startListening() call. Reusing an ended instance causes
+   InvalidStateError which is silently swallowed, leaving
+   the UI showing "Mic ON" with nothing actually listening.
+════════════════════════════════════════════════════════ */
 
-function initVoice() {
+const voiceSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+let recognition      = null;
+let restartTimer     = null;
+
+function startListening() {
+  if (!voiceSupported || !state.voiceActive || state.gameOver) return;
+  clearTimeout(restartTimer);
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    const btn = document.getElementById('btn-voice');
-    btn.textContent = '🎤 Not Supported';
-    btn.disabled = true;
-    showVoiceFeedback('', 'Voice scoring is not supported on this browser. Please use Chrome or Edge.');
-    return false;
-  }
-
   recognition = new SR();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.lang = 'en-US';
+  recognition.continuous      = false;
+  recognition.interimResults  = false;
+  recognition.lang            = 'en-US';
   recognition.maxAlternatives = 3;
 
-  recognition.onresult = event => {
+  recognition.onresult = e => {
     let handled = false;
-    for (let i = 0; i < event.results[0].length && !handled; i++) {
-      const transcript = event.results[0][i].transcript.toLowerCase().trim();
-      showVoiceFeedback(`Heard: "${transcript}"`, '');
-      handled = parseVoiceCommand(transcript);
+    for (let i = 0; i < e.results[0].length && !handled; i++) {
+      const text = e.results[0][i].transcript.trim();
+      setVoiceHeard(`Heard: "${text}"`);
+      handled = parseVoiceCommand(text.toLowerCase());
     }
-    if (!handled) {
-      showVoiceFeedback(
-        document.getElementById('voice-heard').textContent,
-        'Sorry, I didn\'t understand. Try: "Team A scores two"'
-      );
-    }
+    if (!handled) setVoiceAction('Didn\'t catch that — try: "Team A two" or "Nets three"');
   };
 
   recognition.onend = () => {
     if (state.voiceActive && !state.gameOver) {
-      setTimeout(() => {
-        try { recognition.start(); } catch (_) {}
-      }, 300);
+      restartTimer = setTimeout(startListening, 600);
     }
   };
 
-  recognition.onerror = event => {
-    if (event.error === 'no-speech') return;
-    if (event.error === 'not-allowed') {
-      showVoiceFeedback('', 'Microphone permission denied. Please allow mic access.');
+  recognition.onerror = e => {
+    if (e.error === 'no-speech') return;
+    if (e.error === 'aborted')   return;
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
       state.voiceActive = false;
-      updateVoiceButton();
+      updateVoiceUI();
+      setVoiceAction('❌ Mic access denied — allow mic in Chrome settings');
+      return;
+    }
+    if (e.error === 'network') {
+      setVoiceAction('❌ Network error — voice needs internet on Chrome');
     }
   };
 
-  return true;
+  try {
+    recognition.start();
+  } catch (err) {
+    state.voiceActive = false;
+    updateVoiceUI();
+    setVoiceAction('❌ Could not start mic — tap Mic to retry');
+  }
 }
 
 function toggleVoice() {
-  if (!recognition) {
-    if (!initVoice()) return;
+  if (!voiceSupported) {
+    document.getElementById('voice-card').classList.remove('hidden');
+    setVoiceAction('❌ Voice not supported — open in Chrome or Edge');
+    return;
   }
   state.voiceActive = !state.voiceActive;
   if (state.voiceActive) {
-    try {
-      recognition.start();
-      showVoiceFeedback('', 'Listening… say a command');
-    } catch (_) {}
+    document.getElementById('voice-card').classList.remove('hidden');
+    setVoiceHeard('');
+    setVoiceAction('🎤 Listening… say a command');
+    startListening();
   } else {
-    stopVoice();
-    document.getElementById('voice-feedback').classList.add('hidden');
+    clearTimeout(restartTimer);
+    try { if (recognition) recognition.abort(); } catch (_) {}
+    document.getElementById('voice-card').classList.add('hidden');
   }
-  updateVoiceButton();
+  updateVoiceUI();
 }
 
 function stopVoice() {
   state.voiceActive = false;
-  try { if (recognition) recognition.stop(); } catch (_) {}
-  updateVoiceButton();
+  clearTimeout(restartTimer);
+  try { if (recognition) recognition.abort(); } catch (_) {}
+  updateVoiceUI();
 }
 
-function updateVoiceButton() {
-  const btn = document.getElementById('btn-voice');
+function updateVoiceUI() {
+  const btn      = document.getElementById('btn-voice');
+  const icon     = document.getElementById('mic-icon');
+  const label    = document.getElementById('mic-label');
+  const topBtn   = document.getElementById('btn-topbar-mic');
+  const on       = state.voiceActive;
+
+  if (btn)    { btn.classList.toggle('btn-voice-on', on); btn.classList.toggle('btn-voice-off', !on); }
+  if (icon)   icon.textContent  = on ? '🔴' : '🎤';
+  if (label)  label.textContent = on ? 'Mic ON' : 'Mic Off';
+  if (topBtn) { topBtn.textContent = on ? '🔴' : '🎤'; topBtn.classList.toggle('mic-on', on); }
+}
+
+function setVoiceHeard(text) {
+  const el = document.getElementById('voice-heard');
+  if (el) el.textContent = text;
+}
+
+function setVoiceAction(text) {
+  const el = document.getElementById('voice-action');
+  if (el) el.textContent = text;
+  // Also show the card if voice is on and we have something to say
   if (state.voiceActive) {
-    btn.textContent = '🔴 Mic ON';
-    btn.classList.remove('btn-voice-off');
-    btn.classList.add('btn-voice-on');
-  } else {
-    btn.textContent = '🎤 Mic';
-    btn.classList.remove('btn-voice-on');
-    btn.classList.add('btn-voice-off');
+    document.getElementById('voice-card').classList.remove('hidden');
   }
 }
 
-function showVoiceFeedback(heard, action) {
-  const fb = document.getElementById('voice-feedback');
-  fb.classList.remove('hidden');
-  if (heard  !== '') document.getElementById('voice-heard').textContent  = heard;
-  if (action !== '') document.getElementById('voice-action').textContent = action;
-}
-
-/* ── VOICE COMMAND PARSING ──────────────────────────── */
+/* ── VOICE COMMAND PARSING ──────────────────────────────── */
 function resolveTeam(t) {
-  const aName = state.teamA.name.toLowerCase();
-  const bName = state.teamB.name.toLowerCase();
-
-  if (t.includes(aName)) return 'a';
-  if (t.includes(bName)) return 'b';
-
-  if (/\b(team\s*a|team\s*1|first\s*team|red\s*team|light\s*team)\b/.test(t)) return 'a';
-  if (/\b(team\s*b|team\s*2|second\s*team|blue\s*team|dark\s*team)\b/.test(t)) return 'b';
-
+  const a = state.teamA.name.toLowerCase();
+  const b = state.teamB.name.toLowerCase();
+  if (a && t.includes(a)) return 'a';
+  if (b && t.includes(b)) return 'b';
+  if (/\b(team\s*a|team\s*1|first\s*team|red\s*team|left\s*team)\b/.test(t))  return 'a';
+  if (/\b(team\s*b|team\s*2|second\s*team|blue\s*team|right\s*team)\b/.test(t)) return 'b';
   return null;
 }
 
 function extractPoints(t) {
-  const map = { 'one': 1, 'two': 2, 'three': 3, '1': 1, '2': 2, '3': 3 };
-  const match = t.match(/\b(one|two|three|1|2|3)\b/i);
-  return match ? (map[match[1].toLowerCase()] || null) : null;
+  const map = { one:1, two:2, three:3, 1:1, 2:2, 3:3 };
+  const m   = t.match(/\b(one|two|three|1|2|3)\b/i);
+  return m ? (map[m[1].toLowerCase()] || null) : null;
 }
 
 function speakScore() {
   const msg = `${state.teamA.name} ${state.teamA.score}, ${state.teamB.name} ${state.teamB.score}`;
-  showVoiceFeedback('', msg);
+  setVoiceAction(msg);
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(msg);
-    utt.rate = 0.95;
-    window.speechSynthesis.speak(utt);
+    const u = new SpeechSynthesisUtterance(msg);
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
   }
 }
 
-function parseVoiceCommand(transcript) {
-  const t = transcript.toLowerCase().trim();
+function parseVoiceCommand(t) {
 
   // Undo
-  if (/\b(undo|cancel|take\s*it\s*back|remove\s*last|mistake)\b/.test(t)) {
+  if (/\b(undo|cancel|mistake|take\s*it\s*back|remove\s*last)\b/.test(t)) {
     undoLastScore();
-    showVoiceFeedback(`Heard: "${transcript}"`, 'Undone last score.');
     return true;
   }
 
-  // Score check
-  if (/\b(score\s*check|what'?s?\s*the\s*score|score|current\s*score)\b/.test(t)) {
+  // Score check — requires "check", "what", or "current" — not bare "score"
+  // so "Team A scores two" does NOT trigger this
+  if (/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)) {
     speakScore();
     return true;
   }
 
-  // Game over / End game
-  if (/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done|finish)\b/.test(t)) {
+  // Game over
+  if (/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done|finish\s*game)\b/.test(t)) {
     handleEndGame();
     return true;
   }
 
   // Reset
-  if (/\b(reset\s*game|reset|start\s*over|new\s*game)\b/.test(t)) {
-    if (confirm('Reset game?')) {
-      handlePlayAgain();
-      showVoiceFeedback(`Heard: "${transcript}"`, 'Game reset!');
-    }
+  if (/\b(reset\s*game|reset|start\s*over)\b/.test(t)) {
+    if (confirm('Reset scores?')) { handlePlayAgain(); setVoiceAction('Game reset!'); }
     return true;
   }
 
-  // Score command: resolve team + points
+  // Scoring — must identify both team AND points
   const team = resolveTeam(t);
   if (!team) return false;
 
@@ -1244,28 +1284,22 @@ function parseVoiceCommand(transcript) {
   if (!pts) return false;
 
   addScore(team, pts);
-  const teamName = team === 'a' ? state.teamA.name : state.teamB.name;
-  showVoiceFeedback(
-    `Heard: "${transcript}"`,
-    `Added ${pts} point${pts > 1 ? 's' : ''} to ${teamName}`
-  );
+  const name = team === 'a' ? state.teamA.name : state.teamB.name;
+  setVoiceAction(`+${pts} to ${name} ✓`);
   return true;
 }
 
-/* ── INIT ───────────────────────────────────────────── */
+/* ── INIT ───────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  const saved = loadState();
+  const saved     = loadState();
   const canResume = saved && !saved.gameOver && saved.history && saved.history.length > 0;
 
-  if (canResume) {
-    document.getElementById('btn-resume').classList.remove('hidden');
-  }
+  document.getElementById('btn-resume').classList.toggle('hidden', !canResume);
 
-  // Pre-fill team names from last game
   if (saved) {
-    if (saved.teamA && saved.teamA.name !== 'Team A')
+    if (saved.teamA?.name && saved.teamA.name !== 'Team A')
       document.getElementById('input-team-a').value = saved.teamA.name;
-    if (saved.teamB && saved.teamB.name !== 'Team B')
+    if (saved.teamB?.name && saved.teamB.name !== 'Team B')
       document.getElementById('input-team-b').value = saved.teamB.name;
   }
 });
