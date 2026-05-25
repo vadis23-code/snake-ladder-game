@@ -129,7 +129,7 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .t-score.pop{animation:scorePop .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes scorePop{0%{transform:scale(1)}50%{transform:scale(1.38)}100%{transform:scale(1)}}
 .t-meta{display:flex;align-items:center;gap:8px}
-.foul-badge{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;cursor:pointer;transition:all var(--t1);min-height:26px;display:flex;align-items:center}
+.foul-badge{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;cursor:pointer;transition:all var(--t1);min-height:40px;display:flex;align-items:center;user-select:none}
 .foul-badge.warn{border-color:var(--danger);color:var(--danger)}
 .vs-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-left:1px solid var(--border);border-right:1px solid var(--border)}
 .vs-text{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--muted2)}
@@ -394,7 +394,7 @@ table.standings tr:last-child td{border-bottom:none}
 <body>
 
 <!-- ══ PROFILE ══ -->
-<div id="s-profile" class="screen active">
+<div id="s-profile" class="screen">
   <div class="profile-hero">
     <span class="ph-ball">🏀</span>
     <div class="ph-title">CourtCall</div>
@@ -550,8 +550,8 @@ table.standings tr:last-child td{border-bottom:none}
   <div class="controls-bar">
     <button class="ctrl" onclick="undoScore()"><span class="ctrl-icon">↩</span><span class="ctrl-lbl">Undo</span></button>
     <button class="ctrl" id="ctrl-mic" onclick="toggleVoice()"><span class="ctrl-icon" id="mic-icon">🎤</span><span class="ctrl-lbl" id="mic-lbl">Mic Off</span></button>
-    <button class="ctrl" onclick="addFoul('a')" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl">Foul A</span></button>
-    <button class="ctrl" onclick="addFoul('b')" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl">Foul B</span></button>
+    <button class="ctrl" onclick="addFoul('a')" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl" id="ctrl-fa-lbl">Foul A</span></button>
+    <button class="ctrl" onclick="addFoul('b')" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl" id="ctrl-fb-lbl">Foul B</span></button>
     <button class="ctrl danger" onclick="handleEndGame()"><span class="ctrl-icon">🏁</span><span class="ctrl-lbl">End</span></button>
   </div>
   <div class="voice-panel hidden" id="voice-panel">
@@ -1023,10 +1023,8 @@ function renderGame(){
   document.getElementById('t-name-b').textContent=b.name;
   document.getElementById('t-score-a').textContent=a.score;
   document.getElementById('t-score-b').textContent=b.score;
-  document.getElementById('foul-a').textContent=`F: ${a.fouls}`;
-  document.getElementById('foul-b').textContent=`F: ${b.fouls}`;
-  document.getElementById('foul-a').classList.toggle('warn',a.fouls>=4);
-  document.getElementById('foul-b').classList.toggle('warn',b.fouls>=4);
+  updateFoulUI('a');
+  updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
   document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';
   renderScorePads();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();
@@ -1096,8 +1094,19 @@ function undoScore(){
   save();renderGame();setVAction('↩ Last score removed.');
 }
 function addFoul(team){
-  const T=`team${team.toUpperCase()}`;state[T].fouls=Math.min(10,state[T].fouls+1);save();
-  const el=document.getElementById(`foul-${team}`);el.textContent=`F: ${state[T].fouls}`;el.classList.toggle('warn',state[T].fouls>=4);
+  const T=`team${team.toUpperCase()}`;
+  if(!state[T])return;
+  state[T].fouls=Math.min(10,state[T].fouls+1);
+  save();
+  updateFoulUI(team);
+}
+function updateFoulUI(team){
+  const T=`team${team.toUpperCase()}`;
+  const count=state[T]?.fouls??0;
+  const badge=document.getElementById(`foul-${team}`);
+  if(badge){badge.textContent=`F: ${count}`;badge.classList.toggle('warn',count>=4)}
+  const ctrlLbl=document.getElementById(`ctrl-f${team}-lbl`);
+  if(ctrlLbl){ctrlLbl.textContent=count>0?`Foul ${team.toUpperCase()}: ${count}`:`Foul ${team.toUpperCase()}`}
 }
 function nextQuarter(){const idx=QUARTERS.indexOf(state.quarter);state.quarter=QUARTERS[(idx+1)%QUARTERS.length];save();renderGame()}
 function togglePossession(){state.possession=state.possession==='a'?'b':'a';document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';save()}
@@ -1159,6 +1168,7 @@ function closePG(){document.getElementById('pg-overlay').classList.add('hidden')
 function playAgain(){
   document.getElementById('pg-overlay').classList.add('hidden');
   state.teamA.score=0;state.teamB.score=0;state.teamA.fouls=0;state.teamB.fouls=0;
+  ['a','b'].forEach(t=>{const l=document.getElementById(`ctrl-f${t}-lbl`);if(l)l.textContent=`Foul ${t.toUpperCase()}`});
   state.history=[];state.maxLead={a:0,b:0};state.quarter=1;state.possession='a';
   state.gameOver=false;state.startTime=Date.now();state.voiceActive=false;
   gameContext={type:'pickup',tournamentId:null,fixtureId:null};
