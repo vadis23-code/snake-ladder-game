@@ -619,6 +619,40 @@ table.standings tr:last-child td{border-bottom:none}
 .gal-album-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
 .gal-album-chip.on{border-color:var(--orange);background:rgba(255,107,53,.12);color:var(--orange)}
 .gal-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
+/* EVENTS */
+.evt-list{display:flex;flex-direction:column;gap:10px;padding:14px}
+.evt-card{background:var(--s1);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.evt-header{display:flex;gap:12px;align-items:flex-start;padding:12px 14px}
+.evt-date-block{flex-shrink:0;background:var(--ca);border-radius:10px;padding:6px 10px;text-align:center;min-width:44px}
+.evt-date-day{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;line-height:1}
+.evt-date-mon{font-size:10px;font-weight:700;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.06em}
+.evt-info{flex:1;min-width:0}
+.evt-type-badge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:700;margin-bottom:4px}
+.evt-title{font-weight:700;font-size:15px;color:var(--text);line-height:1.3;margin-bottom:2px}
+.evt-meta-row{font-size:11px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px}
+.evt-meta-item{display:flex;align-items:center;gap:3px}
+.evt-desc{font-size:13px;color:var(--muted);line-height:1.5;padding:0 14px 10px;border-top:1px solid var(--border);padding-top:10px}
+.evt-rsvp-row{display:flex;gap:6px;padding:0 14px 12px}
+.btn-rsvp{flex:1;padding:8px 4px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:all var(--t1);display:flex;flex-direction:column;align-items:center;gap:2px}
+.btn-rsvp.going{border-color:var(--success);background:rgba(0,200,81,.14);color:var(--success)}
+.btn-rsvp.maybe{border-color:var(--gold);background:rgba(255,179,0,.14);color:var(--gold)}
+.btn-rsvp.not-going{border-color:var(--danger);background:rgba(255,59,48,.14);color:var(--danger)}
+.evt-attendees-toggle{padding:0 14px 10px}
+.btn-evt-attendees{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.evt-attendees-list{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.evt-attendee-chip{padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600}
+.chip-going{background:rgba(0,200,81,.14);color:var(--success)}
+.chip-maybe{background:rgba(255,179,0,.14);color:var(--gold)}
+.chip-not-going{background:rgba(255,59,48,.12);color:var(--danger)}
+.evt-admin-row{padding:0 14px 12px;display:flex;justify-content:flex-end}
+.btn-evt-del{background:none;border:1px solid var(--danger);border-radius:8px;color:var(--danger);font-size:12px;padding:5px 12px;cursor:pointer}
+.add-evt-form{background:var(--s1);border-radius:12px;border:1px solid var(--border);padding:14px;margin:0 14px 10px}
+.evt-type-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.evt-type-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.evt-type-chip.on{border-color:var(--ca);background:rgba(255,87,34,.12);color:var(--ca)}
+.evt-date-time-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.evt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
+.past-badge{display:inline-block;padding:2px 7px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,255,255,.07);color:var(--muted);margin-left:6px}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -2693,6 +2727,7 @@ function openCommunity(id){
   feedFilter='all';showCreateForm=false;editingPostId=null;
   showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null;
   showAddGalleryForm=false;selectedTaggedPlayers=new Set();galleryFilter='all';
+  showAddEventForm=false;eventsFilter='upcoming';expandedEventRsvps=new Set();
   if(typeof expandedComments!=='undefined')expandedComments.clear();
   if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
   renderCommDetail();
@@ -2747,6 +2782,7 @@ function setCommTab(tab){
   if(tab!=='feed'){showCreateForm=false;editingPostId=null}
   if(tab!=='players'){showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null}
   if(tab!=='gallery'){showAddGalleryForm=false;selectedTaggedPlayers=new Set()}
+  if(tab!=='events'){showAddEventForm=false}
   activeCommTab=tab;
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   const c=getComms().find(x=>x.id===activeCommunityId);
@@ -2768,7 +2804,7 @@ function _renderCommTabContent(c,members,myRole){
   }else if(activeCommTab==='gallery'){
     el.innerHTML=renderGalleryTabHTML(c,myRole);
   }else if(activeCommTab==='events'){
-    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📅</span><span>Events coming in Phase C6.</span></div></div>`;
+    el.innerHTML=renderEventsTabHTML(c,myRole);
   }else if(activeCommTab==='leaderboard'){
     el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">🏆</span><span>Leaderboards coming in Phase C7.</span></div></div>`;
   }else if(activeCommTab==='settings'){
@@ -2914,6 +2950,7 @@ function deleteComm(communityId){
   saveAllCPlayers(getAllCPlayers().filter(p=>p.communityId!==communityId));
   saveAllCRatings(getAllCRatings().filter(r=>r.communityId!==communityId));
   saveAllGalItems(getAllGalItems().filter(g=>g.communityId!==communityId));
+  saveAllEvents(getAllEvents().filter(e=>e.communityId!==communityId));
   showToast('Community deleted');
   showScreen('communities');
 }
@@ -3473,6 +3510,224 @@ function submitCRating(playerId,communityId){
   saveAllCRatings(all);
   ratingPlayerId=null;pendingRating={};
   setCommTab('players');showToast('Rating submitted! ⭐');
+}
+
+/* ════════════════════════════════════════════════════════
+   Community Events (Phase C6)
+════════════════════════════════════════════════════════ */
+const EVT_TYPES=['Pickup Game','Tournament','Practice Session','Social Event','Training Camp','Watch Party'];
+const EVT_TYPE_COLORS={
+  'Pickup Game':'rgba(255,107,53,.18)','Tournament':'rgba(255,179,0,.18)',
+  'Practice Session':'rgba(0,200,81,.18)','Social Event':'rgba(100,181,246,.18)',
+  'Training Camp':'rgba(206,147,216,.18)','Watch Party':'rgba(129,212,250,.18)'
+};
+const EVT_TYPE_TEXT={
+  'Pickup Game':'var(--ca)','Tournament':'var(--gold)',
+  'Practice Session':'var(--success)','Social Event':'#64b5f6',
+  'Training Camp':'#ce93d8','Watch Party':'#81d4fa'
+};
+let eventsFilter='upcoming';
+let showAddEventForm=false;
+let selectedEventType='Pickup Game';
+let expandedEventRsvps=new Set();
+
+function getAllEvents(){try{return JSON.parse(localStorage.getItem(KC.events)||'[]')}catch{return[]}}
+function saveAllEvents(arr){localStorage.setItem(KC.events,JSON.stringify(arr))}
+function getEvents(cid){return getAllEvents().filter(e=>e.communityId===cid)}
+
+function renderEventsTabHTML(c,myRole){
+  const myId=(currentProfile||{id:'guest'}).id;
+  const canAdd=myRole==='admin'||myRole==='contributor';
+  const now=new Date();
+  let events=getEvents(c.id);
+  if(eventsFilter==='upcoming')events=events.filter(e=>new Date(e.date+'T'+(e.time||'23:59'))>=now);
+  else if(eventsFilter==='past')events=events.filter(e=>new Date(e.date+'T'+(e.time||'23:59'))<now);
+  events=events.slice().sort((a,b)=>{
+    const da=new Date(a.date+'T'+(a.time||'00:00')),db=new Date(b.date+'T'+(b.time||'00:00'));
+    return eventsFilter==='past'?db-da:da-db;
+  });
+
+  const filterChips=[{v:'upcoming',l:'Upcoming 📅'},{v:'past',l:'Past'},{v:'all',l:'All'}].map(({v,l})=>
+    `<button class="ff-chip${eventsFilter===v?' on':''}" onclick="setEventsFilter('${v}')">${l}</button>`
+  ).join('');
+
+  const typeChips=EVT_TYPES.map(t=>
+    `<button class="evt-type-chip${selectedEventType===t?' on':''}" onclick="pickEventTypeChip(this,'${escHtml(t)}')">${escHtml(t)}</button>`
+  ).join('');
+
+  const addFormHTML=showAddEventForm&&canAdd?`<div class="add-evt-form">
+    <div class="form-label">Event Type</div>
+    <div class="evt-type-chips">${typeChips}</div>
+    <div class="form-label">Title</div>
+    <input class="add-gal-url" id="evt-title-input" type="text" placeholder="e.g. Saturday Pickup Run" style="margin-bottom:8px">
+    <div class="form-label">Description</div>
+    <textarea class="post-body-input" id="evt-desc-input" rows="2" placeholder="Details, rules, what to bring..."></textarea>
+    <div class="evt-date-time-row" style="margin-top:8px">
+      <div><div class="form-label">Date</div><input class="add-gal-url" id="evt-date-input" type="date" style="margin-bottom:0"></div>
+      <div><div class="form-label">Time</div><input class="add-gal-url" id="evt-time-input" type="time" style="margin-bottom:0"></div>
+    </div>
+    <div class="form-label" style="margin-top:8px">Location / Court</div>
+    <input class="add-gal-url" id="evt-loc-input" type="text" placeholder="Court name or address">
+    <div class="form-label">Max Players <span style="color:var(--muted);font-weight:400">(0 = no limit)</span></div>
+    <input class="add-gal-url" id="evt-max-input" type="number" min="0" placeholder="0" style="margin-bottom:8px">
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-primary" style="flex:1" onclick="submitEvent('${escHtml(c.id)}')">📅 Create Event</button>
+      <button class="btn-secondary" onclick="cancelAddEvent()">Cancel</button>
+    </div>
+  </div>`:'';
+
+  const listHTML=events.length
+    ?`<div class="evt-list">${events.map(e=>buildEventCardHTML(e,c,myRole,myId)).join('')}</div>`
+    :`<div class="evt-empty"><span style="font-size:36px">📅</span><span>${eventsFilter==='upcoming'?'No upcoming events.<br>Create the first one!':eventsFilter==='past'?'No past events yet.':'No events yet.'}</span></div>`;
+
+  return`<div style="padding-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 0">
+      <span style="font-size:12px;color:var(--muted)">${events.length} event${events.length!==1?'s':''}</span>
+      ${canAdd?`<button class="btn-new-post" onclick="toggleAddEvent()">${showAddEventForm?'✕ Close':'📅 Add Event'}</button>`:''}
+    </div>
+    ${addFormHTML}
+    <div class="gal-filter-row">${filterChips}</div>
+    ${listHTML}
+  </div>`;
+}
+
+function buildEventCardHTML(evt,c,myRole,myId){
+  const canDel=myRole==='admin'||evt.createdBy===myId;
+  const now=new Date();
+  const evtDt=new Date(evt.date+'T'+(evt.time||'23:59'));
+  const isPast=evtDt<now;
+  const d=new Date(evt.date+'T12:00:00');
+  const dayNum=d.getDate();
+  const monStr=d.toLocaleString('default',{month:'short'}).toUpperCase();
+
+  const myRsvp=(evt.rsvps||[]).find(r=>r.profileId===myId);
+  const goingCount=(evt.rsvps||[]).filter(r=>r.status==='going').length;
+  const maybeCount=(evt.rsvps||[]).filter(r=>r.status==='maybe').length;
+  const maxLabel=evt.maxPlayers&&evt.maxPlayers>0?` / ${evt.maxPlayers} max`:'';
+  const fullMsg=evt.maxPlayers&&evt.maxPlayers>0&&goingCount>=evt.maxPlayers&&(!myRsvp||myRsvp.status!=='going')?'<span style="color:var(--danger);font-size:11px">Event full</span>':'';
+
+  const rsvpOpen=expandedEventRsvps.has(evt.id);
+  const rsvpListHTML=rsvpOpen&&(evt.rsvps||[]).length?`<div class="evt-attendees-list">
+    ${(evt.rsvps||[]).map(r=>{
+      const cls=r.status==='going'?'chip-going':r.status==='maybe'?'chip-maybe':'chip-not-going';
+      const icon=r.status==='going'?'✅':r.status==='maybe'?'🤔':'❌';
+      return`<span class="evt-attendee-chip ${cls}">${icon} ${escHtml(r.profileName||'?')}</span>`;
+    }).join('')}
+  </div>`:'';
+
+  const typeBg=EVT_TYPE_COLORS[evt.type]||'rgba(255,255,255,.07)';
+  const typeTxt=EVT_TYPE_TEXT[evt.type]||'var(--muted)';
+
+  return`<div class="evt-card">
+    <div class="evt-header">
+      <div class="evt-date-block">
+        <div class="evt-date-day">${dayNum}</div>
+        <div class="evt-date-mon">${monStr}</div>
+      </div>
+      <div class="evt-info">
+        <div class="evt-type-badge" style="background:${typeBg};color:${typeTxt}">${escHtml(evt.type)}${isPast?'<span class="past-badge">Past</span>':''}</div>
+        <div class="evt-title">${escHtml(evt.title)}</div>
+        <div class="evt-meta-row">
+          ${evt.time?`<span class="evt-meta-item">🕐 ${escHtml(evt.time)}</span>`:''}
+          ${evt.location?`<span class="evt-meta-item">📍 ${escHtml(evt.location)}</span>`:''}
+          <span class="evt-meta-item">👤 ${goingCount} going${maxLabel}</span>
+        </div>
+      </div>
+    </div>
+    ${evt.description?`<div class="evt-desc">${escHtml(evt.description)}</div>`:''}
+    ${isPast?'':`<div class="evt-rsvp-row">
+      ${fullMsg||`
+      <button class="btn-rsvp${myRsvp&&myRsvp.status==='going'?' going':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','going')">✅<span>Going</span></button>
+      <button class="btn-rsvp${myRsvp&&myRsvp.status==='maybe'?' maybe':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','maybe')">🤔<span>Maybe</span></button>
+      <button class="btn-rsvp${myRsvp&&myRsvp.status==='not_going'?' not-going':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','not_going')">❌<span>Can't go</span></button>
+      `}
+    </div>`}
+    ${(evt.rsvps||[]).length?`<div class="evt-attendees-toggle">
+      <button class="btn-evt-attendees" onclick="toggleEventRsvps('${escHtml(evt.id)}','${escHtml(c.id)}')">${rsvpOpen?'Hide':'Show'} attendees (${(evt.rsvps||[]).length})</button>
+    </div>`:''}
+    ${rsvpListHTML}
+    ${canDel?`<div class="evt-admin-row"><button class="btn-evt-del" onclick="deleteEvent('${escHtml(evt.id)}','${escHtml(c.id)}')">🗑 Delete Event</button></div>`:''}
+  </div>`;
+}
+
+function toggleAddEvent(){
+  showAddEventForm=!showAddEventForm;
+  if(showAddEventForm)selectedEventType='Pickup Game';
+  setCommTab('events');
+}
+function cancelAddEvent(){showAddEventForm=false;setCommTab('events')}
+
+function pickEventTypeChip(btn,type){
+  document.querySelectorAll('.evt-type-chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  selectedEventType=type;
+}
+
+function setEventsFilter(f){eventsFilter=f;setCommTab('events')}
+
+function submitEvent(communityId){
+  const title=(document.getElementById('evt-title-input')||{}).value?.trim();
+  const desc=(document.getElementById('evt-desc-input')||{}).value?.trim()||'';
+  const date=(document.getElementById('evt-date-input')||{}).value?.trim();
+  const time=(document.getElementById('evt-time-input')||{}).value?.trim()||'';
+  const location=(document.getElementById('evt-loc-input')||{}).value?.trim()||'';
+  const maxRaw=(document.getElementById('evt-max-input')||{}).value?.trim()||'0';
+  if(!title){showToast('Enter an event title');return}
+  if(!date){showToast('Pick a date');return}
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const evt={
+    id:'event_'+Date.now(),
+    communityId,title,description:desc,type:selectedEventType,
+    date,time,location,maxPlayers:parseInt(maxRaw)||0,
+    createdBy:myId,creatorName:myName,
+    createdAt:new Date().toISOString(),
+    rsvps:[]
+  };
+  const all=getAllEvents();
+  all.push(evt);
+  saveAllEvents(all);
+  showAddEventForm=false;
+  eventsFilter='upcoming';
+  setCommTab('events');
+  showToast('Event created! 📅');
+}
+
+function deleteEvent(eventId,communityId){
+  if(!confirm('Delete this event?'))return;
+  saveAllEvents(getAllEvents().filter(e=>e.id!==eventId));
+  expandedEventRsvps.delete(eventId);
+  setCommTab('events');
+  showToast('Event deleted');
+}
+
+function rsvpEvent(eventId,communityId,status){
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const all=getAllEvents();
+  const idx=all.findIndex(e=>e.id===eventId);
+  if(idx===-1)return;
+  const rsvps=all[idx].rsvps||[];
+  const existing=rsvps.findIndex(r=>r.profileId===myId);
+  if(existing!==-1){
+    if(rsvps[existing].status===status){rsvps.splice(existing,1)}
+    else{rsvps[existing].status=status;rsvps[existing].profileName=myName}
+  }else{
+    const maxP=all[idx].maxPlayers;
+    if(status==='going'&&maxP>0&&rsvps.filter(r=>r.status==='going').length>=maxP){
+      showToast('Event is full!');return;
+    }
+    rsvps.push({profileId:myId,profileName:myName,status});
+  }
+  all[idx].rsvps=rsvps;
+  saveAllEvents(all);
+  setCommTab('events');
+}
+
+function toggleEventRsvps(eventId,communityId){
+  if(expandedEventRsvps.has(eventId))expandedEventRsvps.delete(eventId);
+  else expandedEventRsvps.add(eventId);
+  setCommTab('events');
 }
 
 /* ════════════════════════════════════════════════════════
