@@ -419,6 +419,26 @@ table.standings tr:last-child td{border-bottom:none}
 .wp-text{font-size:13px;color:var(--muted2)}
 /* SETTINGS */
 #s-settings{background:var(--bg);overflow-y:auto}
+/* ANALYTICS */
+#s-analytics{background:var(--bg);overflow-y:auto}
+.analytics-body{padding:16px 16px 48px;display:flex;flex-direction:column;gap:20px;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box}
+.an-group-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.an-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.an-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:3px}
+.an-card-full{grid-column:1/-1;flex-direction:row;align-items:center;gap:14px}
+.an-card-full .an-card-main{flex:1;min-width:0}
+.an-card-icon{font-size:22px;line-height:1;flex-shrink:0}
+.an-card-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--text);line-height:1}
+.an-card-val.hi{color:var(--ca)}
+.an-card-lbl{font-size:12px;font-weight:700;color:var(--text)}
+.an-card-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.an-card-small-val{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--text);line-height:1.3;margin-top:2px;word-break:break-all}
+.an-actions{display:flex;gap:8px}
+.btn-an-export{flex:1;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;padding:13px;font-weight:700;font-size:13px;color:var(--text);cursor:pointer;transition:background var(--t1)}
+.btn-an-export:active{background:var(--s2)}
+.btn-an-reset{flex:1;background:none;border:1.5px solid var(--danger);border-radius:10px;padding:13px;font-weight:700;font-size:13px;color:var(--danger);cursor:pointer;transition:all var(--t1)}
+.btn-an-reset:active{background:rgba(255,59,48,.1)}
+.an-note{font-size:11px;color:var(--muted);text-align:center;line-height:1.6;opacity:.7;padding:4px 0}
 .settings-body{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;width:100%}
 .settings-sec{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
 .setting-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
@@ -1548,8 +1568,26 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
+    <div class="hub-section-title" style="padding:8px 0">Analytics</div>
+    <div class="settings-sec">
+      <div class="setting-row" onclick="showScreen('analytics')" style="border-bottom:none">
+        <div class="sr-icon">📊</div>
+        <div class="sr-info"><div class="sr-label">Analytics Dashboard</div><div class="sr-sub">App usage stats &amp; insights</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
     <div class="settings-ver">CourtCall v2.0 — Offline First 🏀</div>
   </div>
+</div>
+
+<!-- ══ ANALYTICS ══ -->
+<div id="s-analytics" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('settings')">← Settings</button>
+    <div class="page-title">Analytics</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="analytics-body" id="analytics-body"></div>
 </div>
 
 <!-- ══ POST-GAME OVERLAY ══ -->
@@ -1660,6 +1698,7 @@ function showScreen(name){
   if(name==='tournament')renderTournament();
   if(name==='teams')renderTeamBuilder();
   if(name==='settings')renderSettings();
+  if(name==='analytics')renderAnalytics();
   if(name==='pulse')renderPulse();
   if(name==='communities')renderCommunities();
   if(name==='comm-create')resetCommCreateForm();
@@ -2778,6 +2817,71 @@ function clearAllData(){
   [K.profile,K.profiles,K.players,'cc_builder',K.matches,K.tournaments,K.settings,K.game,K.games].forEach(k=>localStorage.removeItem(k));
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
   showToast('All data cleared');showScreen('profile');
+}
+function renderAnalytics(){
+  const body=document.getElementById('analytics-body');
+  if(!body)return;
+  const s=getAppStats();
+  const games=getCol(K.matches).length;
+  const tourneys=getCol(K.tournaments).length;
+  const comms=getComms().length;
+  const players=getAllCPlayers().length;
+  const dur=fmtLiveDur(s.appLaunchDate);
+  const lastVisit=s.lastVisitAt?new Date(s.lastVisitAt).toLocaleString():'—';
+
+  function card(icon,val,lbl,sub='',extra=''){
+    return`<div class="an-card${extra}"><div class="an-card-icon">${icon}</div><div class="an-card-val">${val}</div><div class="an-card-lbl">${lbl}</div>${sub?`<div class="an-card-sub">${sub}</div>`:''}</div>`;
+  }
+  function group(title,inner){
+    return`<div><div class="an-group-title">${title}</div><div class="an-cards">${inner}</div></div>`;
+  }
+
+  const appBlock=group('App',[
+    `<div class="an-card an-card-full"><div class="an-card-icon" style="font-size:28px">⏱</div><div class="an-card-main"><div class="an-card-val hi">${dur||'—'}</div><div class="an-card-lbl">Live Duration</div><div class="an-card-sub">Since first launch</div></div></div>`,
+    card('👁',s.totalVisits||0,'Total Visits','App opens'),
+    `<div class="an-card"><div class="an-card-icon">🕐</div><div class="an-card-lbl">Last Visit</div><div class="an-card-small-val">${lastVisit}</div></div>`,
+  ].join(''));
+
+  const gameBlock=group('Gameplay',[
+    card('🏀',s.gamesStarted||0,'Games Scored',(s.gamesCompleted||0)+' completed'),
+    card('💾',s.matchesSaved||0,'Matches Saved'),
+    card('🎤',s.voiceCommandsUsed||0,'Voice Commands'),
+    card('🏆',s.tournamentsCreated||0,'Tournaments'),
+  ].join(''));
+
+  const usersBlock=group('Users & Growth',[
+    card('👤',s.profilesCreated||0,'Profiles Created'),
+    card('👻',s.guestSessions||0,'Guest Sessions'),
+    card('🧍',players,'Players Added'),
+    card('🌍',comms,'Communities'),
+  ].join(''));
+
+  body.innerHTML=`
+    ${appBlock}
+    ${gameBlock}
+    ${usersBlock}
+    <div class="an-actions">
+      <button class="btn-an-export" onclick="exportAnalytics()">⬇ Export JSON</button>
+      <button class="btn-an-reset" onclick="resetAnalytics()">🗑 Reset Stats</button>
+    </div>
+    <div class="an-note">Local stats are stored on this device only.<br>For real global analytics, connect a backend service.</div>
+  `;
+}
+function exportAnalytics(){
+  const s=getAppStats();
+  const blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='courtcall_analytics.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function resetAnalytics(){
+  if(!confirm('Reset all analytics stats? This cannot be undone.'))return;
+  localStorage.removeItem(STATS_KEY);
+  trackEvent('app_opened');
+  showToast('Analytics reset');
+  renderAnalytics();
 }
 /* ════════════════════════════════════════════════════════
    Communities — Phase C1
