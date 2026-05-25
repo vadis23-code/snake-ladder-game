@@ -591,6 +591,34 @@ table.standings tr:last-child td{border-bottom:none}
 .badge-sel-row{display:flex;flex-wrap:wrap;gap:6px}
 .badge-sel-chip{padding:6px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
 .badge-sel-chip.on{border-color:var(--gold);background:rgba(255,179,0,.12);color:var(--gold)}
+/* GALLERY */
+.gal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px}
+.gal-card{background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.gal-img-wrap{position:relative;width:100%;padding-top:75%;background:var(--s2)}
+.gal-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+.gal-img-placeholder{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,var(--s2),var(--s3))}
+.gal-body{padding:10px}
+.gal-album-badge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,107,53,.18);color:var(--orange);margin-bottom:6px}
+.gal-caption{font-size:12px;color:var(--text);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gal-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.gal-tag{font-size:10px;padding:2px 7px;border-radius:50px;background:rgba(255,179,0,.12);color:var(--gold);font-weight:600}
+.gal-meta{font-size:10px;color:var(--muted);margin-bottom:8px}
+.gal-actions{display:flex;align-items:center;gap:8px}
+.btn-gal-like{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--muted);cursor:pointer;transition:all var(--t1);display:flex;align-items:center;gap:4px}
+.btn-gal-like.liked{border-color:var(--ca);color:var(--ca);background:rgba(255,87,34,.12)}
+.btn-gal-cmt{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--muted);cursor:pointer;transition:all var(--t1)}
+.btn-gal-del{margin-left:auto;background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:8px}
+.gal-comments-wrap{padding:0 10px 10px}
+.add-gal-form{background:var(--s1);border-radius:12px;border:1px solid var(--border);padding:14px;margin:0 14px 10px}
+.gal-filter-row{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 4px;overflow-x:auto}
+.add-gal-url{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:14px;font-family:'Inter',sans-serif;margin-bottom:8px;box-sizing:border-box}
+.gal-tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.gal-tag-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.gal-tag-chip.on{border-color:var(--gold);background:rgba(255,179,0,.12);color:var(--gold)}
+.gal-album-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.gal-album-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.gal-album-chip.on{border-color:var(--orange);background:rgba(255,107,53,.12);color:var(--orange)}
+.gal-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -2664,7 +2692,9 @@ function openCommunity(id){
   activeCommTab='feed';
   feedFilter='all';showCreateForm=false;editingPostId=null;
   showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null;
+  showAddGalleryForm=false;selectedTaggedPlayers=new Set();galleryFilter='all';
   if(typeof expandedComments!=='undefined')expandedComments.clear();
+  if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
   renderCommDetail();
   showScreen('comm-detail');
 }
@@ -2716,6 +2746,7 @@ function renderCommDetail(){
 function setCommTab(tab){
   if(tab!=='feed'){showCreateForm=false;editingPostId=null}
   if(tab!=='players'){showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null}
+  if(tab!=='gallery'){showAddGalleryForm=false;selectedTaggedPlayers=new Set()}
   activeCommTab=tab;
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   const c=getComms().find(x=>x.id===activeCommunityId);
@@ -2735,7 +2766,7 @@ function _renderCommTabContent(c,members,myRole){
   }else if(activeCommTab==='players'){
     el.innerHTML=renderPlayersTabHTML(c,myRole);
   }else if(activeCommTab==='gallery'){
-    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📸</span><span>Gallery coming in Phase C5.</span></div></div>`;
+    el.innerHTML=renderGalleryTabHTML(c,myRole);
   }else if(activeCommTab==='events'){
     el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📅</span><span>Events coming in Phase C6.</span></div></div>`;
   }else if(activeCommTab==='leaderboard'){
@@ -2882,6 +2913,7 @@ function deleteComm(communityId){
   if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
   saveAllCPlayers(getAllCPlayers().filter(p=>p.communityId!==communityId));
   saveAllCRatings(getAllCRatings().filter(r=>r.communityId!==communityId));
+  saveAllGalItems(getAllGalItems().filter(g=>g.communityId!==communityId));
   showToast('Community deleted');
   showScreen('communities');
 }
@@ -3441,6 +3473,217 @@ function submitCRating(playerId,communityId){
   saveAllCRatings(all);
   ratingPlayerId=null;pendingRating={};
   setCommTab('players');showToast('Rating submitted! ⭐');
+}
+
+/* ════════════════════════════════════════════════════════
+   Community Gallery (Phase C5)
+════════════════════════════════════════════════════════ */
+const GAL_ALBUMS=['Match Day Photos','Winners Gallery','Player Highlights','Training Sessions','Tournament Photos'];
+let galleryFilter='all';
+let showAddGalleryForm=false;
+let selectedAlbum=GAL_ALBUMS[0];
+let selectedTaggedPlayers=new Set();
+const expandedGalleryComments=new Set();
+
+function getAllGalItems(){try{return JSON.parse(localStorage.getItem(KC.gallery)||'[]')}catch{return[]}}
+function saveAllGalItems(arr){localStorage.setItem(KC.gallery,JSON.stringify(arr))}
+function getGalItems(cid){return getAllGalItems().filter(g=>g.communityId===cid)}
+
+function renderGalleryTabHTML(c,myRole){
+  const myId=(currentProfile||{id:'guest'}).id;
+  const canAdd=myRole==='admin'||myRole==='contributor';
+  let items=getGalItems(c.id);
+  if(galleryFilter!=='all')items=items.filter(g=>g.album===galleryFilter);
+  items=items.slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const players=getCPlayers(c.id);
+
+  const filterChips=[{val:'all',label:'All 📸'},...GAL_ALBUMS.map(a=>({val:a,label:a}))].map(({val,label})=>
+    `<button class="ff-chip${galleryFilter===val?' on':''}" onclick="setGalleryFilter('${escHtml(val)}')">${escHtml(label)}</button>`
+  ).join('');
+
+  const albumChips=GAL_ALBUMS.map(a=>
+    `<button class="gal-album-chip${selectedAlbum===a?' on':''}" onclick="pickAlbumChip(this,'${escHtml(a)}')">${escHtml(a)}</button>`
+  ).join('');
+
+  const tagChips=players.length?players.map(p=>
+    `<button class="gal-tag-chip${selectedTaggedPlayers.has(p.id)?' on':''}" onclick="pickGalleryTag(this,'${escHtml(p.id)}')">${escHtml(p.name)}</button>`
+  ).join(''):'<span style="color:var(--muted);font-size:12px">No players added yet</span>';
+
+  const addFormHTML=showAddGalleryForm&&canAdd?`<div class="add-gal-form">
+    <div class="form-label">Image URL</div>
+    <input class="add-gal-url" id="gal-url-input" type="url" placeholder="https://example.com/photo.jpg">
+    <div class="form-label">Caption</div>
+    <textarea class="post-body-input" id="gal-caption-input" rows="2" placeholder="Describe this photo..."></textarea>
+    <div class="form-label" style="margin-top:8px">Album</div>
+    <div class="gal-album-chips">${albumChips}</div>
+    <div class="form-label">Tag Players</div>
+    <div class="gal-tag-chips">${tagChips}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-primary" style="flex:1" onclick="submitGalleryItem('${escHtml(c.id)}')">📸 Add Photo</button>
+      <button class="btn-secondary" onclick="cancelAddGallery()">Cancel</button>
+    </div>
+  </div>`:'';
+
+  const gridHTML=items.length
+    ?`<div class="gal-grid">${items.map(item=>buildGalCardHTML(item,c,myRole,myId,players)).join('')}</div>`
+    :`<div class="gal-empty"><span style="font-size:36px">📸</span><span>${galleryFilter==='all'?'No photos yet.<br>Add the first photo!':'No photos in this album yet.'}</span></div>`;
+
+  return`<div style="padding-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 0">
+      <span style="font-size:12px;color:var(--muted)">${items.length} photo${items.length!==1?'s':''}</span>
+      ${canAdd?`<button class="btn-new-post" onclick="toggleAddGallery()">${showAddGalleryForm?'✕ Close':'📸 Add Photo'}</button>`:''}
+    </div>
+    ${addFormHTML}
+    <div class="gal-filter-row">${filterChips}</div>
+    ${gridHTML}
+  </div>`;
+}
+
+function buildGalCardHTML(item,c,myRole,myId,players){
+  const canDel=myRole==='admin'||item.uploadedBy===myId;
+  const liked=item.likes&&item.likes.includes(myId);
+  const cmtsOpen=expandedGalleryComments.has(item.id);
+  const taggedNames=item.taggedPlayers&&item.taggedPlayers.length
+    ?players.filter(p=>item.taggedPlayers.includes(p.id)).map(p=>`<span class="gal-tag">${escHtml(p.name)}</span>`).join('')
+    :'';
+  const imgHTML=item.imageUrl
+    ?`<img class="gal-img" src="${escAttr(item.imageUrl)}" alt="gallery photo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    :'';
+  const imgWrap=`<div class="gal-img-wrap">${imgHTML}<div class="gal-img-placeholder" style="${item.imageUrl?'display:none':''}">📸</div></div>`;
+
+  const cmtsHTML=cmtsOpen?`<div class="gal-comments-wrap">
+    ${(item.comments||[]).map(cm=>{
+      const canDelCmt=myRole==='admin'||cm.authorId===myId;
+      return`<div class="comment-item">
+        <div class="cmt-avatar">${(cm.authorName||'?')[0].toUpperCase()}</div>
+        <div class="cmt-body"><div class="cmt-author">${escHtml(cm.authorName||'?')}</div><div class="cmt-text">${escHtml(cm.text)}</div></div>
+        ${canDelCmt?`<button class="btn-del-cmt" onclick="deleteGalCmt('${escHtml(item.id)}','${escHtml(c.id)}','${escHtml(cm.id)}')">✕</button>`:''}
+      </div>`;
+    }).join('')}
+    <div class="add-comment-row">
+      <input class="comment-input" id="gal-cmt-${escHtml(item.id)}" type="text" placeholder="Add a comment...">
+      <button class="btn-cmt-send" onclick="submitGalCmt('${escHtml(item.id)}','${escHtml(c.id)}')">Send</button>
+    </div>
+  </div>`:'';
+
+  return`<div class="gal-card">
+    ${imgWrap}
+    <div class="gal-body">
+      <div class="gal-album-badge">${escHtml(item.album||'Uncategorized')}</div>
+      ${item.caption?`<div class="gal-caption">${escHtml(item.caption)}</div>`:''}
+      ${taggedNames?`<div class="gal-tags">${taggedNames}</div>`:''}
+      <div class="gal-meta">By ${escHtml(item.uploaderName||'Unknown')} · ${fmtPostTime(item.createdAt)}</div>
+      <div class="gal-actions">
+        <button class="btn-gal-like${liked?' liked':''}" onclick="likeGalItem('${escHtml(item.id)}','${escHtml(c.id)}')">❤️ ${(item.likes||[]).length}</button>
+        <button class="btn-gal-cmt" onclick="toggleGalCmts('${escHtml(item.id)}','${escHtml(c.id)}')">💬 ${(item.comments||[]).length}</button>
+        ${canDel?`<button class="btn-gal-del" onclick="deleteGalItem('${escHtml(item.id)}','${escHtml(c.id)}')">🗑</button>`:''}
+      </div>
+    </div>
+    ${cmtsHTML}
+  </div>`;
+}
+
+function toggleAddGallery(){
+  showAddGalleryForm=!showAddGalleryForm;
+  if(showAddGalleryForm){selectedAlbum=GAL_ALBUMS[0];selectedTaggedPlayers=new Set()}
+  setCommTab('gallery');
+}
+function cancelAddGallery(){showAddGalleryForm=false;setCommTab('gallery')}
+
+function pickAlbumChip(btn,album){
+  document.querySelectorAll('.gal-album-chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  selectedAlbum=album;
+}
+
+function pickGalleryTag(btn,playerId){
+  if(selectedTaggedPlayers.has(playerId))selectedTaggedPlayers.delete(playerId);
+  else selectedTaggedPlayers.add(playerId);
+  btn.classList.toggle('on',selectedTaggedPlayers.has(playerId));
+}
+
+function setGalleryFilter(album){galleryFilter=album;setCommTab('gallery')}
+
+function submitGalleryItem(communityId){
+  const urlEl=document.getElementById('gal-url-input');
+  const capEl=document.getElementById('gal-caption-input');
+  const url=(urlEl?urlEl.value.trim():'');
+  const caption=(capEl?capEl.value.trim():'');
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const item={
+    id:'gallery_'+Date.now(),
+    communityId,
+    imageUrl:url,
+    caption,
+    album:selectedAlbum,
+    taggedPlayers:Array.from(selectedTaggedPlayers),
+    uploadedBy:myId,
+    uploaderName:myName,
+    createdAt:new Date().toISOString(),
+    likes:[],
+    comments:[]
+  };
+  const all=getAllGalItems();
+  all.push(item);
+  saveAllGalItems(all);
+  showAddGalleryForm=false;
+  selectedAlbum=GAL_ALBUMS[0];
+  selectedTaggedPlayers=new Set();
+  setCommTab('gallery');
+  showToast('Photo added! 📸');
+}
+
+function deleteGalItem(itemId,communityId){
+  if(!confirm('Delete this photo?'))return;
+  saveAllGalItems(getAllGalItems().filter(g=>g.id!==itemId));
+  expandedGalleryComments.delete(itemId);
+  setCommTab('gallery');
+  showToast('Photo deleted');
+}
+
+function likeGalItem(itemId,communityId){
+  const myId=(currentProfile||{id:'guest'}).id;
+  const all=getAllGalItems();
+  const idx=all.findIndex(g=>g.id===itemId);
+  if(idx===-1)return;
+  const likes=all[idx].likes||[];
+  const pos=likes.indexOf(myId);
+  if(pos===-1)likes.push(myId);else likes.splice(pos,1);
+  all[idx].likes=likes;
+  saveAllGalItems(all);
+  setCommTab('gallery');
+}
+
+function toggleGalCmts(itemId,communityId){
+  if(expandedGalleryComments.has(itemId))expandedGalleryComments.delete(itemId);
+  else expandedGalleryComments.add(itemId);
+  setCommTab('gallery');
+}
+
+function submitGalCmt(itemId,communityId){
+  const inp=document.getElementById('gal-cmt-'+itemId);
+  if(!inp)return;
+  const text=inp.value.trim();
+  if(!text)return;
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const all=getAllGalItems();
+  const idx=all.findIndex(g=>g.id===itemId);
+  if(idx===-1)return;
+  if(!all[idx].comments)all[idx].comments=[];
+  all[idx].comments.push({id:'gcmt_'+Date.now(),authorId:myId,authorName:myName,text,createdAt:new Date().toISOString()});
+  saveAllGalItems(all);
+  setCommTab('gallery');
+}
+
+function deleteGalCmt(itemId,communityId,cmtId){
+  const all=getAllGalItems();
+  const idx=all.findIndex(g=>g.id===itemId);
+  if(idx===-1)return;
+  all[idx].comments=(all[idx].comments||[]).filter(c=>c.id!==cmtId);
+  saveAllGalItems(all);
+  setCommTab('gallery');
 }
 
 /* ════════════════════════════════════════════════════════
