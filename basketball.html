@@ -2014,7 +2014,8 @@ function showActiveTournament(t){
   document.getElementById('tourn-active').classList.remove('hidden');
   document.getElementById('tc-name').textContent=t.name;
   document.getElementById('tc-meta').textContent=`${t.format==='roundrobin'?'Round Robin':'Knockout'} · First to ${t.winScore} · ${t.createdAt||''}`;
-  renderTournTab('standings');
+  document.querySelectorAll('.tc-tab').forEach(tb=>tb.classList.toggle('on',tb.textContent.trim().toLowerCase()===tournTab));
+  renderTournTab(tournTab);
 }
 function switchTournTab(name,btn){
   tournTab=name;
@@ -2046,7 +2047,7 @@ function calcStandings(fixtures,teamNames){
   fixtures.filter(f=>f.played).forEach(f=>{
     if(s[f.teamA]){s[f.teamA].played++;s[f.teamA].pf+=(f.scoreA||0);s[f.teamA].pa+=(f.scoreB||0)}
     if(s[f.teamB]){s[f.teamB].played++;s[f.teamB].pf+=(f.scoreB||0);s[f.teamB].pa+=(f.scoreA||0)}
-    const winner=parseInt(f.scoreA)>parseInt(f.scoreB)?f.teamA:f.teamB;
+    const winner=f.winner||(parseInt(f.scoreA)>parseInt(f.scoreB)?f.teamA:f.teamB);
     const loser=winner===f.teamA?f.teamB:f.teamA;
     if(s[winner]){s[winner].won++;s[winner].pts+=2}
     if(s[loser])s[loser].lost++;
