@@ -498,6 +498,35 @@ table.standings tr:last-child td{border-bottom:none}
 .emoji-opt.on{border-color:var(--success);background:rgba(0,230,118,.12)}
 .btn-comm-submit{background:linear-gradient(135deg,var(--success),#00BFA5);color:#000;border:none;border-radius:var(--r2);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:20px;cursor:pointer;min-height:64px;box-shadow:0 6px 24px rgba(0,230,118,.25);transition:transform var(--t1);width:100%;margin-top:4px}
 .btn-comm-submit:active{transform:translateY(3px)}
+/* COMM DETAIL */
+#s-comm-detail{background:var(--bg);overflow-y:auto}
+.cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
+.cd-logo{font-size:42px;flex-shrink:0;line-height:1}
+.cd-info{flex:1;min-width:0}
+.cd-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);line-height:1.1}
+.cd-meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.cd-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cd-tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}
+.cd-tabs::-webkit-scrollbar{display:none}
+.cd-tab{flex-shrink:0;padding:11px 14px;font:600 13px 'Inter',sans-serif;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;background:none;border-left:none;border-right:none;border-top:none;transition:all var(--t1);white-space:nowrap}
+.cd-tab.on{color:var(--success);border-bottom-color:var(--success)}
+.cd-panel{display:flex;flex-direction:column;gap:10px;padding:16px;max-width:600px;width:100%;margin:0 auto;padding-bottom:40px}
+.cd-coming{text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;line-height:1.6}
+.member-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:10px}
+.mc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;flex-shrink:0}
+.mc-info{flex:1;min-width:0}
+.mc-name{font-size:14px;font-weight:700;color:var(--text)}
+.mc-role-label{font-size:11px;margin-top:2px;font-weight:700}
+.mc-joined{font-size:11px;color:var(--muted2);margin-top:1px}
+.mc-actions{display:flex;gap:5px;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.btn-mc-role{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 11px 'Inter',sans-serif;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:all var(--t1);min-height:32px}
+.btn-mc-role:active{background:var(--s3)}
+.btn-mc-remove{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r1);color:var(--danger);font:600 11px 'Inter',sans-serif;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:all var(--t1);min-height:32px}
+.btn-mc-remove:active{background:rgba(255,23,68,.15)}
+.cd-danger-zone{background:rgba(255,23,68,.05);border:1px solid rgba(255,23,68,.2);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:10px}
+.cd-danger-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--danger)}
+.btn-cd-danger{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r1);color:var(--danger);font:700 13px 'Inter',sans-serif;padding:12px 14px;cursor:pointer;min-height:44px;transition:all var(--t1);width:100%;display:flex;align-items:center;gap:10px;text-align:left}
+.btn-cd-danger:active{background:rgba(255,23,68,.16)}
 /* PULSE */
 #s-pulse{background:var(--bg);overflow-y:auto}
 .pulse-hero{padding:20px 16px 12px;background:radial-gradient(ellipse at 50% 0%,rgba(41,121,255,.14) 0%,transparent 60%);text-align:center}
@@ -1109,6 +1138,26 @@ table.standings tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- ══ COMMUNITY DETAIL ══ -->
+<div id="s-comm-detail" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('communities')">← Communities</button>
+    <div class="page-title" id="cd-nav-title">Community</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="cd-header" id="cd-header"></div>
+  <div class="cd-tabs" id="cd-tabs">
+    <button class="cd-tab on" data-tab="feed"        onclick="setCommTab('feed')">Feed</button>
+    <button class="cd-tab"    data-tab="members"     onclick="setCommTab('members')">Members</button>
+    <button class="cd-tab"    data-tab="players"     onclick="setCommTab('players')">Players</button>
+    <button class="cd-tab"    data-tab="gallery"     onclick="setCommTab('gallery')">Gallery</button>
+    <button class="cd-tab"    data-tab="events"      onclick="setCommTab('events')">Events</button>
+    <button class="cd-tab"    data-tab="leaderboard" onclick="setCommTab('leaderboard')">Leaderboard</button>
+    <button class="cd-tab"    data-tab="settings"    onclick="setCommTab('settings')" id="cd-settings-tab">Settings</button>
+  </div>
+  <div id="cd-tab-content"></div>
+</div>
+
 <!-- ══ PULSE ══ -->
 <div id="s-pulse" class="screen">
   <div class="page-nav">
@@ -1278,6 +1327,8 @@ function showScreen(name){
   if(name==='settings')renderSettings();
   if(name==='pulse')renderPulse();
   if(name==='communities')renderCommunities();
+  if(name==='comm-create')resetCommCreateForm();
+  if(name==='comm-detail')renderCommDetail();
   if(name==='profile'){renderExistingProfiles();document.getElementById('inp-profile-name').value='';document.getElementById('inp-profile-nick').value=''}
 }
 // ── Profile ──────────────────────────────────────────────
@@ -2509,11 +2560,238 @@ function commCardHTML(c,allMembers,isMine){
 </div>`;
 }
 
-// Stub — full detail page built in Phase C2
+// ── Community Detail (Phase C2) ──────────────────────────
+let activeCommunityId=null;
+let activeCommTab='feed';
+
 function openCommunity(id){
   const c=getComms().find(x=>x.id===id);
   if(!c){showToast('Community not found');return}
-  showToast(`${c.logo} ${c.name} — detail page coming in Phase C2`);
+  activeCommunityId=id;
+  activeCommTab='feed';
+  renderCommDetail();
+  showScreen('comm-detail');
+}
+
+function renderCommDetail(){
+  const c=getComms().find(x=>x.id===activeCommunityId);
+  if(!c)return;
+  const allMembers=getCommMembers();
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myMember=allMembers.find(m=>m.communityId===c.id&&m.profileId===myId);
+  const myRole=myMember?myMember.role:'guest';
+  const isAdmin=myRole==='admin';
+
+  // Update nav title
+  document.getElementById('cd-nav-title').textContent=c.name;
+
+  // Header
+  const locParts=[c.area,c.city,c.state].filter(Boolean);
+  const loc=locParts.join(', ')||c.country||'';
+  const visCls=c.visibility==='public'?'public':c.visibility==='private'?'private':'hidden';
+  const visLabel=c.visibility==='public'?'🌐 Public':c.visibility==='private'?'🔒 Private':'👁 Hidden';
+  const roleBadge=myRole!=='guest'?`<span class="comm-badge ${myRole==='admin'?'admin':'member'}">${myRole==='admin'?'Admin':myRole==='contributor'?'Contributor':'Member'}</span>`:'';
+  const readOnlyBadge=c.readOnly?`<span class="comm-badge hidden">Read-Only</span>`:'';
+  const commMembers=allMembers.filter(m=>m.communityId===c.id);
+  document.getElementById('cd-header').innerHTML=`
+    <div class="cd-logo">${escHtml(c.logo)}</div>
+    <div class="cd-info">
+      <div class="cd-name">${escHtml(c.name)}</div>
+      <div class="cd-meta">${escHtml(c.type)}${loc?' · '+escHtml(loc):''}</div>
+      ${c.description?`<div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4">${escHtml(c.description)}</div>`:''}
+      <div class="cd-badges">
+        <span class="comm-badge ${visCls}">${visLabel}</span>
+        ${roleBadge}${readOnlyBadge}
+        <span class="comm-badge member">👥 ${c.memberCount}</span>
+      </div>
+    </div>`;
+
+  // Show settings tab only for admins
+  const stab=document.getElementById('cd-settings-tab');
+  if(stab)stab.style.display=isAdmin?'':'none';
+
+  // Sync active tab chip
+  document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===activeCommTab));
+
+  // Render tab content
+  _renderCommTabContent(c,commMembers,myRole);
+}
+
+function setCommTab(tab){
+  activeCommTab=tab;
+  document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  const c=getComms().find(x=>x.id===activeCommunityId);
+  if(!c)return;
+  const members=getCommMembers().filter(m=>m.communityId===c.id);
+  const myRole=members.find(m=>m.profileId===(currentProfile||{id:'guest'}).id)?.role||'guest';
+  _renderCommTabContent(c,members,myRole);
+}
+
+function _renderCommTabContent(c,members,myRole){
+  const el=document.getElementById('cd-tab-content');
+  if(!el)return;
+  if(activeCommTab==='feed'){
+    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📢</span><span>Community feed coming in Phase C3.</span></div></div>`;
+  }else if(activeCommTab==='members'){
+    el.innerHTML=_buildMembersHTML(c,members,myRole);
+  }else if(activeCommTab==='players'){
+    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">🏅</span><span>Player directory coming in Phase C4.</span></div></div>`;
+  }else if(activeCommTab==='gallery'){
+    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📸</span><span>Gallery coming in Phase C5.</span></div></div>`;
+  }else if(activeCommTab==='events'){
+    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📅</span><span>Events coming in Phase C6.</span></div></div>`;
+  }else if(activeCommTab==='leaderboard'){
+    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">🏆</span><span>Leaderboards coming in Phase C7.</span></div></div>`;
+  }else if(activeCommTab==='settings'){
+    el.innerHTML=_buildSettingsHTML(c,myRole);
+  }
+}
+
+function _buildMembersHTML(c,members,myRole){
+  const isAdmin=myRole==='admin';
+  const myId=(currentProfile||{id:'guest'}).id;
+  if(!members.length)return`<div class="cd-panel"><div class="comm-empty"><span class="comm-empty-icon">👥</span><span>No members yet.</span></div></div>`;
+  const ROLE_COLOR={admin:'var(--ca)',contributor:'var(--gold)',member:'var(--success)'};
+  const ROLE_BG={admin:'rgba(255,87,34,.18)',contributor:'rgba(255,179,0,.15)',member:'rgba(0,230,118,.14)'};
+  const items=members.map(m=>{
+    const isMe=m.profileId===myId;
+    const initial=(m.profileName||'?')[0].toUpperCase();
+    const roleLabel=m.role==='admin'?'Admin':m.role==='contributor'?'Contributor':'Member';
+    const rCol=ROLE_COLOR[m.role]||'var(--muted)';
+    const rBg=ROLE_BG[m.role]||'var(--s2)';
+    let actions='';
+    if(isAdmin&&!isMe){
+      const nextRole=m.role==='member'?'contributor':'member';
+      const nextLabel=m.role==='member'?'Make Contributor':'Make Member';
+      actions=`<div class="mc-actions">
+        <button class="btn-mc-role" onclick="updateMemberRole('${escHtml(c.id)}','${escHtml(m.id)}','${nextRole}')">${nextLabel}</button>
+        <button class="btn-mc-remove" onclick="removeMemberFromComm('${escHtml(c.id)}','${escHtml(m.id)}')">Remove</button>
+      </div>`;
+    }
+    return`<div class="member-card">
+      <div class="mc-avatar" style="background:${rBg};color:${rCol}">${escHtml(initial)}</div>
+      <div class="mc-info">
+        <div class="mc-name">${escHtml(m.profileName||'Unknown')}${isMe?' <span style="font-size:11px;color:var(--muted)">(You)</span>':''}</div>
+        <div class="mc-role-label" style="color:${rCol}">${roleLabel}</div>
+        <div class="mc-joined">Joined ${escHtml(m.joinedAt||'')}</div>
+      </div>${actions}
+    </div>`;
+  }).join('');
+  return`<div class="cd-panel">${items}</div>`;
+}
+
+function _buildSettingsHTML(c,myRole){
+  if(myRole!=='admin')return`<div class="cd-panel"><div class="cd-coming"><span style="font-size:28px">🔒</span><span>Only admins can access Settings.</span></div></div>`;
+  const selPub=c.visibility==='public'?'on':'';
+  const selPriv=c.visibility==='private'?'on':'';
+  const selHid=c.visibility==='hidden'?'on':'';
+  const selApprYes=c.joinApproval?'on':'';
+  const selApprNo=!c.joinApproval?'on':'';
+  return`<div class="cd-panel">
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Community Name</span>
+      <input id="cds-name" class="comm-inp" type="text" value="${escHtml(c.name)}" maxlength="50">
+    </div>
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Description</span>
+      <textarea id="cds-desc" class="comm-inp comm-textarea">${escHtml(c.description||'')}</textarea>
+    </div>
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Visibility</span>
+      <div class="comm-chip-row" id="cds-vis-row">
+        <button class="comm-chip ${selPub}"  data-v="public"  onclick="pickCommChip('cds-vis-row',this)">🌐 Public</button>
+        <button class="comm-chip ${selPriv}" data-v="private" onclick="pickCommChip('cds-vis-row',this)">🔒 Private</button>
+        <button class="comm-chip ${selHid}"  data-v="hidden"  onclick="pickCommChip('cds-vis-row',this)">👁 Hidden</button>
+      </div>
+    </div>
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Join Approval</span>
+      <div class="comm-chip-row" id="cds-approval-row">
+        <button class="comm-chip ${selApprNo}"  data-v="no"  onclick="pickCommChip('cds-approval-row',this)">No — Open Join</button>
+        <button class="comm-chip ${selApprYes}" data-v="yes" onclick="pickCommChip('cds-approval-row',this)">Yes — Admin Approval</button>
+      </div>
+    </div>
+    <button class="btn-comm-submit" style="font-size:18px;min-height:54px" onclick="saveCommEdit('${escHtml(c.id)}')">Save Changes</button>
+    <div class="cd-danger-zone">
+      <div class="cd-danger-title">⚠ Moderation</div>
+      <button class="btn-cd-danger" onclick="toggleCommReadOnly('${escHtml(c.id)}')">
+        <span style="font-size:20px">${c.readOnly?'🔓':'🔒'}</span>
+        <div><div>${c.readOnly?'Make Editable':'Make Read-Only'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Prevent members from posting or making changes</div></div>
+      </button>
+      <button class="btn-cd-danger" onclick="deleteComm('${escHtml(c.id)}')">
+        <span style="font-size:20px">🗑</span>
+        <div><div>Delete Community</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Permanently removes all community data</div></div>
+      </button>
+    </div>
+  </div>`;
+}
+
+function updateMemberRole(communityId,memberId,newRole){
+  const members=getCommMembers();
+  const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
+  if(!m)return;
+  m.role=newRole;
+  setCommMembers(members);
+  showToast(`${escHtml(m.profileName)} is now ${newRole==='contributor'?'a Contributor':'a Member'}`);
+  renderCommDetail();
+}
+
+function removeMemberFromComm(communityId,memberId){
+  const members=getCommMembers();
+  const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
+  if(!m)return;
+  if(!confirm(`Remove ${m.profileName} from this community?`))return;
+  setCommMembers(members.filter(x=>!(x.id===memberId&&x.communityId===communityId)));
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(c){c.memberCount=Math.max(0,(c.memberCount||1)-1);setComms(comms)}
+  showToast(`${m.profileName} removed`);
+  renderCommDetail();
+}
+
+function saveCommEdit(communityId){
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(!c)return;
+  const name=(document.getElementById('cds-name')?.value||'').trim();
+  if(!name){showToast('Community name required');return}
+  c.name=name;
+  c.description=(document.getElementById('cds-desc')?.value||'').trim();
+  c.visibility=getCommChipVal('cds-vis-row')||c.visibility;
+  c.joinApproval=getCommChipVal('cds-approval-row')==='yes';
+  setComms(comms);
+  showToast('Community updated');
+  renderCommDetail();
+}
+
+function toggleCommReadOnly(communityId){
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(!c)return;
+  c.readOnly=!c.readOnly;
+  setComms(comms);
+  showToast(c.readOnly?'Community set to read-only':'Community is now editable');
+  renderCommDetail();
+}
+
+function deleteComm(communityId){
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(!c)return;
+  if(!confirm(`Delete "${c.name}"? This cannot be undone.`))return;
+  setComms(comms.filter(x=>x.id!==communityId));
+  setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
+  showToast('Community deleted');
+  showScreen('communities');
+}
+
+function resetCommCreateForm(){
+  ['cc-name','cc-country','cc-state','cc-city','cc-area','cc-court'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  const desc=document.getElementById('cc-desc');if(desc)desc.value='';
+  const firstType=document.querySelector('#cc-type-row .comm-chip');if(firstType)pickCommChip('cc-type-row',firstType);
+  const firstVis=document.querySelector('#cc-vis-row .comm-chip');if(firstVis)pickCommChip('cc-vis-row',firstVis);
+  const firstAppr=document.querySelector('#cc-approval-row .comm-chip');if(firstAppr)pickCommChip('cc-approval-row',firstAppr);
+  document.querySelectorAll('#cc-emoji-row .emoji-opt').forEach((e,i)=>e.classList.toggle('on',i===0));
 }
 
 /* ════════════════════════════════════════════════════════
