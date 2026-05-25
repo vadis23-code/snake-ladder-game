@@ -618,6 +618,8 @@ table.standings tr:last-child td{border-bottom:none}
 .comment-input:focus{border-color:var(--success)}
 .btn-cmt-send{background:var(--success);border:none;border-radius:var(--r1);color:#000;font:700 12px 'Inter',sans-serif;padding:8px 12px;cursor:pointer;min-height:38px;transition:opacity var(--t1)}
 .btn-cmt-send:active{opacity:.8}
+.cmt-locked-notice{font-size:11px;color:var(--muted);text-align:center;padding:6px 0;letter-spacing:.03em}
+.feed-locked-banner{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r1);font-size:12px;color:var(--muted);margin-bottom:2px}
 /* PLAYERS */
 #s-comm-detail .player-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
 .player-card-top{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 10px}
@@ -3504,7 +3506,9 @@ function renderCommDetail(){
   const visCls=c.visibility==='public'?'public':c.visibility==='private'?'private':'hidden';
   const visLabel=c.visibility==='public'?'🌐 Public':c.visibility==='private'?'🔒 Private':'👁 Hidden';
   const roleBadge=myRole!=='guest'?`<span class="comm-badge ${myRole==='admin'?'admin':'member'}">${myRole==='admin'?'Admin':myRole==='contributor'?'Contributor':'Member'}</span>`:'';
-  const readOnlyBadge=c.readOnly?`<span class="comm-badge hidden">Read-Only</span>`:'';
+  const readOnlyBadge=c.readOnly?`<span class="comm-badge">🔒 Read-Only</span>`:'';
+  const commLockedBadge=c.commentsLocked?`<span class="comm-badge">💬 Locked</span>`:'';
+  const ratingsOffBadge=c.ratingsDisabled?`<span class="comm-badge">📊 Ratings Off</span>`:'';
   const commMembers=allMembers.filter(m=>m.communityId===c.id);
   document.getElementById('cd-header').innerHTML=`
     <div class="cd-logo">${escHtml(c.logo)}</div>
@@ -3514,7 +3518,7 @@ function renderCommDetail(){
       ${c.description?`<div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4">${escHtml(c.description)}</div>`:''}
       <div class="cd-badges">
         <span class="comm-badge ${visCls}">${visLabel}</span>
-        ${roleBadge}${readOnlyBadge}
+        ${roleBadge}${readOnlyBadge}${commLockedBadge}${ratingsOffBadge}
         <span class="comm-badge member">👥 ${c.memberCount}</span>
       </div>
     </div>`;
@@ -3658,7 +3662,15 @@ function _buildSettingsHTML(c,myRole){
       <div class="cd-danger-title">⚠ Moderation</div>
       <button class="btn-cd-danger" onclick="toggleCommReadOnly('${escHtml(c.id)}')">
         <span style="font-size:20px">${c.readOnly?'🔓':'🔒'}</span>
-        <div><div>${c.readOnly?'Make Editable':'Make Read-Only'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Prevent members from posting or making changes</div></div>
+        <div><div>${c.readOnly?'Unlock Posting':'Lock Posting (Read-Only)'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Prevent contributors from posting or making changes</div></div>
+      </button>
+      <button class="btn-cd-danger" onclick="toggleCommentsLocked('${escHtml(c.id)}')">
+        <span style="font-size:20px">${c.commentsLocked?'💬':'🔇'}</span>
+        <div><div>${c.commentsLocked?'Unlock Comments':'Lock Comments'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Prevent members from adding new comments</div></div>
+      </button>
+      <button class="btn-cd-danger" onclick="toggleRatingsDisabled('${escHtml(c.id)}')">
+        <span style="font-size:20px">${c.ratingsDisabled?'📊':'🚫'}</span>
+        <div><div>${c.ratingsDisabled?'Enable Ratings':'Disable Ratings'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Hide the leaderboard and disable player ratings</div></div>
       </button>
       <button class="btn-cd-danger" onclick="deleteComm('${escHtml(c.id)}')">
         <span style="font-size:20px">🗑</span>
@@ -3712,8 +3724,39 @@ function toggleCommReadOnly(communityId){
   if(!c)return;
   c.readOnly=!c.readOnly;
   setComms(comms);
-  showToast(c.readOnly?'Community set to read-only':'Community is now editable');
+  showToast(c.readOnly?'Posting locked — read-only mode':'Posting unlocked');
   renderCommDetail();
+}
+
+function toggleCommentsLocked(communityId){
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(!c)return;
+  c.commentsLocked=!c.commentsLocked;
+  setComms(comms);
+  showToast(c.commentsLocked?'Comments locked':'Comments unlocked');
+  renderCommDetail();
+}
+
+function toggleRatingsDisabled(communityId){
+  const comms=getComms();
+  const c=comms.find(x=>x.id===communityId);
+  if(!c)return;
+  c.ratingsDisabled=!c.ratingsDisabled;
+  setComms(comms);
+  showToast(c.ratingsDisabled?'Ratings disabled':'Ratings enabled');
+  renderCommDetail();
+}
+
+function removePostPhoto(postId,communityId){
+  if(!confirm('Remove the photo from this post? The text will remain.'))return;
+  const all=getAllPosts();
+  const post=all.find(x=>x.id===postId);
+  if(!post)return;
+  post.imageUrl='';
+  saveAllPosts(all);
+  setCommTab('feed');
+  showToast('Photo removed');
 }
 
 function deleteComm(communityId){
@@ -3773,7 +3816,7 @@ function fmtPostTime(iso){
 }
 
 function renderFeedTabHTML(c,myRole){
-  const canPost=['admin','contributor'].includes(myRole);
+  const canPost=myRole==='admin'||(myRole==='contributor'&&!c.readOnly);
   const myId=(currentProfile||{id:'guest'}).id;
   // Build & sort posts
   let posts=getPosts(c.id);
@@ -3806,11 +3849,16 @@ function renderFeedTabHTML(c,myRole){
   const postsHTML=posts.length
     ? posts.map(p=>buildPostCardHTML(p,c,myRole,myId)).join('')
     : `<div class="comm-empty"><span style="font-size:36px">📢</span><span>${feedFilter==='all'?'No posts yet.<br>Be the first to post!':'No posts of this type yet.'}</span></div>`;
+  const feedBanners=[
+    c.readOnly&&myRole!=='admin'?`<div class="feed-locked-banner">🔒 This community is read-only. Posting is disabled.</div>`:'',
+    c.commentsLocked&&myRole!=='admin'?`<div class="feed-locked-banner">💬 Comments are locked by the admin.</div>`:'',
+  ].filter(Boolean).join('');
   return`<div class="cd-panel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
     <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Feed</span>
     ${canPost?`<button class="btn-new-post" onclick="toggleCreatePost('${escHtml(c.id)}')">${showCreateForm?'✕ Close':'+ New Post'}</button>`:''}
   </div>
+  ${feedBanners}
   <div class="feed-filter-row">${filterChips}</div>
   ${createFormHTML}
   ${postsHTML}
@@ -3820,6 +3868,7 @@ function renderFeedTabHTML(c,myRole){
 function buildPostCardHTML(p,c,myRole,myId){
   const isAdmin=myRole==='admin';
   const isAuthor=p.authorId===myId;
+  const commLocked=c.commentsLocked&&!isAdmin;
   const typeInfo=POST_TYPES.find(x=>x.t===p.type)||{t:p.type,i:'💬'};
   const reactions=p.reactions||{like:[],fire:[],clap:[]};
   const myLike=(reactions.like||[]).includes(myId);
@@ -3852,7 +3901,7 @@ function buildPostCardHTML(p,c,myRole,myId){
   <button class="react-btn${myLike?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','like')">👍 ${(reactions.like||[]).length}</button>
   <button class="react-btn${myFire?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','fire')">🔥 ${(reactions.fire||[]).length}</button>
   <button class="react-btn${myClap?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','clap')">👏 ${(reactions.clap||[]).length}</button>
-  <button class="btn-post-action" style="margin-left:auto" onclick="toggleComments('${escHtml(p.id)}','${escHtml(c.id)}')">💬 ${commentCount}${commentsOpen?' ▲':' ▼'}</button>
+  <button class="btn-post-action" style="margin-left:auto" onclick="toggleComments('${escHtml(p.id)}','${escHtml(c.id)}')">💬 ${commentCount}${commLocked?' 🔒':''}${commentsOpen?' ▲':' ▼'}</button>
 </div>`;
 
   // Admin / author actions
@@ -3860,6 +3909,7 @@ function buildPostCardHTML(p,c,myRole,myId){
   if((isAdmin||isAuthor)&&!isEditing){
     actionsHTML=`<div class="post-admin-row">
   ${isAdmin?`<button class="btn-post-action" onclick="pinPost('${escHtml(p.id)}','${escHtml(c.id)}')">${p.pinned?'📌 Unpin':'📌 Pin'}</button>`:''}
+  ${isAdmin&&p.imageUrl?`<button class="btn-post-action" onclick="removePostPhoto('${escHtml(p.id)}','${escHtml(c.id)}')">🖼 Remove Photo</button>`:''}
   ${isAuthor?`<button class="btn-post-action" onclick="editPostInline('${escHtml(p.id)}','${escHtml(c.id)}')">✏ Edit</button>`:''}
   ${(isAdmin||isAuthor)?`<button class="btn-post-action danger" onclick="deletePost('${escHtml(p.id)}','${escHtml(c.id)}')">🗑 Delete</button>`:''}
 </div>`;
@@ -3881,10 +3931,12 @@ function buildPostCardHTML(p,c,myRole,myId){
   ${canDel?`<button class="btn-cmt-del" onclick="deleteComment('${escHtml(p.id)}','${escHtml(c.id)}','${escHtml(cm.id)}')">✕</button>`:''}
 </div>`;
     }).join('')||'<div style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 0">No comments yet.</div>';
-    const addRow=canComment?`<div class="add-comment-row">
+    const addRow=canComment&&!commLocked
+      ?`<div class="add-comment-row">
   <input id="cmt-inp-${escHtml(p.id)}" class="comment-input" type="text" placeholder="Add a comment…" maxlength="200" autocomplete="off">
   <button class="btn-cmt-send" onclick="submitComment('${escHtml(p.id)}','${escHtml(c.id)}')">Send</button>
-</div>`:'';
+</div>`
+      :commLocked?`<div class="cmt-locked-notice">🔒 Comments locked by admin</div>`:'';
     commentsHTML=`<div class="comments-section">${cmtItems}${addRow}</div>`;
   }
 
@@ -3963,6 +4015,9 @@ function submitComment(postId){
   const body=(inp?.value||'').trim();if(!body){showToast('Type a comment first');return}
   const prof=currentProfile||{id:'guest',name:'Guest'};
   const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
+  const _commForLock=getComms().find(x=>x.id===post.communityId);
+  const _myMbrRole=getCommMembers().find(m=>m.communityId===post.communityId&&m.profileId===prof.id)?.role||'guest';
+  if(_commForLock&&_commForLock.commentsLocked&&_myMbrRole!=='admin'){showToast('Comments are locked by the admin');return}
   if(!post.comments)post.comments=[];
   post.comments.push({id:'cmt_'+Date.now(),authorId:prof.id,authorName:prof.name||'Unknown',body,createdAt:new Date().toISOString()});
   saveAllPosts(all);setCommTab('feed');
@@ -4452,6 +4507,9 @@ function _calcAttrAvg(ratings,attr){
 }
 
 function renderLeaderboardTabHTML(c){
+  if(c.ratingsDisabled){
+    return`<div class="lb-empty"><span style="font-size:36px">📊</span><span>Ratings are disabled for this community.<br>An admin can re-enable them in Settings.</span></div>`;
+  }
   const players=getCPlayers(c.id);
   if(!players.length){
     return`<div class="lb-empty"><span style="font-size:36px">🏆</span><span>No players yet.<br>Add players in the Players tab to see leaderboards.</span></div>`;
