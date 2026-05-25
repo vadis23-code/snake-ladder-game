@@ -262,6 +262,25 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .btn-qa{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 13px 'Inter',sans-serif;padding:10px;cursor:pointer;min-height:44px;transition:all var(--t1)}
 .btn-qa:active{background:var(--s3)}
 .btn-qa.orange{background:var(--ca);border-color:var(--ca);color:#fff}
+/* QUEUE SLOTS */
+#q-slot-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.q-slot{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r1);transition:border-color var(--t1),background var(--t1)}
+.q-slot.court{border-color:var(--ca);background:rgba(255,87,34,.08)}
+.q-slot.next-up{border-color:var(--gold);background:rgba(255,179,0,.06)}
+.q-pos{font-size:11px;font-weight:700;color:var(--muted);min-width:18px;text-align:center}
+.q-name{font-size:15px;font-weight:700;color:var(--text);flex:1}
+.q-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.05em}
+.q-badge.live{background:rgba(255,87,34,.2);color:var(--ca)}
+.q-badge.next{background:rgba(255,179,0,.15);color:var(--gold)}
+.q-remove{background:none;border:none;color:var(--muted);font-size:20px;line-height:1;padding:0 4px;cursor:pointer;transition:color var(--t1)}
+.q-remove:active{color:var(--text)}
+.q-empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0;line-height:1.6}
+.q-add-row{display:flex;gap:8px;margin-bottom:10px}
+.q-add-input{flex:1;background:var(--s1);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 14px 'Inter',sans-serif;padding:10px 12px;outline:none}
+.q-add-input::placeholder{color:var(--muted)}
+.q-add-input:focus{border-color:var(--gold)}
+.q-add-btn{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--gold);font:700 12px 'Inter',sans-serif;padding:10px 14px;cursor:pointer;white-space:nowrap;transition:all var(--t1)}
+.q-add-btn:active{background:var(--s3)}
 /* HISTORY */
 #s-history{background:var(--bg);overflow-y:auto}
 .filter-bar{display:flex;gap:8px;padding:12px 16px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}
@@ -739,13 +758,13 @@ table.standings tr:last-child td{border-bottom:none}
         <button class="qm-chip" data-v="manual" onclick="pickQueueMode(this)">Manual</button>
       </div>
     </div>
-    <div id="tb-court-display" class="court-display">
-      <div class="court-row"><span class="court-label">On Court</span><span class="court-team" id="q-court-teams">Generate teams first</span></div>
-      <div class="court-row"><span class="court-label">Next Up</span><span class="court-team" id="q-next-team" style="color:var(--gold)">—</span></div>
-      <div class="court-row"><span class="court-label">Waiting</span><span class="court-team" id="q-waiting" style="color:var(--muted)">—</span></div>
+    <div class="q-add-row">
+      <input type="text" id="q-add-input" class="q-add-input" placeholder="Team or player name…" onkeydown="if(event.key==='Enter')queueAddTeam()">
+      <button class="q-add-btn" onclick="queueAddTeam()">+ Got Next</button>
     </div>
-    <div class="queue-actions">
-      <button class="btn-qa" onclick="queueRotate('winner')">✅ Winner Stays</button>
+    <div id="q-slot-list"></div>
+    <div class="queue-actions" id="q-action-btns" style="display:none">
+      <button class="btn-qa orange" onclick="queueRotate('winner')">✅ Winner Stays</button>
       <button class="btn-qa" onclick="queueRotate('all')">🔄 Rotate All</button>
     </div>
   </div>
@@ -1668,20 +1687,56 @@ function useGeneratedTeams(){
 }
 function renderQueueDisplay(){
   const q=builderState.queue||[];
-  if(!q.length){document.getElementById('q-court-teams').textContent='Generate teams first';document.getElementById('q-next-team').textContent='—';document.getElementById('q-waiting').textContent='—';return}
-  const p=builderState.queuePointer||0;
-  const t0=q[p%q.length],t1=q[(p+1)%q.length],next=q[(p+2)%q.length];
-  document.getElementById('q-court-teams').textContent=q.length>=2?`${t0} vs ${t1}`:(t0||'—');
-  document.getElementById('q-next-team').textContent=next||'—';
-  const waiting=[];for(let i=3;i<q.length;i++)waiting.push(q[(p+i)%q.length]);
-  document.getElementById('q-waiting').textContent=waiting.length?waiting.join(', '):'—';
+  const list=document.getElementById('q-slot-list');
+  const btns=document.getElementById('q-action-btns');
+  if(!list)return;
+  if(!q.length){
+    list.innerHTML='<div class="q-empty">No teams queued up.<br>Add a team above or generate in the Teams tab.</div>';
+    if(btns)btns.style.display='none';
+    return;
+  }
+  list.innerHTML=q.map((name,i)=>{
+    let slotClass='q-slot';
+    let badge='';
+    if(i===0){slotClass+=' court';badge='<span class="q-badge live">LIVE</span>';}
+    else if(i===1&&q.length>=2){slotClass+=' court';badge='<span class="q-badge live">LIVE</span>';}
+    else if(i===2){slotClass+=' next-up';badge='<span class="q-badge next">NEXT</span>';}
+    return`<div class="${slotClass}"><span class="q-pos">${i+1}</span><span class="q-name">${name}</span>${badge}<button class="q-remove" onclick="queueRemoveSlot(${i})" title="Remove">×</button></div>`;
+  }).join('');
+  if(btns)btns.style.display=q.length>=2?'flex':'none';
+}
+function queueAddTeam(){
+  const inp=document.getElementById('q-add-input');
+  const name=(inp.value||'').trim();
+  if(!name){showToast('Enter a team name');return}
+  if(!builderState.queue)builderState.queue=[];
+  builderState.queue.push(name);
+  inp.value='';
+  saveBuilderState();renderQueueDisplay();
+  showToast(`${name} added to queue`);
+}
+function queueRemoveSlot(i){
+  const q=builderState.queue||[];
+  if(i<0||i>=q.length)return;
+  const name=q.splice(i,1)[0];
+  builderState.queue=q;
+  saveBuilderState();renderQueueDisplay();
+  showToast(`${name} removed`);
 }
 function queueRotate(mode){
-  if(!builderState.queue.length){showToast('Generate teams first');return}
-  if(mode==='winner'){builderState.queuePointer=(builderState.queuePointer||0)+1}
-  else{builderState.queuePointer=(builderState.queuePointer||0)+2}
+  const q=builderState.queue||[];
+  if(q.length<2){showToast('Need at least 2 teams');return}
+  if(mode==='winner'){
+    const loser=q.splice(1,1)[0];
+    q.push(loser);
+    showToast(`${loser} goes to back — winner stays!`);
+  } else {
+    const [a,b]=q.splice(0,2);
+    q.push(a,b);
+    showToast('Both teams rotated out');
+  }
+  builderState.queue=q;
   saveBuilderState();renderQueueDisplay();
-  showToast('Court rotated!');
 }
 function pickQueueMode(btn){
   builderState.queueMode=btn.dataset.v;
