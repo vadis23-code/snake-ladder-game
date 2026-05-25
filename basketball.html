@@ -555,6 +555,42 @@ table.standings tr:last-child td{border-bottom:none}
 .comment-input:focus{border-color:var(--success)}
 .btn-cmt-send{background:var(--success);border:none;border-radius:var(--r1);color:#000;font:700 12px 'Inter',sans-serif;padding:8px 12px;cursor:pointer;min-height:38px;transition:opacity var(--t1)}
 .btn-cmt-send:active{opacity:.8}
+/* PLAYERS */
+#s-comm-detail .player-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.player-card-top{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 10px}
+.player-ava{width:46px;height:46px;border-radius:50%;background:var(--cb);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;flex-shrink:0;overflow:hidden}
+.player-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.player-main{flex:1;min-width:0}
+.player-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--text);line-height:1.1}
+.player-nick{font-size:11px;color:var(--muted);font-style:italic}
+.player-sub{display:flex;gap:6px;align-items:center;margin-top:5px;flex-wrap:wrap}
+.pos-badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:10px;background:rgba(41,121,255,.15);color:#90CAF9}
+.jersey-num{font-size:11px;font-weight:700;color:var(--muted2)}
+.player-avg-wrap{text-align:right;flex-shrink:0}
+.player-avg-score{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);line-height:1}
+.player-avg-sub{font-size:10px;color:var(--muted2);margin-top:1px}
+.player-badges-row{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px}
+.badge-chip{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;background:rgba(255,179,0,.12);color:var(--gold);border:1px solid rgba(255,179,0,.2)}
+.player-stats{display:grid;grid-template-columns:repeat(5,1fr);padding:8px 12px;background:var(--s2);border-top:1px solid var(--border)}
+.pstat{display:flex;flex-direction:column;align-items:center;gap:1px}
+.pstat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text)}
+.pstat-lbl{font-size:9px;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase}
+.player-actions-row{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.btn-rate{background:rgba(255,179,0,.1);border:1.5px solid rgba(255,179,0,.3);border-radius:var(--r1);color:var(--gold);font:700 12px 'Inter',sans-serif;padding:7px 12px;cursor:pointer;min-height:34px;transition:all var(--t1)}
+.btn-rate.on{background:rgba(255,179,0,.22);border-color:var(--gold)}
+.btn-rate:active{opacity:.8}
+.rate-form{padding:12px 14px;border-top:1px solid var(--border);background:rgba(255,179,0,.04);display:flex;flex-direction:column;gap:8px}
+.rate-attr-row{display:flex;align-items:center;gap:10px}
+.rate-attr-lbl{font-size:12px;font-weight:700;color:var(--muted);width:100px;flex-shrink:0}
+.rate-stars{display:flex;gap:4px}
+.rs-btn{background:none;border:none;font-size:24px;color:var(--muted2);cursor:pointer;padding:0 1px;line-height:1;transition:color .1s,transform .1s}
+.rs-btn.on{color:var(--gold)}
+.rs-btn:active{transform:scale(1.3)}
+.add-player-form{background:var(--s1);border:1px solid rgba(0,230,118,.3);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:10px}
+.player-stats-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge-sel-row{display:flex;flex-wrap:wrap;gap:6px}
+.badge-sel-chip{padding:6px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.badge-sel-chip.on{border-color:var(--gold);background:rgba(255,179,0,.12);color:var(--gold)}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -2627,6 +2663,7 @@ function openCommunity(id){
   activeCommunityId=id;
   activeCommTab='feed';
   feedFilter='all';showCreateForm=false;editingPostId=null;
+  showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null;
   if(typeof expandedComments!=='undefined')expandedComments.clear();
   renderCommDetail();
   showScreen('comm-detail');
@@ -2678,6 +2715,7 @@ function renderCommDetail(){
 
 function setCommTab(tab){
   if(tab!=='feed'){showCreateForm=false;editingPostId=null}
+  if(tab!=='players'){showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null}
   activeCommTab=tab;
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   const c=getComms().find(x=>x.id===activeCommunityId);
@@ -2695,7 +2733,7 @@ function _renderCommTabContent(c,members,myRole){
   }else if(activeCommTab==='members'){
     el.innerHTML=_buildMembersHTML(c,members,myRole);
   }else if(activeCommTab==='players'){
-    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">🏅</span><span>Player directory coming in Phase C4.</span></div></div>`;
+    el.innerHTML=renderPlayersTabHTML(c,myRole);
   }else if(activeCommTab==='gallery'){
     el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📸</span><span>Gallery coming in Phase C5.</span></div></div>`;
   }else if(activeCommTab==='events'){
@@ -2842,6 +2880,8 @@ function deleteComm(communityId){
   setComms(comms.filter(x=>x.id!==communityId));
   setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
   if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
+  saveAllCPlayers(getAllCPlayers().filter(p=>p.communityId!==communityId));
+  saveAllCRatings(getAllCRatings().filter(r=>r.communityId!==communityId));
   showToast('Community deleted');
   showScreen('communities');
 }
@@ -3085,6 +3125,322 @@ function deleteComment(postId,communityId,commentId){
   const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
   post.comments=(post.comments||[]).filter(c=>c.id!==commentId);
   saveAllPosts(all);setCommTab('feed');showToast('Comment removed');
+}
+
+/* ════════════════════════════════════════════════════════
+   Communities — Phase C4: Players & Ratings
+════════════════════════════════════════════════════════ */
+const POSITIONS=['PG','SG','SF','PF','C','Combo'];
+const PLAYER_BADGES=[
+  {id:'clutch_shooter',label:'Clutch Shooter',icon:'🎯'},
+  {id:'lockdown_defender',label:'Lockdown Defender',icon:'🔒'},
+  {id:'hustle_king',label:'Hustle King',icon:'💪'},
+  {id:'floor_general',label:'Floor General',icon:'🎙'},
+  {id:'silent_killer',label:'Silent Killer',icon:'⚡'},
+  {id:'fast_break_king',label:'Fast Break King',icon:'💨'},
+  {id:'game_point_killer',label:'Game Point Killer',icon:'🔥'},
+  {id:'best_teammate',label:'Best Teammate',icon:'🤝'},
+  {id:'most_improved',label:'Most Improved',icon:'📈'},
+  {id:'positive_energy',label:'Positive Energy',icon:'🌟'},
+];
+const RATE_ATTRS=[
+  {k:'shooting',label:'Shooting'},{k:'defense',label:'Defense'},
+  {k:'passing',label:'Passing'},{k:'speed',label:'Speed'},
+  {k:'teamwork',label:'Teamwork'},{k:'clutch',label:'Clutch'},
+  {k:'sportsmanship',label:'Sportsmanship'},
+];
+
+let showAddPlayerForm=false;
+let editingPlayerId=null;
+let ratingPlayerId=null;
+let selectedPosition='PG';
+let selectedBadges=new Set();
+let pendingRating={};
+
+// ── Storage ───────────────────────────────────────────────
+function getAllCPlayers(){try{return JSON.parse(localStorage.getItem(KC.players)||'[]')}catch{return[]}}
+function saveAllCPlayers(arr){localStorage.setItem(KC.players,JSON.stringify(arr))}
+function getCPlayers(cid){return getAllCPlayers().filter(p=>p.communityId===cid)}
+function getAllCRatings(){try{return JSON.parse(localStorage.getItem(KC.ratings)||'[]')}catch{return[]}}
+function saveAllCRatings(arr){localStorage.setItem(KC.ratings,JSON.stringify(arr))}
+function getCRatingsByPlayer(pid){return getAllCRatings().filter(r=>r.playerId===pid)}
+
+function calcPlayerAvg(playerId){
+  const rs=getCRatingsByPlayer(playerId);
+  if(!rs.length)return null;
+  let total=0,cnt=0;
+  rs.forEach(r=>RATE_ATTRS.forEach(({k})=>{if(r[k]>0){total+=r[k];cnt++}}));
+  return cnt>0?total/cnt:null;
+}
+
+// ── Tab render ────────────────────────────────────────────
+function renderPlayersTabHTML(c,myRole){
+  const canManage=['admin','contributor'].includes(myRole);
+  const players=getCPlayers(c.id);
+  const myId=(currentProfile||{id:'guest'}).id;
+
+  const posChips=POSITIONS.map(pos=>`<button class="comm-chip${selectedPosition===pos?' on':''}" onclick="pickPlayerPos(this,'${escHtml(pos)}')">${escHtml(pos)}</button>`).join('');
+  const badgeSelChips=PLAYER_BADGES.map(b=>`<button class="badge-sel-chip${selectedBadges.has(b.id)?' on':''}" onclick="pickPlayerBadge(this,'${escHtml(b.id)}')">${b.icon} ${escHtml(b.label)}</button>`).join('');
+
+  const addFormHTML=showAddPlayerForm&&canManage?`<div class="add-player-form">
+  <span class="comm-form-label">Player Info</span>
+  <input id="ap-name" class="post-inp" type="text" placeholder="Full name *" maxlength="40" autocomplete="off">
+  <input id="ap-nick" class="post-inp" type="text" placeholder='Nickname / "Call me"' maxlength="20" autocomplete="off">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <input id="ap-jers" class="post-inp" type="text" placeholder="#Jersey" maxlength="4" autocomplete="off">
+    <input id="ap-photo" class="post-inp" type="url" placeholder="Photo URL (optional)" autocomplete="off">
+  </div>
+  <span class="comm-form-label">Position</span>
+  <div class="comm-chip-row" id="ppos-row">${posChips}</div>
+  <span class="comm-form-label">Stats (manual)</span>
+  <div class="player-stats-inputs">
+    <input id="ap-gp"  class="post-inp" type="number" min="0" placeholder="Games">
+    <input id="ap-w"   class="post-inp" type="number" min="0" placeholder="Wins">
+    <input id="ap-l"   class="post-inp" type="number" min="0" placeholder="Losses">
+    <input id="ap-pts" class="post-inp" type="number" min="0" placeholder="Points">
+    <input id="ap-mvp" class="post-inp" type="number" min="0" placeholder="MVPs">
+  </div>
+  <span class="comm-form-label">Badges (multi-select)</span>
+  <div class="badge-sel-row">${badgeSelChips}</div>
+  <div class="post-form-actions">
+    <button class="btn-post-submit" onclick="submitCPlayer('${escHtml(c.id)}')">Add Player</button>
+    <button class="btn-post-cancel" onclick="cancelAddCPlayer()">Cancel</button>
+  </div>
+</div>`:'';
+
+  const cardsHTML=players.length
+    ? players.map(p=>buildPlayerCardHTML(p,c,myRole,myId)).join('')
+    : `<div class="comm-empty"><span style="font-size:36px">🏅</span><span>${canManage?'No players yet.<br>Add your first player!':'No players in this community yet.'}</span></div>`;
+
+  return`<div class="cd-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Players · ${players.length}</span>
+    ${canManage?`<button class="btn-new-post" onclick="toggleAddCPlayer()">${showAddPlayerForm?'✕ Close':'+ Add Player'}</button>`:''}
+  </div>
+  ${addFormHTML}
+  ${cardsHTML}
+</div>`;
+}
+
+function buildPlayerCardHTML(player,c,myRole,myId){
+  const canManage=['admin','contributor'].includes(myRole);
+  const canRate=['admin','contributor','member'].includes(myRole);
+  const isEditing=editingPlayerId===player.id;
+  const isRating=ratingPlayerId===player.id;
+  const avg=calcPlayerAvg(player.id);
+  const raterCount=getCRatingsByPlayer(player.id).length;
+
+  const badgesHTML=(player.badges||[]).map(bid=>{
+    const b=PLAYER_BADGES.find(x=>x.id===bid);
+    return b?`<span class="badge-chip">${b.icon} ${escHtml(b.label)}</span>`:'';
+  }).join('');
+
+  const avatarInner=player.photoUrl
+    ?`<img src="${escHtml(player.photoUrl)}" alt="" onerror="this.style.display='none'">`
+    :escHtml((player.name||'?')[0].toUpperCase());
+
+  const avgHTML=avg!==null
+    ?`<div class="player-avg-score">${avg.toFixed(1)}★</div><div class="player-avg-sub">${raterCount} rating${raterCount===1?'':'s'}</div>`
+    :`<div style="font-size:10px;color:var(--muted2);line-height:1.3">No<br>ratings</div>`;
+
+  let html=`<div class="player-card-top">
+  <div class="player-ava">${avatarInner}</div>
+  <div class="player-main">
+    <div class="player-name">${escHtml(player.name||'Unknown')}</div>
+    ${player.nickname?`<div class="player-nick">"${escHtml(player.nickname)}"</div>`:''}
+    <div class="player-sub">
+      ${player.position?`<span class="pos-badge">${escHtml(player.position)}</span>`:''}
+      ${player.jerseyNumber?`<span class="jersey-num">#${escHtml(player.jerseyNumber)}</span>`:''}
+    </div>
+  </div>
+  <div class="player-avg-wrap">${avgHTML}</div>
+</div>`;
+
+  if(badgesHTML)html+=`<div class="player-badges-row">${badgesHTML}</div>`;
+
+  const gp=player.gamesPlayed||0,w=player.wins||0,l=player.losses||0,pts=player.points||0,mvp=player.mvpCount||0;
+  if(gp||w||l||pts||mvp){
+    html+=`<div class="player-stats">
+  <div class="pstat"><div class="pstat-val">${gp}</div><div class="pstat-lbl">Games</div></div>
+  <div class="pstat"><div class="pstat-val">${w}</div><div class="pstat-lbl">Wins</div></div>
+  <div class="pstat"><div class="pstat-val">${l}</div><div class="pstat-lbl">Loss</div></div>
+  <div class="pstat"><div class="pstat-val">${pts}</div><div class="pstat-lbl">Pts</div></div>
+  <div class="pstat"><div class="pstat-val">${mvp}</div><div class="pstat-lbl">MVP</div></div>
+</div>`;
+  }
+
+  if(!isEditing){
+    html+=`<div class="player-actions-row">
+  ${canRate?`<button class="btn-rate${isRating?' on':''}" onclick="toggleRateCPlayer('${escHtml(player.id)}','${escHtml(c.id)}')">${isRating?'✕ Close':'⭐ Rate'}</button>`:''}
+  ${canManage?`<button class="btn-post-action" onclick="editCPlayerInline('${escHtml(player.id)}','${escHtml(c.id)}')">✏ Edit</button>`:''}
+  ${canManage?`<button class="btn-post-action danger" onclick="deleteCPlayer('${escHtml(player.id)}','${escHtml(c.id)}')">🗑 Delete</button>`:''}
+</div>`;
+  }
+
+  if(isRating&&!isEditing)html+=buildRatingFormHTML(player,c);
+
+  if(isEditing){
+    const posChipsE=POSITIONS.map(pos=>`<button class="comm-chip${selectedPosition===pos?' on':''}" onclick="pickPlayerPos(this,'${escHtml(pos)}')">${escHtml(pos)}</button>`).join('');
+    const badgeChipsE=PLAYER_BADGES.map(b=>`<button class="badge-sel-chip${selectedBadges.has(b.id)?' on':''}" onclick="pickPlayerBadge(this,'${escHtml(b.id)}')">${b.icon} ${escHtml(b.label)}</button>`).join('');
+    html+=`<div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px">
+  <span class="comm-form-label">Edit Player</span>
+  <input id="ep-name" class="post-inp" type="text" value="${escHtml(player.name||'')}" maxlength="40" placeholder="Full name *">
+  <input id="ep-nick" class="post-inp" type="text" value="${escHtml(player.nickname||'')}" maxlength="20" placeholder="Nickname">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <input id="ep-jers"  class="post-inp" type="text"  value="${escHtml(player.jerseyNumber||'')}" maxlength="4" placeholder="#Jersey">
+    <input id="ep-photo" class="post-inp" type="url"   value="${escHtml(player.photoUrl||'')}" placeholder="Photo URL">
+  </div>
+  <span class="comm-form-label">Position</span>
+  <div class="comm-chip-row" id="ppos-row">${posChipsE}</div>
+  <span class="comm-form-label">Stats</span>
+  <div class="player-stats-inputs">
+    <input id="ep-gp"  class="post-inp" type="number" min="0" value="${player.gamesPlayed||0}" placeholder="Games">
+    <input id="ep-w"   class="post-inp" type="number" min="0" value="${player.wins||0}" placeholder="Wins">
+    <input id="ep-l"   class="post-inp" type="number" min="0" value="${player.losses||0}" placeholder="Losses">
+    <input id="ep-pts" class="post-inp" type="number" min="0" value="${player.points||0}" placeholder="Points">
+    <input id="ep-mvp" class="post-inp" type="number" min="0" value="${player.mvpCount||0}" placeholder="MVPs">
+  </div>
+  <span class="comm-form-label">Badges</span>
+  <div class="badge-sel-row">${badgeChipsE}</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-post-submit" style="min-height:40px;font-size:13px" onclick="saveCPlayerEdit('${escHtml(player.id)}','${escHtml(c.id)}')">Save</button>
+    <button class="btn-post-cancel" style="min-height:40px;font-size:13px" onclick="cancelCPlayerEdit()">Cancel</button>
+  </div>
+</div>`;
+  }
+
+  return`<div class="player-card">${html}</div>`;
+}
+
+function buildRatingFormHTML(player,c){
+  const attrRows=RATE_ATTRS.map(({k,label})=>{
+    const cur=pendingRating[k]||0;
+    const stars=[1,2,3,4,5].map(v=>`<button class="rs-btn${v<=cur?' on':''}" data-rattr="${k}" onclick="setRatingStar('${k}',${v})">★</button>`).join('');
+    return`<div class="rate-attr-row"><div class="rate-attr-lbl">${escHtml(label)}</div><div class="rate-stars">${stars}</div></div>`;
+  }).join('');
+  return`<div class="rate-form">
+  <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Rate ${escHtml(player.name)}</div>
+  <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;line-height:1.4">Be positive and honest. Rate skills you've seen on court.</div>
+  ${attrRows}
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button class="btn-post-submit" style="min-height:38px;font-size:13px" onclick="submitCRating('${escHtml(player.id)}','${escHtml(c.id)}')">Submit Rating</button>
+    <button class="btn-post-cancel" style="min-height:38px;font-size:13px" onclick="toggleRateCPlayer('${escHtml(player.id)}','${escHtml(c.id)}')">Cancel</button>
+  </div>
+  <div style="font-size:10px;color:var(--muted2);margin-top:4px;line-height:1.5">Ratings are community-based and meant to be constructive. Focus on what you've genuinely observed.</div>
+</div>`;
+}
+
+// ── Player actions ────────────────────────────────────────
+function toggleAddCPlayer(){
+  showAddPlayerForm=!showAddPlayerForm;
+  if(showAddPlayerForm){selectedBadges=new Set();selectedPosition='PG';editingPlayerId=null;ratingPlayerId=null}
+  setCommTab('players');
+}
+function cancelAddCPlayer(){showAddPlayerForm=false;setCommTab('players')}
+
+function pickPlayerPos(btn,pos){
+  document.querySelectorAll('#ppos-row .comm-chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  selectedPosition=pos;
+}
+function pickPlayerBadge(btn,badgeId){
+  btn.classList.toggle('on');
+  if(selectedBadges.has(badgeId))selectedBadges.delete(badgeId);
+  else selectedBadges.add(badgeId);
+}
+
+function submitCPlayer(communityId){
+  const name=(document.getElementById('ap-name')?.value||'').trim();
+  if(!name){showToast('Enter player name');return}
+  const prof=currentProfile||{id:'guest',name:'Guest'};
+  const player={
+    id:'player_'+Date.now(),communityId,
+    name,
+    nickname:(document.getElementById('ap-nick')?.value||'').trim(),
+    jerseyNumber:(document.getElementById('ap-jers')?.value||'').trim(),
+    photoUrl:(document.getElementById('ap-photo')?.value||'').trim(),
+    position:selectedPosition,
+    gamesPlayed:parseInt(document.getElementById('ap-gp')?.value)||0,
+    wins:parseInt(document.getElementById('ap-w')?.value)||0,
+    losses:parseInt(document.getElementById('ap-l')?.value)||0,
+    points:parseInt(document.getElementById('ap-pts')?.value)||0,
+    mvpCount:parseInt(document.getElementById('ap-mvp')?.value)||0,
+    badges:[...selectedBadges],
+    createdBy:prof.id,createdAt:new Date().toISOString(),
+  };
+  const all=getAllCPlayers();all.push(player);saveAllCPlayers(all);
+  showAddPlayerForm=false;selectedBadges=new Set();
+  setCommTab('players');showToast(`${player.name} added!`);
+}
+
+function editCPlayerInline(playerId){
+  const p=getAllCPlayers().find(x=>x.id===playerId);
+  if(p){selectedBadges=new Set(p.badges||[]);selectedPosition=p.position||'PG'}
+  editingPlayerId=playerId;ratingPlayerId=null;showAddPlayerForm=false;
+  setCommTab('players');
+}
+function cancelCPlayerEdit(){editingPlayerId=null;setCommTab('players')}
+
+function saveCPlayerEdit(playerId){
+  const all=getAllCPlayers();const p=all.find(x=>x.id===playerId);if(!p)return;
+  const name=(document.getElementById('ep-name')?.value||'').trim();
+  if(!name){showToast('Player name required');return}
+  p.name=name;
+  p.nickname=(document.getElementById('ep-nick')?.value||'').trim();
+  p.jerseyNumber=(document.getElementById('ep-jers')?.value||'').trim();
+  p.photoUrl=(document.getElementById('ep-photo')?.value||'').trim();
+  p.position=selectedPosition;
+  p.gamesPlayed=parseInt(document.getElementById('ep-gp')?.value)||0;
+  p.wins=parseInt(document.getElementById('ep-w')?.value)||0;
+  p.losses=parseInt(document.getElementById('ep-l')?.value)||0;
+  p.points=parseInt(document.getElementById('ep-pts')?.value)||0;
+  p.mvpCount=parseInt(document.getElementById('ep-mvp')?.value)||0;
+  p.badges=[...selectedBadges];
+  saveAllCPlayers(all);editingPlayerId=null;
+  setCommTab('players');showToast('Player updated');
+}
+
+function deleteCPlayer(playerId){
+  if(!confirm('Remove this player from the community?'))return;
+  saveAllCPlayers(getAllCPlayers().filter(p=>p.id!==playerId));
+  saveAllCRatings(getAllCRatings().filter(r=>r.playerId!==playerId));
+  setCommTab('players');showToast('Player removed');
+}
+
+function toggleRateCPlayer(playerId){
+  if(ratingPlayerId===playerId){ratingPlayerId=null;pendingRating={}}
+  else{
+    ratingPlayerId=playerId;
+    const myId=(currentProfile||{id:'guest'}).id;
+    const existing=getAllCRatings().find(r=>r.playerId===playerId&&r.raterProfileId===myId);
+    pendingRating={};
+    RATE_ATTRS.forEach(({k})=>{pendingRating[k]=existing?(existing[k]||0):0});
+  }
+  setCommTab('players');
+}
+
+function setRatingStar(attr,val){
+  pendingRating[attr]=val;
+  document.querySelectorAll(`[data-rattr="${attr}"]`).forEach((btn,i)=>btn.classList.toggle('on',i<val));
+}
+
+function submitCRating(playerId,communityId){
+  const hasAny=RATE_ATTRS.some(({k})=>(pendingRating[k]||0)>0);
+  if(!hasAny){showToast('Rate at least one attribute ★');return}
+  const myId=(currentProfile||{id:'guest'}).id;
+  const all=getAllCRatings();
+  const idx=all.findIndex(r=>r.playerId===playerId&&r.raterProfileId===myId);
+  const rating={
+    id:idx>-1?all[idx].id:'rating_'+Date.now(),
+    playerId,communityId,raterProfileId:myId,
+    updatedAt:new Date().toISOString(),
+  };
+  if(idx>-1)rating.createdAt=all[idx].createdAt;else rating.createdAt=rating.updatedAt;
+  RATE_ATTRS.forEach(({k})=>{rating[k]=pendingRating[k]||0});
+  if(idx>-1)all[idx]=rating;else all.push(rating);
+  saveAllCRatings(all);
+  ratingPlayerId=null;pendingRating={};
+  setCommTab('players');showToast('Rating submitted! ⭐');
 }
 
 /* ════════════════════════════════════════════════════════
