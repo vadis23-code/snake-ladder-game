@@ -2068,8 +2068,8 @@ function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
    Init
 ════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
-  // Init rating dots in team builder
-  initRatingDots();
+  // Init attribute grid in team builder
+  initAttrGrid();
   // Load saved profile
   const p=getObj(K.profile,null);
   if(p&&p.id){
