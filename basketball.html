@@ -1031,6 +1031,10 @@ table.standings tr:last-child td{border-bottom:none}
   .lp-topnav-inner{padding:0 16px}
   .lp-s6-ctas{flex-direction:column}
 }
+/* ─── Invite / Share ─────────────────────────────────── */
+.lp-btn-invite{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:var(--r2);font:700 15px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1);border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--text);padding:0 20px}
+.lp-btn-invite:active{background:rgba(255,255,255,.1)}
+.share-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 20px;font-size:13px;font-weight:600;z-index:500;white-space:nowrap;pointer-events:none;animation:fadeInUp .2s ease-out}
 /* ─── Onboarding ─────────────────────────────────────── */
 #s-onboarding{background:radial-gradient(ellipse at 50% 0%,rgba(255,87,34,.18) 0%,transparent 60%),var(--bg);align-items:center;justify-content:center;padding:24px 20px}
 .ob-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -1189,6 +1193,7 @@ table.standings tr:last-child td{border-bottom:none}
       <div class="lp-h-ctas">
         <button class="lp-btn-p" onclick="goSetup()">▶ Start Quick Game</button>
         <button class="lp-btn-o" onclick="scrollToSection('lp-features')">Explore Features</button>
+        <button class="lp-btn-invite" onclick="inviteFriends()">🔗 Invite Friends</button>
       </div>
       <div class="lp-h-trust">
         <div class="lp-h-ti"><span>🔓</span>No log-in</div>
@@ -2051,6 +2056,11 @@ table.standings tr:last-child td{border-bottom:none}
       <div class="setting-row" onclick="openFeedback()">
         <div class="sr-icon">💬</div>
         <div class="sr-info"><div class="sr-label">Send Feedback</div><div class="sr-sub">Report bugs, suggest ideas, or ask questions</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" onclick="inviteFriends()">
+        <div class="sr-icon">🔗</div>
+        <div class="sr-info"><div class="sr-label">Invite Friends</div><div class="sr-sub">Share CourtCall with your squad</div></div>
         <div style="color:var(--muted2)">›</div>
       </div>
       <div class="setting-row" onclick="showOnboarding()" style="border-bottom:none">
@@ -5559,6 +5569,34 @@ function dismissInstall(e){
   if(bar)bar.classList.add('hidden');
   localStorage.setItem('pwa_dismissed','1');
 }
+
+// ── Invite Friends ────────────────────────────────────
+function inviteFriends(){
+  const url=window.location.href.split('#')[0];
+  const text='Try CourtCall 🏀 — voice-first scoring for pickup basketball.';
+  const waUrl=`https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`;
+
+  if(navigator.share){
+    navigator.share({title:'CourtCall',text,url}).catch(()=>{});
+    return;
+  }
+  // Fallback menu
+  const menu=document.createElement('div');
+  menu.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);z-index:500;min-width:240px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5)';
+  menu.innerHTML=`
+    <div style="padding:12px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border)">Share CourtCall</div>
+    <button onclick="window.open('${waUrl}','_blank');this.closest('[style]').remove()" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font:600 14px 'Inter',sans-serif;cursor:pointer">
+      <span style="font-size:20px">💬</span>Share on WhatsApp
+    </button>
+    <button onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}').then(()=>showToast('Link copied!')).catch(()=>{})}this.closest('[style]').remove()" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font:600 14px 'Inter',sans-serif;cursor:pointer">
+      <span style="font-size:20px">📋</span>Copy Link
+    </button>
+    <button onclick="this.closest('[style]').remove()" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;background:none;border:none;color:var(--muted);font:600 14px 'Inter',sans-serif;cursor:pointer">
+      <span style="font-size:20px">✕</span>Cancel
+    </button>`;
+  document.body.appendChild(menu);
+  setTimeout(()=>document.addEventListener('click',function h(e){if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',h)}},{once:false}),100);
+}
 </script>
 
 <!-- ── Feedback Modal ────────────────────────────────── -->
@@ -5645,6 +5683,7 @@ function dismissInstall(e){
     <button class="more-item" onclick="showScreen('profile');hideMoreMenu()"><span class="more-icon">👤</span><span class="more-lbl">Profile</span></button>
     <button class="more-item" onclick="showScreen('settings');hideMoreMenu()"><span class="more-icon">⚙</span><span class="more-lbl">Settings</span></button>
     <button class="more-item" onclick="openFeedback();hideMoreMenu()"><span class="more-icon">💬</span><span class="more-lbl">Feedback</span></button>
+    <button class="more-item" onclick="inviteFriends();hideMoreMenu()"><span class="more-icon">🔗</span><span class="more-lbl">Invite Friends</span></button>
   </div>
 </div>
 </body>
