@@ -509,6 +509,14 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="display:flex;align-items:center;gap:10px"><label style="font-size:13px;color:var(--muted);flex:1">Small basket</label><input id="inp-sm" type="number" min="1" max="9" value="1" class="custom-input show" style="width:80px;margin:0"></div>
         <div style="display:flex;align-items:center;gap:10px"><label style="font-size:13px;color:var(--muted);flex:1">Large basket</label><input id="inp-lg" type="number" min="1" max="9" value="2" class="custom-input show" style="width:80px;margin:0"></div>
       </div>
+      <div style="margin-top:14px">
+        <span class="sec-label" style="margin-bottom:8px;display:block">Free Throw / Foul Point</span>
+        <div class="chip-row" id="cr-ft">
+          <button class="chip on" data-v="on" onclick="pickChip('cr-ft',this)">+1 Always On</button>
+          <button class="chip" data-v="off" onclick="pickChip('cr-ft',this)">Off</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">In 2s &amp; 3s mode this adds a +1 button for free throws and foul shots.</div>
+      </div>
     </div>
   </div>
   <div class="setup-actions">
@@ -959,7 +967,7 @@ function renderHub(){
   </div>`).join('');
 }
 // ── Setup helpers ─────────────────────────────────────────
-let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
+let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
 let teamColors={a:'orange',b:'blue'};
 function pickChip(rowId,btn){
   cx[rowId]=btn.dataset.v;
@@ -986,7 +994,7 @@ let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
    Game State & Engine
 ════════════════════════════════════════════════════════ */
 let state=freshState();
-function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
+function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
 function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
@@ -1008,7 +1016,8 @@ function handleStartGame(){
   let ptsSmall=1,ptsLarge=2;
   if(cx['cr-rule']==='2s3s'){ptsSmall=2;ptsLarge=3}
   if(cx['cr-rule']==='custom'){ptsSmall=parseInt(document.getElementById('inp-sm').value,10)||1;ptsLarge=parseInt(document.getElementById('inp-lg').value,10)||2}
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
+  const allowFreeThrow=cx['cr-ft']!=='off';
+  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
   applyTeamColors();save();renderGame();showScreen('game');
 }
 function handleBackFromGame(){
@@ -1030,8 +1039,15 @@ function renderGame(){
   renderScorePads();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();
 }
 function renderScorePads(){
-  const pts=state.ptsSmall===state.ptsLarge?[state.ptsSmall]:[state.ptsSmall,state.ptsLarge];
-  ['a','b'].forEach(t=>{document.getElementById(`pad-${t}`).innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}">+${p}</button>`).join('')});
+  // Build the base points array from the scoring rule
+  let pts=state.ptsSmall===state.ptsLarge?[state.ptsSmall]:[state.ptsSmall,state.ptsLarge];
+  // Add +1 for free throws if enabled and not already present
+  if(state.allowFreeThrow&&!pts.includes(1))pts=[1,...pts];
+  // Deduplicate and sort ascending
+  pts=[...new Set(pts)].sort((a,b)=>a-b);
+  ['a','b'].forEach(t=>{
+    document.getElementById(`pad-${t}`).innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}">+${p}</button>`).join('');
+  });
   wireScorePads();
 }
 let _padWired=false;
