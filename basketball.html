@@ -276,6 +276,7 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .mc-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)}
 .mc-meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
 .mc-winner-tag{font-size:11px;font-weight:700;color:var(--success);background:rgba(0,230,118,.1);border-radius:10px;padding:2px 8px}
+.mc-spicy{font-size:11px;font-weight:700;color:var(--gold);background:rgba(255,179,0,.1);border-radius:10px;padding:2px 8px}
 .history-empty{text-align:center;padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .history-empty-icon{font-size:48px}
 .history-empty-text{font-size:14px;color:var(--muted);line-height:1.6}
@@ -747,6 +748,9 @@ table.standings tr:last-child td{border-bottom:none}
       <div class="md-stat-row"><span class="md-stat-label">Win Score</span><span class="md-stat-value" id="md-winscore">—</span></div>
       <div class="md-stat-row"><span class="md-stat-label">Duration</span><span class="md-stat-value" id="md-duration">—</span></div>
       <div class="md-stat-row"><span class="md-stat-label">Biggest Lead</span><span class="md-stat-value" id="md-lead">—</span></div>
+      <div class="md-stat-row"><span class="md-stat-label">Lead Changes</span><span class="md-stat-value" id="md-lead-changes">—</span></div>
+      <div class="md-stat-row"><span class="md-stat-label">Biggest Run</span><span class="md-stat-value" id="md-big-run">—</span></div>
+      <div class="md-stat-row"><span class="md-stat-label">Fouls (A / B)</span><span class="md-stat-value" id="md-fouls">—</span></div>
     </div>
     <div class="md-section">
       <div class="md-sec-title">Game Summary</div>
@@ -1198,9 +1202,43 @@ function updateFoulUI(team){
 }
 function nextQuarter(){const idx=QUARTERS.indexOf(state.quarter);state.quarter=QUARTERS[(idx+1)%QUARTERS.length];save();renderGame()}
 function togglePossession(){state.possession=state.possession==='a'?'b':'a';document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';save()}
+// ── Match stat helpers (work on any history array, newest-first) ──
+function computeLeadChanges(hist){
+  const chron=[...hist].reverse();
+  let a=0,b=0,prevLdr=null,changes=0;
+  for(const e of chron){
+    if(e.team==='a')a+=e.pts;else b+=e.pts;
+    const ldr=a>b?'a':b>a?'b':null;
+    if(ldr&&ldr!==prevLdr&&prevLdr!==null)changes++;
+    if(ldr)prevLdr=ldr;
+  }
+  return changes;
+}
+function computeBiggestRun(hist){
+  const chron=[...hist].reverse();
+  let maxRun=0,curTeam=null,curPts=0;
+  for(const e of chron){
+    if(e.team===curTeam)curPts+=e.pts;
+    else{curTeam=e.team;curPts=e.pts}
+    if(curPts>maxRun)maxRun=curPts;
+  }
+  return maxRun;
+}
+function computeWasTrailing(hist,winnerTeam){
+  if(!winnerTeam||!hist.length)return false;
+  const chron=[...hist].reverse();
+  let a=0,b=0;
+  for(const e of chron){
+    if(e.team==='a')a+=e.pts;else b+=e.pts;
+    if(winnerTeam==='a'&&b>a)return true;
+    if(winnerTeam==='b'&&a>b)return true;
+  }
+  return false;
+}
 function buildMatchEntry(winner,loser){
   const dur=state.startTime?fmtDur(Date.now()-state.startTime):'—';
-  return{id:'m_'+Date.now(),teamA:{name:state.teamA.name,score:state.teamA.score},teamB:{name:state.teamB.name,score:state.teamB.score},winner:{name:winner.name,score:winner.score},loser:{name:loser.name,score:loser.score},gameType:state.gameType,winScore:state.winScore,date:new Date().toLocaleDateString(),duration:dur,history:[...state.history],foulsA:state.teamA.fouls,foulsB:state.teamB.fouls,maxLead:state.maxLead,tournamentId:gameContext.tournamentId,fixtureId:gameContext.fixtureId};
+  const h=state.history;
+  return{id:'m_'+Date.now(),teamA:{name:state.teamA.name,score:state.teamA.score},teamB:{name:state.teamB.name,score:state.teamB.score},winner:{name:winner.name,score:winner.score},loser:{name:loser.name,score:loser.score},gameType:state.gameType,winScore:state.winScore,date:new Date().toLocaleDateString(),duration:dur,history:[...h],foulsA:state.teamA.fouls,foulsB:state.teamB.fouls,maxLead:state.maxLead,leadChanges:computeLeadChanges(h),biggestRun:computeBiggestRun(h),tournamentId:gameContext.tournamentId,fixtureId:gameContext.fixtureId};
 }
 function fmtDur(ms){return`${Math.floor(ms/60000)}m ${Math.floor((ms%60000)/1000)}s`}
 function checkWin(){
@@ -1631,10 +1669,14 @@ function renderHistory(){
     const aName=m.teamA?.name||'Team A',bName=m.teamB?.name||'Team B';
     const aScore=m.teamA?.score??'?',bScore=m.teamB?.score??'?';
     const winner=m.winner?.name||aName;
-    const tag=m.tournamentId?'<span class="mc-winner-tag">🏆 Tourn</span>':'';
+    const tTag=m.tournamentId?'<span class="mc-winner-tag">🏆 Tourn</span>':'';
+    // Spicy stat badge (only for matches with stored stats)
+    let spicy='';
+    if(m.biggestRun>=6)spicy=`<span class="mc-spicy">🔥 ${m.biggestRun}-0 run</span>`;
+    else if(m.leadChanges>=4)spicy=`<span class="mc-spicy">↕ ${m.leadChanges} lead changes</span>`;
     return`<div class="match-card" onclick="openMatchDetail('${m.id}')">
       <div class="mc-top"><span class="mc-teams">${escHtml(aName)} vs ${escHtml(bName)}</span><span class="mc-score">${aScore}–${bScore}</span></div>
-      <div class="mc-meta"><span class="mc-winner-tag">🏆 ${escHtml(winner)}</span>${tag}<span>${m.gameType||'pickup'}</span><span>·</span><span>${m.date||''}</span><span>·</span><span>${m.duration||'—'}</span></div>
+      <div class="mc-meta"><span class="mc-winner-tag">🏆 ${escHtml(winner)}</span>${tTag}<span>${m.gameType||'pickup'}</span><span>·</span><span>${m.date||''}</span><span>·</span><span>${m.duration||'—'}</span>${spicy}</div>
     </div>`;
   }).join('');
 }
@@ -1657,15 +1699,28 @@ function openMatchDetail(id){
   document.getElementById('md-type').textContent=m.gameType||'pickup';
   document.getElementById('md-winscore').textContent=`First to ${m.winScore||21}`;
   document.getElementById('md-duration').textContent=m.duration||'—';
+  const hist=m.history||[];
   const bigLead=m.maxLead?Math.max(m.maxLead.a||0,m.maxLead.b||0):0;
+  const leadChanges=m.leadChanges!=null?m.leadChanges:(hist.length?computeLeadChanges(hist):null);
+  const biggestRun=m.biggestRun!=null?m.biggestRun:(hist.length?computeBiggestRun(hist):null);
+  const winTeam=m.winner?.name===m.teamA?.name?'a':'b';
+  const wasTrailing=hist.length?computeWasTrailing(hist,winTeam):false;
   document.getElementById('md-lead').textContent=bigLead?`+${bigLead}`:'—';
-  // Summary
+  document.getElementById('md-lead-changes').textContent=leadChanges!=null?leadChanges:'—';
+  document.getElementById('md-big-run').textContent=biggestRun?`${biggestRun} pts`:'—';
+  document.getElementById('md-fouls').textContent=(m.foulsA!=null&&m.foulsB!=null)?`${m.foulsA} / ${m.foulsB}`:'—';
+  // Enhanced summary
   const diff=Math.abs((aScore||0)-(bScore||0));
-  let sum=`${m.winner?.name||aName} beat ${m.loser?.name||bName} ${aScore}–${bScore}`;
-  if(diff>=10)sum+=', a dominant performance.';else if(diff<=2)sum+=', a close game until the end.';else sum+='.';
+  const wName=m.winner?.name||aName,lName=m.loser?.name||bName;
+  let sum=`${wName} beat ${lName} ${aScore}–${bScore}`;
+  if(diff>=10)sum+=', a dominant performance.';
+  else if(diff<=2)sum+=', a nail-biting finish.';
+  else sum+='.';
+  if(wasTrailing)sum+=` Comeback win for ${wName}!`;
+  if(leadChanges>=3)sum+=` The lead changed hands ${leadChanges} times.`;
+  if(biggestRun>=6)sum+=` Biggest run: ${biggestRun} straight.`;
   document.getElementById('md-summary').textContent=sum;
   // Timeline
-  const hist=m.history||[];
   const tl=document.getElementById('md-timeline');
   if(!hist.length){tl.innerHTML='<li style="font-size:13px;color:var(--muted);padding:8px">No timeline recorded</li>'}
   else{
