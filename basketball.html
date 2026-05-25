@@ -400,6 +400,13 @@ table.standings tr:last-child td{border-bottom:none}
 .sc-btn.go:active{opacity:.8}
 .gc-wrap{display:flex;flex-direction:column;align-items:center;border-left:1px solid var(--border);padding-left:12px;min-width:60px}
 .gc-digits{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,5vw,30px);color:var(--muted);line-height:1}
+/* VOICE TEST */
+.voice-test-row{display:flex;gap:6px;margin-top:8px}
+.v-test-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,87,34,.3);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:8px 10px;outline:none;min-height:36px}
+.v-test-input::placeholder{color:var(--muted2)}
+.v-test-input:focus{border-color:var(--ca)}
+.v-test-btn{background:var(--ca);border:none;border-radius:var(--r1);color:#fff;font:700 15px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;min-height:36px;transition:opacity var(--t1)}
+.v-test-btn:active{opacity:.8}
 /* RESPONSIVE */
 @media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
@@ -621,7 +628,11 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="voice-inner">
       <div id="v-heard"></div>
       <div id="v-action">🎤 Listening… say a command</div>
-      <div class="voice-hint">Try: "Orange two" · "Team B three" · "Undo" · "Score check"</div>
+      <div class="voice-hint" id="v-hint">Try: "Orange two" · "Blue three" · "Undo" · "Score check"</div>
+      <div class="voice-test-row">
+        <input id="v-test-input" class="v-test-input" type="text" placeholder="Type a command to test…" autocomplete="off" onkeydown="if(event.key==='Enter')testVoiceCmd()">
+        <button class="v-test-btn" onclick="testVoiceCmd()">→</button>
+      </div>
     </div>
   </div>
   <div class="feed-wrap">
@@ -1096,7 +1107,7 @@ function renderGame(){
   updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
   document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';
-  renderScorePads();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();
+  renderScorePads();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();
 }
 function renderScorePads(){
   // Build the base points array from the scoring rule
@@ -1334,12 +1345,23 @@ const GC={
 ════════════════════════════════════════════════════════ */
 const voiceOK=!!(window.SpeechRecognition||window.webkitSpeechRecognition);
 let recognition=null,restartTmr=null;
-// Misheard word map
+// Misheard word map — numbers, basketball slang, noise stripping, team aliases
 const MISHEAR=[
-  [/\bwon\b/g,'one'],[/\btoo\b/g,'two'],[/\bto\b/g,'two'],[/\btree\b/g,'three'],
-  [/\bfree\b/g,'three'],[/\bfort\b/g,'four'],[/\bvardy\b/g,'vadi'],
-  [/\bhome team\b/g,'team a'],[/\baway team\b/g,'team b'],
-  [/\bleft team\b/g,'team a'],[/\bright team\b/g,'team b'],
+  // Number mishears
+  [/\bwon\b/g,'one'],[/\btoo\b/g,'two'],[/\bto\b/g,'two'],
+  [/\btree\b/g,'three'],[/\bfree\b/g,'three'],
+  // Basketball slang → point values
+  [/\bbucket\b/g,'two'],[/\bdeuce\b/g,'two'],
+  [/\btriple\b/g,'three'],[/\bdagger\b/g,'three'],[/\bbomb\b/g,'three'],
+  [/\band\s+one\b/g,'one'],
+  // Noise words to strip (safe with word boundaries)
+  [/\bscored?\b/g,''],[/\bpoints?\b/g,''],[/\bbasket\b/g,''],
+  [/\bgets?\b/g,''],[/\bmade\b/g,''],[/\bhit\b/g,''],
+  // Team aliases
+  [/\bhome\s+team\b/g,'team a'],[/\baway\s+team\b/g,'team b'],
+  [/\bleft\s+team\b/g,'team a'],[/\bright\s+team\b/g,'team b'],
+  [/\bour\s+side\b/g,'team a'],[/\btheir\s+side\b/g,'team b'],
+  [/\bvardy\b/g,'vadi'],
 ];
 function normalizeVoice(t){
   let s=t.toLowerCase().trim();
@@ -1350,7 +1372,11 @@ function resolveTeam(t){
   const a=state.teamA.name.toLowerCase(),b=state.teamB.name.toLowerCase();
   if(a&&t.includes(a))return'a';
   if(b&&t.includes(b))return'b';
-  // check builder players' teams
+  // Color-key aliases (e.g. "orange two" when team A color is orange)
+  const ca=state.teamA.colorKey?.toLowerCase(),cb=state.teamB.colorKey?.toLowerCase();
+  if(ca&&t.includes(ca))return'a';
+  if(cb&&t.includes(cb))return'b';
+  // Builder team names
   if(builderState.teams.length>=2){
     const t0=builderState.teams[0].name.toLowerCase(),t1=builderState.teams[1].name.toLowerCase();
     if(t0&&t.includes(t0))return'a';
@@ -1358,6 +1384,8 @@ function resolveTeam(t){
   }
   if(/\b(team\s*a|team\s*1|first|left)\b/.test(t))return'a';
   if(/\b(team\s*b|team\s*2|second|right)\b/.test(t))return'b';
+  // Possessive shortcuts
+  if(/\b(them|they|theirs)\b/.test(t))return'b';
   return null;
 }
 function extractPts(t){
@@ -1370,9 +1398,10 @@ function speakScore(){
   setVAction(msg);
   if(window.speechSynthesis){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(msg);u.rate=.95;window.speechSynthesis.speak(u)}
 }
-function parseVoiceCmd(rawText){
+function parseVoiceCmd(rawText,confidence){
   const t=normalizeVoice(rawText);
-  setVHeard(`Heard: "${rawText}"`);
+  const confStr=confidence!=null&&confidence>0?` [${Math.round(confidence*100)}%]`:'';
+  setVHeard(`Heard: "${rawText}"${confStr}`);
   if(/\b(undo|cancel|mistake|take\s*it\s*back|wrong\s*score|remove\s*last)\b/.test(t)){undoScore();return true}
   if(/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)){speakScore();return true}
   if(/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)){nextQuarter();setVAction(`Now ${typeof state.quarter==='number'?'Q'+state.quarter:state.quarter}`);return true}
@@ -1398,8 +1427,11 @@ function startListening(){
   recognition.continuous=false;recognition.interimResults=false;recognition.lang='en-US';recognition.maxAlternatives=3;
   recognition.onresult=e=>{
     let ok=false;
-    for(let i=0;i<e.results[0].length&&!ok;i++){ok=parseVoiceCmd(e.results[0][i].transcript.trim())}
-    if(!ok)setVAction('Didn\'t catch that — try "Team A two" or "Undo"');
+    for(let i=0;i<e.results[0].length&&!ok;i++){
+      const alt=e.results[0][i];
+      ok=parseVoiceCmd(alt.transcript.trim(),alt.confidence);
+    }
+    if(!ok)setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
   };
   recognition.onend=()=>{if(state.voiceActive&&!state.gameOver)restartTmr=setTimeout(startListening,600)};
   recognition.onerror=e=>{
@@ -1425,6 +1457,20 @@ function updateVoiceUI(){
 }
 function setVHeard(t){const e=document.getElementById('v-heard');if(e)e.textContent=t}
 function setVAction(t){const e=document.getElementById('v-action');if(e)e.textContent=t;if(state.voiceActive)document.getElementById('voice-panel').classList.remove('hidden')}
+function testVoiceCmd(){
+  const inp=document.getElementById('v-test-input');
+  if(!inp||!inp.value.trim())return;
+  document.getElementById('voice-panel').classList.remove('hidden');
+  const ok=parseVoiceCmd(inp.value.trim());
+  if(!ok)setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
+  inp.value='';inp.focus();
+}
+function updateVoiceHint(){
+  const h=document.getElementById('v-hint');if(!h)return;
+  const ca=state.teamA.colorKey||'orange',cb=state.teamB.colorKey||'blue';
+  h.textContent=`Try: "${cap(ca)} two" · "${cap(cb)} three" · "Undo" · "Score check"`;
+}
+function cap(s){return s?s[0].toUpperCase()+s.slice(1):s}
 /* ════════════════════════════════════════════════════════
    Team Builder
 ════════════════════════════════════════════════════════ */
