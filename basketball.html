@@ -1031,6 +1031,58 @@ table.standings tr:last-child td{border-bottom:none}
   .lp-topnav-inner{padding:0 16px}
   .lp-s6-ctas{flex-direction:column}
 }
+/* ─── Onboarding ─────────────────────────────────────── */
+#s-onboarding{background:radial-gradient(ellipse at 50% 0%,rgba(255,87,34,.18) 0%,transparent 60%),var(--bg);align-items:center;justify-content:center;padding:24px 20px}
+.ob-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:0}
+.ob-logo{font-size:52px;margin-bottom:12px;animation:ballBounce 1.4s ease-in-out infinite}
+.ob-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,9vw,48px);letter-spacing:.04em;text-align:center;line-height:1.1;margin-bottom:6px}
+.ob-sub{font-size:14px;color:var(--muted);text-align:center;margin-bottom:20px}
+.ob-cards{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ob-card{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;transition:background var(--t1),border-color var(--t1);text-align:left}
+.ob-card:active{background:var(--s2)}
+.ob-card-prime{border-color:rgba(255,87,34,.4);background:rgba(255,87,34,.08)}
+.ob-card-prime:active{background:rgba(255,87,34,.16)}
+.ob-card-icon{font-size:26px;width:40px;text-align:center;flex-shrink:0}
+.ob-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.ob-card-sub{font-size:12px;color:var(--muted);line-height:1.35}
+.ob-card-prime .ob-card-title{color:var(--ca)}
+.ob-hint{font-size:12px;color:var(--muted2);text-align:center;margin-bottom:10px}
+.ob-skip{background:none;border:none;color:var(--muted);font:600 13px 'Inter',sans-serif;cursor:pointer;padding:10px 20px;min-height:44px}
+.ob-skip:active{color:var(--text)}
+/* ─── Shared Modal ───────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;backdrop-filter:blur(3px)}
+.modal{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;background:var(--s1);border-radius:20px 20px 0 0;z-index:401;display:flex;flex-direction:column;max-height:85dvh}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em}
+.modal-close{background:var(--s2);border:none;color:var(--muted);font-size:16px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close:active{color:var(--text)}
+.modal-body{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.modal-footer{padding:12px 18px calc(env(safe-area-inset-bottom,0px)+12px);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+/* ─── Feedback Modal ─────────────────────────────────── */
+.fb-row{display:flex;flex-direction:column;gap:5px}
+.fb-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.fb-select{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:10px 12px;width:100%;outline:none;cursor:pointer}
+.fb-inp{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:10px 12px;width:100%;outline:none}
+.fb-textarea{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:10px 12px;width:100%;outline:none;resize:none;min-height:100px;line-height:1.45}
+.fb-inp:focus,.fb-textarea:focus,.fb-select:focus{border-color:var(--ca)}
+.fb-inp::placeholder,.fb-textarea::placeholder{color:var(--muted2)}
+.fb-copy-area{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r1);color:var(--muted);font:12px 'Inter',sans-serif;padding:10px;resize:none;min-height:80px;margin-top:4px}
+.fb-btn-main{background:var(--ca);border:none;border-radius:var(--r1);color:#fff;font:700 14px 'Inter',sans-serif;padding:13px;cursor:pointer;min-height:48px;transition:opacity var(--t1)}
+.fb-btn-main:active{opacity:.85}
+.fb-btn-sec{background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:700 14px 'Inter',sans-serif;padding:11px;cursor:pointer;min-height:44px}
+.fb-btn-sec:active{background:rgba(255,255,255,.12)}
+.fb-btn-cancel{background:none;border:none;color:var(--muted);font:600 13px 'Inter',sans-serif;cursor:pointer;padding:8px;min-height:40px}
+/* ─── Changelog Modal ────────────────────────────────── */
+.cl-version{display:flex;flex-direction:column;gap:8px}
+.cl-v-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.cl-v-num{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--ca)}
+.cl-v-date{font-size:12px;color:var(--muted)}
+.cl-section-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.cl-list{list-style:none;display:flex;flex-direction:column;gap:6px;padding:0}
+.cl-list li{font-size:13px;color:var(--text);padding-left:16px;position:relative;line-height:1.4}
+.cl-list li::before{content:'✓';position:absolute;left:0;color:var(--success);font-size:11px;top:1px}
+.cl-list-note li::before{content:'ℹ';color:var(--gold)}
+.cl-list-up li::before{content:'→';color:var(--ca)}
 /* ─── PWA Install Prompt ─────────────────────────────── */
 .pwa-bar{display:flex;align-items:center;gap:10px;padding:11px 14px;background:linear-gradient(135deg,rgba(255,87,34,.14),rgba(255,87,34,.07));border:1px solid rgba(255,87,34,.28);border-radius:var(--r2);margin-top:12px;cursor:pointer;transition:background var(--t1)}
 .pwa-bar:active{background:rgba(255,87,34,.22)}
@@ -1044,6 +1096,47 @@ table.standings tr:last-child td{border-bottom:none}
 </style>
 </head>
 <body>
+
+<!-- ══ ONBOARDING ══ -->
+<div id="s-onboarding" class="screen">
+  <div class="ob-wrap">
+    <div class="ob-logo">🏀</div>
+    <h1 class="ob-h1">Welcome to<br>CourtCall</h1>
+    <p class="ob-sub">What do you want to do today?</p>
+    <div class="ob-cards">
+      <div class="ob-card ob-card-prime" onclick="obAction('game')">
+        <div class="ob-card-icon">▶</div>
+        <div>
+          <div class="ob-card-title">Score a Quick Game</div>
+          <div class="ob-card-sub">Open the scoreboard and start scoring in seconds.</div>
+        </div>
+      </div>
+      <div class="ob-card" onclick="obAction('teams')">
+        <div class="ob-card-icon">👥</div>
+        <div>
+          <div class="ob-card-title">Build Teams</div>
+          <div class="ob-card-sub">Add players and create fair pickup teams.</div>
+        </div>
+      </div>
+      <div class="ob-card" onclick="obAction('tournament')">
+        <div class="ob-card-icon">🏆</div>
+        <div>
+          <div class="ob-card-title">Run a Tournament</div>
+          <div class="ob-card-sub">Create fixtures, standings, and match results.</div>
+        </div>
+      </div>
+      <div class="ob-card" onclick="obAction('community')">
+        <div class="ob-card-icon">🏘</div>
+        <div>
+          <div class="ob-card-title">Create a Community</div>
+          <div class="ob-card-sub">Start a basketball group with players, posts, photos, and events.</div>
+        </div>
+      </div>
+    </div>
+    <p class="ob-hint">Not sure? Start with Quick Game — you can explore everything else from the hub.</p>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip for now</button>
+  </div>
+</div>
 
 <!-- ══ PROFILE ══ -->
 <div id="s-profile" class="screen">
@@ -1953,7 +2046,36 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
-    <div class="settings-ver">CourtCall v2.0 — Offline First 🏀</div>
+    <div class="hub-section-title" style="padding:8px 0">Feedback</div>
+    <div class="settings-sec">
+      <div class="setting-row" onclick="openFeedback()">
+        <div class="sr-icon">💬</div>
+        <div class="sr-info"><div class="sr-label">Send Feedback</div><div class="sr-sub">Report bugs, suggest ideas, or ask questions</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" onclick="showOnboarding()" style="border-bottom:none">
+        <div class="sr-icon">👋</div>
+        <div class="sr-info"><div class="sr-label">Show Onboarding</div><div class="sr-sub">See the getting-started guide again</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
+    <div class="hub-section-title" style="padding:8px 0">About</div>
+    <div class="settings-sec">
+      <div class="setting-row no-click">
+        <div class="sr-icon">🏀</div>
+        <div class="sr-info"><div class="sr-label">CourtCall</div><div class="sr-sub" id="settings-version-label">v0.9 Beta</div></div>
+      </div>
+      <div class="setting-row no-click">
+        <div class="sr-icon">🏗</div>
+        <div class="sr-info"><div class="sr-label">Build</div><div class="sr-sub" id="settings-build-label">GitHub Pages Beta</div></div>
+      </div>
+      <div class="setting-row" onclick="openChangelog()" style="border-bottom:none">
+        <div class="sr-icon">📋</div>
+        <div class="sr-info"><div class="sr-label">What's New</div><div class="sr-sub">View changelog &amp; upcoming features</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
+    <div class="settings-ver" id="settings-ver-footer">CourtCall — Offline First 🏀</div>
   </div>
 </div>
 
@@ -2009,6 +2131,16 @@ function getCol(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catc
 function setCol(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
 function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.parse(r):def}catch{return def}}
 function setObj(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
+// ── App constants ─────────────────────────────────────────
+const APP_VERSION='v0.9 Beta';
+const APP_LAST_UPDATED='May 2026';
+const APP_BUILD='GitHub Pages Beta';
+const CHANGELOG=[{
+  version:'v0.9 Beta',date:'May 2026',
+  items:['Redesigned Apple-style landing page','Shot clock and game clock','+1 free throw / foul point scoring','Team Builder with fair team generation','Communities with feed, players, gallery, events','CourtCall Pulse — community news feed','Match History and analytics','Export / Import data','PWA — installable on home screen','Community moderation tools'],
+  notes:['Data is stored locally on this device only','Export backup regularly to avoid data loss','Voice scoring works best in Chrome / Edge','Some features are still in testing'],
+  upcoming:['Player rating stability','Core gameplay QA polish','Community feature polish','Push notifications'],
+}];
 // ── App-level keys ───────────────────────────────────────
 const K={profile:'cc_profile',profiles:'cc_profiles',players:'cc_players',builder:'cc_builder',matches:'cc_matches',tournaments:'cc_tournaments',settings:'cc_settings',game:'courtcall_v1',games:'courtcall_games'};
 
@@ -3241,6 +3373,12 @@ function renderSettings(){
   const dw=s.defaultWinScore||21;
   const defBtn=document.querySelector(`#cr-default-win [data-v="${dw}"]`);
   if(defBtn)pickChip('cr-default-win',defBtn);
+  const vl=document.getElementById('settings-version-label');
+  if(vl)vl.textContent=`${APP_VERSION} · ${APP_LAST_UPDATED}`;
+  const bl=document.getElementById('settings-build-label');
+  if(bl)bl.textContent=APP_BUILD;
+  const vf=document.getElementById('settings-ver-footer');
+  if(vf)vf.textContent=`CourtCall ${APP_VERSION} · ${APP_BUILD} 🏀`;
 }
 function saveSetting(key,val){const s=getObj(K.settings,{});s[key]=val;setObj(K.settings,s)}
 function toggleSetting(key,btn){
@@ -3249,9 +3387,14 @@ function toggleSetting(key,btn){
   btn.classList.toggle('on',s[key]);
 }
 function exportData(){
-  const data={profile:getObj(K.profile),profiles:getCol(K.profiles),players:getCol(K.players),builder:getObj('cc_builder'),matches:getCol(K.matches),tournaments:getCol(K.tournaments),settings:getObj(K.settings)};
+  const data={
+    metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString()},
+    profile:getObj(K.profile),profiles:getCol(K.profiles),players:getCol(K.players),
+    builder:getObj('cc_builder'),matches:getCol(K.matches),tournaments:getCol(K.tournaments),settings:getObj(K.settings)
+  };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='courtcall-backup.json';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`courtcall-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
+  URL.revokeObjectURL(a.href);
   showToast('Data exported!');
 }
 function importData(){document.getElementById('import-file').click()}
@@ -3344,6 +3487,90 @@ function resetAnalytics(){
   showToast('Analytics reset');
   renderAnalytics();
 }
+/* ════════════════════════════════════════════════════════
+   POLISH-1: Onboarding, Feedback, Version / Changelog
+════════════════════════════════════════════════════════ */
+// ── Onboarding ────────────────────────────────────────
+const OB_KEY='courtcall_onboarding_seen';
+function checkOnboarding(){
+  if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}
+}
+function obAction(type){
+  localStorage.setItem(OB_KEY,'1');
+  renderHub();
+  if(type==='game'){showScreen('hub');setTimeout(()=>goSetup(),60);}
+  else if(type==='teams'){showScreen('teams');}
+  else if(type==='tournament'){showScreen('tournament');}
+  else if(type==='community'){showScreen('communities');}
+}
+function skipOnboarding(){
+  localStorage.setItem(OB_KEY,'1');
+  renderHub();showScreen('hub');
+}
+function showOnboarding(){
+  localStorage.removeItem(OB_KEY);
+  showScreen('onboarding');
+}
+
+// ── Feedback ──────────────────────────────────────────
+function openFeedback(){
+  document.getElementById('feedback-overlay').classList.remove('hidden');
+  document.getElementById('feedback-modal').classList.remove('hidden');
+}
+function closeFeedback(){
+  document.getElementById('feedback-overlay').classList.add('hidden');
+  document.getElementById('feedback-modal').classList.add('hidden');
+  const ca=document.getElementById('fb-copy-area');
+  if(ca)ca.style.display='none';
+}
+function _buildFeedbackText(){
+  const typeEl=document.getElementById('fb-type');
+  const labels={bug:'Bug Report',idea:'Feature Suggestion',general:'General Feedback',broken:'Something Not Working'};
+  const typeVal=typeEl?.value||'general';
+  const typeLabel=labels[typeVal]||typeVal;
+  const msg=(document.getElementById('fb-msg')?.value||'').trim()||'[No message provided]';
+  const name=(document.getElementById('fb-name')?.value||'').trim()||'Anonymous';
+  return`CourtCall Feedback\n\nType: ${typeLabel}\nFrom: ${name}\n\nMessage:\n${msg}\n\n---\nApp: CourtCall ${APP_VERSION} (${APP_BUILD})\nDate: ${new Date().toLocaleString()}\nBrowser: ${navigator.userAgent}`;
+}
+function sendFeedbackEmail(){
+  const typeVal=document.getElementById('fb-type')?.value||'general';
+  const subjects={bug:'CourtCall Bug Report',idea:'CourtCall Feature Suggestion',general:'CourtCall Feedback',broken:'CourtCall — Something Not Working'};
+  const subject=subjects[typeVal]||'CourtCall Feedback';
+  const body=_buildFeedbackText();
+  window.open(`mailto:vadi.s23@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,'_blank');
+}
+function copyFeedback(){
+  const text=_buildFeedbackText();
+  const showFallback=()=>{const ca=document.getElementById('fb-copy-area');if(ca){ca.value=text;ca.style.display='block';ca.select();}showToast('Select all and copy manually');};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('Feedback copied!')).catch(showFallback);
+  }else{showFallback();}
+}
+
+// ── Changelog ─────────────────────────────────────────
+function openChangelog(){
+  const body=document.getElementById('changelog-body');
+  if(body){
+    body.innerHTML=CHANGELOG.map(v=>`
+      <div class="cl-version">
+        <div class="cl-v-head"><span class="cl-v-num">${v.version}</span><span class="cl-v-date">${v.date}</span></div>
+        <div class="cl-section-label">What's New</div>
+        <ul class="cl-list">${v.items.map(i=>`<li>${escHtml(i)}</li>`).join('')}</ul>
+        <div class="cl-section-label">Beta Notes</div>
+        <ul class="cl-list cl-list-note">${v.notes.map(n=>`<li>${escHtml(n)}</li>`).join('')}</ul>
+        <div class="cl-section-label">Upcoming</div>
+        <ul class="cl-list cl-list-up">${v.upcoming.map(u=>`<li>${escHtml(u)}</li>`).join('')}</ul>
+      </div>
+    `).join('');
+  }
+  document.getElementById('changelog-overlay').classList.remove('hidden');
+  document.getElementById('changelog-modal').classList.remove('hidden');
+}
+function closeChangelog(){
+  document.getElementById('changelog-overlay').classList.add('hidden');
+  document.getElementById('changelog-modal').classList.add('hidden');
+}
+
 /* ════════════════════════════════════════════════════════
    Communities — Phase C1
 ════════════════════════════════════════════════════════ */
@@ -5268,9 +5495,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     applySetupColors();
     renderHub();
-    showScreen('hub');
+    if(!localStorage.getItem(OB_KEY)){
+      showScreen('onboarding');
+    }else{
+      showScreen('hub');
+    }
   }else{
-    // First time — show profile screen
+    // First time — show profile screen (onboarding runs after profile is set)
     renderExistingProfiles();
     showScreen('profile');
   }
@@ -5330,6 +5561,53 @@ function dismissInstall(e){
 }
 </script>
 
+<!-- ── Feedback Modal ────────────────────────────────── -->
+<div id="feedback-overlay" class="modal-overlay hidden" onclick="closeFeedback()"></div>
+<div id="feedback-modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <div class="modal-title">Send Feedback</div>
+    <button class="modal-close" onclick="closeFeedback()" aria-label="Close">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="fb-row">
+      <label class="fb-label">Feedback type</label>
+      <select id="fb-type" class="fb-select">
+        <option value="bug">🐛 Report a Bug</option>
+        <option value="idea">💡 Suggest an Idea</option>
+        <option value="general">💬 General Feedback</option>
+        <option value="broken">⚠️ Something is not working</option>
+      </select>
+    </div>
+    <div class="fb-row">
+      <label class="fb-label">Message</label>
+      <textarea id="fb-msg" class="fb-textarea" placeholder="Describe the issue or idea…" maxlength="1000"></textarea>
+    </div>
+    <div class="fb-row">
+      <label class="fb-label">Your name (optional)</label>
+      <input id="fb-name" class="fb-inp" type="text" placeholder="e.g. Vadi" maxlength="60" autocomplete="off">
+    </div>
+    <textarea id="fb-copy-area" class="fb-copy-area" style="display:none" readonly></textarea>
+  </div>
+  <div class="modal-footer">
+    <button class="fb-btn-main" onclick="sendFeedbackEmail()">📧 Send via Email</button>
+    <button class="fb-btn-sec" onclick="copyFeedback()">📋 Copy Feedback</button>
+    <button class="fb-btn-cancel" onclick="closeFeedback()">Cancel</button>
+  </div>
+</div>
+
+<!-- ── Changelog Modal ───────────────────────────────── -->
+<div id="changelog-overlay" class="modal-overlay hidden" onclick="closeChangelog()"></div>
+<div id="changelog-modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <div class="modal-title">What's New</div>
+    <button class="modal-close" onclick="closeChangelog()" aria-label="Close">✕</button>
+  </div>
+  <div class="modal-body" id="changelog-body"></div>
+  <div class="modal-footer">
+    <button class="fb-btn-cancel" onclick="closeChangelog()">Close</button>
+  </div>
+</div>
+
 <!-- ── Bottom Navigation ─────────────────────────────── -->
 <nav class="btm-nav hidden" id="btm-nav">
   <button class="bn-btn active" data-nav="hub" onclick="showScreen('hub')">
@@ -5366,6 +5644,7 @@ function dismissInstall(e){
     <button class="more-item" onclick="showScreen('world');hideMoreMenu()"><span class="more-icon">🌍</span><span class="more-lbl">Basketball World</span></button>
     <button class="more-item" onclick="showScreen('profile');hideMoreMenu()"><span class="more-icon">👤</span><span class="more-lbl">Profile</span></button>
     <button class="more-item" onclick="showScreen('settings');hideMoreMenu()"><span class="more-icon">⚙</span><span class="more-lbl">Settings</span></button>
+    <button class="more-item" onclick="openFeedback();hideMoreMenu()"><span class="more-icon">💬</span><span class="more-lbl">Feedback</span></button>
   </div>
 </div>
 </body>
