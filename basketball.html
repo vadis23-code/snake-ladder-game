@@ -1198,8 +1198,8 @@ function updateLeadUI(){
   else if(gpA||gpB){const gpt=(gpA&&a>bv)?state.teamA.name:(gpB&&bv>a)?state.teamB.name:null;if(gpt){bar.textContent=`🎯 GAME POINT — ${gpt.toUpperCase()}`;bar.className='game-status lead'}else{const ldr=a>bv?state.teamA.name:state.teamB.name;bar.textContent=`${ldr.toUpperCase()} LEADS BY ${Math.abs(a-bv)}`;bar.className='game-status lead'}}
   else{const ldr=a>bv?state.teamA.name:state.teamB.name;bar.textContent=`${ldr.toUpperCase()} LEADS BY ${Math.abs(a-bv)}`;bar.className='game-status lead'}
 }
-function updateMomentumBar(){const recent=state.history.slice(0,8);const mo=recent.length?recent.filter(e=>e.team==='a').length/recent.length:.5;document.getElementById('m-fill-a').style.width=`${Math.round(mo*100)}%`}
-function getCurrentRun(){if(!state.history.length)return null;const team=state.history[0].team;let pts=0,count=0;for(const e of state.history){if(e.team!==team)break;pts+=e.pts;count++}return pts>=4?{team,pts,count}:null}
+function updateMomentumBar(){const scored=state.history.filter(e=>!e.type||e.type==='score');const recent=scored.slice(0,8);const mo=recent.length?recent.filter(e=>e.team==='a').length/recent.length:.5;document.getElementById('m-fill-a').style.width=`${Math.round(mo*100)}%`}
+function getCurrentRun(){const scored=state.history.filter(e=>!e.type||e.type==='score');if(!scored.length)return null;const team=scored[0].team;let pts=0,count=0;for(const e of scored){if(e.team!==team)break;pts+=e.pts;count++}return pts>=4?{team,pts,count}:null}
 function updateRunBanner(){
   const run=getCurrentRun(),banner=document.getElementById('run-banner');
   if(run&&!state.gameOver){const name=run.team==='a'?state.teamA.name:state.teamB.name;const col=COLORS[run.team==='a'?state.teamA.colorKey:state.teamB.colorKey].hex;banner.textContent=`🔥 ${name.toUpperCase()} ON A ${run.pts}-0 RUN`;banner.style.setProperty('--rc',col);banner.classList.remove('hidden')}
@@ -1208,14 +1208,19 @@ function updateRunBanner(){
 function renderFeed(){
   const list=document.getElementById('feed-list');
   if(!state.history.length){list.innerHTML='<li class="feed-empty">Game starts when first point is scored</li>';return}
-  let lastQ=null;const items=[];const run=getCurrentRun();const chrono=[...state.history].reverse();
-  chrono.forEach((e,idx)=>{
+  let lastQ=null;const items=[];const run=getCurrentRun();
+  const chrono=[...state.history].reverse();
+  chrono.forEach(e=>{
     const qLabel=typeof e.quarter==='number'?`Q${e.quarter}`:e.quarter;
     if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
     const name=e.team==='a'?state.teamA.name:state.teamB.name;
     const col=e.team==='a'?'var(--ca)':'var(--cb)';
-    const isRun=run&&e.team===run.team&&idx>=state.history.length-run.count;
-    items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${isRun?'<span class="fe-run">🔥</span>':''}</li>`);
+    if(e.type==='foul'){
+      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
+    } else {
+      const inRun=run&&e.team===run.team;
+      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${inRun?'<span class="fe-run">🔥</span>':''}</li>`);
+    }
   });
   list.innerHTML=items.reverse().join('');list.scrollTop=0;
 }
@@ -1224,7 +1229,7 @@ function addScore(team,pts){
   if(state.gameOver)return;
   const T=`team${team.toUpperCase()}`;
   state[T].score+=pts;
-  state.history.unshift({team,pts,quarter:state.quarter});
+  state.history.unshift({type:'score',team,pts,quarter:state.quarter});
   const lead=Math.abs(state.teamA.score-state.teamB.score);
   if(state.teamA.score>state.teamB.score)state.maxLead.a=Math.max(state.maxLead.a,lead);
   else if(state.teamB.score>state.teamA.score)state.maxLead.b=Math.max(state.maxLead.b,lead);
@@ -1239,15 +1244,22 @@ function undoScore(){
   if(!state.history.length)return;
   const last=state.history.shift();
   const T=`team${last.team.toUpperCase()}`;
-  state[T].score=Math.max(0,state[T].score-last.pts);
-  save();renderGame();setVAction('↩ Last score removed.');
+  if(last.type==='foul'){
+    state[T].fouls=Math.max(0,state[T].fouls-1);
+    updateFoulUI(last.team);
+    save();renderGame();setVAction('↩ Last foul removed.');
+  } else {
+    state[T].score=Math.max(0,state[T].score-(last.pts||0));
+    save();renderGame();setVAction('↩ Last score removed.');
+  }
 }
 function addFoul(team){
   const T=`team${team.toUpperCase()}`;
   if(!state[T])return;
-  state[T].fouls=Math.min(10,state[T].fouls+1);
-  save();
-  updateFoulUI(team);
+  if(state[T].fouls>=10)return;
+  state[T].fouls++;
+  state.history.unshift({type:'foul',team,quarter:state.quarter});
+  save();renderGame();
 }
 function updateFoulUI(team){
   const T=`team${team.toUpperCase()}`;
@@ -1261,7 +1273,7 @@ function nextQuarter(){const idx=QUARTERS.indexOf(state.quarter);state.quarter=Q
 function togglePossession(){state.possession=state.possession==='a'?'b':'a';document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';save()}
 // ── Match stat helpers (work on any history array, newest-first) ──
 function computeLeadChanges(hist){
-  const chron=[...hist].reverse();
+  const chron=[...hist].filter(e=>!e.type||e.type==='score').reverse();
   let a=0,b=0,prevLdr=null,changes=0;
   for(const e of chron){
     if(e.team==='a')a+=e.pts;else b+=e.pts;
@@ -1272,7 +1284,7 @@ function computeLeadChanges(hist){
   return changes;
 }
 function computeBiggestRun(hist){
-  const chron=[...hist].reverse();
+  const chron=[...hist].filter(e=>!e.type||e.type==='score').reverse();
   let maxRun=0,curTeam=null,curPts=0;
   for(const e of chron){
     if(e.team===curTeam)curPts+=e.pts;
@@ -1283,7 +1295,7 @@ function computeBiggestRun(hist){
 }
 function computeWasTrailing(hist,winnerTeam){
   if(!winnerTeam||!hist.length)return false;
-  const chron=[...hist].reverse();
+  const chron=[...hist].filter(e=>!e.type||e.type==='score').reverse();
   let a=0,b=0;
   for(const e of chron){
     if(e.team==='a')a+=e.pts;else b+=e.pts;
@@ -1906,6 +1918,9 @@ function openMatchDetail(id){
       const qL=typeof e.quarter==='number'?`Q${e.quarter}`:e.quarter||'Q1';
       const eName=e.team==='a'?aName:bName;
       const col=e.team==='a'?'var(--ca)':'var(--cb)';
+      if(e.type==='foul'){
+        return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:var(--muted)">Foul</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
+      }
       if(e.team==='a')sa+=e.pts;else sb+=e.pts;
       return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:${col}">+${e.pts}</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
     }).join('');
