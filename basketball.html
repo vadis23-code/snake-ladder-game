@@ -451,6 +451,51 @@ table.standings tr:last-child td{border-bottom:none}
 .v-test-input:focus{border-color:var(--ca)}
 .v-test-btn{background:var(--ca);border:none;border-radius:var(--r1);color:#fff;font:700 15px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;min-height:36px;transition:opacity var(--t1)}
 .v-test-btn:active{opacity:.8}
+/* PULSE */
+#s-pulse{background:var(--bg);overflow-y:auto}
+.pulse-hero{padding:20px 16px 12px;background:radial-gradient(ellipse at 50% 0%,rgba(41,121,255,.14) 0%,transparent 60%);text-align:center}
+.pulse-hero-icon{font-size:40px}
+.pulse-hero-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:var(--text);margin-top:4px}
+.pulse-hero-sub{font-size:12px;color:var(--muted);margin-top:2px;margin-bottom:12px;line-height:1.5}
+.pulse-loc-card{margin:0 16px 14px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.pulse-loc-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pulse-loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pulse-loc-grid.full{grid-template-columns:1fr}
+.pulse-inp{background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 14px 'Inter',sans-serif;padding:10px 12px;outline:none;min-height:44px;width:100%;transition:border-color var(--t1)}
+.pulse-inp:focus{border-color:var(--cb)}
+.pulse-inp::placeholder{color:var(--muted2)}
+.btn-pulse-save{background:linear-gradient(135deg,#2979FF,#448aff);color:#fff;border:none;border-radius:var(--r1);font:700 14px 'Inter',sans-serif;padding:11px;cursor:pointer;min-height:44px;width:100%;transition:opacity var(--t1)}
+.btn-pulse-save:active{opacity:.8}
+.pulse-filter-bar{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}
+.pulse-filter-bar::-webkit-scrollbar{display:none}
+.pf-chip{padding:7px 14px;border:1.5px solid var(--border);border-radius:50px;background:var(--s1);color:var(--muted);font:600 12px 'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:all var(--t1);flex-shrink:0}
+.pf-chip.on{border-color:var(--cb);background:rgba(41,121,255,.15);color:#90CAF9}
+.pulse-feed{padding:0 16px 40px;display:flex;flex-direction:column;gap:10px}
+.pulse-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;flex-direction:column;gap:6px;transition:background var(--t1)}
+.pulse-card:active{background:var(--s2)}
+.pulse-card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(41,121,255,.15);color:#90CAF9}
+.pc-cat.local{background:rgba(0,230,118,.12);color:var(--success)}
+.pc-cat.weather{background:rgba(255,179,0,.12);color:var(--gold)}
+.pc-cat.national{background:rgba(156,39,176,.2);color:#CE93D8}
+.pc-cat.community{background:rgba(255,87,34,.12);color:#FFAB91}
+.pc-cat.tournament{background:rgba(255,179,0,.18);color:var(--gold)}
+.pc-demo{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);background:var(--s2);padding:3px 9px;border-radius:20px;border:1px solid var(--border)}
+.pulse-headline{font-size:15px;font-weight:700;color:var(--text);line-height:1.4}
+.pulse-summary{font-size:13px;color:var(--muted);line-height:1.5}
+.pulse-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pm-source{font-size:11px;color:var(--muted2);font-weight:600}
+.pm-time{font-size:11px;color:var(--muted2)}
+.pm-loc{font-size:11px;color:var(--muted2)}
+.pulse-link-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(41,121,255,.12);border:1.5px solid rgba(41,121,255,.3);border-radius:var(--r1);color:#90CAF9;font:700 12px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;text-decoration:none;transition:all var(--t1);margin-top:2px;min-height:36px}
+.pulse-link-btn:active{background:rgba(41,121,255,.22)}
+.pulse-search-links{margin:0 16px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.psl-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.psl-link{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;padding:8px 10px;background:var(--s1);border-radius:var(--r1);transition:background var(--t1);border:1px solid var(--border)}
+.psl-link:active{background:var(--s3)}
+.psl-arrow{color:var(--muted);font-size:14px;margin-left:auto}
+.pulse-disclaimer{margin:0 16px 14px;font-size:11px;color:var(--muted2);line-height:1.5;text-align:center;padding:0 8px}
+.pulse-empty{text-align:center;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;line-height:1.6}
 /* RESPONSIVE */
 @media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
@@ -507,6 +552,7 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="hub-card" onclick="showScreen('history')"><span class="hc-icon">📋</span><div class="hc-title">History</div><div class="hc-sub">Past games</div></div>
     <div class="hub-card" onclick="showScreen('tournament')"><span class="hc-icon">🏆</span><div class="hc-title">Tournament</div><div class="hc-sub">Run brackets</div></div>
     <div class="hub-card" onclick="showScreen('world')"><span class="hc-icon">🌍</span><div class="hc-title">Bball World</div><div class="hc-sub">Leagues & links</div></div>
+    <div class="hub-card" onclick="showScreen('pulse')"><span class="hc-icon">📡</span><div class="hc-title">CourtCall Pulse</div><div class="hc-sub">Local sports updates</div></div>
     <div class="hub-card" onclick="showScreen('settings')"><span class="hc-icon">⚙</span><div class="hc-title">Settings</div><div class="hc-sub">Preferences</div></div>
   </div>
   <div class="hub-section-title">Recent Games</div>
@@ -911,6 +957,53 @@ table.standings tr:last-child td{border-bottom:none}
   <div class="world-placeholder" style="margin-bottom:40px"><div class="wp-text">📍 Local Pickup Runs near you — coming soon</div></div>
 </div>
 
+<!-- ══ PULSE ══ -->
+<div id="s-pulse" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
+    <div class="page-title">CourtCall Pulse</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="pulse-hero">
+    <div class="pulse-hero-icon">📡</div>
+    <div class="pulse-hero-title">CourtCall Pulse</div>
+    <div class="pulse-hero-sub">Latest basketball and local sports updates near your court.</div>
+  </div>
+  <!-- Location form -->
+  <div class="pulse-loc-card">
+    <div class="pulse-loc-title">📍 Your Location</div>
+    <div class="pulse-loc-grid">
+      <input id="pulse-country" class="pulse-inp" type="text" placeholder="Country" maxlength="40" autocomplete="off">
+      <input id="pulse-state" class="pulse-inp" type="text" placeholder="State / Province" maxlength="40" autocomplete="off">
+      <input id="pulse-city" class="pulse-inp" type="text" placeholder="City" maxlength="40" autocomplete="off">
+      <input id="pulse-area" class="pulse-inp" type="text" placeholder="Area / Locality" maxlength="40" autocomplete="off">
+    </div>
+    <div class="pulse-loc-grid full">
+      <input id="pulse-court" class="pulse-inp" type="text" placeholder="Court name (optional)" maxlength="60" autocomplete="off">
+    </div>
+    <button class="btn-pulse-save" onclick="savePulseLocation()">Save &amp; Refresh Feed</button>
+  </div>
+  <!-- Category filters -->
+  <div class="pulse-filter-bar" id="pulse-filter-bar">
+    <button class="pf-chip on" data-cat="all" onclick="setPulseFilter('all')">All</button>
+    <button class="pf-chip" data-cat="basketball" onclick="setPulseFilter('basketball')">🏀 Basketball</button>
+    <button class="pf-chip" data-cat="local" onclick="setPulseFilter('local')">📍 Local Sports</button>
+    <button class="pf-chip" data-cat="tournament" onclick="setPulseFilter('tournament')">🏆 Tournaments</button>
+    <button class="pf-chip" data-cat="community" onclick="setPulseFilter('community')">🤝 Community</button>
+    <button class="pf-chip" data-cat="weather" onclick="setPulseFilter('weather')">⛅ Weather</button>
+    <button class="pf-chip" data-cat="national" onclick="setPulseFilter('national')">🌐 National Bball</button>
+  </div>
+  <!-- Live search links (location-aware) -->
+  <div class="pulse-search-links" id="pulse-search-links">
+    <div class="psl-title">🔍 Search Live News</div>
+    <div id="pulse-link-list"></div>
+  </div>
+  <!-- News feed -->
+  <div class="pulse-feed" id="pulse-feed"></div>
+  <!-- Disclaimer -->
+  <div class="pulse-disclaimer">Live news links open external search results. CourtCall does not verify third-party news.</div>
+</div>
+
 <!-- ══ SETTINGS ══ -->
 <div id="s-settings" class="screen">
   <div class="page-nav">
@@ -1031,6 +1124,7 @@ function showScreen(name){
   if(name==='tournament')renderTournament();
   if(name==='teams')renderTeamBuilder();
   if(name==='settings')renderSettings();
+  if(name==='pulse')renderPulse();
   if(name==='profile'){renderExistingProfiles();document.getElementById('inp-profile-name').value='';document.getElementById('inp-profile-nick').value=''}
 }
 // ── Profile ──────────────────────────────────────────────
@@ -2140,8 +2234,133 @@ function clearAllData(){
   showToast('All data cleared');showScreen('profile');
 }
 /* ════════════════════════════════════════════════════════
-   Utils
+   CourtCall Pulse
 ════════════════════════════════════════════════════════ */
+const K_PULSE='pickup_app_pulse_location';
+let pulseFilter='all';
+
+const PULSE_DEMO_CARDS=[
+  {id:'d1',cat:'basketball',headline:'Local 3-on-3 pickup runs gaining traction this summer',summary:'Courts across the city are seeing record turnout as pickup basketball makes a strong comeback. Weekend games at community courts are drawing players of all skill levels.',source:'Demo local updates',time:'2 hours ago',locRelevance:'Near your area'},
+  {id:'d2',cat:'tournament',headline:'City Basketball League announces open registration for summer season',summary:'The City Basketball League has opened registration for its upcoming summer season. Teams of all experience levels are welcome. Registration closes in two weeks.',source:'Demo local updates',time:'5 hours ago',locRelevance:'Your city'},
+  {id:'d3',cat:'local',headline:'New outdoor court facility opens near central park',summary:'A newly refurbished outdoor basketball facility with 4 full courts, lighting for evening play, and spectator seating has opened near the central park area.',source:'Demo local updates',time:'1 day ago',locRelevance:'2 km away'},
+  {id:'d4',cat:'community',headline:'Youth basketball academy launches free weekend coaching clinics',summary:'Local coaches are offering free Saturday morning clinics for ages 8–16. Sessions cover fundamentals, teamwork, and sportsmanship. No prior experience needed.',source:'Demo local updates',time:'2 days ago',locRelevance:'Your locality'},
+  {id:'d5',cat:'weather',headline:'Weekend weather outlook for outdoor courts',summary:'Partly cloudy skies expected Saturday with low humidity — ideal conditions for outdoor basketball. Sunday may bring afternoon showers; pack an umbrella just in case.',source:'Demo local updates',time:'3 hours ago',locRelevance:'Your area'},
+  {id:'d6',cat:'national',headline:'National Basketball Federation announces grassroots development program',summary:'The national federation has launched a new grassroots initiative to build 200 community basketball courts in tier-2 and tier-3 cities over the next three years.',source:'Demo local updates',time:'1 day ago',locRelevance:'National'},
+  {id:'d7',cat:'basketball',headline:'Pickup basketball etiquette guide goes viral among local players',summary:'A short guide on pickup game etiquette — calling fouls, calling next, and respecting call — is circulating in local basketball WhatsApp groups and gaining wide approval.',source:'Demo local updates',time:'6 hours ago',locRelevance:'Near your court'},
+  {id:'d8',cat:'tournament',headline:'Inter-locality 5-on-5 tournament to be held next month',summary:'Registrations are open for the inter-locality tournament. 16-team bracket, prizes for top 3 teams. Games will be played over two weekends at the main sports complex.',source:'Demo local updates',time:'4 hours ago',locRelevance:'Your area'},
+];
+
+const CAT_CLASS={basketball:'',local:'local',tournament:'tournament',community:'community',weather:'weather',national:'national'};
+const CAT_LABEL={basketball:'Basketball',local:'Local Sports',tournament:'Tournaments',community:'Community',weather:'Weather',national:'National Bball'};
+
+function buildNewsQueries(loc){
+  const city=loc.city||'your city';
+  const state=loc.state||'';
+  const country=loc.country||'India';
+  const court=loc.court||'';
+  const queries=[];
+  // Basketball-specific
+  queries.push({label:`🏀 ${city} basketball news`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' basketball')}&hl=en`,cat:'basketball'});
+  if(state)queries.push({label:`🏀 ${state} basketball`,url:`https://news.google.com/search?q=${encodeURIComponent(state+' basketball news')}&hl=en`,cat:'basketball'});
+  // Local sports
+  queries.push({label:`📍 ${city} local sports`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' sports news')}&hl=en`,cat:'local'});
+  // Tournament
+  queries.push({label:`🏆 ${city} basketball tournament`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' basketball tournament')}&hl=en`,cat:'tournament'});
+  if(state)queries.push({label:`🏆 ${state} sports tournament`,url:`https://news.google.com/search?q=${encodeURIComponent(state+' sports tournament 2025')}&hl=en`,cat:'tournament'});
+  // Community
+  queries.push({label:`🤝 ${city} community sports events`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' community sports event')}&hl=en`,cat:'community'});
+  // Weather
+  queries.push({label:`⛅ ${city} weekend weather`,url:`https://www.google.com/search?q=${encodeURIComponent('weather '+city+' weekend')}&hl=en`,cat:'weather'});
+  // National
+  queries.push({label:`🌐 ${country} basketball news`,url:`https://news.google.com/search?q=${encodeURIComponent(country+' basketball news')}&hl=en`,cat:'national'});
+  queries.push({label:`🌐 India basketball federation`,url:`https://news.google.com/search?q=${encodeURIComponent('Basketball Federation India news')}&hl=en`,cat:'national'});
+  // Court-specific
+  if(court)queries.push({label:`📍 "${court}" court updates`,url:`https://www.google.com/search?q=${encodeURIComponent(court+' basketball court '+city)}&hl=en`,cat:'local'});
+  return queries;
+}
+
+function loadPulseLocation(){
+  try{return JSON.parse(localStorage.getItem(K_PULSE)||'null')||{country:'India',state:'Karnataka',city:'Bengaluru',area:'Bhartiya City',court:''}}
+  catch{return{country:'India',state:'Karnataka',city:'Bengaluru',area:'Bhartiya City',court:''}}
+}
+
+function savePulseLocation(){
+  const loc={
+    country:(document.getElementById('pulse-country').value.trim()||'India'),
+    state:(document.getElementById('pulse-state').value.trim()||'Karnataka'),
+    city:(document.getElementById('pulse-city').value.trim()||'Bengaluru'),
+    area:(document.getElementById('pulse-area').value.trim()||''),
+    court:(document.getElementById('pulse-court').value.trim()||''),
+  };
+  localStorage.setItem(K_PULSE,JSON.stringify(loc));
+  renderPulse();
+  showToast('Location saved!');
+}
+
+function setPulseFilter(cat){
+  pulseFilter=cat;
+  document.querySelectorAll('.pf-chip').forEach(c=>c.classList.toggle('on',c.dataset.cat===cat));
+  renderPulseFeed();
+}
+
+function renderPulse(){
+  const loc=loadPulseLocation();
+  // Fill location fields
+  document.getElementById('pulse-country').value=loc.country||'';
+  document.getElementById('pulse-state').value=loc.state||'';
+  document.getElementById('pulse-city').value=loc.city||'';
+  document.getElementById('pulse-area').value=loc.area||'';
+  document.getElementById('pulse-court').value=loc.court||'';
+  // Render search links
+  renderPulseLinks(loc);
+  // Render feed
+  renderPulseFeed();
+}
+
+function renderPulseLinks(loc){
+  const queries=buildNewsQueries(loc);
+  const filtered=pulseFilter==='all'?queries:queries.filter(q=>q.cat===pulseFilter);
+  const list=document.getElementById('pulse-link-list');
+  if(!filtered.length){list.innerHTML='<div style="font-size:12px;color:var(--muted2);padding:4px 0">No search links for this filter.</div>';return}
+  list.innerHTML=filtered.map(q=>`<a class="psl-link" href="${escHtml(q.url)}" target="_blank" rel="noopener noreferrer">${escHtml(q.label)}<span class="psl-arrow">↗</span></a>`).join('');
+}
+
+function renderPulseFeed(){
+  const loc=loadPulseLocation();
+  const feed=document.getElementById('pulse-feed');
+  const cards=pulseFilter==='all'?PULSE_DEMO_CARDS:PULSE_DEMO_CARDS.filter(c=>c.cat===pulseFilter);
+  if(!cards.length){feed.innerHTML='<div class="pulse-empty"><span style="font-size:36px">📭</span><span>No updates for this category yet.</span></div>';return}
+  const city=loc.city||'your city';
+  // Personalise summary hint for first basketball card with user's city
+  feed.innerHTML=cards.map(card=>{
+    const catCls=CAT_CLASS[card.cat]||'';
+    const catLbl=CAT_LABEL[card.cat]||card.cat;
+    const summary=card.cat==='basketball'&&card.id==='d1'?card.summary.replace('Courts across the city',`Courts across ${escHtml(city)}`):escHtml(card.summary);
+    // Search link for this card
+    const q=`${escHtml(card.headline.split(' ').slice(0,6).join(' '))} ${city}`;
+    const searchUrl=`https://news.google.com/search?q=${encodeURIComponent(card.headline+' '+city)}&hl=en`;
+    return`<div class="pulse-card">
+  <div class="pulse-card-top"><span class="pc-cat${catCls?' '+catCls:''}">${escHtml(catLbl)}</span><span class="pc-demo">Demo</span></div>
+  <div class="pulse-headline">${escHtml(card.headline)}</div>
+  <div class="pulse-summary">${summary}</div>
+  <div class="pulse-meta"><span class="pm-source">${escHtml(card.source)}</span><span class="pm-time">${escHtml(card.time)}</span><span class="pm-loc">📍 ${escHtml(card.locRelevance)}</span></div>
+  <a class="pulse-link-btn" href="${searchUrl}" target="_blank" rel="noopener noreferrer">Read More ↗</a>
+</div>`;
+  }).join('');
+  // Also refresh links
+  renderPulseLinks(loc);
+}
+
+/* Production API integration points (replace demo cards with real data):
+   - NewsAPI: https://newsapi.org — requires API key in header
+   - GNews: https://gnews.io — free tier with key
+   - Bing News Search: Azure Cognitive Services — key required
+   - SerpAPI: https://serpapi.com — Google News results with key
+   - Google Custom Search JSON API: https://developers.google.com/custom-search
+   Example (NewsAPI):
+   fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(city+' basketball')}&apiKey=YOUR_KEY`)
+     .then(r=>r.json()).then(data=>renderRealCards(data.articles))
+*/
 function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 /* ════════════════════════════════════════════════════════
    Init
