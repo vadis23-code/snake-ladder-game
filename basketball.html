@@ -1115,7 +1115,7 @@ function toggleCustomSC(){const i=document.getElementById('inp-sc');if(!i)return
 function updateRule(){const f=document.getElementById('custom-rule-form');f.style.display=cx['cr-rule']==='custom'?'flex':'none'}
 function applyTeamColors(){const ca=COLORS[state.teamA.colorKey]||COLORS.orange,cb=COLORS[state.teamB.colorKey]||COLORS.blue;const r=document.documentElement;r.style.setProperty('--ca',ca.hex);r.style.setProperty('--ga',ca.glow);r.style.setProperty('--cb',cb.hex);r.style.setProperty('--gb',cb.glow)}
 function goSetup(){applySetupColors();showScreen('setup')}
-function handleResume(){const saved=load();if(!saved)return;const savedCtx=saved._gc;Object.assign(state,saved);state.voiceActive=false;if(savedCtx)gameContext=savedCtx;applyTeamColors();renderGame();SC.init();GC.init();showScreen('game')}
+function handleResume(){const saved=load();if(!saved)return;const savedCtx=saved._gc,savedGCE=saved._gce||0;Object.assign(state,saved);state.voiceActive=false;if(savedCtx)gameContext=savedCtx;applyTeamColors();renderGame();SC.init();GC.init();GC.elapsed=savedGCE;GC.render();showScreen('game')}
 // ── Game Context (pickup or tournament) ──────────────────
 let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
 /* ════════════════════════════════════════════════════════
@@ -1124,7 +1124,7 @@ let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
 let state=freshState();
 function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
-function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext}))}catch{}}
+function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext,_gce:GC.elapsed}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
 function clearSave(){localStorage.removeItem(K.game)}
 // Save to match history
@@ -1407,6 +1407,7 @@ const SC={
   toggle(){if(this.running)this.pause();else this.start()},
   start(){
     if(!state.shotClockDuration||state.gameOver)return;
+    clearInterval(this._tmr);this._tmr=null;
     if(this.current<=0)this.current=state.shotClockDuration;
     this.running=true;this.render();
     this._tmr=setInterval(()=>{
@@ -1442,6 +1443,7 @@ const GC={
   },
   start(){
     if(state.gameClockMode==='off'||state.gameOver)return;
+    clearInterval(this._tmr);this._tmr=null;
     this.running=true;
     this._tmr=setInterval(()=>{this.elapsed++;this.render()},1000);
   },
