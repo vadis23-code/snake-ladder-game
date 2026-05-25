@@ -846,6 +846,118 @@ table.standings tr:last-child td{border-bottom:none}
 @media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important}}
+/* ─── Landing Page L1 ─────────────────────────────────── */
+#s-hub.active{display:block}
+#s-hub{overflow-y:auto}
+/* hero */
+.lp-hero{background:linear-gradient(170deg,rgba(255,107,53,.14) 0%,rgba(255,107,53,.04) 45%,transparent 70%),linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);padding-bottom:28px;border-bottom:1px solid rgba(255,107,53,.12);position:relative;overflow:hidden}
+.lp-hero::before{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;background:radial-gradient(circle,rgba(255,107,53,.09) 0%,transparent 70%);pointer-events:none}
+.lp-hero::after{content:'🏀';position:absolute;right:-10px;top:16px;font-size:180px;opacity:.033;pointer-events:none;line-height:1}
+.lp-nav-bar{display:flex;align-items:center;justify-content:space-between;padding:22px 20px 26px}
+.lp-brand{display:flex;align-items:center;gap:11px}
+.lp-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;flex-shrink:0;box-shadow:0 4px 16px rgba(255,87,34,.35)}
+.lp-brand-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;color:var(--text);line-height:1}
+.lp-settings-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-size:18px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--t1)}
+.lp-settings-btn:active{background:rgba(255,255,255,.12)}
+.lp-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,7vw,36px);line-height:1.15;letter-spacing:.02em;color:var(--text);padding:0 20px;margin:0 0 12px}
+.lp-sub{font-size:15px;color:rgba(240,240,240,.65);line-height:1.65;padding:0 20px;margin:0 0 22px;font-weight:500}
+/* mini scoreboard demo */
+.lp-sb{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin:0 20px 22px;padding:16px 20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.lpsb-t{display:flex;flex-direction:column;gap:2px}
+.lpsb-r{text-align:right}
+.lpsb-nm{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.lpsb-sc{font-family:'Bebas Neue',sans-serif;font-size:56px;line-height:1;color:rgba(240,240,240,.28)}
+.lpsb-sc.lead{color:var(--text);text-shadow:0 0 28px rgba(255,107,53,.5)}
+.lpsb-mid{text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.lpsb-ck{font-size:11px;color:var(--muted);font-weight:600;background:rgba(255,255,255,.07);border-radius:20px;padding:3px 10px}
+.lpsb-vs{font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.2);letter-spacing:.1em}
+.lpsb-gp{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.04em;text-transform:uppercase;background:rgba(255,179,0,.14);border-radius:50px;padding:3px 9px}
+/* resume card in hero */
+.lp-resume{margin:0 20px 16px;background:var(--s1);border:2px solid var(--ca);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 20px rgba(255,87,34,.2);transition:background var(--t1)}
+.lp-resume:active{background:var(--s2)}
+.lp-resume-dot{width:9px;height:9px;border-radius:50%;background:var(--ca);flex-shrink:0;animation:pulse 1.5s infinite}
+.lp-resume-txt{flex:1}
+.lp-resume-live{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ca);margin-bottom:2px}
+.lp-resume-label{font-size:14px;font-weight:700;color:var(--text)}
+/* CTA buttons */
+.lp-ctas{display:flex;flex-direction:column;gap:10px;padding:0 20px}
+.lp-btn-primary{width:100%;background:linear-gradient(135deg,#FF5722,#FF7A50);color:#fff;border:none;border-radius:14px;padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 28px rgba(255,87,34,.42);transition:transform .12s,box-shadow .12s;min-height:58px}
+.lp-btn-primary:active{transform:translateY(2px);box-shadow:0 2px 10px rgba(255,87,34,.3)}
+.lp-btn-sec{width:100%;background:var(--s1);color:var(--text);border:1.5px solid var(--border);border-radius:13px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;transition:background var(--t1);min-height:50px}
+.lp-btn-sec:active{background:var(--s2)}
+.lp-btn-ghost{width:100%;background:transparent;color:var(--muted);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:14px;font-weight:600;font-size:14px;cursor:pointer;transition:all var(--t1);min-height:50px}
+.lp-btn-ghost:active{background:rgba(255,255,255,.05)}
+.lp-trust{text-align:center;font-size:11px;color:var(--muted);padding:14px 20px 0;letter-spacing:.02em;opacity:.6}
+/* landing sections */
+.lp-section{padding:28px 20px 0}
+.lp-section-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 0 12px;opacity:.7}
+/* play cards */
+.lp-play-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background var(--t1)}
+.lp-play-card:active{background:var(--s2)}
+.lpc-hero{border-color:rgba(255,107,53,.3);background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,107,53,.04));margin-bottom:10px}
+.lp-play-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lpc-icon{font-size:26px;line-height:1}
+.lpc-half .lpc-icon{font-size:20px}
+.lpc-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.02em;color:var(--text);line-height:1.2}
+.lpc-half .lpc-title{font-size:14px}
+.lpc-desc{font-size:13px;color:var(--muted);line-height:1.5}
+.lpc-half .lpc-desc{font-size:11px}
+.lpc-cta{background:var(--ca);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity var(--t1);margin-top:4px;text-align:left;width:fit-content}
+.lpc-cta:active{opacity:.8}
+.lpc-cta-dim{background:rgba(255,255,255,.08);color:var(--text);font-size:12px;padding:8px 12px}
+/* feature tabs */
+.lp-feat-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.lp-feat-tabs::-webkit-scrollbar{display:none}
+.lft{flex-shrink:0;background:var(--s1);border:1.5px solid var(--border);border-radius:50px;padding:9px 17px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all var(--t1);white-space:nowrap}
+.lft.on{background:var(--ca);border-color:var(--ca);color:#fff}
+.lft:active{opacity:.8}
+.lp-feat-panel{background:var(--s1);border:1px solid var(--border);border-radius:14px;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:hidden}
+.lfp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+.lfp-item:nth-last-child(-n+2){border-bottom:none}
+.lfp-item:nth-child(odd){border-right:1px solid rgba(255,255,255,.05)}
+.lfp-icon{font-size:17px;flex-shrink:0;width:24px;text-align:center}
+.lfp-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+/* chaos section */
+.lp-chaos-lines{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.lp-chaos-line{font-size:16px;color:rgba(240,240,240,.5);line-height:1.4;padding-left:2px}
+.lp-chaos-line strong{color:var(--text)}
+.lp-chaos-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lp-chaos-tile{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:6px}
+.lp-chaos-icon{font-size:22px;line-height:1}
+.lp-chaos-name{font-size:12px;font-weight:700;color:var(--text)}
+/* grow steps */
+.lp-grow-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.lp-grow-step{display:flex;align-items:flex-start;gap:14px;padding:16px;border-bottom:1px solid var(--border)}
+.lp-grow-step:last-child{border-bottom:none}
+.lgs-num{width:32px;height:32px;border-radius:50%;background:var(--ca);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.lgs-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.lgs-desc{font-size:13px;color:var(--muted);line-height:1.4}
+/* final CTA */
+.lp-final{text-align:center;padding:36px 20px 0;display:flex;flex-direction:column;align-items:stretch;gap:10px}
+.lp-final-hl{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.04em;color:var(--text);margin-bottom:4px}
+.lp-final-sub{font-size:14px;color:var(--muted);margin-bottom:10px}
+/* recent games footer */
+.lp-footer{padding:28px 20px 20px}
+/* ── Bottom Nav ───────────────────────────────────────── */
+.btm-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(26,26,46,.96);border-top:1px solid var(--border);display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:var(--muted);transition:color var(--t1);padding:0;-webkit-tap-highlight-color:transparent}
+.bn-btn:active{opacity:.7}
+.bn-btn.active{color:var(--ca)}
+.bn-icon{font-size:20px;line-height:1}
+.bn-lbl{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+/* screens that need bottom nav clearance */
+.has-btm-nav{padding-bottom:72px!important}
+/* ── More Sheet ───────────────────────────────────────── */
+.more-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:301;padding-bottom:calc(env(safe-area-inset-bottom,0) + 12px);animation:slideUp .22s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.more-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:14px auto 18px}
+.more-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.08em;color:var(--muted);text-align:center;margin-bottom:16px}
+.more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px}
+.more-item{display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--s2);border-radius:14px;padding:16px 8px;cursor:pointer;border:none;transition:background var(--t1)}
+.more-item:active{background:rgba(255,255,255,.1)}
+.more-icon{font-size:24px;line-height:1}
+.more-lbl{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
 </style>
 </head>
 <body>
@@ -870,77 +982,143 @@ table.standings tr:last-child td{border-bottom:none}
 
 <!-- ══ HUB ══ -->
 <div id="s-hub" class="screen">
-  <!-- Hero -->
-  <div class="hub-hero">
-    <div class="hub-hero-bar">
-      <div class="hub-brand-row">
-        <div class="hub-avatar" id="hub-avatar">🏀</div>
-        <div>
-          <div class="hub-name" id="hub-name">CourtCall 🏀</div>
-          <div class="hub-tagline" id="hub-tagline">Voice-first pickup basketball OS</div>
-        </div>
+
+  <!-- ── S1: HERO ─────────────────────────────────────── -->
+  <section class="lp-hero">
+    <div class="lp-nav-bar">
+      <div class="lp-brand">
+        <div class="lp-logo" id="hub-avatar">🏀</div>
+        <span class="lp-brand-name" id="hub-name">CourtCall</span>
       </div>
-      <button class="hub-settings-btn" onclick="showScreen('settings')">⚙</button>
+      <button class="lp-settings-btn" onclick="showScreen('settings')">⚙</button>
     </div>
-    <div class="hub-tag-badge">Voice-first pickup basketball OS</div>
-    <div class="hub-hero-copy">Score games. Build fair teams. Run tournaments. Track every run from your phone.</div>
-    <div class="hub-scoreboard-demo" aria-hidden="true">
-      <div class="hsd-team">
-        <div class="hsd-tname">Ballers</div>
-        <div class="hsd-tscore lead">14</div>
+
+    <h1 class="lp-headline">The pickup basketball app that keeps the game moving.</h1>
+    <p class="lp-sub">Score games. Build fair teams.<br>Run tournaments. Track every run.</p>
+
+    <div class="lp-sb" aria-hidden="true">
+      <div class="lpsb-t">
+        <div class="lpsb-nm">Orange</div>
+        <div class="lpsb-sc lead">12</div>
       </div>
-      <div class="hsd-mid">
-        <div class="hsd-qtime">Q3 · 2:47</div>
-        <div class="hsd-vs">VS</div>
-        <div class="hsd-gp">GAME POINT</div>
+      <div class="lpsb-mid">
+        <div class="lpsb-ck">⏱ 14s</div>
+        <div class="lpsb-vs">VS</div>
+        <div class="lpsb-gp">GAME POINT</div>
       </div>
-      <div class="hsd-team hsd-team-r">
-        <div class="hsd-tname">Squad</div>
-        <div class="hsd-tscore">11</div>
+      <div class="lpsb-t lpsb-r">
+        <div class="lpsb-nm">Black</div>
+        <div class="lpsb-sc">10</div>
       </div>
     </div>
-  </div>
-  <!-- CTAs -->
-  <div class="hub-cta-section">
-    <button class="hub-cta-primary" onclick="goSetup()">▶ Start Quick Game</button>
-    <div class="hub-cta-row">
-      <button class="hub-cta-sec" onclick="showScreen('profile')">👤 Create Profile</button>
-      <button class="hub-cta-ghost" onclick="guestLogin()">Continue as Guest →</button>
+
+    <div class="lp-resume hidden" id="resume-card" onclick="handleResume()">
+      <div class="lp-resume-dot"></div>
+      <div class="lp-resume-txt">
+        <div class="lp-resume-live">● LIVE GAME</div>
+        <div class="lp-resume-label" id="resume-game-label">Game in progress</div>
+      </div>
+      <span style="color:var(--ca);font-size:18px">▶</span>
     </div>
-  </div>
-  <!-- Feature cards -->
-  <div class="hub-feat-section-lbl">What's inside</div>
-  <div class="hub-feat-cards">
-    <div class="hub-feat-card"><div class="hfc-icon">🎤</div><div><div class="hfc-title">Voice Scoring</div><div class="hfc-desc">Say "Team A scores 2"</div></div></div>
-    <div class="hub-feat-card"><div class="hfc-icon">⏱</div><div><div class="hfc-title">Shot Clock</div><div class="hfc-desc">24s / 14s countdown</div></div></div>
-    <div class="hub-feat-card"><div class="hfc-icon">👥</div><div><div class="hfc-title">Smart Teams</div><div class="hfc-desc">Fair splits & queues</div></div></div>
-    <div class="hub-feat-card"><div class="hfc-icon">🏆</div><div><div class="hfc-title">Tournaments</div><div class="hfc-desc">Run full brackets</div></div></div>
-    <div class="hub-feat-card"><div class="hfc-icon">🏘</div><div><div class="hfc-title">Communities</div><div class="hfc-desc">Your hoops crew</div></div></div>
-  </div>
-  <div class="hub-trust">No login required · Works offline · Built for pickup</div>
+
+    <div class="lp-ctas">
+      <button class="lp-btn-primary" onclick="goSetup()">▶ Start Quick Game</button>
+      <button class="lp-btn-sec" onclick="scrollToFeatures()">Explore Features</button>
+      <button class="lp-btn-ghost" onclick="guestLogin()">Continue as Guest →</button>
+    </div>
+
+    <div class="lp-trust">No login required · Works offline · Built for pickup</div>
+  </section>
+
+  <!-- ── S2: CHOOSE HOW YOU PLAY ───────────────────────── -->
+  <section class="lp-section">
+    <div class="lp-section-lbl">Choose How You Play</div>
+    <div class="lp-play-card lpc-hero" onclick="goSetup()">
+      <div class="lpc-icon">🏀</div>
+      <div class="lpc-title">Open. Score. Play.</div>
+      <div class="lpc-desc">Start scoring in seconds with no login.</div>
+      <button class="lpc-cta" onclick="event.stopPropagation();goSetup()">Start scoring ›</button>
+    </div>
+    <div class="lp-play-row">
+      <div class="lp-play-card lpc-half" onclick="showScreen('teams')">
+        <div class="lpc-icon">👥</div>
+        <div class="lpc-title">Bring order to pickup chaos.</div>
+        <div class="lpc-desc">Fair teams, queues, every result.</div>
+        <button class="lpc-cta lpc-cta-dim" onclick="event.stopPropagation();showScreen('teams')">Build teams ›</button>
+      </div>
+      <div class="lp-play-card lpc-half" onclick="showScreen('communities')">
+        <div class="lpc-icon">🏘</div>
+        <div class="lpc-title">Create your basketball tribe.</div>
+        <div class="lpc-desc">Feeds, players, photos, events.</div>
+        <button class="lpc-cta lpc-cta-dim" onclick="event.stopPropagation();showScreen('communities')">Create community ›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── S3: FEATURE TABS ──────────────────────────────── -->
+  <section class="lp-section" id="lp-features">
+    <div class="lp-section-lbl">Features</div>
+    <div class="lp-feat-tabs">
+      <button class="lft on" onclick="switchFeatTab('score',this)">Score</button>
+      <button class="lft" onclick="switchFeatTab('teams',this)">Teams</button>
+      <button class="lft" onclick="switchFeatTab('tourneys',this)">Tourneys</button>
+      <button class="lft" onclick="switchFeatTab('comms',this)">Communities</button>
+      <button class="lft" onclick="switchFeatTab('discover',this)">Discover</button>
+    </div>
+    <div class="lp-feat-panel" id="lp-feat-panel"></div>
+  </section>
+
+  <!-- ── S4: PICKUP CHAOS ──────────────────────────────── -->
+  <section class="lp-section">
+    <div class="lp-section-lbl">Designed for Real Pickup Chaos</div>
+    <div class="lp-chaos-lines">
+      <div class="lp-chaos-line">No more <strong>"what's the score?"</strong></div>
+      <div class="lp-chaos-line">No more <strong>unfair teams.</strong></div>
+      <div class="lp-chaos-line">No more <strong>confusion on who's next.</strong></div>
+      <div class="lp-chaos-line">No more <strong>lost match history.</strong></div>
+    </div>
+    <div class="lp-chaos-tiles">
+      <div class="lp-chaos-tile"><div class="lp-chaos-icon">🎤</div><div class="lp-chaos-name">Voice-first scoring</div></div>
+      <div class="lp-chaos-tile"><div class="lp-chaos-icon">⚖️</div><div class="lp-chaos-name">Fair team creation</div></div>
+      <div class="lp-chaos-tile"><div class="lp-chaos-icon">🔄</div><div class="lp-chaos-name">Pickup queue</div></div>
+      <div class="lp-chaos-tile"><div class="lp-chaos-icon">💾</div><div class="lp-chaos-name">Match memory</div></div>
+    </div>
+  </section>
+
+  <!-- ── S5: GROW ──────────────────────────────────────── -->
+  <section class="lp-section">
+    <div class="lp-section-lbl">Start Simple, Grow When Ready</div>
+    <div class="lp-grow-card">
+      <div class="lp-grow-step">
+        <div class="lgs-num">1</div>
+        <div><div class="lgs-title">Quick Game</div><div class="lgs-desc">Score any pickup game instantly.</div></div>
+      </div>
+      <div class="lp-grow-step">
+        <div class="lgs-num">2</div>
+        <div><div class="lgs-title">Team Tools</div><div class="lgs-desc">Add fair teams and queue management.</div></div>
+      </div>
+      <div class="lp-grow-step">
+        <div class="lgs-num">3</div>
+        <div><div class="lgs-title">Full League</div><div class="lgs-desc">Run tournaments and communities.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── S6: FINAL CTA ─────────────────────────────────── -->
+  <section class="lp-final">
+    <div class="lp-final-hl">Ready to run?</div>
+    <div class="lp-final-sub">Start a game in under 10 seconds.</div>
+    <button class="lp-btn-primary" onclick="goSetup()">▶ Start Quick Game</button>
+    <button class="lp-btn-ghost" onclick="guestLogin()">Continue as Guest →</button>
+  </section>
+
+  <!-- ── Stats + Recent ───────────────────────────────── -->
   <div class="hub-stats" id="hub-stats"></div>
-  <!-- Resume card -->
-  <div class="resume-card hidden" id="resume-card" onclick="handleResume()">
-    <div class="rc-dot"></div>
-    <div class="rc-text">
-      <div class="rc-live">● LIVE GAME</div>
-      <div class="rc-game" id="resume-game-label">Game in progress</div>
-    </div>
-    <div style="font-size:20px;color:var(--ca)">▶</div>
+  <div class="lp-footer">
+    <div class="lp-section-lbl">Recent Games</div>
+    <div class="hub-recent" id="hub-recent"></div>
   </div>
-  <!-- Navigation grid -->
-  <div class="hub-nav-label">Everything</div>
-  <div class="hub-grid">
-    <div class="hub-card" onclick="showScreen('teams')"><span class="hc-icon">👥</span><div class="hc-title">Team Builder</div><div class="hc-sub">Balance & queue</div></div>
-    <div class="hub-card" onclick="showScreen('history')"><span class="hc-icon">📋</span><div class="hc-title">History</div><div class="hc-sub">Past games</div></div>
-    <div class="hub-card" onclick="showScreen('tournament')"><span class="hc-icon">🏆</span><div class="hc-title">Tournament</div><div class="hc-sub">Run brackets</div></div>
-    <div class="hub-card" onclick="showScreen('communities')"><span class="hc-icon">🏘</span><div class="hc-title">Communities</div><div class="hc-sub">Your hoops crew</div></div>
-    <div class="hub-card" onclick="showScreen('world')"><span class="hc-icon">🌍</span><div class="hc-title">Bball World</div><div class="hc-sub">Leagues & links</div></div>
-    <div class="hub-card" onclick="showScreen('pulse')"><span class="hc-icon">📡</span><div class="hc-title">Pulse</div><div class="hc-sub">Local updates</div></div>
-    <div class="hub-card" onclick="showScreen('settings')"><span class="hc-icon">⚙</span><div class="hc-title">Settings</div><div class="hc-sub">Preferences</div></div>
-  </div>
-  <div class="hub-section-title">Recent Games</div>
-  <div class="hub-recent" id="hub-recent"></div>
+
 </div>
 
 <!-- ══ SETUP ══ -->
@@ -1697,8 +1875,20 @@ function buildHubStatsHTML(){
 let toastTmr=null;
 function showToast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),dur)}
 // ── Screen ───────────────────────────────────────────────
+const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
+const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.toggle('active',s.id===`s-${name}`)});
+  // Bottom nav visibility + active state
+  const nav=document.getElementById('btm-nav');
+  if(nav){
+    const showNav=BTM_NAV_SCREENS.includes(name);
+    nav.classList.toggle('hidden',!showNav);
+    const activeNav=BTM_NAV_MAP[name]||'more';
+    nav.querySelectorAll('.bn-btn').forEach(b=>b.classList.toggle('active',b.dataset.nav===activeNav));
+    // Add clearance to screens showing the nav
+    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('has-btm-nav',showNav&&s.classList.contains('active')));
+  }
   if(name==='hub')renderHub();
   if(name==='history')renderHistory();
   if(name==='tournament')renderTournament();
@@ -1752,29 +1942,70 @@ function renderHub(){
   const p=currentProfile||getObj(K.profile,null);
   if(p){
     const init=p.name&&p.name!=='Guest'?p.name[0].toUpperCase():'🏀';
-    document.getElementById('hub-avatar').textContent=init;
-    document.getElementById('hub-name').textContent=p.name==='Guest'?'CourtCall 🏀':`Hey, ${p.name}!`;
-    document.getElementById('hub-tagline').textContent=p.name==='Guest'?'Voice-first pickup basketball OS':'Ready to run?';
+    const avatarEl=document.getElementById('hub-avatar');
+    const nameEl=document.getElementById('hub-name');
+    if(avatarEl)avatarEl.textContent=init;
+    if(nameEl)nameEl.textContent=p.name==='Guest'?'CourtCall':`Hey, ${p.name}!`;
   }
   // Resume card
   const saved=load();
   const canRes=saved&&!saved.gameOver&&saved.history&&saved.history.length>0;
   const rc=document.getElementById('resume-card');
-  rc.classList.toggle('hidden',!canRes);
-  if(canRes){document.getElementById('resume-game-label').textContent=`${saved.teamA.name} ${saved.teamA.score} – ${saved.teamB.score} ${saved.teamB.name}`}
+  if(rc)rc.classList.toggle('hidden',!canRes);
+  if(canRes){const rl=document.getElementById('resume-game-label');if(rl)rl.textContent=`${saved.teamA.name} ${saved.teamA.score} – ${saved.teamB.score} ${saved.teamB.name}`}
   // Stats section
   const statsEl=document.getElementById('hub-stats');
   if(statsEl)statsEl.innerHTML=buildHubStatsHTML();
+  // Feature tabs
+  renderFeatPanel();
   // Recent games
   const matches=getCol(K.matches).slice(0,5);
   const legacy=getCol(K.games).filter(g=>g.id).slice(0,3);
   const all=[...matches,...legacy.filter(g=>!matches.find(m=>m.id===g.id))].slice(0,5);
   const wrap=document.getElementById('hub-recent');
+  if(!wrap)return;
   if(!all.length){wrap.innerHTML='<div class="recent-empty">No games yet — start your first game!</div>';return}
   wrap.innerHTML=all.map(g=>`<div class="recent-card" onclick="openMatchDetail('${g.id||''}')">
     <div><div class="rc-teams"><span>${escHtml(g.teamA?.name||g.winner||'Team A')}</span><span style="color:var(--muted2)"> vs </span><span>${escHtml(g.teamB?.name||g.loser||'Team B')}</span></div><div class="rc-meta">${g.gameType||'pickup'} · First to ${g.winScore||21}</div></div>
     <div class="rc-right"><div class="rc-score">${g.teamA?.score??g.scoreW??'?'}–${g.teamB?.score??g.scoreL??'?'}</div><div class="rc-meta">${g.date||''}</div></div>
   </div>`).join('');
+}
+// ── Landing page helpers ──────────────────────────────
+const FEAT_TABS={
+  score:[{i:'🎤',n:'Voice Scoring'},{i:'🏀',n:'+1 / +2 / +3'},{i:'🚫',n:'Fouls'},{i:'⏱',n:'Shot Clock'},{i:'🕐',n:'Game Clock'},{i:'📋',n:'Live Feed'}],
+  teams:[{i:'⚖️',n:'Smart Builder'},{i:'⭐',n:'Player Ratings'},{i:'🐍',n:'Snake Draft'},{i:'🔄',n:'Who Got Next'},{i:'🏆',n:'Winner Stays'}],
+  tourneys:[{i:'📅',n:'Fixtures'},{i:'📊',n:'Standings'},{i:'🏅',n:'Brackets'},{i:'📋',n:'Match History'},{i:'🏆',n:'Champion Screen'}],
+  comms:[{i:'📢',n:'Community Feed'},{i:'👥',n:'Members'},{i:'🧍',n:'Players'},{i:'📷',n:'Gallery'},{i:'📅',n:'Events'},{i:'🏅',n:'Leaderboards'}],
+  discover:[{i:'📡',n:'CourtCall Pulse'},{i:'🌍',n:'Basketball World'},{i:'🗓',n:'Court Booking*'}],
+};
+let activeFeatTab='score';
+function switchFeatTab(tab,btn){
+  activeFeatTab=tab;
+  document.querySelectorAll('.lft').forEach(b=>b.classList.toggle('on',b===btn));
+  renderFeatPanel();
+}
+function renderFeatPanel(){
+  const panel=document.getElementById('lp-feat-panel');
+  if(!panel)return;
+  const items=FEAT_TABS[activeFeatTab]||[];
+  panel.innerHTML=items.map(f=>`<div class="lfp-item"><div class="lfp-icon">${f.i}</div><div class="lfp-name">${f.n}</div></div>`).join('');
+}
+function scrollToFeatures(){
+  const el=document.getElementById('lp-features');
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function handleGameNav(){
+  const saved=load();
+  if(saved&&!saved.gameOver&&saved.history&&saved.history.length>0)handleResume();
+  else goSetup();
+}
+function showMoreMenu(){
+  document.getElementById('more-overlay').classList.remove('hidden');
+  document.getElementById('more-sheet').classList.remove('hidden');
+}
+function hideMoreMenu(){
+  document.getElementById('more-overlay').classList.add('hidden');
+  document.getElementById('more-sheet').classList.add('hidden');
 }
 // ── Setup helpers ─────────────────────────────────────────
 let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-sc':'0','cr-sc-ar':'on','cr-gc':'off','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
@@ -4774,5 +5005,44 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(bs)builderState=bs;
 });
 </script>
+
+<!-- ── Bottom Navigation ─────────────────────────────── -->
+<nav class="btm-nav hidden" id="btm-nav">
+  <button class="bn-btn active" data-nav="hub" onclick="showScreen('hub')">
+    <span class="bn-icon">🏠</span>
+    <span class="bn-lbl">Home</span>
+  </button>
+  <button class="bn-btn" data-nav="game" onclick="handleGameNav()">
+    <span class="bn-icon">🏀</span>
+    <span class="bn-lbl">Game</span>
+  </button>
+  <button class="bn-btn" data-nav="teams" onclick="showScreen('teams')">
+    <span class="bn-icon">👥</span>
+    <span class="bn-lbl">Teams</span>
+  </button>
+  <button class="bn-btn" data-nav="history" onclick="showScreen('history')">
+    <span class="bn-icon">📋</span>
+    <span class="bn-lbl">History</span>
+  </button>
+  <button class="bn-btn" data-nav="more" onclick="showMoreMenu()">
+    <span class="bn-icon">⋯</span>
+    <span class="bn-lbl">More</span>
+  </button>
+</nav>
+
+<!-- ── More Sheet ────────────────────────────────────── -->
+<div class="more-overlay hidden" id="more-overlay" onclick="hideMoreMenu()"></div>
+<div class="more-sheet hidden" id="more-sheet">
+  <div class="more-handle"></div>
+  <div class="more-title">More</div>
+  <div class="more-grid">
+    <button class="more-item" onclick="showScreen('tournament');hideMoreMenu()"><span class="more-icon">🏆</span><span class="more-lbl">Tournaments</span></button>
+    <button class="more-item" onclick="showScreen('communities');hideMoreMenu()"><span class="more-icon">🏘</span><span class="more-lbl">Communities</span></button>
+    <button class="more-item" onclick="showScreen('pulse');hideMoreMenu()"><span class="more-icon">📡</span><span class="more-lbl">Pulse</span></button>
+    <button class="more-item" onclick="showScreen('world');hideMoreMenu()"><span class="more-icon">🌍</span><span class="more-lbl">Basketball World</span></button>
+    <button class="more-item" onclick="showScreen('profile');hideMoreMenu()"><span class="more-icon">👤</span><span class="more-lbl">Profile</span></button>
+    <button class="more-item" onclick="showScreen('settings');hideMoreMenu()"><span class="more-icon">⚙</span><span class="more-lbl">Settings</span></button>
+  </div>
+</div>
 </body>
 </html>
