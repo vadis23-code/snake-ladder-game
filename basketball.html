@@ -1589,8 +1589,8 @@ function cap(s){return s?s[0].toUpperCase()+s.slice(1):s}
 /* ════════════════════════════════════════════════════════
    Team Builder
 ════════════════════════════════════════════════════════ */
-const TEAM_NAMES_DEFAULT=['Orange','Black','White','Blue','Red','Gold'];
-const TEAM_COLOR_HEXES=['#FF5722','#222244','#E0E0F0','#2979FF','#F44336','#FFB300'];
+const TEAM_NAMES_DEFAULT=['Orange','Blue','Red','Gold','Green','Purple'];
+const TEAM_COLOR_HEXES=['#FF5722','#2979FF','#F44336','#FFB300','#43A047','#9C27B0'];
 let builderState=getObj('cc_builder',{players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0});
 function saveBuilderState(){setObj('cc_builder',builderState)}
 // Attribute grid — 4 skills × 5 dots each
