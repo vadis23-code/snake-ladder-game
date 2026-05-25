@@ -675,6 +675,29 @@ table.standings tr:last-child td{border-bottom:none}
 .lb-stat-unit{font-size:10px;color:var(--muted)}
 .lb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
 .lb-section-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:10px 14px 4px}
+/* JOIN / LEAVE */
+.cd-join-bar{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,179,0,.10));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.cd-join-bar.pending{background:rgba(255,179,0,.08)}
+.cd-join-bar.private{background:rgba(255,59,48,.07);border-color:rgba(255,59,48,.2)}
+.join-bar-icon{font-size:26px;flex-shrink:0}
+.join-bar-text{flex:1}
+.join-bar-title{font-weight:700;font-size:14px;color:var(--text)}
+.join-bar-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.btn-join-comm{flex-shrink:0;background:var(--ca);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity var(--t1)}
+.btn-join-comm:active{opacity:.8}
+.btn-join-req{flex-shrink:0;background:none;border:1.5px solid var(--gold);color:var(--gold);border-radius:10px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.btn-cancel-req{flex-shrink:0;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.btn-leave-comm{width:100%;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:10px;margin-top:10px}
+.join-req-card{background:var(--s2);border-radius:10px;border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.jrc-avatar{width:34px;height:34px;border-radius:50%;background:var(--ca);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:#fff;flex-shrink:0}
+.jrc-info{flex:1;min-width:0}
+.jrc-name{font-weight:700;font-size:13px;color:var(--text)}
+.jrc-time{font-size:11px;color:var(--muted)}
+.jrc-actions{display:flex;gap:6px}
+.btn-approve{background:var(--success);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer}
+.btn-reject{background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:8px;padding:5px 10px;font-weight:700;font-size:12px;cursor:pointer}
+.join-reqs-section{padding:12px 14px 4px}
+.join-reqs-title{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -1323,6 +1346,7 @@ table.standings tr:last-child td{border-bottom:none}
     <div style="width:60px"></div>
   </div>
   <div class="cd-header" id="cd-header"></div>
+  <div id="cd-join-bar"></div>
   <div class="cd-tabs" id="cd-tabs">
     <button class="cd-tab on" data-tab="feed"        onclick="setCommTab('feed')">Feed</button>
     <button class="cd-tab"    data-tab="members"     onclick="setCommTab('members')">Members</button>
@@ -2790,6 +2814,10 @@ function renderCommDetail(){
       </div>
     </div>`;
 
+  // Join bar (non-members)
+  const jb=document.getElementById('cd-join-bar');
+  if(jb)jb.innerHTML=_buildJoinBarHTML(c,myRole);
+
   // Show settings tab only for admins
   const stab=document.getElementById('cd-settings-tab');
   if(stab)stab.style.display=isAdmin?'':'none';
@@ -2866,10 +2894,30 @@ function _buildMembersHTML(c,members,myRole){
       </div>${actions}
     </div>`;
   }).join('');
-  return`<div class="cd-panel">${items}</div>`;
+
+  const pendingReqs=isAdmin?getJoinReqs(c.id):[];
+  const pendingHTML=pendingReqs.length?`<div class="join-reqs-section">
+    <div class="join-reqs-title">⏳ Pending Join Requests (${pendingReqs.length})</div>
+    ${pendingReqs.map(r=>`<div class="join-req-card">
+      <div class="jrc-avatar">${(r.profileName||'?')[0].toUpperCase()}</div>
+      <div class="jrc-info"><div class="jrc-name">${escHtml(r.profileName||'Unknown')}</div><div class="jrc-time">${fmtPostTime(r.requestedAt)}</div></div>
+      <div class="jrc-actions">
+        <button class="btn-approve" onclick="approveJoin('${escHtml(r.id)}','${escHtml(c.id)}')">Approve</button>
+        <button class="btn-reject" onclick="rejectJoin('${escHtml(r.id)}','${escHtml(c.id)}')">Reject</button>
+      </div>
+    </div>`).join('')}
+  </div>`:'';
+
+  return`<div class="cd-panel">${pendingHTML}${items}</div>`;
 }
 
 function _buildSettingsHTML(c,myRole){
+  if(myRole==='contributor'||myRole==='member'){
+    return`<div class="cd-panel" style="padding:16px">
+      <div style="font-size:14px;color:var(--muted);margin-bottom:14px">Settings are managed by the community admin.</div>
+      <button class="btn-leave-comm" onclick="leaveComm('${escHtml(c.id)}')"><span style="font-size:20px">🚪</span><div><div>Leave Community</div><div style="font-size:11px;font-weight:400;opacity:.7;margin-top:2px">You can re-join later if the community is public</div></div></button>
+    </div>`;
+  }
   if(myRole!=='admin')return`<div class="cd-panel"><div class="cd-coming"><span style="font-size:28px">🔒</span><span>Only admins can access Settings.</span></div></div>`;
   const selPub=c.visibility==='public'?'on':'';
   const selPriv=c.visibility==='private'?'on':'';
@@ -2975,6 +3023,7 @@ function deleteComm(communityId){
   saveAllCRatings(getAllCRatings().filter(r=>r.communityId!==communityId));
   saveAllGalItems(getAllGalItems().filter(g=>g.communityId!==communityId));
   saveAllEvents(getAllEvents().filter(e=>e.communityId!==communityId));
+  saveAllJoinReqs(getAllJoinReqs().filter(r=>r.communityId!==communityId));
   showToast('Community deleted');
   showScreen('communities');
 }
@@ -3534,6 +3583,144 @@ function submitCRating(playerId,communityId){
   saveAllCRatings(all);
   ratingPlayerId=null;pendingRating={};
   setCommTab('players');showToast('Rating submitted! ⭐');
+}
+
+/* ════════════════════════════════════════════════════════
+   Community Join / Leave (Phase C8)
+════════════════════════════════════════════════════════ */
+function getAllJoinReqs(){try{return JSON.parse(localStorage.getItem(KC.joins)||'[]')}catch{return[]}}
+function saveAllJoinReqs(arr){localStorage.setItem(KC.joins,JSON.stringify(arr))}
+function getJoinReqs(cid){return getAllJoinReqs().filter(r=>r.communityId===cid&&r.status==='pending')}
+
+function _buildJoinBarHTML(c,myRole){
+  if(myRole!=='guest')return'';
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const pending=getAllJoinReqs().find(r=>r.communityId===c.id&&r.profileId===myId&&r.status==='pending');
+
+  if(pending){
+    return`<div class="cd-join-bar pending">
+      <div class="join-bar-icon">⏳</div>
+      <div class="join-bar-text">
+        <div class="join-bar-title">Request Pending</div>
+        <div class="join-bar-sub">Waiting for admin approval</div>
+      </div>
+      <button class="btn-cancel-req" onclick="cancelJoinReq('${escHtml(c.id)}')">Cancel</button>
+    </div>`;
+  }
+
+  if(c.visibility==='private'||c.visibility==='hidden'){
+    return`<div class="cd-join-bar private">
+      <div class="join-bar-icon">🔒</div>
+      <div class="join-bar-text">
+        <div class="join-bar-title">Private Community</div>
+        <div class="join-bar-sub">Send a request to join</div>
+      </div>
+      <button class="btn-join-req" onclick="joinCommunity('${escHtml(c.id)}')">Request to Join</button>
+    </div>`;
+  }
+
+  if(c.joinApproval){
+    return`<div class="cd-join-bar">
+      <div class="join-bar-icon">🏀</div>
+      <div class="join-bar-text">
+        <div class="join-bar-title">Join ${escHtml(c.name)}</div>
+        <div class="join-bar-sub">Admin approval required</div>
+      </div>
+      <button class="btn-join-req" onclick="joinCommunity('${escHtml(c.id)}')">Request to Join</button>
+    </div>`;
+  }
+
+  return`<div class="cd-join-bar">
+    <div class="join-bar-icon">🏀</div>
+    <div class="join-bar-text">
+      <div class="join-bar-title">Join ${escHtml(c.name)}</div>
+      <div class="join-bar-sub">Open community — join instantly</div>
+    </div>
+    <button class="btn-join-comm" onclick="joinCommunity('${escHtml(c.id)}')">Join</button>
+  </div>`;
+}
+
+function joinCommunity(communityId){
+  const c=getComms().find(x=>x.id===communityId);
+  if(!c){showToast('Community not found');return}
+  const myId=(currentProfile||{id:'guest'}).id;
+  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const members=getCommMembers();
+  if(members.find(m=>m.communityId===communityId&&m.profileId===myId)){
+    showToast('You are already a member');return;
+  }
+  const needsApproval=c.joinApproval||(c.visibility==='private')|| (c.visibility==='hidden');
+  if(needsApproval){
+    const reqs=getAllJoinReqs();
+    if(reqs.find(r=>r.communityId===communityId&&r.profileId===myId&&r.status==='pending')){
+      showToast('Request already sent');return;
+    }
+    reqs.push({id:'join_'+Date.now(),communityId,profileId:myId,profileName:myName,requestedAt:new Date().toISOString(),status:'pending'});
+    saveAllJoinReqs(reqs);
+    showToast('Join request sent! ⏳');
+  }else{
+    const newMember={id:'mem_'+Date.now(),communityId,profileId:myId,profileName:myName,role:'member',joinedAt:new Date().toISOString().split('T')[0]};
+    members.push(newMember);
+    setCommMembers(members);
+    const comms=getComms();
+    const ci=comms.findIndex(x=>x.id===communityId);
+    if(ci!==-1){comms[ci].memberCount=(comms[ci].memberCount||0)+1;setComms(comms)}
+    showToast('You joined '+c.name+' 🏀');
+  }
+  renderCommDetail();
+}
+
+function cancelJoinReq(communityId){
+  const myId=(currentProfile||{id:'guest'}).id;
+  saveAllJoinReqs(getAllJoinReqs().filter(r=>!(r.communityId===communityId&&r.profileId===myId)));
+  showToast('Request cancelled');
+  renderCommDetail();
+}
+
+function leaveComm(communityId){
+  const c=getComms().find(x=>x.id===communityId);
+  if(!c)return;
+  if(!confirm(`Leave "${c.name}"?`))return;
+  const myId=(currentProfile||{id:'guest'}).id;
+  const members=getCommMembers();
+  const myMember=members.find(m=>m.communityId===communityId&&m.profileId===myId);
+  if(!myMember)return;
+  if(myMember.role==='admin'){showToast('Admins cannot leave. Transfer admin role first or delete the community.');return}
+  setCommMembers(members.filter(m=>!(m.communityId===communityId&&m.profileId===myId)));
+  const comms=getComms();
+  const ci=comms.findIndex(x=>x.id===communityId);
+  if(ci!==-1){comms[ci].memberCount=Math.max(0,(comms[ci].memberCount||1)-1);setComms(comms)}
+  showToast('You left '+c.name);
+  showScreen('communities');
+}
+
+function approveJoin(reqId,communityId){
+  const reqs=getAllJoinReqs();
+  const req=reqs.find(r=>r.id===reqId);
+  if(!req)return;
+  req.status='approved';
+  saveAllJoinReqs(reqs);
+  const members=getCommMembers();
+  if(!members.find(m=>m.communityId===communityId&&m.profileId===req.profileId)){
+    members.push({id:'mem_'+Date.now(),communityId,profileId:req.profileId,profileName:req.profileName,role:'member',joinedAt:new Date().toISOString().split('T')[0]});
+    setCommMembers(members);
+    const comms=getComms();
+    const ci=comms.findIndex(x=>x.id===communityId);
+    if(ci!==-1){comms[ci].memberCount=(comms[ci].memberCount||0)+1;setComms(comms)}
+  }
+  showToast(escHtml(req.profileName)+' approved ✅');
+  setCommTab('members');
+}
+
+function rejectJoin(reqId,communityId){
+  const reqs=getAllJoinReqs();
+  const req=reqs.find(r=>r.id===reqId);
+  if(!req)return;
+  req.status='rejected';
+  saveAllJoinReqs(reqs);
+  showToast('Request rejected');
+  setCommTab('members');
 }
 
 /* ════════════════════════════════════════════════════════
