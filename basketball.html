@@ -385,6 +385,21 @@ table.standings tr:last-child td{border-bottom:none}
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s3);color:var(--text);border-radius:var(--r2);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:300;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:300px;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* CLOCK BAR */
+.clock-bar{display:none;width:100%;background:var(--s1);border-bottom:1px solid var(--border);padding:8px 12px;flex-direction:row;align-items:center;gap:12px;flex-shrink:0}
+.clock-bar.visible{display:flex}
+.sc-wrap{display:flex;flex-direction:column;align-items:center;flex:1}
+.sc-label,.gc-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.sc-digits{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,8vw,44px);color:var(--text);line-height:1;transition:color .2s;min-width:2ch;text-align:center}
+.sc-digits.urgent{color:var(--danger);animation:scUrgent .5s ease-in-out infinite alternate}
+@keyframes scUrgent{from{opacity:1}to{opacity:.5}}
+.sc-btns{display:flex;gap:5px;margin-top:4px}
+.sc-btn{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--muted);font:700 11px 'Inter',sans-serif;padding:4px 10px;cursor:pointer;min-height:32px;min-width:36px;transition:all var(--t1)}
+.sc-btn:active{background:var(--s3);color:var(--text)}
+.sc-btn.go{background:var(--success);color:#000;border-color:var(--success)}
+.sc-btn.go:active{opacity:.8}
+.gc-wrap{display:flex;flex-direction:column;align-items:center;border-left:1px solid var(--border);padding-left:12px;min-width:60px}
+.gc-digits{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,5vw,30px);color:var(--muted);line-height:1}
 /* RESPONSIVE */
 @media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
@@ -518,6 +533,32 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">In 2s &amp; 3s mode this adds a +1 button for free throws and foul shots.</div>
       </div>
     </div>
+    <div class="setup-sec">
+      <span class="sec-label">Shot Clock</span>
+      <div class="chip-row" id="cr-sc">
+        <button class="chip on" data-v="0" onclick="pickChip('cr-sc',this);toggleCustomSC()">Off</button>
+        <button class="chip" data-v="12" onclick="pickChip('cr-sc',this);toggleCustomSC()">12s</button>
+        <button class="chip" data-v="14" onclick="pickChip('cr-sc',this);toggleCustomSC()">14s</button>
+        <button class="chip" data-v="24" onclick="pickChip('cr-sc',this);toggleCustomSC()">24s</button>
+        <button class="chip" data-v="30" onclick="pickChip('cr-sc',this);toggleCustomSC()">30s</button>
+        <button class="chip" data-v="custom" onclick="pickChip('cr-sc',this);toggleCustomSC()">Custom</button>
+      </div>
+      <input id="inp-sc" class="custom-input" type="number" min="5" max="60" placeholder="e.g. 20">
+      <div style="margin-top:14px">
+        <span class="sec-label" style="margin-bottom:8px;display:block">Auto-reset after score</span>
+        <div class="chip-row" id="cr-sc-ar">
+          <button class="chip on" data-v="on" onclick="pickChip('cr-sc-ar',this)">On</button>
+          <button class="chip" data-v="off" onclick="pickChip('cr-sc-ar',this)">Off</button>
+        </div>
+      </div>
+    </div>
+    <div class="setup-sec">
+      <span class="sec-label">Game Clock</span>
+      <div class="chip-row" id="cr-gc">
+        <button class="chip on" data-v="off" onclick="pickChip('cr-gc',this)">Off</button>
+        <button class="chip" data-v="up" onclick="pickChip('cr-gc',this)">Count Up</button>
+      </div>
+    </div>
   </div>
   <div class="setup-actions">
     <button class="btn-start" onclick="handleStartGame()">Start Game</button>
@@ -550,6 +591,20 @@ table.standings tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="game-status" id="game-status">—</div>
+  <div class="clock-bar" id="clock-bar">
+    <div class="sc-wrap" id="sc-wrap">
+      <div class="sc-label">Shot Clock</div>
+      <div class="sc-digits" id="sc-digits">—</div>
+      <div class="sc-btns">
+        <button class="sc-btn go" id="sc-start-btn" onclick="SC.toggle()">▶</button>
+        <button class="sc-btn" onclick="SC.reset()">↺</button>
+      </div>
+    </div>
+    <div class="gc-wrap" id="gc-wrap">
+      <div class="gc-label">Game</div>
+      <div class="gc-digits" id="gc-digits">0:00</div>
+    </div>
+  </div>
   <div class="score-zone" id="score-zone">
     <div class="score-pad" id="pad-a" data-t="a"></div>
     <div class="score-zone-divider"></div>
@@ -967,7 +1022,7 @@ function renderHub(){
   </div>`).join('');
 }
 // ── Setup helpers ─────────────────────────────────────────
-let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
+let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-sc':'0','cr-sc-ar':'on','cr-gc':'off','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
 let teamColors={a:'orange',b:'blue'};
 function pickChip(rowId,btn){
   cx[rowId]=btn.dataset.v;
@@ -984,17 +1039,18 @@ function applySetupColors(){
   document.documentElement.style.setProperty('--cb',cb.hex);document.documentElement.style.setProperty('--gb',cb.glow);
 }
 function toggleCustomWin(){const i=document.getElementById('inp-win');i.classList.toggle('show',cx['cr-win']==='custom');if(cx['cr-win']==='custom')i.focus()}
+function toggleCustomSC(){const i=document.getElementById('inp-sc');if(!i)return;i.classList.toggle('show',cx['cr-sc']==='custom');if(cx['cr-sc']==='custom')i.focus()}
 function updateRule(){const f=document.getElementById('custom-rule-form');f.style.display=cx['cr-rule']==='custom'?'flex':'none'}
 function applyTeamColors(){const ca=COLORS[state.teamA.colorKey]||COLORS.orange,cb=COLORS[state.teamB.colorKey]||COLORS.blue;const r=document.documentElement;r.style.setProperty('--ca',ca.hex);r.style.setProperty('--ga',ca.glow);r.style.setProperty('--cb',cb.hex);r.style.setProperty('--gb',cb.glow)}
 function goSetup(){applySetupColors();showScreen('setup')}
-function handleResume(){const saved=load();if(!saved)return;Object.assign(state,saved);state.voiceActive=false;applyTeamColors();renderGame();showScreen('game')}
+function handleResume(){const saved=load();if(!saved)return;Object.assign(state,saved);state.voiceActive=false;applyTeamColors();renderGame();SC.init();GC.init();showScreen('game')}
 // ── Game Context (pickup or tournament) ──────────────────
 let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
 /* ════════════════════════════════════════════════════════
    Game State & Engine
 ════════════════════════════════════════════════════════ */
 let state=freshState();
-function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
+function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
 function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
@@ -1017,12 +1073,16 @@ function handleStartGame(){
   if(cx['cr-rule']==='2s3s'){ptsSmall=2;ptsLarge=3}
   if(cx['cr-rule']==='custom'){ptsSmall=parseInt(document.getElementById('inp-sm').value,10)||1;ptsLarge=parseInt(document.getElementById('inp-lg').value,10)||2}
   const allowFreeThrow=cx['cr-ft']!=='off';
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
-  applyTeamColors();save();renderGame();showScreen('game');
+  let shotClockDuration=parseInt(cx['cr-sc'],10)||0;
+  if(cx['cr-sc']==='custom')shotClockDuration=parseInt(document.getElementById('inp-sc').value,10)||24;
+  const shotClockAutoReset=cx['cr-sc-ar']!=='off';
+  const gameClockMode=cx['cr-gc']||'off';
+  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
+  applyTeamColors();save();renderGame();SC.init();GC.init();showScreen('game');
 }
 function handleBackFromGame(){
   if(state.history.length>0&&!state.gameOver){if(!confirm('Go back? Progress is saved.'))return}
-  stopVoice();showScreen('hub');
+  SC.stop();GC.stop();stopVoice();showScreen('hub');
   document.getElementById('resume-card').classList.toggle('hidden',!(state.history.length>0&&!state.gameOver));
 }
 // Render game
@@ -1100,6 +1160,7 @@ function addScore(team,pts){
   el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
   const s=getObj(K.settings,{vibration:true,sound:true});
   if(s.vibration&&navigator.vibrate)navigator.vibrate(40);
+  if(state.shotClockDuration>0&&state.shotClockAutoReset)SC.reset(SC.running);
   save();renderGame();checkWin();
 }
 function undoScore(){
@@ -1134,7 +1195,7 @@ function fmtDur(ms){return`${Math.floor(ms/60000)}m ${Math.floor((ms%60000)/1000
 function checkWin(){
   const aWon=state.teamA.score>=state.winScore,bWon=state.teamB.score>=state.winScore;
   if(!aWon&&!bWon)return;
-  state.gameOver=true;stopVoice();save();
+  state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const winner=aWon?state.teamA:state.teamB,loser=aWon?state.teamB:state.teamA;
   const entry=buildMatchEntry(winner,loser);
   saveToMatches(entry);
@@ -1143,7 +1204,7 @@ function checkWin(){
 }
 function handleEndGame(){
   if(!confirm('End game now?'))return;
-  state.gameOver=true;stopVoice();save();
+  state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const winner=state.teamA.score>=state.teamB.score?state.teamA:state.teamB;
   const loser=state.teamA.score>=state.teamB.score?state.teamB:state.teamA;
   const entry=buildMatchEntry(winner,loser);
@@ -1188,7 +1249,7 @@ function playAgain(){
   state.history=[];state.maxLead={a:0,b:0};state.quarter=1;state.possession='a';
   state.gameOver=false;state.startTime=Date.now();state.voiceActive=false;
   gameContext={type:'pickup',tournamentId:null,fixtureId:null};
-  save();renderGame();showScreen('game');
+  save();renderGame();SC.init();GC.init();showScreen('game');
 }
 function newGame(){document.getElementById('pg-overlay').classList.add('hidden');clearSave();stopVoice();gameContext={type:'pickup',tournamentId:null,fixtureId:null};renderHub();showScreen('hub')}
 async function shareScore(){
@@ -1202,6 +1263,72 @@ function launchConfetti(cid){
   for(let i=0;i<90;i++){const p=document.createElement('div');const sz=8+Math.random()*10;p.className='cp';p.style.cssText=`left:${Math.random()*100}vw;background:${cols[i%cols.length]};width:${sz}px;height:${sz*(.4+Math.random()*.6)}px;animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*1.8}s;`;c.appendChild(p)}
   setTimeout(()=>{c.innerHTML=''},6200);
 }
+/* ════════════════════════════════════════════════════════
+   Clock Modules — Shot Clock & Game Clock
+════════════════════════════════════════════════════════ */
+const SC={
+  _tmr:null,running:false,current:0,
+  init(){
+    this.stop();this.running=false;
+    this.current=state.shotClockDuration;
+    const bar=document.getElementById('clock-bar');
+    const scWrap=document.getElementById('sc-wrap');
+    const hasSC=state.shotClockDuration>0;
+    const hasGC=state.gameClockMode!=='off';
+    if(bar)bar.classList.toggle('visible',hasSC||hasGC);
+    if(scWrap)scWrap.style.display=hasSC?'':'none';
+    this.render();
+  },
+  render(){
+    const el=document.getElementById('sc-digits');if(!el)return;
+    el.textContent=this.current;
+    el.className='sc-digits'+(this.current<=5&&this.current>0?' urgent':'');
+    const btn=document.getElementById('sc-start-btn');
+    if(btn)btn.textContent=this.running?'⏸':'▶';
+  },
+  toggle(){if(this.running)this.pause();else this.start()},
+  start(){
+    if(!state.shotClockDuration||state.gameOver)return;
+    if(this.current<=0)this.current=state.shotClockDuration;
+    this.running=true;this.render();
+    this._tmr=setInterval(()=>{
+      this.current=Math.max(0,this.current-1);this.render();
+      if(this.current<=0){this.stop();this._buzz();}
+    },1000);
+  },
+  pause(){this.running=false;clearInterval(this._tmr);this._tmr=null;this.render()},
+  stop(){this.running=false;clearInterval(this._tmr);this._tmr=null},
+  reset(restart){
+    this.stop();this.current=state.shotClockDuration;
+    if(restart)this.start();else this.render();
+  },
+  _buzz(){
+    const s=getObj(K.settings,{vibration:true});
+    if(s.vibration&&navigator.vibrate)navigator.vibrate([200,100,200]);
+    showToast('⏱ Shot clock expired!');
+  }
+};
+const GC={
+  _tmr:null,running:false,elapsed:0,
+  init(){
+    this.stop();this.elapsed=0;this.running=false;
+    const gcWrap=document.getElementById('gc-wrap');
+    if(gcWrap)gcWrap.style.display=state.gameClockMode!=='off'?'':'none';
+    this.render();
+    if(state.gameClockMode!=='off')this.start();
+  },
+  render(){
+    const el=document.getElementById('gc-digits');if(!el)return;
+    const m=Math.floor(this.elapsed/60),s=this.elapsed%60;
+    el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+  },
+  start(){
+    if(state.gameClockMode==='off'||state.gameOver)return;
+    this.running=true;
+    this._tmr=setInterval(()=>{this.elapsed++;this.render()},1000);
+  },
+  stop(){this.running=false;clearInterval(this._tmr);this._tmr=null}
+};
 /* ════════════════════════════════════════════════════════
    Voice Engine — upgraded with misheard word normalization
 ════════════════════════════════════════════════════════ */
@@ -1252,6 +1379,9 @@ function parseVoiceCmd(rawText){
   if(/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)){handleEndGame();return true}
   if(/\b(reset\s*game|start\s*over)\b/.test(t)){if(confirm('Reset scores?')){playAgain();setVAction('Reset!')}return true}
   if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}}
+  if(/\b(start\s*shot\s*clock|go\s*shot\s*clock|shot\s*clock\s*go)\b/.test(t)){SC.start();setVAction('Shot clock started');return true}
+  if(/\b(pause\s*shot\s*clock|stop\s*shot\s*clock|shot\s*clock\s*stop)\b/.test(t)){SC.pause();setVAction('Shot clock paused');return true}
+  if(/\b(reset\s*shot\s*clock|restart\s*shot\s*clock|shot\s*clock\s*reset)\b/.test(t)){SC.reset(SC.running);setVAction('Shot clock reset');return true}
   const team=resolveTeam(t);
   if(!team)return false;
   const pts=extractPts(t);
@@ -1637,7 +1767,7 @@ function startTournMatch(tournId,fixtureId){
   else if(winScore===15)pickChipByVal('cr-win','15');
   else{pickChipByVal('cr-win','21')}
   state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall:1,ptsLarge:2,teamA:{name:fx.teamA,score:0,fouls:0,colorKey:'orange'},teamB:{name:fx.teamB,score:0,fouls:0,colorKey:'blue'},startTime:Date.now()};
-  applyTeamColors();save();renderGame();showScreen('game');
+  applyTeamColors();save();renderGame();SC.init();GC.init();showScreen('game');
 }
 function pickChipByVal(rowId,val){const btn=document.querySelector(`#${rowId} [data-v="${val}"]`);if(btn)pickChip(rowId,btn)}
 function saveTournamentResult(entry){
