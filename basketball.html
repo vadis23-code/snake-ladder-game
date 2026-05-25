@@ -846,108 +846,152 @@ table.standings tr:last-child td{border-bottom:none}
 @media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important}}
-/* ─── Landing Page L1 ─────────────────────────────────── */
+/* ─── Landing Page v2 ────────────────────────────────── */
 #s-hub.active{display:block}
-#s-hub{overflow-y:auto}
-/* hero */
-.lp-hero{background:linear-gradient(170deg,rgba(255,107,53,.14) 0%,rgba(255,107,53,.04) 45%,transparent 70%),linear-gradient(180deg,var(--s1) 0%,var(--bg) 100%);padding-bottom:28px;border-bottom:1px solid rgba(255,107,53,.12);position:relative;overflow:hidden}
-.lp-hero::before{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;background:radial-gradient(circle,rgba(255,107,53,.09) 0%,transparent 70%);pointer-events:none}
-.lp-hero::after{content:'🏀';position:absolute;right:-10px;top:16px;font-size:180px;opacity:.033;pointer-events:none;line-height:1}
-.lp-nav-bar{display:flex;align-items:center;justify-content:space-between;padding:22px 20px 26px}
-.lp-brand{display:flex;align-items:center;gap:11px}
-.lp-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;flex-shrink:0;box-shadow:0 4px 16px rgba(255,87,34,.35)}
-.lp-brand-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;color:var(--text);line-height:1}
-.lp-settings-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-size:18px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--t1)}
-.lp-settings-btn:active{background:rgba(255,255,255,.12)}
-.lp-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,7vw,36px);line-height:1.15;letter-spacing:.02em;color:var(--text);padding:0 20px;margin:0 0 12px}
-.lp-sub{font-size:15px;color:rgba(240,240,240,.65);line-height:1.65;padding:0 20px;margin:0 0 22px;font-weight:500}
-/* mini scoreboard demo */
-.lp-sb{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin:0 20px 22px;padding:16px 20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;box-shadow:0 4px 24px rgba(0,0,0,.25)}
-.lpsb-t{display:flex;flex-direction:column;gap:2px}
-.lpsb-r{text-align:right}
-.lpsb-nm{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.lpsb-sc{font-family:'Bebas Neue',sans-serif;font-size:56px;line-height:1;color:rgba(240,240,240,.28)}
-.lpsb-sc.lead{color:var(--text);text-shadow:0 0 28px rgba(255,107,53,.5)}
-.lpsb-mid{text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
-.lpsb-ck{font-size:11px;color:var(--muted);font-weight:600;background:rgba(255,255,255,.07);border-radius:20px;padding:3px 10px}
-.lpsb-vs{font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.2);letter-spacing:.1em}
-.lpsb-gp{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.04em;text-transform:uppercase;background:rgba(255,179,0,.14);border-radius:50px;padding:3px 9px}
-/* resume card in hero */
-.lp-resume{margin:0 20px 16px;background:var(--s1);border:2px solid var(--ca);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 20px rgba(255,87,34,.2);transition:background var(--t1)}
+#s-hub{overflow-y:auto;padding-bottom:0}
+/* Top nav */
+.lp-topnav{position:sticky;top:0;z-index:100;background:rgba(10,10,26,.92);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.lp-topnav-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.lp-tnav-logo{display:flex;align-items:center;gap:9px}
+.lp-tnav-ball{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,87,34,.3)}
+.lp-tnav-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);line-height:1}
+.lp-tnav-links{display:flex;gap:28px;align-items:center}
+.lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:0}
+.lp-tnav-link:hover{color:var(--text)}
+.lp-tnav-actions{display:flex;align-items:center;gap:10px}
+.lp-tnav-login{background:none;border:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:8px 12px;transition:color var(--t1)}
+.lp-tnav-login:hover{color:var(--text)}
+.lp-tnav-start{background:var(--ca);color:#fff;border:none;border-radius:50px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity var(--t1)}
+.lp-tnav-start:active{opacity:.8}
+/* Hero */
+.lp-hero-wrap{max-width:1100px;margin:0 auto;padding:56px 24px 52px;display:grid;grid-template-columns:55fr 45fr;gap:48px;align-items:center;min-height:calc(100dvh - 58px);box-sizing:border-box}
+.lp-h-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.28);border-radius:50px;padding:5px 14px;font-size:10px;font-weight:700;color:var(--ca);letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
+.lp-h-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--ca);animation:pulse 1.5s infinite}
+.lp-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5.2vw,62px);line-height:1.06;letter-spacing:.02em;color:var(--text);margin:0 0 18px}
+.lp-h1 em{color:var(--ca);font-style:normal}
+.lp-h-sub{font-size:16px;color:rgba(240,240,240,.6);line-height:1.7;margin:0 0 30px;max-width:400px}
+.lp-h-ctas{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.lp-btn-p{background:linear-gradient(135deg,#FF5722,#FF7A50);color:#fff;border:none;border-radius:12px;padding:14px 26px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.07em;cursor:pointer;box-shadow:0 6px 24px rgba(255,87,34,.38);transition:transform .12s,box-shadow .12s;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.lp-btn-p:active{transform:translateY(2px);box-shadow:0 2px 8px rgba(255,87,34,.28)}
+.lp-btn-o{background:transparent;color:rgba(240,240,240,.82);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;transition:border-color var(--t1),color var(--t1);white-space:nowrap}
+.lp-btn-o:active{border-color:var(--ca);color:var(--ca)}
+.lp-h-trust{display:flex;gap:18px;flex-wrap:wrap}
+.lp-h-ti{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.42);font-weight:600}
+/* Resume card in hero */
+.lp-resume{margin-top:22px;background:var(--s1);border:1.5px solid var(--ca);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 18px rgba(255,87,34,.18);transition:background var(--t1);max-width:400px}
 .lp-resume:active{background:var(--s2)}
 .lp-resume-dot{width:9px;height:9px;border-radius:50%;background:var(--ca);flex-shrink:0;animation:pulse 1.5s infinite}
 .lp-resume-txt{flex:1}
-.lp-resume-live{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ca);margin-bottom:2px}
+.lp-resume-live{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ca);margin-bottom:2px}
 .lp-resume-label{font-size:14px;font-weight:700;color:var(--text)}
-/* CTA buttons */
-.lp-ctas{display:flex;flex-direction:column;gap:10px;padding:0 20px}
-.lp-btn-primary{width:100%;background:linear-gradient(135deg,#FF5722,#FF7A50);color:#fff;border:none;border-radius:14px;padding:18px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 28px rgba(255,87,34,.42);transition:transform .12s,box-shadow .12s;min-height:58px}
-.lp-btn-primary:active{transform:translateY(2px);box-shadow:0 2px 10px rgba(255,87,34,.3)}
-.lp-btn-sec{width:100%;background:var(--s1);color:var(--text);border:1.5px solid var(--border);border-radius:13px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;transition:background var(--t1);min-height:50px}
-.lp-btn-sec:active{background:var(--s2)}
-.lp-btn-ghost{width:100%;background:transparent;color:var(--muted);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:14px;font-weight:600;font-size:14px;cursor:pointer;transition:all var(--t1);min-height:50px}
-.lp-btn-ghost:active{background:rgba(255,255,255,.05)}
-.lp-trust{text-align:center;font-size:11px;color:var(--muted);padding:14px 20px 0;letter-spacing:.02em;opacity:.6}
-/* landing sections */
-.lp-section{padding:28px 20px 0}
-.lp-section-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:0 0 12px;opacity:.7}
-/* play cards */
-.lp-play-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background var(--t1)}
-.lp-play-card:active{background:var(--s2)}
-.lpc-hero{border-color:rgba(255,107,53,.3);background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,107,53,.04));margin-bottom:10px}
-.lp-play-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.lpc-icon{font-size:26px;line-height:1}
-.lpc-half .lpc-icon{font-size:20px}
-.lpc-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.02em;color:var(--text);line-height:1.2}
-.lpc-half .lpc-title{font-size:14px}
-.lpc-desc{font-size:13px;color:var(--muted);line-height:1.5}
-.lpc-half .lpc-desc{font-size:11px}
-.lpc-cta{background:var(--ca);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity var(--t1);margin-top:4px;text-align:left;width:fit-content}
-.lpc-cta:active{opacity:.8}
-.lpc-cta-dim{background:rgba(255,255,255,.08);color:var(--text);font-size:12px;padding:8px 12px}
-/* feature tabs */
-.lp-feat-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.lp-feat-tabs::-webkit-scrollbar{display:none}
-.lft{flex-shrink:0;background:var(--s1);border:1.5px solid var(--border);border-radius:50px;padding:9px 17px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all var(--t1);white-space:nowrap}
+/* Game preview card */
+.lp-game-card{background:linear-gradient(160deg,#181832,#0e0e22);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:22px;box-shadow:0 24px 64px rgba(0,0,0,.55),0 0 0 1px rgba(255,107,53,.06);overflow:hidden;position:relative}
+.lp-game-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ca),rgba(255,107,53,.1),transparent)}
+.lgc-live{display:inline-flex;align-items:center;gap:7px;background:rgba(255,87,34,.14);border:1px solid rgba(255,87,34,.28);border-radius:50px;padding:4px 12px;font-size:10px;font-weight:700;color:var(--ca);letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px}
+.lgc-live-dot{width:6px;height:6px;border-radius:50%;background:var(--ca);animation:pulse 1.4s infinite}
+.lgc-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:16px}
+.lgc-team{display:flex;flex-direction:column;gap:3px}
+.lgc-team-r{text-align:right}
+.lgc-tname{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.lgc-score{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,76px);line-height:1;color:rgba(240,240,240,.2)}
+.lgc-score.hi{color:var(--text);text-shadow:0 0 32px rgba(255,107,53,.45)}
+.lgc-mid{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lgc-timer{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:var(--text);background:rgba(255,255,255,.06);border-radius:10px;padding:6px 12px;line-height:1}
+.lgc-gp{background:rgba(255,179,0,.12);border:1px solid rgba(255,179,0,.28);border-radius:50px;padding:4px 12px;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:.07em;text-transform:uppercase}
+.lgc-sbtn-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-bottom:10px;align-items:center}
+.lgc-sbtn-grp{display:flex;gap:5px}
+.lgc-sbtn-grp-r{justify-content:flex-end}
+.lgc-sbtn{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 4px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--text);text-align:center}
+.lgc-sbtn.hi{background:rgba(255,87,34,.18);border-color:rgba(255,87,34,.3);color:var(--ca)}
+.lgc-vs-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.18);text-align:center;font-family:'Bebas Neue',sans-serif;letter-spacing:.1em}
+.lgc-qrow{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:5px;margin-bottom:14px}
+.lgc-q{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:7px 4px;font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+.lgc-q.on{background:var(--ca);border-color:var(--ca);color:#fff}
+.lgc-q-gc{font-size:9px;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}
+.lgc-actions{display:grid;grid-template-columns:1fr auto;gap:8px}
+.lgc-act-main{background:linear-gradient(135deg,var(--ca),#c84000);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity var(--t1)}
+.lgc-act-main:active{opacity:.8}
+.lgc-act-sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:13px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+/* Section base */
+.lp-sec{padding:72px 0}
+.lp-sec-inner{max-width:1100px;margin:0 auto;padding:0 24px}
+.lp-sec-kicker{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:.65;margin-bottom:10px}
+.lp-sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,4vw,40px);letter-spacing:.03em;color:var(--text);margin:0 0 32px;line-height:1.1}
+/* S2: Choose how you play */
+.lp-s2{background:var(--bg)}
+.lp-play-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.lp-pc{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:24px 22px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:transform var(--t1),box-shadow var(--t1)}
+.lp-pc:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(0,0,0,.3)}
+.lp-pc:active{transform:translateY(0)}
+.lp-pc-prime{background:linear-gradient(145deg,rgba(255,87,34,.17),rgba(255,87,34,.05));border-color:rgba(255,107,53,.36)}
+.lp-pc-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:2px}
+.lp-pc-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.lp-pc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.02em;color:var(--text);line-height:1.2}
+.lp-pc-desc{font-size:13px;color:var(--muted);line-height:1.6;flex:1}
+.lp-pc-cta{background:var(--ca);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity var(--t1);width:fit-content;margin-top:4px}
+.lp-pc-cta:active{opacity:.8}
+.lp-pc-cta-dim{background:rgba(255,255,255,.08);color:var(--text)}
+/* S3: Features */
+.lp-s3{background:linear-gradient(180deg,var(--bg) 0%,#111128 100%)}
+.lp-ftabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.lp-ftabs::-webkit-scrollbar{display:none}
+.lft{flex-shrink:0;background:var(--s1);border:1.5px solid var(--border);border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all var(--t1);white-space:nowrap}
 .lft.on{background:var(--ca);border-color:var(--ca);color:#fff}
 .lft:active{opacity:.8}
-.lp-feat-panel{background:var(--s1);border:1px solid var(--border);border-radius:14px;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:hidden}
-.lfp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
-.lfp-item:nth-last-child(-n+2){border-bottom:none}
-.lfp-item:nth-child(odd){border-right:1px solid rgba(255,255,255,.05)}
-.lfp-icon{font-size:17px;flex-shrink:0;width:24px;text-align:center}
-.lfp-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
-/* chaos section */
-.lp-chaos-lines{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
-.lp-chaos-line{font-size:16px;color:rgba(240,240,240,.5);line-height:1.4;padding-left:2px}
-.lp-chaos-line strong{color:var(--text)}
-.lp-chaos-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.lp-chaos-tile{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:6px}
-.lp-chaos-icon{font-size:22px;line-height:1}
-.lp-chaos-name{font-size:12px;font-weight:700;color:var(--text)}
-/* grow steps */
-.lp-grow-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.lp-grow-step{display:flex;align-items:flex-start;gap:14px;padding:16px;border-bottom:1px solid var(--border)}
-.lp-grow-step:last-child{border-bottom:none}
-.lgs-num{width:32px;height:32px;border-radius:50%;background:var(--ca);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.lgs-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
-.lgs-desc{font-size:13px;color:var(--muted);line-height:1.4}
-/* final CTA */
-.lp-final{text-align:center;padding:36px 20px 0;display:flex;flex-direction:column;align-items:stretch;gap:10px}
-.lp-final-hl{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.04em;color:var(--text);margin-bottom:4px}
-.lp-final-sub{font-size:14px;color:var(--muted);margin-bottom:10px}
-/* recent games footer */
-.lp-footer{padding:28px 20px 20px}
-/* ── Bottom Nav ───────────────────────────────────────── */
+.lp-fpanel{background:var(--s1);border:1px solid var(--border);border-radius:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;overflow:hidden}
+.lp-fi{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.05)}
+.lp-fi:not(:nth-child(3n)){border-right:1px solid rgba(255,255,255,.05)}
+.lp-fi:nth-last-child(-n+3){border-bottom:none}
+.lp-fi-icon{font-size:20px;flex-shrink:0;width:30px;text-align:center;margin-top:2px}
+.lp-fi-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.lp-fi-sub{font-size:11px;color:var(--muted);line-height:1.4}
+/* S4: Chaos */
+.lp-s4{background:linear-gradient(180deg,#111128 0%,#0a0a1e 100%);padding:72px 0}
+.lp-s4-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.lp-s4-lines{display:flex;flex-direction:column;gap:18px}
+.lp-s4-line{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.8vw,30px);letter-spacing:.02em;color:rgba(240,240,240,.36);line-height:1.2}
+.lp-s4-line strong{color:var(--text)}
+.lp-s4-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lp-s4-tile{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px}
+.lp-s4-tile-icon{font-size:24px;line-height:1}
+.lp-s4-tile-name{font-size:13px;font-weight:700;color:var(--text)}
+.lp-s4-tile-desc{font-size:11px;color:var(--muted);line-height:1.4}
+/* S5: Grow */
+.lp-s5{background:linear-gradient(180deg,#0a0a1e 0%,#0d0d22 100%);padding:72px 0}
+.lp-s5-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.lp-s5-quote{font-size:16px;color:rgba(240,240,240,.48);line-height:1.65;border-left:3px solid var(--ca);padding-left:18px;margin-top:20px;font-style:italic}
+.lp-steps{background:var(--s1);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.lp-step{display:flex;align-items:flex-start;gap:16px;padding:20px;border-bottom:1px solid var(--border)}
+.lp-step:last-child{border-bottom:none}
+.lp-step-num{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ca),#c84000);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(255,87,34,.28)}
+.lp-step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.lp-step-desc{font-size:13px;color:var(--muted);line-height:1.45}
+/* S6: Final CTA */
+.lp-s6{background:var(--bg);padding:72px 0}
+.lp-s6-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.lp-s6-hl{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5.5vw,58px);letter-spacing:.03em;color:var(--text);margin:0 0 10px;line-height:1.05}
+.lp-s6-sub{font-size:16px;color:var(--muted);margin:0 0 28px;line-height:1.55}
+.lp-s6-ctas{display:flex;flex-direction:column;gap:10px;max-width:320px}
+.lp-checklist{display:flex;flex-direction:column;gap:14px}
+.lp-chk{display:flex;align-items:center;gap:14px;font-size:14px;color:rgba(240,240,240,.7);font-weight:500}
+.lp-chk-dot{width:30px;height:30px;border-radius:50%;background:rgba(255,87,34,.12);border:1px solid rgba(255,87,34,.24);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+/* Footer */
+.lp-footer-bar{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.07);padding:22px 24px}
+.lp-footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.lp-foot-logo{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em;color:var(--muted)}
+.lp-foot-ball{width:24px;height:24px;border-radius:7px;background:var(--ca);display:flex;align-items:center;justify-content:center;font-size:12px}
+.lp-foot-copy{font-size:11px;color:rgba(255,255,255,.22)}
+.lp-foot-guest{background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;padding:7px 14px;transition:all var(--t1)}
+.lp-foot-guest:active{color:var(--text)}
+/* Bottom nav (app screens) */
 .btm-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(26,26,46,.96);border-top:1px solid var(--border);display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:var(--muted);transition:color var(--t1);padding:0;-webkit-tap-highlight-color:transparent}
 .bn-btn:active{opacity:.7}
 .bn-btn.active{color:var(--ca)}
 .bn-icon{font-size:20px;line-height:1}
 .bn-lbl{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-/* screens that need bottom nav clearance */
 .has-btm-nav{padding-bottom:72px!important}
-/* ── More Sheet ───────────────────────────────────────── */
+/* More sheet */
 .more-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:301;padding-bottom:calc(env(safe-area-inset-bottom,0) + 12px);animation:slideUp .22s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -958,6 +1002,27 @@ table.standings tr:last-child td{border-bottom:none}
 .more-item:active{background:rgba(255,255,255,.1)}
 .more-icon{font-size:24px;line-height:1}
 .more-lbl{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+/* Responsive */
+@media(max-width:900px){
+  .lp-hero-wrap{grid-template-columns:1fr;min-height:auto;padding:36px 20px 44px;gap:28px}
+  .lp-game-card{display:none}
+  .lp-play-grid{grid-template-columns:1fr}
+  .lp-fpanel{grid-template-columns:1fr 1fr!important}
+  .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{grid-template-columns:1fr;gap:32px}
+  .lp-s6-ctas{max-width:none}
+  .lp-tnav-links{display:none}
+  .lp-sec,.lp-s4,.lp-s5,.lp-s6{padding:48px 0}
+  .lp-sec-inner{padding:0 20px}
+  .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{padding:0 20px}
+}
+@media(max-width:480px){
+  .lp-fpanel{grid-template-columns:1fr!important}
+  .lp-s4-tiles{grid-template-columns:1fr}
+  .lp-h-ctas{flex-direction:column}
+  .lp-btn-p,.lp-btn-o{width:100%;justify-content:center;text-align:center}
+  .lp-topnav-inner{padding:0 16px}
+  .lp-s6-ctas{flex-direction:column}
+}
 </style>
 </head>
 <body>
@@ -983,141 +1048,211 @@ table.standings tr:last-child td{border-bottom:none}
 <!-- ══ HUB ══ -->
 <div id="s-hub" class="screen">
 
-  <!-- ── S1: HERO ─────────────────────────────────────── -->
-  <section class="lp-hero">
-    <div class="lp-nav-bar">
-      <div class="lp-brand">
-        <div class="lp-logo" id="hub-avatar">🏀</div>
-        <span class="lp-brand-name" id="hub-name">CourtCall</span>
+  <!-- TOP NAV -->
+  <header class="lp-topnav">
+    <div class="lp-topnav-inner">
+      <div class="lp-tnav-logo">
+        <div class="lp-tnav-ball" id="hub-avatar">🏀</div>
+        <span class="lp-tnav-name" id="hub-name">CourtCall</span>
       </div>
-      <button class="lp-settings-btn" onclick="showScreen('settings')">⚙</button>
-    </div>
-
-    <h1 class="lp-headline">The pickup basketball app that keeps the game moving.</h1>
-    <p class="lp-sub">Score games. Build fair teams.<br>Run tournaments. Track every run.</p>
-
-    <div class="lp-sb" aria-hidden="true">
-      <div class="lpsb-t">
-        <div class="lpsb-nm">Orange</div>
-        <div class="lpsb-sc lead">12</div>
-      </div>
-      <div class="lpsb-mid">
-        <div class="lpsb-ck">⏱ 14s</div>
-        <div class="lpsb-vs">VS</div>
-        <div class="lpsb-gp">GAME POINT</div>
-      </div>
-      <div class="lpsb-t lpsb-r">
-        <div class="lpsb-nm">Black</div>
-        <div class="lpsb-sc">10</div>
+      <nav class="lp-tnav-links">
+        <button class="lp-tnav-link" onclick="scrollToSection('lp-features')">Features</button>
+        <button class="lp-tnav-link" onclick="scrollToSection('lp-s5')">How it Works</button>
+        <button class="lp-tnav-link" onclick="showScreen('communities')">Communities</button>
+        <button class="lp-tnav-link" onclick="showScreen('world')">Discover</button>
+      </nav>
+      <div class="lp-tnav-actions">
+        <button class="lp-tnav-login" onclick="showScreen('profile')">Log In</button>
+        <button class="lp-tnav-start" onclick="goSetup()">Start Game</button>
       </div>
     </div>
+  </header>
 
-    <div class="lp-resume hidden" id="resume-card" onclick="handleResume()">
-      <div class="lp-resume-dot"></div>
-      <div class="lp-resume-txt">
-        <div class="lp-resume-live">● LIVE GAME</div>
-        <div class="lp-resume-label" id="resume-game-label">Game in progress</div>
+  <!-- S1: HERO -->
+  <div class="lp-hero-wrap">
+    <!-- Left: copy + CTAs -->
+    <div>
+      <div class="lp-h-badge"><div class="lp-h-badge-dot"></div>Voice-first pickup OS</div>
+      <h1 class="lp-h1">The pickup basketball app that keeps the <em>game moving.</em></h1>
+      <p class="lp-h-sub">Score games. Build fair teams. Run tournaments. Track every run.</p>
+      <div class="lp-h-ctas">
+        <button class="lp-btn-p" onclick="goSetup()">▶ Start Quick Game</button>
+        <button class="lp-btn-o" onclick="scrollToSection('lp-features')">Explore Features</button>
       </div>
-      <span style="color:var(--ca);font-size:18px">▶</span>
-    </div>
-
-    <div class="lp-ctas">
-      <button class="lp-btn-primary" onclick="goSetup()">▶ Start Quick Game</button>
-      <button class="lp-btn-sec" onclick="scrollToFeatures()">Explore Features</button>
-      <button class="lp-btn-ghost" onclick="guestLogin()">Continue as Guest →</button>
-    </div>
-
-    <div class="lp-trust">No login required · Works offline · Built for pickup</div>
-  </section>
-
-  <!-- ── S2: CHOOSE HOW YOU PLAY ───────────────────────── -->
-  <section class="lp-section">
-    <div class="lp-section-lbl">Choose How You Play</div>
-    <div class="lp-play-card lpc-hero" onclick="goSetup()">
-      <div class="lpc-icon">🏀</div>
-      <div class="lpc-title">Open. Score. Play.</div>
-      <div class="lpc-desc">Start scoring in seconds with no login.</div>
-      <button class="lpc-cta" onclick="event.stopPropagation();goSetup()">Start scoring ›</button>
-    </div>
-    <div class="lp-play-row">
-      <div class="lp-play-card lpc-half" onclick="showScreen('teams')">
-        <div class="lpc-icon">👥</div>
-        <div class="lpc-title">Bring order to pickup chaos.</div>
-        <div class="lpc-desc">Fair teams, queues, every result.</div>
-        <button class="lpc-cta lpc-cta-dim" onclick="event.stopPropagation();showScreen('teams')">Build teams ›</button>
+      <div class="lp-h-trust">
+        <div class="lp-h-ti"><span>🔓</span>No log-in</div>
+        <div class="lp-h-ti"><span>📶</span>Works offline</div>
+        <div class="lp-h-ti"><span>🏀</span>Built for pickup</div>
       </div>
-      <div class="lp-play-card lpc-half" onclick="showScreen('communities')">
-        <div class="lpc-icon">🏘</div>
-        <div class="lpc-title">Create your basketball tribe.</div>
-        <div class="lpc-desc">Feeds, players, photos, events.</div>
-        <button class="lpc-cta lpc-cta-dim" onclick="event.stopPropagation();showScreen('communities')">Create community ›</button>
+      <div class="lp-resume hidden" id="resume-card" onclick="handleResume()">
+        <div class="lp-resume-dot"></div>
+        <div class="lp-resume-txt">
+          <div class="lp-resume-live">● LIVE GAME</div>
+          <div class="lp-resume-label" id="resume-game-label">Game in progress</div>
+        </div>
+        <span style="color:var(--ca);font-size:18px">▶</span>
       </div>
     </div>
-  </section>
 
-  <!-- ── S3: FEATURE TABS ──────────────────────────────── -->
-  <section class="lp-section" id="lp-features">
-    <div class="lp-section-lbl">Features</div>
-    <div class="lp-feat-tabs">
-      <button class="lft on" onclick="switchFeatTab('score',this)">Score</button>
-      <button class="lft" onclick="switchFeatTab('teams',this)">Teams</button>
-      <button class="lft" onclick="switchFeatTab('tourneys',this)">Tourneys</button>
-      <button class="lft" onclick="switchFeatTab('comms',this)">Communities</button>
-      <button class="lft" onclick="switchFeatTab('discover',this)">Discover</button>
-    </div>
-    <div class="lp-feat-panel" id="lp-feat-panel"></div>
-  </section>
-
-  <!-- ── S4: PICKUP CHAOS ──────────────────────────────── -->
-  <section class="lp-section">
-    <div class="lp-section-lbl">Designed for Real Pickup Chaos</div>
-    <div class="lp-chaos-lines">
-      <div class="lp-chaos-line">No more <strong>"what's the score?"</strong></div>
-      <div class="lp-chaos-line">No more <strong>unfair teams.</strong></div>
-      <div class="lp-chaos-line">No more <strong>confusion on who's next.</strong></div>
-      <div class="lp-chaos-line">No more <strong>lost match history.</strong></div>
-    </div>
-    <div class="lp-chaos-tiles">
-      <div class="lp-chaos-tile"><div class="lp-chaos-icon">🎤</div><div class="lp-chaos-name">Voice-first scoring</div></div>
-      <div class="lp-chaos-tile"><div class="lp-chaos-icon">⚖️</div><div class="lp-chaos-name">Fair team creation</div></div>
-      <div class="lp-chaos-tile"><div class="lp-chaos-icon">🔄</div><div class="lp-chaos-name">Pickup queue</div></div>
-      <div class="lp-chaos-tile"><div class="lp-chaos-icon">💾</div><div class="lp-chaos-name">Match memory</div></div>
-    </div>
-  </section>
-
-  <!-- ── S5: GROW ──────────────────────────────────────── -->
-  <section class="lp-section">
-    <div class="lp-section-lbl">Start Simple, Grow When Ready</div>
-    <div class="lp-grow-card">
-      <div class="lp-grow-step">
-        <div class="lgs-num">1</div>
-        <div><div class="lgs-title">Quick Game</div><div class="lgs-desc">Score any pickup game instantly.</div></div>
+    <!-- Right: live game preview card -->
+    <div class="lp-game-card" aria-hidden="true">
+      <div class="lgc-live"><div class="lgc-live-dot"></div>LIVE GAME</div>
+      <div class="lgc-board">
+        <div class="lgc-team">
+          <div class="lgc-tname">Orange</div>
+          <div class="lgc-score hi">12</div>
+        </div>
+        <div class="lgc-mid">
+          <div class="lgc-timer">04:38</div>
+          <div class="lgc-gp">GAME POINT</div>
+        </div>
+        <div class="lgc-team lgc-team-r">
+          <div class="lgc-tname">Black</div>
+          <div class="lgc-score">10</div>
+        </div>
       </div>
-      <div class="lp-grow-step">
-        <div class="lgs-num">2</div>
-        <div><div class="lgs-title">Team Tools</div><div class="lgs-desc">Add fair teams and queue management.</div></div>
+      <div class="lgc-sbtn-row">
+        <div class="lgc-sbtn-grp">
+          <div class="lgc-sbtn hi">+1</div>
+          <div class="lgc-sbtn hi">+2</div>
+          <div class="lgc-sbtn hi">+3</div>
+        </div>
+        <div class="lgc-vs-lbl">VS</div>
+        <div class="lgc-sbtn-grp lgc-sbtn-grp-r">
+          <div class="lgc-sbtn">+1</div>
+          <div class="lgc-sbtn">+2</div>
+          <div class="lgc-sbtn">+3</div>
+        </div>
       </div>
-      <div class="lp-grow-step">
-        <div class="lgs-num">3</div>
-        <div><div class="lgs-title">Full League</div><div class="lgs-desc">Run tournaments and communities.</div></div>
+      <div class="lgc-qrow">
+        <div class="lgc-q on">Q1</div>
+        <div class="lgc-q">Q2</div>
+        <div class="lgc-q">Q3</div>
+        <div class="lgc-q lgc-q-gc">GAME CLOCK<br>04:38</div>
+      </div>
+      <div class="lgc-actions">
+        <button class="lgc-act-main" onclick="goSetup()">▶ Add Score</button>
+        <button class="lgc-act-sec">↩ Undo</button>
       </div>
     </div>
-  </section>
-
-  <!-- ── S6: FINAL CTA ─────────────────────────────────── -->
-  <section class="lp-final">
-    <div class="lp-final-hl">Ready to run?</div>
-    <div class="lp-final-sub">Start a game in under 10 seconds.</div>
-    <button class="lp-btn-primary" onclick="goSetup()">▶ Start Quick Game</button>
-    <button class="lp-btn-ghost" onclick="guestLogin()">Continue as Guest →</button>
-  </section>
-
-  <!-- ── Stats + Recent ───────────────────────────────── -->
-  <div class="hub-stats" id="hub-stats"></div>
-  <div class="lp-footer">
-    <div class="lp-section-lbl">Recent Games</div>
-    <div class="hub-recent" id="hub-recent"></div>
   </div>
+
+  <!-- S2: CHOOSE HOW YOU PLAY -->
+  <div class="lp-sec lp-s2">
+    <div class="lp-sec-inner">
+      <div class="lp-sec-kicker">Choose how you play</div>
+      <div class="lp-play-grid">
+        <div class="lp-pc lp-pc-prime" onclick="goSetup()">
+          <div class="lp-pc-icon" style="background:rgba(255,87,34,.2)">⚡</div>
+          <div class="lp-pc-tag" style="color:var(--ca)">Quick Game</div>
+          <div class="lp-pc-title">Open. Score. Play.</div>
+          <div class="lp-pc-desc">Start scoring instantly, no login, no setup. Track every bucket from the first tip-off.</div>
+          <button class="lp-pc-cta" onclick="event.stopPropagation();goSetup()">Start scoring ›</button>
+        </div>
+        <div class="lp-pc" onclick="showScreen('teams')">
+          <div class="lp-pc-icon" style="background:rgba(255,255,255,.06)">👥</div>
+          <div class="lp-pc-tag" style="color:var(--muted)">Organize</div>
+          <div class="lp-pc-title">Bring order to pickup chaos.</div>
+          <div class="lp-pc-desc">Build fair teams, manage who's next, and save every result. Built for real pickup runs.</div>
+          <button class="lp-pc-cta lp-pc-cta-dim" onclick="event.stopPropagation();showScreen('teams')">Build teams ›</button>
+        </div>
+        <div class="lp-pc" onclick="showScreen('communities')">
+          <div class="lp-pc-icon" style="background:rgba(0,200,80,.1)">🏘</div>
+          <div class="lp-pc-tag" style="color:#00c851">Community</div>
+          <div class="lp-pc-title">Create your basketball tribe.</div>
+          <div class="lp-pc-desc">Run your group with feeds, players, photos, events, and leaderboards.</div>
+          <button class="lp-pc-cta lp-pc-cta-dim" onclick="event.stopPropagation();showScreen('communities')">Create community ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: FEATURES -->
+  <div class="lp-sec lp-s3" id="lp-features">
+    <div class="lp-sec-inner">
+      <div class="lp-sec-kicker">Powerful features. Simple to use.</div>
+      <div class="lp-ftabs">
+        <button class="lft on" onclick="switchFeatTab('score',this)">Score</button>
+        <button class="lft" onclick="switchFeatTab('teams',this)">Teams</button>
+        <button class="lft" onclick="switchFeatTab('tourneys',this)">Tournaments</button>
+        <button class="lft" onclick="switchFeatTab('comms',this)">Communities</button>
+        <button class="lft" onclick="switchFeatTab('discover',this)">Discover</button>
+      </div>
+      <div class="lp-fpanel" id="lp-feat-panel"></div>
+    </div>
+  </div>
+
+  <!-- S4: PICKUP CHAOS -->
+  <div class="lp-s4">
+    <div class="lp-s4-inner">
+      <div>
+        <div class="lp-sec-kicker" style="opacity:.5;padding-bottom:0;margin-bottom:10px">Designed for real pickup chaos.</div>
+        <div class="lp-s4-lines">
+          <div class="lp-s4-line">No more <strong>"what's the score?"</strong></div>
+          <div class="lp-s4-line">No more <strong>unfair teams.</strong></div>
+          <div class="lp-s4-line">No more <strong>confusion on who's next.</strong></div>
+          <div class="lp-s4-line">No more <strong>lost match history.</strong></div>
+        </div>
+      </div>
+      <div class="lp-s4-tiles">
+        <div class="lp-s4-tile"><div class="lp-s4-tile-icon">🎤</div><div class="lp-s4-tile-name">Voice-first scoring</div><div class="lp-s4-tile-desc">Say it, score it.</div></div>
+        <div class="lp-s4-tile"><div class="lp-s4-tile-icon">⚖️</div><div class="lp-s4-tile-name">Fair team creation</div><div class="lp-s4-tile-desc">No more stacked teams.</div></div>
+        <div class="lp-s4-tile"><div class="lp-s4-tile-icon">🔄</div><div class="lp-s4-tile-name">Pickup queue</div><div class="lp-s4-tile-desc">Everyone knows who's next.</div></div>
+        <div class="lp-s4-tile"><div class="lp-s4-tile-icon">💾</div><div class="lp-s4-tile-name">Match memory</div><div class="lp-s4-tile-desc">Every game, saved forever.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: GROW -->
+  <div class="lp-s5" id="lp-s5">
+    <div class="lp-s5-inner">
+      <div>
+        <div class="lp-sec-kicker">Start simple. Grow when ready.</div>
+        <div class="lp-sec-title" style="margin-bottom:0">Use CourtCall<br>your way.</div>
+        <p class="lp-s5-quote">"Finally, an app that understands how real basketball works."</p>
+      </div>
+      <div class="lp-steps">
+        <div class="lp-step"><div class="lp-step-num">1</div><div><div class="lp-step-title">Start with free quick scoring.</div><div class="lp-step-desc">Open the app, enter team names, start scoring. Done in seconds.</div></div></div>
+        <div class="lp-step"><div class="lp-step-num">2</div><div><div class="lp-step-title">Add team tools when your group grows.</div><div class="lp-step-desc">Smart team builder, ratings, snake draft, who's-next queue.</div></div></div>
+        <div class="lp-step"><div class="lp-step-num">3</div><div><div class="lp-step-title">Run tournaments and communities when you're ready.</div><div class="lp-step-desc">Full brackets, leaderboards, gallery, events.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6: FINAL CTA -->
+  <div class="lp-s6">
+    <div class="lp-s6-inner">
+      <div>
+        <div class="lp-s6-hl">Ready to run?</div>
+        <p class="lp-s6-sub">Start a game in under 10 seconds.</p>
+        <div class="lp-s6-ctas">
+          <button class="lp-btn-p" onclick="goSetup()">▶ Start Quick Game</button>
+          <button class="lp-btn-o" onclick="guestLogin()">Continue as Guest →</button>
+        </div>
+      </div>
+      <div class="lp-checklist">
+        <div class="lp-chk"><div class="lp-chk-dot">🎤</div>Voice scoring — hands-free</div>
+        <div class="lp-chk"><div class="lp-chk-dot">⏱</div>Shot clock &amp; game clock</div>
+        <div class="lp-chk"><div class="lp-chk-dot">👥</div>Smart, fair team builder</div>
+        <div class="lp-chk"><div class="lp-chk-dot">🏆</div>Full tournament brackets</div>
+        <div class="lp-chk"><div class="lp-chk-dot">🏘</div>Communities &amp; leaderboards</div>
+        <div class="lp-chk"><div class="lp-chk-dot">📴</div>Works 100% offline</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="lp-footer-bar">
+    <div class="lp-footer-inner">
+      <div class="lp-foot-logo"><div class="lp-foot-ball">🏀</div>CourtCall</div>
+      <div class="lp-foot-copy">© 2025 CourtCall · No login required · Works offline</div>
+      <button class="lp-foot-guest" onclick="guestLogin()">Continue as Guest →</button>
+    </div>
+  </footer>
+
+  <!-- Hidden elements renderHub() writes into -->
+  <div id="hub-stats" style="display:none"></div>
+  <div id="hub-recent" style="display:none"></div>
 
 </div>
 
@@ -1972,11 +2107,41 @@ function renderHub(){
 }
 // ── Landing page helpers ──────────────────────────────
 const FEAT_TABS={
-  score:[{i:'🎤',n:'Voice Scoring'},{i:'🏀',n:'+1 / +2 / +3'},{i:'🚫',n:'Fouls'},{i:'⏱',n:'Shot Clock'},{i:'🕐',n:'Game Clock'},{i:'📋',n:'Live Feed'}],
-  teams:[{i:'⚖️',n:'Smart Builder'},{i:'⭐',n:'Player Ratings'},{i:'🐍',n:'Snake Draft'},{i:'🔄',n:'Who Got Next'},{i:'🏆',n:'Winner Stays'}],
-  tourneys:[{i:'📅',n:'Fixtures'},{i:'📊',n:'Standings'},{i:'🏅',n:'Brackets'},{i:'📋',n:'Match History'},{i:'🏆',n:'Champion Screen'}],
-  comms:[{i:'📢',n:'Community Feed'},{i:'👥',n:'Members'},{i:'🧍',n:'Players'},{i:'📷',n:'Gallery'},{i:'📅',n:'Events'},{i:'🏅',n:'Leaderboards'}],
-  discover:[{i:'📡',n:'CourtCall Pulse'},{i:'🌍',n:'Basketball World'},{i:'🗓',n:'Court Booking*'}],
+  score:[
+    {i:'🎤',n:'Voice Scoring',d:'Score hands-free by voice'},
+    {i:'🏀',n:'+1 / +2 / +3',d:'Tap to score instantly'},
+    {i:'🚫',n:'Fouls',d:'Track team fouls live'},
+    {i:'⏱',n:'Shot Clock',d:'24s / 14s countdown'},
+    {i:'🕐',n:'Game Clock',d:'Full period timing'},
+    {i:'📋',n:'Live Feed',d:'Play-by-play log'},
+  ],
+  teams:[
+    {i:'⚖️',n:'Smart Builder',d:'Rating-based fair splits'},
+    {i:'⭐',n:'Player Ratings',d:'Rate 1–5 stars per player'},
+    {i:'🐍',n:'Snake Draft',d:'Alternating pick order'},
+    {i:'🔄',n:'Who Got Next',d:'Manage the waiting queue'},
+    {i:'🏆',n:'Winner Stays',d:'Auto-rotate losers out'},
+  ],
+  tourneys:[
+    {i:'📅',n:'Fixtures',d:'Auto-generated schedule'},
+    {i:'📊',n:'Standings',d:'Live W-L-D table'},
+    {i:'🏅',n:'Brackets',d:'Single elimination view'},
+    {i:'📋',n:'Match History',d:'All results saved'},
+    {i:'🏆',n:'Champion Screen',d:'Celebration moment'},
+  ],
+  comms:[
+    {i:'📢',n:'Community Feed',d:'Posts & announcements'},
+    {i:'👥',n:'Members',d:'Manage your crew'},
+    {i:'🧍',n:'Players',d:'Ratings & profiles'},
+    {i:'📷',n:'Gallery',d:'Game photos & albums'},
+    {i:'📅',n:'Events',d:'Schedule & RSVP'},
+    {i:'🏅',n:'Leaderboards',d:'Top scorers & rankings'},
+  ],
+  discover:[
+    {i:'📡',n:'CourtCall Pulse',d:'Local court activity'},
+    {i:'🌍',n:'Basketball World',d:'NBA, FIBA, EuroLeague'},
+    {i:'🗓',n:'Court Booking',d:'Coming soon'},
+  ],
 };
 let activeFeatTab='score';
 function switchFeatTab(tab,btn){
@@ -1988,12 +2153,13 @@ function renderFeatPanel(){
   const panel=document.getElementById('lp-feat-panel');
   if(!panel)return;
   const items=FEAT_TABS[activeFeatTab]||[];
-  panel.innerHTML=items.map(f=>`<div class="lfp-item"><div class="lfp-icon">${f.i}</div><div class="lfp-name">${f.n}</div></div>`).join('');
+  panel.innerHTML=items.map(f=>`<div class="lp-fi"><div class="lp-fi-icon">${f.i}</div><div><div class="lp-fi-name">${f.n}</div><div class="lp-fi-sub">${f.d}</div></div></div>`).join('');
 }
-function scrollToFeatures(){
-  const el=document.getElementById('lp-features');
+function scrollToSection(id){
+  const el=document.getElementById(id);
   if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
 }
+function scrollToFeatures(){scrollToSection('lp-features')}
 function handleGameNav(){
   const saved=load();
   if(saved&&!saved.gameOver&&saved.history&&saved.history.length>0)handleResume();
