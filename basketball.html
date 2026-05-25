@@ -418,8 +418,9 @@ table.standings tr:last-child td{border-bottom:none}
 .lc-logo{font-size:28px}
 .lc-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em}
 .lc-desc{font-size:11px;color:var(--muted);line-height:1.4;flex:1}
-.lc-btn{display:inline-block;margin-top:6px;padding:7px 12px;background:rgba(255,87,34,.12);border:1.5px solid rgba(255,87,34,.3);border-radius:var(--r1);color:var(--ca);font:700 12px 'Inter',sans-serif;text-decoration:none;transition:background var(--t1)}
-.lc-btn:active{background:rgba(255,87,34,.22)}
+.league-link{display:inline-block;margin-top:6px;padding:8px 14px;background:rgba(255,87,34,.12);border:1.5px solid rgba(255,87,34,.3);border-radius:var(--r1);color:var(--ca);font:700 12px 'Inter',sans-serif;text-decoration:none;transition:background var(--t1);cursor:pointer}
+.league-link:hover{background:rgba(255,87,34,.2)}
+.league-link:active{background:rgba(255,87,34,.28)}
 .world-placeholder{margin:0 16px 16px;background:var(--s1);border:1px dashed var(--border);border-radius:var(--r2);padding:20px;text-align:center}
 .wp-text{font-size:13px;color:var(--muted2)}
 /* SETTINGS */
@@ -1642,12 +1643,42 @@ table.standings tr:last-child td{border-bottom:none}
   </div>
   <div class="section-label">Major Leagues</div>
   <div class="league-grid">
-    <div class="league-card"><div class="lc-logo">🏀</div><div class="lc-name">NBA</div><div class="lc-desc">National Basketball Association — the world's premier league</div><a class="lc-btn" href="https://www.nba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
-    <div class="league-card"><div class="lc-logo">⭐</div><div class="lc-name">WNBA</div><div class="lc-desc">Women's National Basketball Association</div><a class="lc-btn" href="https://www.wnba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
-    <div class="league-card"><div class="lc-logo">🌐</div><div class="lc-name">FIBA</div><div class="lc-desc">International Basketball Federation — global governing body</div><a class="lc-btn" href="https://www.fiba.basketball" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
-    <div class="league-card"><div class="lc-logo">🏅</div><div class="lc-name">EuroLeague</div><div class="lc-desc">Europe's top club basketball competition</div><a class="lc-btn" href="https://www.euroleague.net" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
-    <div class="league-card"><div class="lc-logo">🎓</div><div class="lc-name">NCAA</div><div class="lc-desc">College basketball — March Madness and more</div><a class="lc-btn" href="https://www.ncaa.com/sports/basketball-men" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
-    <div class="league-card"><div class="lc-logo">3️⃣</div><div class="lc-name">BIG3</div><div class="lc-desc">Professional 3-on-3 basketball league</div><a class="lc-btn" href="https://www.thebig3.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a></div>
+    <div class="league-card">
+      <div class="lc-logo">🏀</div>
+      <div class="lc-name">NBA</div>
+      <div class="lc-desc">National Basketball Association — the world's premier league</div>
+      <a class="league-link" href="https://www.nba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
+    <div class="league-card">
+      <div class="lc-logo">⭐</div>
+      <div class="lc-name">WNBA</div>
+      <div class="lc-desc">Women's National Basketball Association</div>
+      <a class="league-link" href="https://www.wnba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
+    <div class="league-card">
+      <div class="lc-logo">🌐</div>
+      <div class="lc-name">FIBA</div>
+      <div class="lc-desc">International Basketball Federation — global governing body</div>
+      <a class="league-link" href="https://www.fiba.basketball" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
+    <div class="league-card">
+      <div class="lc-logo">🏅</div>
+      <div class="lc-name">EuroLeague</div>
+      <div class="lc-desc">Europe's top club basketball competition</div>
+      <a class="league-link" href="https://www.euroleaguebasketball.net" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
+    <div class="league-card">
+      <div class="lc-logo">🎓</div>
+      <div class="lc-name">NCAA</div>
+      <div class="lc-desc">College basketball — March Madness and more</div>
+      <a class="league-link" href="https://www.ncaa.com/sports/basketball-men/d1" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
+    <div class="league-card">
+      <div class="lc-logo">3️⃣</div>
+      <div class="lc-name">BIG3</div>
+      <div class="lc-desc">Professional 3-on-3 basketball league</div>
+      <a class="league-link" href="https://big3.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+    </div>
   </div>
   <div class="section-label" style="margin-top:8px">Coming Soon</div>
   <div class="world-placeholder"><div class="wp-text">📰 Today in Basketball — news feed coming soon</div></div>
