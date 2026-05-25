@@ -641,6 +641,19 @@ table.standings tr:last-child td{border-bottom:none}
 .gal-album-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
 .gal-album-chip.on{border-color:var(--orange);background:rgba(255,107,53,.12);color:var(--orange)}
 .gal-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
+.gal-mode-tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.gal-mode-tab{padding:9px 10px;background:var(--s2);border:none;color:var(--muted);font:600 13px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.gal-mode-tab.on{background:var(--ca);color:#fff}
+.gal-upload-area{border:2px dashed var(--border);border-radius:10px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:border-color var(--t1);margin-bottom:8px;text-align:center;-webkit-tap-highlight-color:transparent}
+.gal-upload-area:active,.gal-upload-area:focus{border-color:var(--ca);outline:none}
+.gal-upload-label{font-weight:700;font-size:14px;color:var(--text)}
+.gal-upload-sub{font-size:11px;color:var(--muted)}
+.gal-preview-card{background:var(--s2);border-radius:10px;border:1px solid var(--border);padding:10px;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.gal-preview-img{width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--s3)}
+.gal-preview-info{flex:1;min-width:0}
+.gal-preview-name{font-size:12px;font-weight:700;color:var(--text);word-break:break-all;line-height:1.3}
+.gal-preview-size{font-size:11px;color:var(--success);margin-top:3px;font-weight:600}
+.gal-preview-remove{margin-top:8px;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
 /* EVENTS */
 .evt-list{display:flex;flex-direction:column;gap:10px;padding:14px}
 .evt-card{background:var(--s1);border-radius:12px;border:1px solid var(--border);overflow:hidden}
@@ -4122,6 +4135,10 @@ let showAddGalleryForm=false;
 let selectedAlbum=GAL_ALBUMS[0];
 let selectedTaggedPlayers=new Set();
 const expandedGalleryComments=new Set();
+let galImageMode='upload';
+let galPendingFile='';
+let galPendingFileName='';
+let galPendingFileSize=0;
 
 function getAllGalItems(){try{return JSON.parse(localStorage.getItem(KC.gallery)||'[]')}catch{return[]}}
 function saveAllGalItems(arr){localStorage.setItem(KC.gallery,JSON.stringify(arr))}
@@ -4147,17 +4164,40 @@ function renderGalleryTabHTML(c,myRole){
     `<button class="gal-tag-chip${selectedTaggedPlayers.has(p.id)?' on':''}" onclick="pickGalleryTag(this,'${escHtml(p.id)}')">${escHtml(p.name)}</button>`
   ).join(''):'<span style="color:var(--muted);font-size:12px">No players added yet</span>';
 
+  const previewVisible=galPendingFile?'':'hidden';
+  const uploadAreaStyle=galPendingFile?'display:none':'';
   const addFormHTML=showAddGalleryForm&&canAdd?`<div class="add-gal-form">
-    <div class="form-label">Image URL</div>
-    <input class="add-gal-url" id="gal-url-input" type="url" placeholder="https://example.com/photo.jpg">
-    <div class="form-label">Caption</div>
+    <div class="gal-mode-tabs">
+      <button class="gal-mode-tab${galImageMode==='upload'?' on':''}" onclick="galSwitchMode('upload')">📁 Upload</button>
+      <button class="gal-mode-tab${galImageMode==='url'?' on':''}" onclick="galSwitchMode('url')">🔗 Image URL</button>
+    </div>
+    <div id="gal-upload-section" style="${galImageMode==='url'?'display:none':''}">
+      <input type="file" id="gal-file-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="galHandleFile(this)">
+      <div class="gal-upload-area" style="${uploadAreaStyle}" onclick="document.getElementById('gal-file-input').click()" role="button" tabindex="0">
+        <span style="font-size:32px">📁</span>
+        <div class="gal-upload-label">Tap to choose from gallery</div>
+        <div class="gal-upload-sub">JPG, PNG, WEBP · Max 2 MB</div>
+      </div>
+      <div class="gal-preview-card ${previewVisible}" id="gal-preview-card">
+        <img class="gal-preview-img" id="gal-preview-img" src="${galPendingFile?escAttr(galPendingFile):''}" alt="preview">
+        <div class="gal-preview-info">
+          <div class="gal-preview-name" id="gal-preview-name">${escHtml(galPendingFileName)}</div>
+          <div class="gal-preview-size" id="gal-preview-size">${galPendingFileSize?'✓ '+formatFileSize(galPendingFileSize):''}</div>
+          <button class="gal-preview-remove" onclick="galClearFile()">✕ Remove</button>
+        </div>
+      </div>
+    </div>
+    <div id="gal-url-section" style="${galImageMode==='upload'?'display:none':''}">
+      <input class="add-gal-url" id="gal-url-input" type="url" placeholder="https://example.com/photo.jpg">
+    </div>
+    <div class="form-label" style="margin-top:8px">Caption</div>
     <textarea class="post-body-input" id="gal-caption-input" rows="2" placeholder="Describe this photo..."></textarea>
     <div class="form-label" style="margin-top:8px">Album</div>
     <div class="gal-album-chips">${albumChips}</div>
     <div class="form-label">Tag Players</div>
     <div class="gal-tag-chips">${tagChips}</div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-primary" style="flex:1" onclick="submitGalleryItem('${escHtml(c.id)}')">📸 Add Photo</button>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-primary" style="flex:1" onclick="submitGalleryItem('${escHtml(c.id)}')">📸 Save Photo</button>
       <button class="btn-secondary" onclick="cancelAddGallery()">Cancel</button>
     </div>
   </div>`:'';
@@ -4184,10 +4224,11 @@ function buildGalCardHTML(item,c,myRole,myId,players){
   const taggedNames=item.taggedPlayers&&item.taggedPlayers.length
     ?players.filter(p=>item.taggedPlayers.includes(p.id)).map(p=>`<span class="gal-tag">${escHtml(p.name)}</span>`).join('')
     :'';
-  const imgHTML=item.imageUrl
-    ?`<img class="gal-img" src="${escAttr(item.imageUrl)}" alt="gallery photo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+  const imgSrc=item.imageData||item.imageUrl||'';
+  const imgHTML=imgSrc
+    ?`<img class="gal-img" src="${escAttr(imgSrc)}" alt="gallery photo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
     :'';
-  const imgWrap=`<div class="gal-img-wrap">${imgHTML}<div class="gal-img-placeholder" style="${item.imageUrl?'display:none':''}">📸</div></div>`;
+  const imgWrap=`<div class="gal-img-wrap">${imgHTML}<div class="gal-img-placeholder" style="${imgSrc?'display:none':''}">📸</div></div>`;
 
   const cmtsHTML=cmtsOpen?`<div class="gal-comments-wrap">
     ${(item.comments||[]).map(cm=>{
@@ -4223,10 +4264,10 @@ function buildGalCardHTML(item,c,myRole,myId,players){
 
 function toggleAddGallery(){
   showAddGalleryForm=!showAddGalleryForm;
-  if(showAddGalleryForm){selectedAlbum=GAL_ALBUMS[0];selectedTaggedPlayers=new Set()}
+  if(showAddGalleryForm){selectedAlbum=GAL_ALBUMS[0];selectedTaggedPlayers=new Set();galImageMode='upload';galPendingFile='';galPendingFileName='';galPendingFileSize=0;}
   setCommTab('gallery');
 }
-function cancelAddGallery(){showAddGalleryForm=false;setCommTab('gallery')}
+function cancelAddGallery(){showAddGalleryForm=false;galPendingFile='';galPendingFileName='';galPendingFileSize=0;setCommTab('gallery')}
 
 function pickAlbumChip(btn,album){
   document.querySelectorAll('.gal-album-chip').forEach(b=>b.classList.remove('on'));
@@ -4242,17 +4283,78 @@ function pickGalleryTag(btn,playerId){
 
 function setGalleryFilter(album){galleryFilter=album;setCommTab('gallery')}
 
+function galSwitchMode(mode){
+  galImageMode=mode;
+  const up=document.getElementById('gal-upload-section');
+  const ur=document.getElementById('gal-url-section');
+  if(up)up.style.display=mode==='upload'?'':'none';
+  if(ur)ur.style.display=mode==='url'?'':'none';
+  document.querySelectorAll('.gal-mode-tab').forEach((t,i)=>t.classList.toggle('on',(i===0&&mode==='upload')||(i===1&&mode==='url')));
+}
+
+function galHandleFile(input){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  const allowed=['image/jpeg','image/png','image/webp'];
+  if(!allowed.includes(file.type)){showToast('Please choose a JPG, PNG, or WEBP image');input.value='';return}
+  const MAX=2*1024*1024;
+  if(file.size>MAX){showToast('Image is too large. Please choose an image under 2 MB.');input.value='';return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    galPendingFile=e.target.result;
+    galPendingFileName=file.name;
+    galPendingFileSize=file.size;
+    const preview=document.getElementById('gal-preview-card');
+    const img=document.getElementById('gal-preview-img');
+    const nameEl=document.getElementById('gal-preview-name');
+    const sizeEl=document.getElementById('gal-preview-size');
+    const area=document.querySelector('.gal-upload-area');
+    if(img)img.src=galPendingFile;
+    if(nameEl)nameEl.textContent=file.name;
+    if(sizeEl)sizeEl.textContent='✓ '+formatFileSize(file.size);
+    if(preview)preview.classList.remove('hidden');
+    if(area)area.style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function galClearFile(){
+  galPendingFile='';galPendingFileName='';galPendingFileSize=0;
+  const input=document.getElementById('gal-file-input');
+  if(input)input.value='';
+  const preview=document.getElementById('gal-preview-card');
+  const area=document.querySelector('.gal-upload-area');
+  if(preview)preview.classList.add('hidden');
+  if(area)area.style.display='';
+}
+
+function formatFileSize(bytes){
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB';
+  return (bytes/(1024*1024)).toFixed(1)+' MB';
+}
+
+/* For production, use Firebase Storage, Supabase Storage, S3, or Cloudflare R2
+   instead of localStorage for image uploads. Do not expose storage keys in frontend. */
 function submitGalleryItem(communityId){
-  const urlEl=document.getElementById('gal-url-input');
   const capEl=document.getElementById('gal-caption-input');
-  const url=(urlEl?urlEl.value.trim():'');
   const caption=(capEl?capEl.value.trim():'');
   const myId=(currentProfile||{id:'guest'}).id;
   const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  let imageSourceType,imageData='',imageUrl='',fileName='';
+  if(galImageMode==='upload'){
+    if(!galPendingFile){showToast('Please select an image first');return}
+    imageSourceType='upload';imageData=galPendingFile;fileName=galPendingFileName;
+  }else{
+    const urlEl=document.getElementById('gal-url-input');
+    imageUrl=(urlEl?urlEl.value.trim():'');
+    if(!imageUrl){showToast('Please enter an image URL');return}
+    imageSourceType='url';
+  }
   const item={
     id:'gallery_'+Date.now(),
     communityId,
-    imageUrl:url,
+    imageSourceType,imageData,imageUrl,fileName,
     caption,
     album:selectedAlbum,
     taggedPlayers:Array.from(selectedTaggedPlayers),
@@ -4265,6 +4367,7 @@ function submitGalleryItem(communityId){
   const all=getAllGalItems();
   all.push(item);
   saveAllGalItems(all);
+  galPendingFile='';galPendingFileName='';galPendingFileSize=0;
   showAddGalleryForm=false;
   selectedAlbum=GAL_ALBUMS[0];
   selectedTaggedPlayers=new Set();
