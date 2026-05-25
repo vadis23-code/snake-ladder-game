@@ -653,6 +653,28 @@ table.standings tr:last-child td{border-bottom:none}
 .evt-date-time-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .evt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
 .past-badge{display:inline-block;padding:2px 7px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,255,255,.07);color:var(--muted);margin-left:6px}
+/* LEADERBOARD */
+.lb-cat-row{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 4px}
+.lb-cat-chip{padding:6px 12px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1);white-space:nowrap}
+.lb-cat-chip.on{border-color:var(--gold);background:rgba(255,179,0,.13);color:var(--gold)}
+.lb-list{display:flex;flex-direction:column;gap:0;padding:0 14px 16px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:var(--s1);border:1px solid var(--border);transition:background var(--t1)}
+.lb-row.rank-1{border-color:var(--gold);background:rgba(255,179,0,.08)}
+.lb-row.rank-2{border-color:#b0bec5;background:rgba(176,190,197,.07)}
+.lb-row.rank-3{border-color:#cd7f32;background:rgba(205,127,50,.07)}
+.lb-rank{flex-shrink:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;background:var(--s2);color:var(--muted)}
+.lb-rank.gold{background:rgba(255,179,0,.25);color:var(--gold)}
+.lb-rank.silver{background:rgba(176,190,197,.2);color:#b0bec5}
+.lb-rank.bronze{background:rgba(205,127,50,.2);color:#cd7f32}
+.lb-avatar{flex-shrink:0;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ca),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-sub{font-size:11px;color:var(--muted)}
+.lb-stat{flex-shrink:0;text-align:right}
+.lb-stat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);line-height:1}
+.lb-stat-unit{font-size:10px;color:var(--muted)}
+.lb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--muted);font-size:14px;text-align:center}
+.lb-section-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:10px 14px 4px}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -2728,6 +2750,7 @@ function openCommunity(id){
   showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null;
   showAddGalleryForm=false;selectedTaggedPlayers=new Set();galleryFilter='all';
   showAddEventForm=false;eventsFilter='upcoming';expandedEventRsvps=new Set();
+  lbCategory='rating';
   if(typeof expandedComments!=='undefined')expandedComments.clear();
   if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
   renderCommDetail();
@@ -2783,6 +2806,7 @@ function setCommTab(tab){
   if(tab!=='players'){showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null}
   if(tab!=='gallery'){showAddGalleryForm=false;selectedTaggedPlayers=new Set()}
   if(tab!=='events'){showAddEventForm=false}
+  if(tab==='leaderboard')lbCategory='rating';
   activeCommTab=tab;
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   const c=getComms().find(x=>x.id===activeCommunityId);
@@ -2806,7 +2830,7 @@ function _renderCommTabContent(c,members,myRole){
   }else if(activeCommTab==='events'){
     el.innerHTML=renderEventsTabHTML(c,myRole);
   }else if(activeCommTab==='leaderboard'){
-    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">🏆</span><span>Leaderboards coming in Phase C7.</span></div></div>`;
+    el.innerHTML=renderLeaderboardTabHTML(c,myRole);
   }else if(activeCommTab==='settings'){
     el.innerHTML=_buildSettingsHTML(c,myRole);
   }
@@ -3510,6 +3534,121 @@ function submitCRating(playerId,communityId){
   saveAllCRatings(all);
   ratingPlayerId=null;pendingRating={};
   setCommTab('players');showToast('Rating submitted! ⭐');
+}
+
+/* ════════════════════════════════════════════════════════
+   Community Leaderboards (Phase C7)
+════════════════════════════════════════════════════════ */
+const LB_CATS=[
+  {k:'rating',label:'⭐ Overall Rating'},
+  {k:'scoring',label:'🏀 Top Scorers'},
+  {k:'games',label:'🎮 Most Games'},
+  {k:'winrate',label:'📈 Win Rate'},
+  {k:'mvp',label:'🥇 MVP Count'},
+  {k:'sport',label:'🤝 Sportsmanship'},
+];
+let lbCategory='rating';
+
+function setLbCategory(cat){lbCategory=cat;setCommTab('leaderboard')}
+
+function _calcAttrAvg(ratings,attr){
+  if(!ratings.length)return null;
+  const vals=ratings.map(r=>Number(r[attr])||0).filter(v=>v>0);
+  if(!vals.length)return null;
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+
+function renderLeaderboardTabHTML(c){
+  const players=getCPlayers(c.id);
+  if(!players.length){
+    return`<div class="lb-empty"><span style="font-size:36px">🏆</span><span>No players yet.<br>Add players in the Players tab to see leaderboards.</span></div>`;
+  }
+
+  const catChips=LB_CATS.map(({k,label})=>
+    `<button class="lb-cat-chip${lbCategory===k?' on':''}" onclick="setLbCategory('${k}')">${label}</button>`
+  ).join('');
+
+  const ranked=_rankPlayers(players,lbCategory);
+
+  const rowsHTML=ranked.length
+    ?ranked.map((r,i)=>buildLbRowHTML(i+1,r.player,r.value,r.unit)).join('')
+    :`<div class="lb-empty"><span style="font-size:28px">📊</span><span>No data yet for this category.</span></div>`;
+
+  const catMeta=LB_CATS.find(x=>x.k===lbCategory)||{};
+
+  return`<div style="padding-bottom:16px">
+    <div class="lb-cat-row">${catChips}</div>
+    <div class="lb-section-label">${catMeta.label||''} — Top Players</div>
+    <div class="lb-list">${rowsHTML}</div>
+  </div>`;
+}
+
+function _rankPlayers(players,cat){
+  const allRatings=getAllCRatings();
+  let scored=[];
+
+  if(cat==='rating'){
+    scored=players.map(p=>{
+      const pr=allRatings.filter(r=>r.playerId===p.id);
+      const attrs=['shooting','defense','passing','speed','teamwork','clutch','sportsmanship'];
+      const totals=attrs.map(a=>_calcAttrAvg(pr,a)).filter(v=>v!==null);
+      const avg=totals.length?totals.reduce((a,b)=>a+b,0)/totals.length:null;
+      return{player:p,value:avg,unit:'avg'};
+    }).filter(x=>x.value!==null);
+    scored.sort((a,b)=>b.value-a.value);
+    scored=scored.map(x=>({...x,value:x.value.toFixed(1)}));
+
+  }else if(cat==='scoring'){
+    scored=players.map(p=>({player:p,value:p.points||0,unit:'pts'}));
+    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+
+  }else if(cat==='games'){
+    scored=players.map(p=>({player:p,value:p.gamesPlayed||0,unit:'games'}));
+    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+
+  }else if(cat==='winrate'){
+    scored=players.map(p=>{
+      const g=p.gamesPlayed||0;
+      if(g<3)return null;
+      const wr=Math.round(((p.wins||0)/g)*100);
+      return{player:p,value:wr,unit:'%'};
+    }).filter(Boolean).sort((a,b)=>b.value-a.value);
+
+  }else if(cat==='mvp'){
+    scored=players.map(p=>({player:p,value:p.mvpCount||0,unit:'MVPs'}));
+    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+
+  }else if(cat==='sport'){
+    scored=players.map(p=>{
+      const pr=allRatings.filter(r=>r.playerId===p.id);
+      const avg=_calcAttrAvg(pr,'sportsmanship');
+      return{player:p,value:avg,unit:'avg'};
+    }).filter(x=>x.value!==null);
+    scored.sort((a,b)=>b.value-a.value);
+    scored=scored.map(x=>({...x,value:x.value.toFixed(1)}));
+  }
+
+  return scored.slice(0,10);
+}
+
+function buildLbRowHTML(rank,player,value,unit){
+  const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+  const rankClass=rank===1?'gold':rank===2?'silver':rank===3?'bronze':'';
+  const rowClass=rank<=3?`rank-${rank}`:'';
+  const initial=(player.name||'?')[0].toUpperCase();
+  const subParts=[player.position,player.nickname?`"${player.nickname}"`:''].filter(Boolean).join(' · ');
+  return`<div class="lb-row ${rowClass}">
+    <div class="lb-rank ${rankClass}">${medal||rank}</div>
+    <div class="lb-avatar">${initial}</div>
+    <div class="lb-info">
+      <div class="lb-name">${escHtml(player.name)}</div>
+      <div class="lb-sub">${escHtml(subParts||player.position||'')}</div>
+    </div>
+    <div class="lb-stat">
+      <div class="lb-stat-val">${escHtml(String(value))}</div>
+      <div class="lb-stat-unit">${escHtml(unit)}</div>
+    </div>
+  </div>`;
 }
 
 /* ════════════════════════════════════════════════════════
