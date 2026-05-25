@@ -401,6 +401,30 @@ table.standings tr:last-child td{border-bottom:none}
 .sc-btn.go:active{opacity:.8}
 .gc-wrap{display:flex;flex-direction:column;align-items:center;border-left:1px solid var(--border);padding-left:12px;min-width:60px}
 .gc-digits{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,5vw,30px);color:var(--muted);line-height:1}
+/* TEAM BUILDER — DETAILED RATINGS */
+.attr-grid{display:flex;flex-direction:column;gap:8px}
+.attr-row{display:flex;align-items:center;gap:10px}
+.attr-lbl{font-size:12px;font-weight:700;color:var(--muted);width:72px;flex-shrink:0}
+.attr-dots{display:flex;gap:4px}
+.adot{width:26px;height:26px;border-radius:6px;background:var(--s2);border:1px solid var(--border);cursor:pointer;transition:all var(--t1)}
+.adot.on{background:var(--ca);border-color:var(--ca)}
+.adot:active{transform:scale(.9)}
+/* CAPTAIN DRAFT */
+.captain-draft-wrap{display:flex;flex-direction:column;gap:10px}
+.draft-turn-bar{background:var(--s2);border-radius:var(--r1);padding:10px 16px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em}
+.draft-teams-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.draft-team{background:var(--s1);border:2px solid var(--border);border-radius:var(--r2);padding:12px;display:flex;flex-direction:column;gap:4px;transition:border-color var(--t2)}
+.draft-team-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em;color:var(--text)}
+.draft-picks{display:flex;flex-direction:column;gap:3px;min-height:20px}
+.draft-pick{font-size:12px;font-weight:600;color:var(--text);line-height:1.4}
+.draft-pool{display:flex;flex-direction:column;gap:6px}
+.draft-pool-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.pool-player{background:var(--s1);border:1px solid var(--border);border-radius:var(--r1);padding:10px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all var(--t1)}
+.pool-player:active{background:var(--s2);transform:translateX(3px)}
+.pool-player-name{font-size:14px;font-weight:700;color:var(--text)}
+.pool-player-stats{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.draft-btn-cancel{background:none;border:1px solid var(--border);border-radius:var(--r1);color:var(--muted);font:600 13px 'Inter',sans-serif;padding:10px;cursor:pointer;min-height:44px;transition:all var(--t1)}
+.draft-btn-cancel:active{background:var(--s2)}
 /* VOICE TEST */
 .voice-test-row{display:flex;gap:6px;margin-top:8px}
 .v-test-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,87,34,.3);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:8px 10px;outline:none;min-height:36px}
@@ -658,9 +682,11 @@ table.standings tr:last-child td{border-bottom:none}
   <div class="tb-panel on" id="tb-players">
     <div class="add-player-form">
       <input id="tb-player-name" class="pname-input" type="text" placeholder="Player name" maxlength="20" autocomplete="off">
-      <div class="rating-wrap">
-        <div class="rating-label">Skill Rating</div>
-        <div class="rating-dots" id="tb-rating-dots"></div>
+      <div class="attr-grid" id="tb-attr-grid">
+        <div class="attr-row"><span class="attr-lbl">🏀 Shoot</span><div class="attr-dots" data-attr="shoot"></div></div>
+        <div class="attr-row"><span class="attr-lbl">🛡 Defense</span><div class="attr-dots" data-attr="def"></div></div>
+        <div class="attr-row"><span class="attr-lbl">⚡ Speed</span><div class="attr-dots" data-attr="speed"></div></div>
+        <div class="attr-row"><span class="attr-lbl">🔋 Stamina</span><div class="attr-dots" data-attr="stamina"></div></div>
       </div>
       <button class="btn-add-player" onclick="tbAddPlayer()">+ Add Player</button>
     </div>
@@ -678,8 +704,9 @@ table.standings tr:last-child td{border-bottom:none}
       </div>
       <div class="gen-row">
         <button class="btn-gen" onclick="generateTeams('random')">🎲 Random</button>
-        <button class="btn-gen orange" onclick="generateTeams('balanced')">⚖ Balanced</button>
+        <button class="btn-gen orange" onclick="generateTeams('balanced')">🐍 Snake Draft</button>
       </div>
+      <button class="btn-gen orange" style="width:100%;margin-top:0" onclick="startCaptainDraft()">👑 Captain Draft — Alternate Picks</button>
     </div>
     <div id="tb-fairness-box" class="fairness-box hidden">
       <div class="fairness-pct" id="tb-fairness-pct">—</div>
@@ -690,6 +717,17 @@ table.standings tr:last-child td{border-bottom:none}
     </div>
     <div id="tb-teams-display" class="gen-teams"></div>
     <button class="btn-use-teams hidden" id="btn-use-teams" onclick="useGeneratedTeams()">▶ Start Game With These Teams</button>
+    <!-- Captain Draft Panel -->
+    <div class="captain-draft-wrap hidden" id="captain-draft-panel">
+      <div class="draft-turn-bar" id="draft-turn-bar">Pick a player</div>
+      <div class="draft-teams-row">
+        <div class="draft-team" id="draft-team-a"><div class="draft-team-name" id="draft-name-a">Team A</div><div class="draft-picks" id="draft-picks-a"></div></div>
+        <div class="draft-team" id="draft-team-b"><div class="draft-team-name" id="draft-name-b">Team B</div><div class="draft-picks" id="draft-picks-b"></div></div>
+      </div>
+      <div class="draft-pool" id="draft-pool"></div>
+      <button class="btn-use-teams hidden" id="btn-draft-done" onclick="finishCaptainDraft()">▶ Use Drafted Teams</button>
+      <button class="draft-btn-cancel" onclick="cancelCaptainDraft()">✕ Cancel Draft</button>
+    </div>
   </div>
   <!-- Queue Tab -->
   <div class="tb-panel" id="tb-queue">
@@ -1516,30 +1554,41 @@ const TEAM_NAMES_DEFAULT=['Orange','Black','White','Blue','Red','Gold'];
 const TEAM_COLOR_HEXES=['#FF5722','#222244','#E0E0F0','#2979FF','#F44336','#FFB300'];
 let builderState=getObj('cc_builder',{players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0});
 function saveBuilderState(){setObj('cc_builder',builderState)}
-// Rating dots init
-function initRatingDots(){
-  const wrap=document.getElementById('tb-rating-dots');
-  if(!wrap)return;
-  let selected=5;
-  wrap.innerHTML='';
-  for(let i=1;i<=10;i++){
-    const b=document.createElement('button');
-    b.className='rdot'+(i<=selected?' on':'');
-    b.textContent=i;
-    b.onclick=(()=>{const v=i;return()=>{selected=v;wrap.querySelectorAll('.rdot').forEach((d,j)=>d.classList.toggle('on',j<v));wrap._rating=v}})();
-    wrap.appendChild(b);
-  }
-  wrap._rating=selected;
+// Attribute grid — 4 skills × 5 dots each
+function initAttrGrid(){
+  document.querySelectorAll('#tb-attr-grid .attr-dots').forEach(row=>{
+    row.innerHTML='';row._val=3;
+    for(let i=1;i<=5;i++){
+      const b=document.createElement('button');
+      b.className='adot'+(i<=3?' on':'');
+      b.onclick=(()=>{const v=i;return()=>{row._val=v;row.querySelectorAll('.adot').forEach((d,j)=>d.classList.toggle('on',j<v))}})();
+      row.appendChild(b);
+    }
+  });
+}
+function readAttrGrid(){
+  const attrs={shoot:3,def:3,speed:3,stamina:3};
+  document.querySelectorAll('#tb-attr-grid .attr-dots').forEach(row=>{attrs[row.dataset.attr]=row._val||3});
+  return attrs;
+}
+function effectiveRating(p){
+  if(p.attrs)return Math.round((p.attrs.shoot+p.attrs.def+p.attrs.speed+p.attrs.stamina)/4*2);
+  return p.rating||5;
+}
+function fmtAttrs(p){
+  if(p.attrs)return`S${p.attrs.shoot}·D${p.attrs.def}·Sp${p.attrs.speed}·St${p.attrs.stamina}`;
+  return`Rating: ${p.rating}/10`;
 }
 function tbAddPlayer(){
   const name=document.getElementById('tb-player-name').value.trim();
   if(!name){showToast('Enter player name');return}
-  const wrap=document.getElementById('tb-rating-dots');
-  const rating=(wrap&&wrap._rating)||5;
-  const player={id:'pl_'+Date.now()+'_'+Math.random().toString(36).slice(2),name,rating};
+  const attrs=readAttrGrid();
+  const rating=Math.round((attrs.shoot+attrs.def+attrs.speed+attrs.stamina)/4*2);
+  const player={id:'pl_'+Date.now()+'_'+Math.random().toString(36).slice(2),name,rating,attrs};
   builderState.players.push(player);
   saveBuilderState();
   document.getElementById('tb-player-name').value='';
+  initAttrGrid();
   renderPlayerList();
 }
 function renderPlayerList(){
@@ -1549,7 +1598,7 @@ function renderPlayerList(){
   const n=builderState.players.length;
   count.textContent=`${n} player${n!==1?'s':''} checked in`;
   if(!n){list.innerHTML='<div class="recent-empty" style="text-align:center;padding:16px 0">No players yet — add players above</div>';return}
-  list.innerHTML=builderState.players.map((p,i)=>`<div class="player-card"><div class="pc-num">${i+1}</div><div class="pc-info"><div class="pc-name">${escHtml(p.name)}</div><div class="pc-rating">Rating: ${p.rating}/10</div></div><button class="pc-remove" onclick="tbRemovePlayer('${p.id}')">✕</button></div>`).join('');
+  list.innerHTML=builderState.players.map((p,i)=>`<div class="player-card"><div class="pc-num">${i+1}</div><div class="pc-info"><div class="pc-name">${escHtml(p.name)}</div><div class="pc-rating">${fmtAttrs(p)}</div></div><button class="pc-remove" onclick="tbRemovePlayer('${p.id}')">✕</button></div>`).join('');
 }
 function tbRemovePlayer(id){
   builderState.players=builderState.players.filter(p=>p.id!==id);
@@ -1561,14 +1610,14 @@ function generateTeams(mode){
   const players=[...builderState.players];
   if(players.length<n*2){showToast(`Need at least ${n*2} players for ${n} teams`);return}
   // Sort by rating for balanced, shuffle for random
-  if(mode==='balanced')players.sort((a,b)=>b.rating-a.rating);
+  if(mode==='balanced')players.sort((a,b)=>effectiveRating(b)-effectiveRating(a));
   else for(let i=players.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[players[i],players[j]]=[players[j],players[i]]}
   const teams=Array.from({length:n},(_,idx)=>({name:TEAM_NAMES_DEFAULT[idx]||`Team ${idx+1}`,color:TEAM_COLOR_HEXES[idx]||'#666',players:[],totalRating:0}));
   players.forEach((p,i)=>{
     const round=Math.floor(i/n);
     const pos=i%n;
     const idx=mode==='balanced'?(round%2===0?pos:n-1-pos):pos;
-    teams[idx].players.push(p);teams[idx].totalRating+=p.rating;
+    teams[idx].players.push(p);teams[idx].totalRating+=effectiveRating(p);
   });
   builderState.teams=teams;
   builderState.queue=teams.map(t=>t.name);
@@ -1579,7 +1628,7 @@ function generateTeams(mode){
 }
 function calcFairness(teams){
   if(teams.length<2)return 100;
-  const avgs=teams.map(t=>t.players.length?t.totalRating/t.players.length:5);
+  const avgs=teams.map(t=>t.players.length?t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length:5);
   const spread=Math.max(...avgs)-Math.min(...avgs);
   return Math.max(0,Math.round(100-spread*9));
 }
@@ -1596,10 +1645,13 @@ function renderGeneratedTeams(){
   document.getElementById('tb-fairness-label').textContent=fair>=80?'Well Balanced':fair>=60?'Mostly Fair':'May Be Unbalanced';
   document.getElementById('tb-fairness-fill').style.width=`${fair}%`;
   document.getElementById('tb-fairness-fill').className=`fairness-bar-fill ${cls}`;
-  display.innerHTML=builderState.teams.map(t=>`<div class="gen-team-card">
-    <div class="gtc-header"><div class="gtc-dot" style="background:${t.color}"></div><div class="gtc-name">${escHtml(t.name)}</div><div class="gtc-avg">Avg: ${t.players.length?(t.totalRating/t.players.length).toFixed(1):'—'}</div></div>
-    <div>${t.players.map(p=>`<div class="gtc-player"><span class="gtc-player-name">${escHtml(p.name)}</span><span class="gtc-player-rating">${p.rating}</span></div>`).join('')}</div>
-  </div>`).join('');
+  display.innerHTML=builderState.teams.map(t=>{
+    const avg=t.players.length?(t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length).toFixed(1):'—';
+    return`<div class="gen-team-card">
+      <div class="gtc-header"><div class="gtc-dot" style="background:${t.color}"></div><div class="gtc-name">${escHtml(t.name)}</div><div class="gtc-avg">Avg: ${avg}</div></div>
+      <div>${t.players.map(p=>`<div class="gtc-player"><span class="gtc-player-name">${escHtml(p.name)}</span><span class="gtc-player-rating">${fmtAttrs(p)}</span></div>`).join('')}</div>
+    </div>`;
+  }).join('');
   useBtn.classList.remove('hidden');
 }
 function useGeneratedTeams(){
@@ -1641,8 +1693,78 @@ function switchTbTab(name,btn){
   document.querySelectorAll('.tb-panel').forEach(p=>p.classList.toggle('on',p.id===`tb-${name}`));
   if(name==='queue')renderQueueDisplay();
 }
+// ── Captain Draft ─────────────────────────────────────
+let draftState=null;
+function startCaptainDraft(){
+  if(builderState.players.length<4){showToast('Need at least 4 players');return}
+  draftState={
+    turn:0,
+    teams:[
+      {name:TEAM_NAMES_DEFAULT[0]||'Team A',color:TEAM_COLOR_HEXES[0],players:[],totalRating:0},
+      {name:TEAM_NAMES_DEFAULT[1]||'Team B',color:TEAM_COLOR_HEXES[1],players:[],totalRating:0}
+    ],
+    remaining:[...builderState.players]
+  };
+  document.getElementById('captain-draft-panel').classList.remove('hidden');
+  document.getElementById('tb-fairness-box').classList.add('hidden');
+  document.getElementById('tb-teams-display').innerHTML='';
+  document.getElementById('btn-use-teams').classList.add('hidden');
+  renderDraftPanel();
+}
+function renderDraftPanel(){
+  const ds=draftState;if(!ds)return;
+  const turnTeam=ds.teams[ds.turn];
+  const bar=document.getElementById('draft-turn-bar');
+  bar.textContent=ds.remaining.length?`${turnTeam.name} picks`:'Draft complete!';
+  bar.style.color=ds.turn===0?'var(--ca)':'var(--cb)';
+  document.getElementById('draft-team-a').style.borderColor=ds.turn===0?'var(--ca)':'var(--border)';
+  document.getElementById('draft-team-b').style.borderColor=ds.turn===1?'var(--cb)':'var(--border)';
+  ['a','b'].forEach((t,i)=>{
+    document.getElementById(`draft-name-${t}`).textContent=ds.teams[i].name;
+    const picksEl=document.getElementById(`draft-picks-${t}`);
+    picksEl.innerHTML=ds.teams[i].players.length
+      ?ds.teams[i].players.map(p=>`<div class="draft-pick">${escHtml(p.name)}</div>`).join('')
+      :'<div class="draft-pick" style="color:var(--muted2)">—</div>';
+  });
+  const pool=document.getElementById('draft-pool');
+  if(!ds.remaining.length){
+    pool.innerHTML='<div class="draft-pool-label">All players drafted!</div>';
+    document.getElementById('btn-draft-done').classList.remove('hidden');
+    builderState.teams=ds.teams;
+    builderState.queue=ds.teams.map(t=>t.name);
+    builderState.queuePointer=0;
+    saveBuilderState();
+    return;
+  }
+  const sorted=[...ds.remaining].sort((a,b)=>effectiveRating(b)-effectiveRating(a));
+  pool.innerHTML=`<div class="draft-pool-label">Tap to pick — ${ds.remaining.length} left</div>`
+    +sorted.map(p=>`<div class="pool-player" onclick="draftPick('${p.id}')"><span class="pool-player-name">${escHtml(p.name)}</span><span class="pool-player-stats">${fmtAttrs(p)}</span></div>`).join('');
+}
+function draftPick(playerId){
+  if(!draftState||!draftState.remaining.length)return;
+  const idx=draftState.remaining.findIndex(p=>p.id===playerId);
+  if(idx===-1)return;
+  const player=draftState.remaining.splice(idx,1)[0];
+  const team=draftState.teams[draftState.turn];
+  team.players.push(player);team.totalRating+=effectiveRating(player);
+  draftState.turn=1-draftState.turn;
+  renderDraftPanel();
+}
+function finishCaptainDraft(){
+  if(!draftState)return;
+  document.getElementById('captain-draft-panel').classList.add('hidden');
+  builderState.teams=draftState.teams;draftState=null;
+  renderGeneratedTeams();
+  const teamsBtn=Array.from(document.querySelectorAll('.tb-tab')).find(t=>t.textContent.trim()==='Teams');
+  switchTbTab('teams',teamsBtn);
+}
+function cancelCaptainDraft(){
+  document.getElementById('captain-draft-panel').classList.add('hidden');
+  document.getElementById('btn-draft-done').classList.add('hidden');
+  draftState=null;
+}
 function renderTeamBuilder(){
-  initRatingDots();
+  initAttrGrid();
   renderPlayerList();
   renderGeneratedTeams();
   renderQueueDisplay();
