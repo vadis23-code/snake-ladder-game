@@ -452,6 +452,52 @@ table.standings tr:last-child td{border-bottom:none}
 .v-test-input:focus{border-color:var(--ca)}
 .v-test-btn{background:var(--ca);border:none;border-radius:var(--r1);color:#fff;font:700 15px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;min-height:36px;transition:opacity var(--t1)}
 .v-test-btn:active{opacity:.8}
+/* COMMUNITIES */
+#s-communities{background:var(--bg);overflow-y:auto}
+#s-comm-create{background:var(--bg);overflow-y:auto;align-items:center}
+.comm-hero{padding:16px 16px 10px;background:radial-gradient(ellipse at 50% 0%,rgba(0,230,118,.10) 0%,transparent 60%)}
+.comm-hero-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.06em;color:var(--text)}
+.comm-hero-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.comm-section-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+.comm-section-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.btn-comm-create{background:linear-gradient(135deg,var(--success),#00BFA5);color:#000;border:none;border-radius:var(--r1);font:700 13px 'Inter',sans-serif;padding:9px 16px;cursor:pointer;min-height:38px;transition:opacity var(--t1)}
+.btn-comm-create:active{opacity:.8}
+.comm-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.comm-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;transition:background var(--t1)}
+.comm-card:active{background:var(--s2)}
+.comm-logo{font-size:32px;flex-shrink:0;line-height:1;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.comm-info{flex:1;min-width:0}
+.comm-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--text);line-height:1.1}
+.comm-type{font-size:11px;color:var(--muted);margin-top:2px}
+.comm-loc{font-size:11px;color:var(--muted2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.comm-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.comm-badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:10px}
+.comm-badge.public{background:rgba(0,230,118,.12);color:var(--success)}
+.comm-badge.private{background:rgba(255,179,0,.12);color:var(--gold)}
+.comm-badge.hidden{background:rgba(255,255,255,.06);color:var(--muted)}
+.comm-badge.admin{background:rgba(255,87,34,.15);color:var(--ca)}
+.comm-badge.member{background:rgba(255,255,255,.06);color:var(--muted)}
+.comm-members{font-size:11px;color:var(--muted2);margin-top:2px}
+.btn-comm-open{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:700 12px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;flex-shrink:0;align-self:center;transition:all var(--t1);min-height:36px}
+.btn-comm-open:active{background:var(--s3)}
+.comm-empty{text-align:center;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;line-height:1.6}
+.comm-empty-icon{font-size:40px}
+.comm-form{width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px;padding:12px 16px 40px}
+.comm-form-sec{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px;display:flex;flex-direction:column;gap:10px}
+.comm-form-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.comm-inp{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 15px 'Inter',sans-serif;padding:12px 14px;outline:none;min-height:48px;width:100%;transition:border-color var(--t1)}
+.comm-inp:focus{border-color:var(--success)}
+.comm-inp::placeholder{color:var(--muted2)}
+.comm-textarea{resize:vertical;min-height:80px;font-family:'Inter',sans-serif}
+.comm-chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.comm-chip{padding:9px 14px;border:2px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 12px 'Inter',sans-serif;cursor:pointer;min-height:40px;transition:all var(--t1)}
+.comm-chip.on{border-color:var(--success);background:rgba(0,230,118,.12);color:var(--success)}
+.comm-chip:active{opacity:.75}
+.emoji-row{display:flex;flex-wrap:wrap;gap:8px}
+.emoji-opt{width:44px;height:44px;font-size:24px;display:flex;align-items:center;justify-content:center;border-radius:var(--r1);border:2px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;transition:all var(--t1)}
+.emoji-opt.on{border-color:var(--success);background:rgba(0,230,118,.12)}
+.btn-comm-submit{background:linear-gradient(135deg,var(--success),#00BFA5);color:#000;border:none;border-radius:var(--r2);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:20px;cursor:pointer;min-height:64px;box-shadow:0 6px 24px rgba(0,230,118,.25);transition:transform var(--t1);width:100%;margin-top:4px}
+.btn-comm-submit:active{transform:translateY(3px)}
 /* PULSE */
 #s-pulse{background:var(--bg);overflow-y:auto}
 .pulse-hero{padding:20px 16px 12px;background:radial-gradient(ellipse at 50% 0%,rgba(41,121,255,.14) 0%,transparent 60%);text-align:center}
@@ -554,6 +600,7 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="hub-card" onclick="showScreen('tournament')"><span class="hc-icon">🏆</span><div class="hc-title">Tournament</div><div class="hc-sub">Run brackets</div></div>
     <div class="hub-card" onclick="showScreen('world')"><span class="hc-icon">🌍</span><div class="hc-title">Bball World</div><div class="hc-sub">Leagues & links</div></div>
     <div class="hub-card" onclick="showScreen('pulse')"><span class="hc-icon">📡</span><div class="hc-title">CourtCall Pulse</div><div class="hc-sub">Local sports updates</div></div>
+    <div class="hub-card" onclick="showScreen('communities')"><span class="hc-icon">🏘</span><div class="hc-title">Communities</div><div class="hc-sub">Your hoops crew</div></div>
     <div class="hub-card" onclick="showScreen('settings')"><span class="hc-icon">⚙</span><div class="hc-title">Settings</div><div class="hc-sub">Preferences</div></div>
   </div>
   <div class="hub-section-title">Recent Games</div>
@@ -958,6 +1005,110 @@ table.standings tr:last-child td{border-bottom:none}
   <div class="world-placeholder" style="margin-bottom:40px"><div class="wp-text">📍 Local Pickup Runs near you — coming soon</div></div>
 </div>
 
+<!-- ══ COMMUNITIES ══ -->
+<div id="s-communities" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
+    <div class="page-title">Communities</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="comm-hero">
+    <div class="comm-hero-title">🏘 Communities</div>
+    <div class="comm-hero-sub">Your basketball crew, your space.</div>
+  </div>
+  <div class="comm-section-row">
+    <div class="comm-section-title">My Communities</div>
+    <button class="btn-comm-create" onclick="showScreen('comm-create')">+ Create</button>
+  </div>
+  <div class="comm-list" id="my-comm-list"></div>
+  <div class="comm-section-row" style="margin-top:12px">
+    <div class="comm-section-title">Discover Public Communities</div>
+  </div>
+  <div class="comm-list" id="discover-comm-list" style="padding-bottom:40px"></div>
+</div>
+
+<!-- ══ CREATE COMMUNITY ══ -->
+<div id="s-comm-create" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('communities')">← Communities</button>
+    <div class="page-title">New Community</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="comm-form">
+    <!-- Name -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Community Name</span>
+      <input id="cc-name" class="comm-inp" type="text" placeholder="e.g. Bhartiya City Hoopers" maxlength="50" autocomplete="off">
+    </div>
+    <!-- Type -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Community Type</span>
+      <div class="comm-chip-row" id="cc-type-row">
+        <button class="comm-chip on" data-v="Pickup Group" onclick="pickCommChip('cc-type-row',this)">Pickup Group</button>
+        <button class="comm-chip" data-v="Apartment Community" onclick="pickCommChip('cc-type-row',this)">Apartment</button>
+        <button class="comm-chip" data-v="Office Team" onclick="pickCommChip('cc-type-row',this)">Office Team</button>
+        <button class="comm-chip" data-v="School Team" onclick="pickCommChip('cc-type-row',this)">School Team</button>
+        <button class="comm-chip" data-v="College Team" onclick="pickCommChip('cc-type-row',this)">College Team</button>
+        <button class="comm-chip" data-v="Masters Group" onclick="pickCommChip('cc-type-row',this)">Masters Group</button>
+        <button class="comm-chip" data-v="Tournament Community" onclick="pickCommChip('cc-type-row',this)">Tournament</button>
+        <button class="comm-chip" data-v="Club Team" onclick="pickCommChip('cc-type-row',this)">Club Team</button>
+        <button class="comm-chip" data-v="Academy" onclick="pickCommChip('cc-type-row',this)">Academy</button>
+      </div>
+    </div>
+    <!-- Location -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Location</span>
+      <input id="cc-country" class="comm-inp" type="text" placeholder="Country" maxlength="40" autocomplete="off">
+      <input id="cc-state" class="comm-inp" type="text" placeholder="State / Province" maxlength="40" autocomplete="off">
+      <input id="cc-city" class="comm-inp" type="text" placeholder="City" maxlength="40" autocomplete="off">
+      <input id="cc-area" class="comm-inp" type="text" placeholder="Area / Locality" maxlength="60" autocomplete="off">
+      <input id="cc-court" class="comm-inp" type="text" placeholder="Home court (optional)" maxlength="60" autocomplete="off">
+    </div>
+    <!-- Description -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Description</span>
+      <textarea id="cc-desc" class="comm-inp comm-textarea" placeholder="What is this community about?" maxlength="280"></textarea>
+    </div>
+    <!-- Logo emoji -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Logo Emoji</span>
+      <div class="emoji-row" id="cc-emoji-row">
+        <button class="emoji-opt on" data-v="🏀" onclick="pickCommEmoji(this)">🏀</button>
+        <button class="emoji-opt" data-v="🏆" onclick="pickCommEmoji(this)">🏆</button>
+        <button class="emoji-opt" data-v="⚡" onclick="pickCommEmoji(this)">⚡</button>
+        <button class="emoji-opt" data-v="🔥" onclick="pickCommEmoji(this)">🔥</button>
+        <button class="emoji-opt" data-v="🦁" onclick="pickCommEmoji(this)">🦁</button>
+        <button class="emoji-opt" data-v="🐯" onclick="pickCommEmoji(this)">🐯</button>
+        <button class="emoji-opt" data-v="💪" onclick="pickCommEmoji(this)">💪</button>
+        <button class="emoji-opt" data-v="🌟" onclick="pickCommEmoji(this)">🌟</button>
+        <button class="emoji-opt" data-v="🎯" onclick="pickCommEmoji(this)">🎯</button>
+        <button class="emoji-opt" data-v="🏅" onclick="pickCommEmoji(this)">🏅</button>
+        <button class="emoji-opt" data-v="🌍" onclick="pickCommEmoji(this)">🌍</button>
+        <button class="emoji-opt" data-v="🏙" onclick="pickCommEmoji(this)">🏙</button>
+      </div>
+    </div>
+    <!-- Visibility -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Visibility</span>
+      <div class="comm-chip-row" id="cc-vis-row">
+        <button class="comm-chip on" data-v="public" onclick="pickCommChip('cc-vis-row',this)">🌐 Public</button>
+        <button class="comm-chip" data-v="private" onclick="pickCommChip('cc-vis-row',this)">🔒 Private</button>
+        <button class="comm-chip" data-v="hidden" onclick="pickCommChip('cc-vis-row',this)">👁 Hidden</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px">Public — anyone can discover and join. Private — listed but needs approval. Hidden — only accessible by invite.</div>
+    </div>
+    <!-- Join approval -->
+    <div class="comm-form-sec">
+      <span class="comm-form-label">Join Approval Required?</span>
+      <div class="comm-chip-row" id="cc-approval-row">
+        <button class="comm-chip on" data-v="no" onclick="pickCommChip('cc-approval-row',this)">No — Open Join</button>
+        <button class="comm-chip" data-v="yes" onclick="pickCommChip('cc-approval-row',this)">Yes — Admin Approval</button>
+      </div>
+    </div>
+    <button class="btn-comm-submit" onclick="createCommunity()">Create Community</button>
+  </div>
+</div>
+
 <!-- ══ PULSE ══ -->
 <div id="s-pulse" class="screen">
   <div class="page-nav">
@@ -1126,6 +1277,7 @@ function showScreen(name){
   if(name==='teams')renderTeamBuilder();
   if(name==='settings')renderSettings();
   if(name==='pulse')renderPulse();
+  if(name==='communities')renderCommunities();
   if(name==='profile'){renderExistingProfiles();document.getElementById('inp-profile-name').value='';document.getElementById('inp-profile-nick').value=''}
 }
 // ── Profile ──────────────────────────────────────────────
@@ -2234,6 +2386,136 @@ function clearAllData(){
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
   showToast('All data cleared');showScreen('profile');
 }
+/* ════════════════════════════════════════════════════════
+   Communities — Phase C1
+════════════════════════════════════════════════════════ */
+// localStorage keys — community module
+const KC={
+  communities:'courtcall_communities',
+  members:'courtcall_community_members',
+  // reserved for future phases:
+  posts:'courtcall_community_posts',
+  players:'courtcall_community_players',
+  gallery:'courtcall_community_gallery',
+  events:'courtcall_community_events',
+  ratings:'courtcall_community_ratings',
+};
+
+// ── Helpers ──────────────────────────────────────────────
+function getComms(){try{return JSON.parse(localStorage.getItem(KC.communities)||'[]')}catch{return[]}}
+function setComms(arr){localStorage.setItem(KC.communities,JSON.stringify(arr))}
+function getCommMembers(){try{return JSON.parse(localStorage.getItem(KC.members)||'[]')}catch{return[]}}
+function setCommMembers(arr){localStorage.setItem(KC.members,JSON.stringify(arr))}
+
+function getCommChipVal(rowId){
+  const el=document.querySelector(`#${rowId} .comm-chip.on`);
+  return el?el.dataset.v:'';
+}
+function pickCommChip(rowId,btn){
+  document.querySelectorAll(`#${rowId} .comm-chip`).forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+}
+function pickCommEmoji(btn){
+  document.querySelectorAll('#cc-emoji-row .emoji-opt').forEach(e=>e.classList.remove('on'));
+  btn.classList.add('on');
+}
+function getSelectedEmoji(){
+  const el=document.querySelector('#cc-emoji-row .emoji-opt.on');
+  return el?el.dataset.v:'🏀';
+}
+
+// ── Create Community ─────────────────────────────────────
+function createCommunity(){
+  const name=document.getElementById('cc-name').value.trim();
+  if(!name){showToast('Enter a community name');return}
+  const p=currentProfile||{id:'guest',name:'Guest'};
+  const community={
+    id:'community_'+Date.now(),
+    name,
+    type:getCommChipVal('cc-type-row')||'Pickup Group',
+    country:document.getElementById('cc-country').value.trim()||'',
+    state:document.getElementById('cc-state').value.trim()||'',
+    city:document.getElementById('cc-city').value.trim()||'',
+    area:document.getElementById('cc-area').value.trim()||'',
+    court:document.getElementById('cc-court').value.trim()||'',
+    description:document.getElementById('cc-desc').value.trim()||'',
+    logo:getSelectedEmoji(),
+    visibility:getCommChipVal('cc-vis-row')||'public',
+    joinApproval:getCommChipVal('cc-approval-row')==='yes',
+    createdBy:p.id,
+    createdAt:new Date().toLocaleDateString(),
+    memberCount:1,
+  };
+  const communities=getComms();
+  communities.push(community);
+  setComms(communities);
+
+  // Creator becomes admin member
+  const member={
+    id:'member_'+Date.now(),
+    communityId:community.id,
+    profileId:p.id,
+    profileName:p.name,
+    role:'admin',
+    joinedAt:new Date().toLocaleDateString(),
+  };
+  const members=getCommMembers();
+  members.push(member);
+  setCommMembers(members);
+
+  showToast(`${community.logo} ${community.name} created!`);
+  showScreen('communities');
+}
+
+// ── Render Communities Screen ────────────────────────────
+function renderCommunities(){
+  const p=currentProfile||{id:'guest'};
+  const communities=getComms();
+  const members=getCommMembers();
+
+  // My communities — communities where current user is a member
+  const myIds=new Set(members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
+  const myComms=communities.filter(c=>myIds.has(c.id));
+
+  // Discover — public communities not already joined
+  const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
+
+  document.getElementById('my-comm-list').innerHTML=myComms.length
+    ? myComms.map(c=>commCardHTML(c,members,true)).join('')
+    : '<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
+
+  document.getElementById('discover-comm-list').innerHTML=discoverComms.length
+    ? discoverComms.map(c=>commCardHTML(c,members,false)).join('')
+    : '<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
+}
+
+function commCardHTML(c,allMembers,isMine){
+  const role=allMembers.find(m=>m.communityId===c.id&&m.profileId===(currentProfile||{id:'guest'}).id)?.role||'';
+  const locParts=[c.area,c.city,c.state].filter(Boolean);
+  const loc=locParts.join(', ')||c.country||'';
+  const visCls=c.visibility==='public'?'public':c.visibility==='private'?'private':'hidden';
+  const visLabel=c.visibility==='public'?'Public':c.visibility==='private'?'Private':'Hidden';
+  const roleBadge=role?`<span class="comm-badge ${role==='admin'?'admin':'member'}">${role==='admin'?'Admin':role==='contributor'?'Contributor':'Member'}</span>`:'';
+  return`<div class="comm-card">
+  <div class="comm-logo">${escHtml(c.logo)}</div>
+  <div class="comm-info">
+    <div class="comm-name">${escHtml(c.name)}</div>
+    <div class="comm-type">${escHtml(c.type)}</div>
+    ${loc?`<div class="comm-loc">📍 ${escHtml(loc)}</div>`:''}
+    <div class="comm-badges"><span class="comm-badge ${visCls}">${visLabel}</span>${roleBadge}</div>
+    <div class="comm-members">👥 ${c.memberCount} member${c.memberCount===1?'':'s'}</div>
+  </div>
+  <button class="btn-comm-open" onclick="openCommunity('${escHtml(c.id)}')">Open</button>
+</div>`;
+}
+
+// Stub — full detail page built in Phase C2
+function openCommunity(id){
+  const c=getComms().find(x=>x.id===id);
+  if(!c){showToast('Community not found');return}
+  showToast(`${c.logo} ${c.name} — detail page coming in Phase C2`);
+}
+
 /* ════════════════════════════════════════════════════════
    CourtCall Pulse
 ════════════════════════════════════════════════════════ */
