@@ -985,7 +985,7 @@ table.standings tr:last-child td{border-bottom:none}
   <div class="pg-card">
     <div class="pg-trophy">🏆</div>
     <div class="pg-winner" id="pg-winner"></div>
-    <div class="pg-wins">WINS!</div>
+    <div class="pg-wins" id="pg-wins">WINS!</div>
     <div class="pg-score" id="pg-score"></div>
     <div class="pg-meta" id="pg-meta"></div>
     <div class="pg-summary" id="pg-summary"></div>
@@ -1084,7 +1084,7 @@ function renderHub(){
   if(canRes){document.getElementById('resume-game-label').textContent=`${saved.teamA.name} ${saved.teamA.score} – ${saved.teamB.score} ${saved.teamB.name}`}
   // Recent games
   const matches=getCol(K.matches).slice(0,5);
-  const legacy=getCol(K.games).slice(0,3);
+  const legacy=getCol(K.games).filter(g=>g.id).slice(0,3);
   const all=[...matches,...legacy.filter(g=>!matches.find(m=>m.id===g.id))].slice(0,5);
   const wrap=document.getElementById('hub-recent');
   if(!all.length){wrap.innerHTML='<div class="recent-empty">No games yet — start your first game!</div>';return}
@@ -1834,7 +1834,7 @@ function renderHistory(){
   const legacy=getCol(K.games);
   let all=[...matches];
   // merge legacy entries that aren't already in matches
-  legacy.forEach(g=>{if(!matches.find(m=>m.id===g.id)&&g.winner){all.push({id:g.id||('leg_'+Math.random()),teamA:{name:g.nameA||g.winner,score:g.scoreW||0},teamB:{name:g.nameB||g.loser,score:g.scoreL||0},winner:{name:g.winner},loser:{name:g.loser},gameType:g.gameType||'pickup',winScore:g.winScore||21,date:g.date||'',history:[],duration:'—'})}});
+  legacy.forEach(g=>{if(!matches.find(m=>m.id===g.id)&&g.winner){all.push({id:g.id||'',teamA:{name:g.nameA||g.winner,score:g.scoreW||0},teamB:{name:g.nameB||g.loser,score:g.scoreL||0},winner:{name:g.winner},loser:{name:g.loser},gameType:g.gameType||'pickup',winScore:g.winScore||21,date:g.date||'',history:[],duration:'—'})}});
   if(historyFilterMode==='pickup')all=all.filter(m=>!m.tournamentId);
   if(historyFilterMode==='tournament')all=all.filter(m=>!!m.tournamentId);
   const wrap=document.getElementById('history-list');
@@ -1851,7 +1851,7 @@ function renderHistory(){
     let spicy='';
     if(m.biggestRun>=6)spicy=`<span class="mc-spicy">🔥 ${m.biggestRun}-0 run</span>`;
     else if(m.leadChanges>=4)spicy=`<span class="mc-spicy">↕ ${m.leadChanges} lead changes</span>`;
-    return`<div class="match-card" onclick="openMatchDetail('${m.id}')">
+    return`<div class="match-card"${m.id?` onclick="openMatchDetail('${m.id}')"`:''}>
       <div class="mc-top"><span class="mc-teams">${escHtml(aName)} vs ${escHtml(bName)}</span><span class="mc-score">${aScore}–${bScore}</span></div>
       <div class="mc-meta"><span class="mc-winner-tag">🏆 ${escHtml(winner)}</span>${tTag}<span>${m.gameType||'pickup'}</span><span>·</span><span>${m.date||''}</span><span>·</span><span>${m.duration||'—'}</span>${spicy}</div>
     </div>`;
