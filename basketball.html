@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#07070F">
+<meta name="theme-color" content="#FF5722">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CourtCall">
+<meta name="description" content="Basketball pickup game scorer — score, build teams, run tournaments">
+<link rel="manifest" href="basketball.manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
 <title>CourtCall 🏀</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1024,6 +1029,16 @@ table.standings tr:last-child td{border-bottom:none}
   .lp-topnav-inner{padding:0 16px}
   .lp-s6-ctas{flex-direction:column}
 }
+/* ─── PWA Install Prompt ─────────────────────────────── */
+.pwa-bar{display:flex;align-items:center;gap:10px;padding:11px 14px;background:linear-gradient(135deg,rgba(255,87,34,.14),rgba(255,87,34,.07));border:1px solid rgba(255,87,34,.28);border-radius:var(--r2);margin-top:12px;cursor:pointer;transition:background var(--t1)}
+.pwa-bar:active{background:rgba(255,87,34,.22)}
+.pwa-bar-icon{font-size:22px;flex-shrink:0}
+.pwa-bar-txt{flex:1;min-width:0}
+.pwa-bar-title{font-size:13px;font-weight:700;color:var(--text)}
+.pwa-bar-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.pwa-bar-cta{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;padding:6px 14px;background:var(--ca);border-radius:var(--r1);flex-shrink:0}
+.pwa-bar-x{background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px;flex-shrink:0}
+.pwa-bar-x:active{color:var(--text)}
 </style>
 </head>
 <body>
@@ -1092,6 +1107,16 @@ table.standings tr:last-child td{border-bottom:none}
           <div class="lp-resume-label" id="resume-game-label">Game in progress</div>
         </div>
         <span style="color:var(--ca);font-size:18px">▶</span>
+      </div>
+      <!-- PWA install prompt — shown by JS when beforeinstallprompt fires -->
+      <div class="pwa-bar hidden" id="pwa-install-bar" onclick="triggerInstall()">
+        <div class="pwa-bar-icon">📲</div>
+        <div class="pwa-bar-txt">
+          <div class="pwa-bar-title">Add CourtCall to your home screen</div>
+          <div class="pwa-bar-sub">Works offline · Feels like a real app</div>
+        </div>
+        <div class="pwa-bar-cta">Install</div>
+        <button class="pwa-bar-x" onclick="dismissInstall(event)" aria-label="Dismiss">×</button>
       </div>
     </div>
 
@@ -5201,6 +5226,50 @@ document.addEventListener('DOMContentLoaded',()=>{
   const bs=getObj('cc_builder',null);
   if(bs)builderState=bs;
 });
+
+// ── PWA: Service Worker + Install Prompt ─────────────────────
+let _deferredInstall=null;
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./basketball-sw.js',{scope:'./'}).catch(()=>{});
+  });
+}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  _deferredInstall=e;
+  if(!localStorage.getItem('pwa_dismissed')){
+    const bar=document.getElementById('pwa-install-bar');
+    if(bar)bar.classList.remove('hidden');
+  }
+});
+
+window.addEventListener('appinstalled',()=>{
+  _deferredInstall=null;
+  const bar=document.getElementById('pwa-install-bar');
+  if(bar)bar.classList.add('hidden');
+  if(typeof showToast==='function')showToast('CourtCall installed! 🎉');
+});
+
+function triggerInstall(){
+  if(!_deferredInstall)return;
+  _deferredInstall.prompt();
+  _deferredInstall.userChoice.then(r=>{
+    if(r.outcome==='accepted'){
+      _deferredInstall=null;
+      const bar=document.getElementById('pwa-install-bar');
+      if(bar)bar.classList.add('hidden');
+    }
+  });
+}
+
+function dismissInstall(e){
+  e.stopPropagation();
+  const bar=document.getElementById('pwa-install-bar');
+  if(bar)bar.classList.add('hidden');
+  localStorage.setItem('pwa_dismissed','1');
+}
 </script>
 
 <!-- ── Bottom Navigation ─────────────────────────────── -->
