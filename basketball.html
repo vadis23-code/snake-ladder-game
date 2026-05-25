@@ -498,6 +498,63 @@ table.standings tr:last-child td{border-bottom:none}
 .emoji-opt.on{border-color:var(--success);background:rgba(0,230,118,.12)}
 .btn-comm-submit{background:linear-gradient(135deg,var(--success),#00BFA5);color:#000;border:none;border-radius:var(--r2);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:20px;cursor:pointer;min-height:64px;box-shadow:0 6px 24px rgba(0,230,118,.25);transition:transform var(--t1);width:100%;margin-top:4px}
 .btn-comm-submit:active{transform:translateY(3px)}
+/* FEED */
+.feed-filter-row{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.feed-filter-row::-webkit-scrollbar{display:none}
+.ff-chip{flex-shrink:0;padding:6px 12px;border:1.5px solid var(--border);border-radius:50px;background:var(--s1);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:all var(--t1)}
+.ff-chip.on{border-color:var(--success);background:rgba(0,230,118,.12);color:var(--success)}
+.btn-new-post{background:linear-gradient(135deg,var(--success),#00BFA5);color:#000;border:none;border-radius:var(--r1);font:700 13px 'Inter',sans-serif;padding:9px 16px;cursor:pointer;min-height:38px;flex-shrink:0;transition:opacity var(--t1)}
+.btn-new-post:active{opacity:.8}
+.post-form{background:var(--s1);border:1px solid rgba(0,230,118,.3);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:10px}
+.post-form-type-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.post-form-type-row::-webkit-scrollbar{display:none}
+.pft-chip{flex-shrink:0;padding:6px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
+.pft-chip.on{border-color:var(--success);background:rgba(0,230,118,.12);color:var(--success)}
+.post-inp{background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:var(--r1);color:var(--text);font:600 14px 'Inter',sans-serif;padding:10px 12px;outline:none;min-height:44px;width:100%;transition:border-color var(--t1)}
+.post-inp:focus{border-color:var(--success)}
+.post-inp::placeholder{color:var(--muted2)}
+.post-textarea{resize:vertical;min-height:80px;font-family:'Inter',sans-serif}
+.post-form-actions{display:flex;gap:8px}
+.btn-post-submit{flex:1;background:var(--success);color:#000;border:none;border-radius:var(--r1);font:700 14px 'Inter',sans-serif;padding:11px;cursor:pointer;min-height:44px;transition:opacity var(--t1)}
+.btn-post-submit:active{opacity:.8}
+.btn-post-cancel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--muted);font:700 14px 'Inter',sans-serif;padding:11px 16px;cursor:pointer;min-height:44px;transition:all var(--t1)}
+.btn-post-cancel:active{background:var(--s3)}
+.post-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.post-card-pinned{border-color:var(--gold)!important}
+.post-top{display:flex;align-items:center;gap:8px;padding:12px 14px 4px;flex-wrap:wrap}
+.post-type-badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(0,230,118,.12);color:var(--success);flex-shrink:0}
+.post-pin-badge{font-size:10px;font-weight:700;color:var(--gold);background:rgba(255,179,0,.12);border-radius:20px;padding:3px 9px}
+.post-author-row{display:flex;align-items:center;gap:8px;padding:4px 14px 8px}
+.post-avatar{width:28px;height:28px;border-radius:50%;background:var(--ca);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;flex-shrink:0}
+.post-author-name{font-size:12px;font-weight:700;color:var(--muted)}
+.post-time{font-size:11px;color:var(--muted2);margin-left:auto}
+.post-title{font-size:15px;font-weight:700;color:var(--text);padding:0 14px 4px;line-height:1.3}
+.post-body{font-size:13px;color:var(--text);padding:0 14px 10px;line-height:1.6;white-space:pre-wrap;opacity:.85}
+.post-img{width:100%;max-height:220px;object-fit:cover;display:block}
+.post-reactions{display:flex;align-items:center;gap:6px;padding:8px 14px;border-top:1px solid var(--border);flex-wrap:wrap}
+.react-btn{background:var(--s2);border:1px solid var(--border);border-radius:20px;font-size:13px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:4px;font:700 12px 'Inter',sans-serif;color:var(--muted);transition:all var(--t1);min-height:32px}
+.react-btn.active{border-color:var(--success);background:rgba(0,230,118,.1);color:var(--success)}
+.react-btn:active{transform:scale(.92)}
+.post-admin-row{display:flex;align-items:center;gap:4px;padding:4px 10px 8px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.btn-post-action{background:none;border:none;font:600 11px 'Inter',sans-serif;color:var(--muted2);cursor:pointer;padding:5px 8px;border-radius:var(--r1);transition:all var(--t1);min-height:30px}
+.btn-post-action:active{background:var(--s2);color:var(--text)}
+.btn-post-action.danger{color:var(--danger)}
+.btn-post-action.danger:active{background:rgba(255,23,68,.1)}
+.comments-section{border-top:1px solid var(--border);padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.comment-item{display:flex;gap:8px;align-items:flex-start}
+.cmt-avatar{width:24px;height:24px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--muted);flex-shrink:0;margin-top:1px}
+.cmt-body-wrap{flex:1;min-width:0}
+.cmt-author{font-size:11px;font-weight:700;color:var(--muted)}
+.cmt-text{font-size:13px;color:var(--text);line-height:1.4;margin-top:1px}
+.cmt-time{font-size:10px;color:var(--muted2);margin-top:2px}
+.btn-cmt-del{background:none;border:none;color:var(--muted2);font-size:16px;cursor:pointer;padding:2px 4px;transition:color var(--t1);flex-shrink:0;margin-top:2px}
+.btn-cmt-del:active{color:var(--danger)}
+.add-comment-row{display:flex;gap:6px;margin-top:4px}
+.comment-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font:14px 'Inter',sans-serif;padding:8px 10px;outline:none;min-height:38px}
+.comment-input::placeholder{color:var(--muted2)}
+.comment-input:focus{border-color:var(--success)}
+.btn-cmt-send{background:var(--success);border:none;border-radius:var(--r1);color:#000;font:700 12px 'Inter',sans-serif;padding:8px 12px;cursor:pointer;min-height:38px;transition:opacity var(--t1)}
+.btn-cmt-send:active{opacity:.8}
 /* COMM DETAIL */
 #s-comm-detail{background:var(--bg);overflow-y:auto}
 .cd-header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0}
@@ -2569,6 +2626,8 @@ function openCommunity(id){
   if(!c){showToast('Community not found');return}
   activeCommunityId=id;
   activeCommTab='feed';
+  feedFilter='all';showCreateForm=false;editingPostId=null;
+  if(typeof expandedComments!=='undefined')expandedComments.clear();
   renderCommDetail();
   showScreen('comm-detail');
 }
@@ -2618,6 +2677,7 @@ function renderCommDetail(){
 }
 
 function setCommTab(tab){
+  if(tab!=='feed'){showCreateForm=false;editingPostId=null}
   activeCommTab=tab;
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   const c=getComms().find(x=>x.id===activeCommunityId);
@@ -2631,7 +2691,7 @@ function _renderCommTabContent(c,members,myRole){
   const el=document.getElementById('cd-tab-content');
   if(!el)return;
   if(activeCommTab==='feed'){
-    el.innerHTML=`<div class="cd-panel"><div class="cd-coming"><span style="font-size:36px">📢</span><span>Community feed coming in Phase C3.</span></div></div>`;
+    el.innerHTML=renderFeedTabHTML(c,myRole);
   }else if(activeCommTab==='members'){
     el.innerHTML=_buildMembersHTML(c,members,myRole);
   }else if(activeCommTab==='players'){
@@ -2781,6 +2841,7 @@ function deleteComm(communityId){
   if(!confirm(`Delete "${c.name}"? This cannot be undone.`))return;
   setComms(comms.filter(x=>x.id!==communityId));
   setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
+  if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
   showToast('Community deleted');
   showScreen('communities');
 }
@@ -2792,6 +2853,238 @@ function resetCommCreateForm(){
   const firstVis=document.querySelector('#cc-vis-row .comm-chip');if(firstVis)pickCommChip('cc-vis-row',firstVis);
   const firstAppr=document.querySelector('#cc-approval-row .comm-chip');if(firstAppr)pickCommChip('cc-approval-row',firstAppr);
   document.querySelectorAll('#cc-emoji-row .emoji-opt').forEach((e,i)=>e.classList.toggle('on',i===0));
+}
+
+/* ════════════════════════════════════════════════════════
+   Communities — Phase C3: Feed
+════════════════════════════════════════════════════════ */
+const POST_TYPES=[
+  {t:'General Post',i:'💬'},{t:'Announcement',i:'📢'},{t:'Match Result',i:'🏀'},
+  {t:'Upcoming Game',i:'📅'},{t:'Tournament Update',i:'🏆'},{t:'Photo Post',i:'📸'},
+  {t:'Player Spotlight',i:'⭐'},{t:'Poll',i:'📊'},{t:'MVP Vote',i:'🥇'},
+  {t:'Training Tip',i:'💪'},{t:'Court Update',i:'🏟'}
+];
+let feedFilter='all';
+let showCreateForm=false;
+let newPostType='General Post';
+let editingPostId=null;
+const expandedComments=new Set();
+
+function getAllPosts(){try{return JSON.parse(localStorage.getItem(KC.posts)||'[]')}catch{return[]}}
+function saveAllPosts(arr){localStorage.setItem(KC.posts,JSON.stringify(arr))}
+function getPosts(cid){return getAllPosts().filter(p=>p.communityId===cid)}
+
+function fmtPostTime(iso){
+  if(!iso)return'';
+  const d=new Date(iso),now=new Date(),diff=now-d;
+  if(isNaN(diff))return'';
+  if(diff<60000)return'just now';
+  if(diff<3600000)return Math.floor(diff/60000)+'m ago';
+  if(diff<86400000)return Math.floor(diff/3600000)+'h ago';
+  if(diff<604800000)return Math.floor(diff/86400000)+'d ago';
+  return d.toLocaleDateString();
+}
+
+function renderFeedTabHTML(c,myRole){
+  const canPost=['admin','contributor'].includes(myRole);
+  const myId=(currentProfile||{id:'guest'}).id;
+  // Build & sort posts
+  let posts=getPosts(c.id);
+  if(feedFilter!=='all')posts=posts.filter(p=>p.type===feedFilter);
+  posts.sort((a,b)=>{
+    if(a.pinned&&!b.pinned)return -1;
+    if(!a.pinned&&b.pinned)return 1;
+    return new Date(b.createdAt)-new Date(a.createdAt);
+  });
+  // Filter chips
+  const allFilters=[{t:'All',i:''},...POST_TYPES];
+  const filterChips=allFilters.map(({t,i})=>{
+    const val=t==='All'?'all':t;
+    return`<button class="ff-chip${feedFilter===val?' on':''}" onclick="setFeedFilter('${escHtml(val)}','${escHtml(c.id)}')">${i?i+' ':''}${escHtml(t)}</button>`;
+  }).join('');
+  // Create form
+  const typeChips=POST_TYPES.map(({t,i})=>`<button class="pft-chip${newPostType===t?' on':''}" onclick="pickPostTypeChip(this,'${escHtml(t)}')">${i} ${escHtml(t)}</button>`).join('');
+  const createFormHTML=showCreateForm&&canPost?`<div class="post-form" id="create-post-form">
+  <span class="comm-form-label">Post Type</span>
+  <div class="post-form-type-row">${typeChips}</div>
+  <input id="pp-title" class="post-inp" type="text" placeholder="Title (optional)" maxlength="80" autocomplete="off">
+  <textarea id="pp-body" class="post-inp post-textarea" placeholder="What's on the court?…" maxlength="600"></textarea>
+  <input id="pp-img" class="post-inp" type="url" placeholder="Image URL (optional)" autocomplete="off">
+  <div class="post-form-actions">
+    <button class="btn-post-submit" onclick="submitPost('${escHtml(c.id)}')">Publish</button>
+    <button class="btn-post-cancel" onclick="cancelCreatePost()">Cancel</button>
+  </div>
+</div>`:'' ;
+  // Posts list
+  const postsHTML=posts.length
+    ? posts.map(p=>buildPostCardHTML(p,c,myRole,myId)).join('')
+    : `<div class="comm-empty"><span style="font-size:36px">📢</span><span>${feedFilter==='all'?'No posts yet.<br>Be the first to post!':'No posts of this type yet.'}</span></div>`;
+  return`<div class="cd-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Feed</span>
+    ${canPost?`<button class="btn-new-post" onclick="toggleCreatePost('${escHtml(c.id)}')">${showCreateForm?'✕ Close':'+ New Post'}</button>`:''}
+  </div>
+  <div class="feed-filter-row">${filterChips}</div>
+  ${createFormHTML}
+  ${postsHTML}
+</div>`;
+}
+
+function buildPostCardHTML(p,c,myRole,myId){
+  const isAdmin=myRole==='admin';
+  const isAuthor=p.authorId===myId;
+  const typeInfo=POST_TYPES.find(x=>x.t===p.type)||{t:p.type,i:'💬'};
+  const reactions=p.reactions||{like:[],fire:[],clap:[]};
+  const myLike=(reactions.like||[]).includes(myId);
+  const myFire=(reactions.fire||[]).includes(myId);
+  const myClap=(reactions.clap||[]).includes(myId);
+  const commentCount=(p.comments||[]).length;
+  const commentsOpen=expandedComments.has(p.id);
+  const isEditing=editingPostId===p.id;
+  const pinCls=p.pinned?'post-card-pinned':'';
+
+  // Body / edit form
+  let bodyHTML='';
+  if(isEditing){
+    bodyHTML=`<div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:8px">
+  <input id="edit-t-${escHtml(p.id)}" class="post-inp" type="text" value="${escHtml(p.title||'')}" maxlength="80" placeholder="Title (optional)">
+  <textarea id="edit-b-${escHtml(p.id)}" class="post-inp post-textarea">${escHtml(p.body||'')}</textarea>
+  <input id="edit-i-${escHtml(p.id)}" class="post-inp" type="url" value="${escHtml(p.imageUrl||'')}" placeholder="Image URL (optional)">
+  <div style="display:flex;gap:8px">
+    <button class="btn-post-submit" style="min-height:40px;font-size:13px" onclick="savePostEdit('${escHtml(p.id)}','${escHtml(c.id)}')">Save</button>
+    <button class="btn-post-cancel" style="min-height:40px;font-size:13px" onclick="cancelPostEdit()">Cancel</button>
+  </div>
+</div>`;
+  } else {
+    bodyHTML=`${p.title?`<div class="post-title">${escHtml(p.title)}</div>`:''}${p.body?`<div class="post-body">${escHtml(p.body)}</div>`:''}${p.imageUrl?`<img class="post-img" src="${escHtml(p.imageUrl)}" alt="" onerror="this.style.display='none'">`:'' }`;
+  }
+
+  // Reactions + comment toggle
+  const reactRow=isEditing?'':
+    `<div class="post-reactions">
+  <button class="react-btn${myLike?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','like')">👍 ${(reactions.like||[]).length}</button>
+  <button class="react-btn${myFire?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','fire')">🔥 ${(reactions.fire||[]).length}</button>
+  <button class="react-btn${myClap?' active':''}" onclick="reactPost('${escHtml(p.id)}','${escHtml(c.id)}','clap')">👏 ${(reactions.clap||[]).length}</button>
+  <button class="btn-post-action" style="margin-left:auto" onclick="toggleComments('${escHtml(p.id)}','${escHtml(c.id)}')">💬 ${commentCount}${commentsOpen?' ▲':' ▼'}</button>
+</div>`;
+
+  // Admin / author actions
+  let actionsHTML='';
+  if((isAdmin||isAuthor)&&!isEditing){
+    actionsHTML=`<div class="post-admin-row">
+  ${isAdmin?`<button class="btn-post-action" onclick="pinPost('${escHtml(p.id)}','${escHtml(c.id)}')">${p.pinned?'📌 Unpin':'📌 Pin'}</button>`:''}
+  ${isAuthor?`<button class="btn-post-action" onclick="editPostInline('${escHtml(p.id)}','${escHtml(c.id)}')">✏ Edit</button>`:''}
+  ${(isAdmin||isAuthor)?`<button class="btn-post-action danger" onclick="deletePost('${escHtml(p.id)}','${escHtml(c.id)}')">🗑 Delete</button>`:''}
+</div>`;
+  }
+
+  // Comments section
+  let commentsHTML='';
+  if(commentsOpen){
+    const canComment=['admin','contributor','member'].includes(myRole);
+    const cmtItems=(p.comments||[]).map(cm=>{
+      const canDel=isAdmin||cm.authorId===myId;
+      return`<div class="comment-item">
+  <div class="cmt-avatar">${escHtml((cm.authorName||'?')[0].toUpperCase())}</div>
+  <div class="cmt-body-wrap">
+    <div class="cmt-author">${escHtml(cm.authorName||'Unknown')}</div>
+    <div class="cmt-text">${escHtml(cm.body)}</div>
+    <div class="cmt-time">${fmtPostTime(cm.createdAt)}</div>
+  </div>
+  ${canDel?`<button class="btn-cmt-del" onclick="deleteComment('${escHtml(p.id)}','${escHtml(c.id)}','${escHtml(cm.id)}')">✕</button>`:''}
+</div>`;
+    }).join('')||'<div style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 0">No comments yet.</div>';
+    const addRow=canComment?`<div class="add-comment-row">
+  <input id="cmt-inp-${escHtml(p.id)}" class="comment-input" type="text" placeholder="Add a comment…" maxlength="200" autocomplete="off">
+  <button class="btn-cmt-send" onclick="submitComment('${escHtml(p.id)}','${escHtml(c.id)}')">Send</button>
+</div>`:'';
+    commentsHTML=`<div class="comments-section">${cmtItems}${addRow}</div>`;
+  }
+
+  return`<div class="post-card ${pinCls}" id="pc-${escHtml(p.id)}">
+<div class="post-top"><span class="post-type-badge">${typeInfo.i} ${escHtml(p.type)}</span>${p.pinned?`<span class="post-pin-badge">📌 Pinned</span>`:''}</div>
+<div class="post-author-row"><div class="post-avatar">${escHtml((p.authorName||'?')[0].toUpperCase())}</div><span class="post-author-name">${escHtml(p.authorName||'Unknown')}</span><span class="post-time">${fmtPostTime(p.createdAt)}</span></div>
+${bodyHTML}${reactRow}${actionsHTML}${commentsHTML}
+</div>`;
+}
+
+// ── Feed actions ──────────────────────────────────────────
+function setFeedFilter(type){feedFilter=type;setCommTab('feed')}
+function toggleCreatePost(){showCreateForm=!showCreateForm;setCommTab('feed')}
+function cancelCreatePost(){showCreateForm=false;setCommTab('feed')}
+function pickPostTypeChip(btn,type){document.querySelectorAll('.pft-chip').forEach(c=>c.classList.remove('on'));btn.classList.add('on');newPostType=type}
+
+function submitPost(communityId){
+  const prof=currentProfile||{id:'guest',name:'Guest'};
+  const body=(document.getElementById('pp-body')?.value||'').trim();
+  const title=(document.getElementById('pp-title')?.value||'').trim();
+  if(!body&&!title){showToast('Add a title or body text');return}
+  const post={
+    id:'post_'+Date.now(),communityId,
+    authorId:prof.id,authorName:prof.name||prof.nickname||'Unknown',
+    type:newPostType,title,body,
+    imageUrl:(document.getElementById('pp-img')?.value||'').trim(),
+    pinned:false,createdAt:new Date().toISOString(),
+    reactions:{like:[],fire:[],clap:[]},comments:[],
+  };
+  const all=getAllPosts();all.push(post);saveAllPosts(all);
+  showCreateForm=false;newPostType='General Post';
+  setCommTab('feed');showToast('Post published!');
+}
+
+function editPostInline(postId){editingPostId=postId;setCommTab('feed')}
+function cancelPostEdit(){editingPostId=null;setCommTab('feed')}
+function savePostEdit(postId){
+  const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
+  p.title=(document.getElementById(`edit-t-${postId}`)?.value||'').trim();
+  p.body=(document.getElementById(`edit-b-${postId}`)?.value||'').trim();
+  p.imageUrl=(document.getElementById(`edit-i-${postId}`)?.value||'').trim();
+  saveAllPosts(all);editingPostId=null;setCommTab('feed');showToast('Post updated');
+}
+
+function deletePost(postId){
+  if(!confirm('Delete this post?'))return;
+  saveAllPosts(getAllPosts().filter(p=>p.id!==postId));
+  expandedComments.delete(postId);
+  if(editingPostId===postId)editingPostId=null;
+  setCommTab('feed');showToast('Post deleted');
+}
+
+function pinPost(postId){
+  const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
+  p.pinned=!p.pinned;saveAllPosts(all);
+  setCommTab('feed');showToast(p.pinned?'Post pinned 📌':'Post unpinned');
+}
+
+function reactPost(postId,communityId,emoji){
+  const myId=(currentProfile||{id:'guest'}).id;
+  const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
+  if(!p.reactions)p.reactions={like:[],fire:[],clap:[]};
+  if(!p.reactions[emoji])p.reactions[emoji]=[];
+  const idx=p.reactions[emoji].indexOf(myId);
+  if(idx>-1)p.reactions[emoji].splice(idx,1);else p.reactions[emoji].push(myId);
+  saveAllPosts(all);setCommTab('feed');
+}
+
+function toggleComments(postId){
+  if(expandedComments.has(postId))expandedComments.delete(postId);else expandedComments.add(postId);
+  setCommTab('feed');
+}
+
+function submitComment(postId){
+  const inp=document.getElementById(`cmt-inp-${postId}`);
+  const body=(inp?.value||'').trim();if(!body){showToast('Type a comment first');return}
+  const prof=currentProfile||{id:'guest',name:'Guest'};
+  const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
+  if(!post.comments)post.comments=[];
+  post.comments.push({id:'cmt_'+Date.now(),authorId:prof.id,authorName:prof.name||'Unknown',body,createdAt:new Date().toISOString()});
+  saveAllPosts(all);setCommTab('feed');
+}
+
+function deleteComment(postId,communityId,commentId){
+  const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
+  post.comments=(post.comments||[]).filter(c=>c.id!==commentId);
+  saveAllPosts(all);setCommTab('feed');showToast('Comment removed');
 }
 
 /* ════════════════════════════════════════════════════════
