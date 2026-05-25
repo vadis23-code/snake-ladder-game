@@ -1516,7 +1516,7 @@ function parseVoiceCmd(rawText,confidence){
   if(/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)){nextQuarter();setVAction(`Now ${typeof state.quarter==='number'?'Q'+state.quarter:state.quarter}`);return true}
   if(/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)){handleEndGame();return true}
   if(/\b(reset\s*game|start\s*over)\b/.test(t)){if(confirm('Reset scores?')){playAgain();setVAction('Reset!')}return true}
-  if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}}
+  if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}setVAction(`Which team? Try "foul ${state.teamA.colorKey||'orange'}" or "foul ${state.teamB.colorKey||'blue'}"`);return true}
   if(/\b(start\s*shot\s*clock|go\s*shot\s*clock|shot\s*clock\s*go)\b/.test(t)){SC.start();setVAction('Shot clock started');return true}
   if(/\b(pause\s*shot\s*clock|stop\s*shot\s*clock|shot\s*clock\s*stop)\b/.test(t)){SC.pause();setVAction('Shot clock paused');return true}
   if(/\b(reset\s*shot\s*clock|restart\s*shot\s*clock|shot\s*clock\s*reset)\b/.test(t)){SC.reset(SC.running);setVAction('Shot clock reset');return true}
@@ -1545,8 +1545,14 @@ function startListening(){
   recognition.onend=()=>{if(state.voiceActive&&!state.gameOver)restartTmr=setTimeout(startListening,600)};
   recognition.onerror=e=>{
     if(['no-speech','aborted'].includes(e.error))return;
-    if(['not-allowed','service-not-allowed'].includes(e.error)){state.voiceActive=false;updateVoiceUI();setVAction('❌ Mic denied — allow in Chrome settings');return}
-    if(e.error==='network')setVAction('❌ Network error — voice needs internet');
+    const fatal=['not-allowed','service-not-allowed','audio-capture','network'];
+    if(fatal.includes(e.error)){
+      state.voiceActive=false;updateVoiceUI();clearTimeout(restartTmr);
+      if(e.error==='audio-capture')setVAction('❌ Mic not accessible — check device permissions');
+      else if(e.error==='network')setVAction('❌ Network error — voice needs internet');
+      else setVAction('❌ Mic denied — allow microphone in browser settings');
+      return;
+    }
   };
   try{recognition.start()}catch{state.voiceActive=false;updateVoiceUI();setVAction('❌ Could not start mic — tap Mic to retry')}
 }
