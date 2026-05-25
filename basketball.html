@@ -83,6 +83,16 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .hub-feats::-webkit-scrollbar{display:none}
 .hub-feat-pill{flex-shrink:0;background:var(--s1);border:1px solid var(--border);border-radius:50px;padding:7px 14px;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
 .hub-trust{text-align:center;font-size:11px;color:var(--muted);padding:2px 20px 12px;letter-spacing:.02em;opacity:.6}
+.hub-stats{padding:0 20px 6px}
+.hub-stats-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);opacity:.7;margin-bottom:7px}
+.hub-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.hub-stat-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.hsc-icon{font-size:15px;line-height:1}
+.hsc-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);line-height:1}
+.hsc-lbl{font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1.3}
+.hub-stat-live{margin-top:6px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.hsc-live-txt{font-size:12px;color:var(--muted)}
+.hsc-live-txt strong{color:var(--ca);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.04em}
 .resume-card{margin:10px 20px 0;background:var(--s1);border:2px solid var(--ca);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 20px rgba(255,87,34,.2);transition:background var(--t1)}
 .resume-card:active{background:var(--s2)}
 .rc-dot{width:10px;height:10px;border-radius:50%;background:var(--ca);flex-shrink:0;animation:pulse 1.5s infinite}
@@ -882,6 +892,7 @@ table.standings tr:last-child td{border-bottom:none}
     <span class="hub-feat-pill">🏘 Communities</span>
   </div>
   <div class="hub-trust">No login required · Works offline · Built for pickup</div>
+  <div class="hub-stats" id="hub-stats"></div>
   <!-- Resume card -->
   <div class="resume-card hidden" id="resume-card" onclick="handleResume()">
     <div class="rc-dot"></div>
@@ -1585,6 +1596,59 @@ function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.
 function setObj(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
 // ── App-level keys ───────────────────────────────────────
 const K={profile:'cc_profile',profiles:'cc_profiles',players:'cc_players',builder:'cc_builder',matches:'cc_matches',tournaments:'cc_tournaments',settings:'cc_settings',game:'courtcall_v1',games:'courtcall_games'};
+
+/* ── Analytics (Phase A1) ──────────────────────────────────
+   V1: localStorage only. Device/browser-specific.
+   For real global stats, use Firebase Analytics, PostHog,
+   Plausible, or Supabase events table.
+   trackEvent() is the single hook — easy to extend later.
+──────────────────────────────────────────────────────────── */
+const STATS_KEY='courtcall_app_stats';
+function trackEvent(name){
+  try{
+    const s=JSON.parse(localStorage.getItem(STATS_KEY)||'{}');
+    if(!s.appLaunchDate)s.appLaunchDate=new Date().toISOString();
+    s.lastVisitAt=new Date().toISOString();
+    if(name==='app_opened')s.totalVisits=(s.totalVisits||0)+1;
+    else if(name==='profile_created')s.profilesCreated=(s.profilesCreated||0)+1;
+    else if(name==='guest_started')s.guestSessions=(s.guestSessions||0)+1;
+    else if(name==='game_started')s.gamesStarted=(s.gamesStarted||0)+1;
+    else if(name==='game_completed'){s.gamesCompleted=(s.gamesCompleted||0)+1;s.matchesSaved=(s.matchesSaved||0)+1;}
+    else if(name==='player_added')s.playersAdded=(s.playersAdded||0)+1;
+    else if(name==='tournament_created')s.tournamentsCreated=(s.tournamentsCreated||0)+1;
+    else if(name==='community_created')s.communitiesCreated=(s.communitiesCreated||0)+1;
+    else if(name==='voice_command_used')s.voiceCommandsUsed=(s.voiceCommandsUsed||0)+1;
+    localStorage.setItem(STATS_KEY,JSON.stringify(s));
+  }catch{}
+}
+function getAppStats(){try{return JSON.parse(localStorage.getItem(STATS_KEY)||'{}')}catch{return{}}}
+function fmtLiveDur(iso){
+  if(!iso)return null;
+  const ms=Date.now()-new Date(iso).getTime();
+  if(ms<0)return null;
+  const m=Math.floor(ms/60000),d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mn=m%60;
+  if(d>0)return`${d}d ${h}h`;
+  if(h>0)return`${h}h ${mn}m`;
+  return`${mn}m`;
+}
+function buildHubStatsHTML(){
+  const st=getAppStats();
+  const dur=fmtLiveDur(st.appLaunchDate);
+  if(!dur)return'';
+  const games=getCol(K.matches).length;
+  const tourneys=getCol(K.tournaments).length;
+  const comms=getComms().length;
+  const players=getAllCPlayers().length;
+  const cards=[
+    {icon:'🏀',val:games,lbl:'Games'},
+    {icon:'👥',val:players,lbl:'Players'},
+    {icon:'🏆',val:tourneys,lbl:'Tourneys'},
+    {icon:'🌍',val:comms,lbl:'Comms'},
+  ];
+  const anyData=cards.some(c=>c.val>0);
+  const gridHTML=anyData?`<div class="hub-stats-grid">${cards.map(c=>`<div class="hub-stat-card"><div class="hsc-icon">${c.icon}</div><div class="hsc-val">${c.val}</div><div class="hsc-lbl">${c.lbl}</div></div>`).join('')}</div>`:'';
+  return`<div class="hub-stats-label">CourtCall in Action</div>${gridHTML}<div class="hub-stat-live"><span style="font-size:15px">⏱</span><span class="hsc-live-txt">Live for <strong>${dur}</strong></span></div>`;
+}
 // ── Toast ────────────────────────────────────────────────
 let toastTmr=null;
 function showToast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),dur)}
@@ -1614,12 +1678,14 @@ function createProfile(){
   setCol(K.profiles,profiles);
   setObj(K.profile,p);
   currentProfile=p;
+  trackEvent('profile_created');
   renderHub();showScreen('hub');
 }
 function guestLogin(){
   const p={id:'guest',name:'Guest',nickname:'Guest',createdAt:'',gamesPlayed:0};
   setObj(K.profile,p);
   currentProfile=p;
+  trackEvent('guest_started');
   renderHub();showScreen('hub');
 }
 function selectProfile(id){
@@ -1651,6 +1717,9 @@ function renderHub(){
   const rc=document.getElementById('resume-card');
   rc.classList.toggle('hidden',!canRes);
   if(canRes){document.getElementById('resume-game-label').textContent=`${saved.teamA.name} ${saved.teamA.score} – ${saved.teamB.score} ${saved.teamB.name}`}
+  // Stats section
+  const statsEl=document.getElementById('hub-stats');
+  if(statsEl)statsEl.innerHTML=buildHubStatsHTML();
   // Recent games
   const matches=getCol(K.matches).slice(0,5);
   const legacy=getCol(K.games).filter(g=>g.id).slice(0,3);
@@ -1719,7 +1788,7 @@ function handleStartGame(){
   const shotClockAutoReset=cx['cr-sc-ar']!=='off';
   const gameClockMode=cx['cr-gc']||'off';
   state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
-  applyTeamColors();save();renderGame();SC.init();GC.init();showScreen('game');
+  applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
 function handleBackFromGame(){
   if(state.history.length>0&&!state.gameOver){if(!confirm('Go back? Progress is saved.'))return}
@@ -1885,7 +1954,7 @@ function checkWin(){
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const winner=aWon?state.teamA:state.teamB,loser=aWon?state.teamB:state.teamA;
   const entry=buildMatchEntry(winner,loser);
-  saveToMatches(entry);
+  saveToMatches(entry);trackEvent('game_completed');
   if(gameContext.type==='tournament'&&gameContext.fixtureId)saveTournamentResult(entry);
   showPostGame(winner,loser,entry);
 }
@@ -1895,7 +1964,7 @@ function handleEndGame(){
   const winner=state.teamA.score>=state.teamB.score?state.teamA:state.teamB;
   const loser=state.teamA.score>=state.teamB.score?state.teamB:state.teamA;
   const entry=buildMatchEntry(winner,loser);
-  saveToMatches(entry);
+  saveToMatches(entry);trackEvent('game_completed');
   if(gameContext.type==='tournament'&&gameContext.fixtureId)saveTournamentResult(entry);
   showPostGame(winner,loser,entry);
 }
@@ -2109,7 +2178,8 @@ function startListening(){
       const alt=e.results[0][i];
       ok=parseVoiceCmd(alt.transcript.trim(),alt.confidence);
     }
-    if(!ok)setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
+    if(ok)trackEvent('voice_command_used');
+    else setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
   };
   recognition.onend=()=>{if(state.voiceActive&&!state.gameOver)restartTmr=setTimeout(startListening,600)};
   recognition.onerror=e=>{
@@ -2561,6 +2631,7 @@ function createTournament(){
   const fixtures=format==='roundrobin'?genRoundRobin(teams):genKnockout(teams);
   const t={id:'t_'+Date.now(),name,format,winScore,teams:teams.map(n=>({name:n})),fixtures,createdAt:new Date().toLocaleDateString(),completed:false};
   const tours=getCol(K.tournaments);tours.push(t);setCol(K.tournaments,tours);
+  trackEvent('tournament_created');
   activeTournId=t.id;
   showActiveTournament(t);
 }
@@ -2785,6 +2856,7 @@ function createCommunity(){
   members.push(member);
   setCommMembers(members);
 
+  trackEvent('community_created');
   showToast(`${community.logo} ${community.name} created!`);
   showScreen('communities');
 }
@@ -3581,6 +3653,7 @@ function submitCPlayer(communityId){
     createdBy:prof.id,createdAt:new Date().toISOString(),
   };
   const all=getAllCPlayers();all.push(player);saveAllCPlayers(all);
+  trackEvent('player_added');
   showAddPlayerForm=false;selectedBadges=new Set();
   setCommTab('players');showToast(`${player.name} added!`);
 }
@@ -4560,6 +4633,7 @@ function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
    Init
 ════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
+  trackEvent('app_opened');
   // Init attribute grid in team builder
   initAttrGrid();
   // Load saved profile
