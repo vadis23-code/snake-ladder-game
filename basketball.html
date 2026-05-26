@@ -2100,6 +2100,19 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
+    <div class="hub-section-title" style="padding:8px 0">Developer / Test Tools</div>
+    <div class="settings-sec">
+      <div class="setting-row" onclick="loadDemoData()">
+        <div class="sr-icon">🧪</div>
+        <div class="sr-info"><div class="sr-label">Load Demo Data</div><div class="sr-sub" id="demo-load-sub">Populate app with sample players, matches &amp; community</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" onclick="clearDemoData()" style="border-bottom:none">
+        <div class="sr-icon">🗑</div>
+        <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Clear Demo Data</div><div class="sr-sub">Remove only demo/test records — real data untouched</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
     <div class="settings-ver" id="settings-ver-footer">CourtCall — Offline First 🏀</div>
   </div>
 </div>
@@ -5662,6 +5675,201 @@ function inviteFriends(){
     </button>`;
   document.body.appendChild(menu);
   setTimeout(()=>document.addEventListener('click',function h(e){if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',h)}},{once:false}),100);
+}
+
+// ── Demo / Test Data Loader ─────────────────────────────────────────
+const DEMO_BATCH_ID='courtcall_demo_v1';
+const _DCID='community_demo_1';
+const _DPID='demo_vadi';
+
+function isDemoDataLoaded(){
+  return getCol(K.matches).some(m=>m.demoBatchId===DEMO_BATCH_ID);
+}
+
+function _updDemoBtn(){
+  const sub=document.getElementById('demo-load-sub');
+  if(sub)sub.innerHTML=isDemoDataLoaded()?'✓ Demo data loaded':'Populate app with sample players, matches &amp; community';
+}
+
+function loadDemoData(){
+  if(isDemoDataLoaded()){showToast('Demo data already loaded');_updDemoBtn();return;}
+  const D=DEMO_BATCH_ID,CID=_DCID,PID=_DPID;
+  const sh=(t,p,q)=>({type:'score',team:t,pts:p,quarter:q});
+
+  // 1. Builder players (14)
+  const dp=[
+    {id:'dp_1',name:'Marcus T.',rating:9,attrs:{shoot:5,def:4,speed:4,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_2',name:'Deja R.',rating:8,attrs:{shoot:4,def:4,speed:5,stamina:3},isDemo:true,demoBatchId:D},
+    {id:'dp_3',name:'Zion K.',rating:8,attrs:{shoot:5,def:3,speed:4,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_4',name:'Aaliyah B.',rating:8,attrs:{shoot:3,def:5,speed:4,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_5',name:'Tyrese W.',rating:8,attrs:{shoot:4,def:3,speed:5,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_6',name:'Simone F.',rating:8,attrs:{shoot:4,def:4,speed:3,stamina:5},isDemo:true,demoBatchId:D},
+    {id:'dp_7',name:'Jalen C.',rating:8,attrs:{shoot:5,def:4,speed:3,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_8',name:'Kamila V.',rating:8,attrs:{shoot:3,def:5,speed:5,stamina:3},isDemo:true,demoBatchId:D},
+    {id:'dp_9',name:'Devon N.',rating:8,attrs:{shoot:4,def:4,speed:4,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_10',name:'Priya S.',rating:8,attrs:{shoot:5,def:3,speed:4,stamina:4},isDemo:true,demoBatchId:D},
+    {id:'dp_11',name:'Chase M.',rating:8,attrs:{shoot:4,def:4,speed:5,stamina:3},isDemo:true,demoBatchId:D},
+    {id:'dp_12',name:'Nia H.',rating:9,attrs:{shoot:3,def:5,speed:4,stamina:5},isDemo:true,demoBatchId:D},
+    {id:'dp_13',name:'Rahul D.',rating:8,attrs:{shoot:4,def:4,speed:3,stamina:5},isDemo:true,demoBatchId:D},
+    {id:'dp_14',name:'Bex O.',rating:9,attrs:{shoot:5,def:3,speed:5,stamina:4},isDemo:true,demoBatchId:D},
+  ];
+  setCol(K.players,[...getCol(K.players),...dp]);
+  try{
+    const bs=getObj('cc_builder',{players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0});
+    bs.players=[...(bs.players||[]),...dp];
+    setObj('cc_builder',bs);
+    if(typeof builderState!=='undefined')builderState.players=[...(builderState.players||[]),...dp];
+  }catch{}
+
+  // 2. Match history (5 matches, history arrays newest-first)
+  const dm=[
+    {id:'match_demo_1',teamA:{name:'Brawlers',score:21},teamB:{name:'Titans',score:17},winner:{name:'Brawlers',score:21},loser:{name:'Titans',score:17},gameType:'5v5',winScore:21,date:'5/20/2026',duration:'28m 14s',foulsA:1,foulsB:2,maxLead:{a:6,b:3},leadChanges:4,biggestRun:7,tournamentId:'tourn_demo_1',fixtureId:'fx_demo_1',isDemo:true,demoBatchId:D,
+      history:[sh('a',1,3),sh('b',2,3),sh('b',2,3),sh('a',3,3),sh('b',2,3),sh('a',2,3),sh('b',2,2),sh('a',2,2),sh('b',2,2),sh('a',2,2),sh('a',3,2),sh('a',2,2),sh('b',2,1),sh('a',2,1),sh('a',2,1),sh('b',3,1),sh('b',2,1),sh('a',2,1)]},
+    {id:'match_demo_2',teamA:{name:'Falcons',score:15},teamB:{name:'Warriors',score:13},winner:{name:'Falcons',score:15},loser:{name:'Warriors',score:13},gameType:'3v3',winScore:15,date:'5/18/2026',duration:'21m 5s',foulsA:0,foulsB:1,maxLead:{a:2,b:1},leadChanges:6,biggestRun:3,tournamentId:'tourn_demo_1',fixtureId:'fx_demo_2',isDemo:true,demoBatchId:D,
+      history:[sh('a',2,3),sh('b',2,3),sh('a',2,3),sh('b',2,3),sh('a',3,2),sh('b',2,2),sh('a',2,2),sh('b',2,2),sh('a',2,2),sh('b',3,1),sh('a',2,1),sh('b',2,1),sh('a',2,1)]},
+    {id:'match_demo_3',teamA:{name:'Titans',score:21},teamB:{name:'Falcons',score:20},winner:{name:'Titans',score:21},loser:{name:'Falcons',score:20},gameType:'5v5',winScore:21,date:'5/18/2026',duration:'35m 42s',foulsA:2,foulsB:2,maxLead:{a:2,b:2},leadChanges:14,biggestRun:3,tournamentId:'tourn_demo_1',fixtureId:'fx_demo_3',isDemo:true,demoBatchId:D,
+      history:[sh('a',2,3),sh('b',2,3),sh('a',3,3),sh('b',3,3),sh('a',2,3),sh('b',2,3),sh('a',2,2),sh('b',3,2),sh('a',3,2),sh('b',2,2),sh('a',2,2),sh('b',3,1),sh('a',2,1),sh('b',2,1),sh('a',3,1),sh('b',3,1),sh('a',2,1)]},
+    {id:'match_demo_4',teamA:{name:'Brawlers',score:11},teamB:{name:'Warriors',score:8},winner:{name:'Brawlers',score:11},loser:{name:'Warriors',score:8},gameType:'4v4',winScore:11,date:'5/15/2026',duration:'18m 30s',foulsA:0,foulsB:1,maxLead:{a:3,b:0},leadChanges:0,biggestRun:2,tournamentId:'tourn_demo_1',fixtureId:'fx_demo_4',isDemo:true,demoBatchId:D,
+      history:[sh('a',2,2),sh('b',2,2),sh('a',2,2),sh('b',1,2),sh('a',1,2),sh('b',2,1),sh('a',2,1),sh('b',1,1),sh('a',2,1),sh('b',2,1),sh('a',2,1)]},
+    {id:'match_demo_5',teamA:{name:'Warriors',score:21},teamB:{name:'Titans',score:18},winner:{name:'Warriors',score:21},loser:{name:'Titans',score:18},gameType:'5v5',winScore:21,date:'5/22/2026',duration:'31m 55s',foulsA:1,foulsB:2,maxLead:{a:3,b:2},leadChanges:12,biggestRun:5,tournamentId:'tourn_demo_1',fixtureId:'fx_demo_5',isDemo:true,demoBatchId:D,
+      history:[sh('a',2,3),sh('a',3,3),sh('b',3,3),sh('a',3,3),sh('b',2,3),sh('a',2,3),sh('b',3,2),sh('a',2,2),sh('b',2,2),sh('a',2,2),sh('b',3,2),sh('a',3,1),sh('b',2,1),sh('a',2,1),sh('b',3,1),sh('a',2,1)]},
+  ];
+  setCol(K.matches,[...dm,...getCol(K.matches)].slice(0,100));
+
+  // 3. Tournament (round robin, 4 teams, 5 of 6 fixtures played)
+  const dt={id:'tourn_demo_1',name:'Summer Hoops Classic',format:'roundrobin',winScore:21,
+    teams:[{name:'Brawlers'},{name:'Titans'},{name:'Falcons'},{name:'Warriors'}],
+    fixtures:[
+      {id:'fx_demo_1',teamA:'Brawlers',teamB:'Titans',scoreA:21,scoreB:17,winner:'Brawlers',played:true},
+      {id:'fx_demo_2',teamA:'Falcons',teamB:'Warriors',scoreA:15,scoreB:13,winner:'Falcons',played:true},
+      {id:'fx_demo_3',teamA:'Titans',teamB:'Falcons',scoreA:21,scoreB:20,winner:'Titans',played:true},
+      {id:'fx_demo_4',teamA:'Brawlers',teamB:'Warriors',scoreA:11,scoreB:8,winner:'Brawlers',played:true},
+      {id:'fx_demo_5',teamA:'Warriors',teamB:'Titans',scoreA:21,scoreB:18,winner:'Warriors',played:true},
+      {id:'fx_demo_6',teamA:'Falcons',teamB:'Brawlers',scoreA:null,scoreB:null,winner:null,played:false},
+    ],
+    createdAt:'5/15/2026',completed:false,isDemo:true,demoBatchId:D};
+  setCol(K.tournaments,[...getCol(K.tournaments),dt]);
+
+  // 4. Community
+  const dc={id:CID,name:'Westside Ballers',type:'Pickup Group',country:'US',state:'California',city:'Los Angeles',area:'Westside',court:'Palisades Park',description:'Sunday pickup games at Palisades Park. All skill levels welcome!',logo:'🏀',visibility:'public',joinApproval:false,createdBy:PID,createdAt:'5/1/2026',memberCount:5,isDemo:true,demoBatchId:D};
+  setComms([...getComms(),dc]);
+
+  // 5. Community members (5)
+  const dmem=[
+    {id:'member_demo_1',communityId:CID,profileId:PID,profileName:'Vadi S.',role:'admin',joinedAt:'5/1/2026',isDemo:true,demoBatchId:D},
+    {id:'member_demo_2',communityId:CID,profileId:'demo_marcus',profileName:'Marcus T.',role:'contributor',joinedAt:'5/2/2026',isDemo:true,demoBatchId:D},
+    {id:'member_demo_3',communityId:CID,profileId:'demo_deja',profileName:'Deja R.',role:'member',joinedAt:'5/3/2026',isDemo:true,demoBatchId:D},
+    {id:'member_demo_4',communityId:CID,profileId:'demo_zion',profileName:'Zion K.',role:'member',joinedAt:'5/4/2026',isDemo:true,demoBatchId:D},
+    {id:'member_demo_5',communityId:CID,profileId:'demo_aaliyah',profileName:'Aaliyah B.',role:'member',joinedAt:'5/5/2026',isDemo:true,demoBatchId:D},
+  ];
+  setCommMembers([...getCommMembers(),...dmem]);
+
+  // 6. Community players (6)
+  const dcp=[
+    {id:'cp_demo_1',communityId:CID,name:'Marcus T.',nickname:'Big Marc',jerseyNumber:'23',photoUrl:'',position:'SF',gamesPlayed:8,wins:5,losses:3,points:87,mvpCount:2,badges:['🏆','🎯'],createdBy:PID,createdAt:'2026-05-02T10:00:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'cp_demo_2',communityId:CID,name:'Deja R.',nickname:'Flash',jerseyNumber:'7',photoUrl:'',position:'PG',gamesPlayed:8,wins:5,losses:3,points:72,mvpCount:1,badges:['⚡'],createdBy:PID,createdAt:'2026-05-02T10:01:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'cp_demo_3',communityId:CID,name:'Zion K.',nickname:'Z',jerseyNumber:'1',photoUrl:'',position:'C',gamesPlayed:7,wins:4,losses:3,points:63,mvpCount:0,badges:['🛡'],createdBy:PID,createdAt:'2026-05-02T10:02:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'cp_demo_4',communityId:CID,name:'Aaliyah B.',nickname:'Lock',jerseyNumber:'4',photoUrl:'',position:'SG',gamesPlayed:6,wins:4,losses:2,points:58,mvpCount:1,badges:['🛡','🤝'],createdBy:PID,createdAt:'2026-05-03T10:00:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'cp_demo_5',communityId:CID,name:'Tyrese W.',nickname:'Ty',jerseyNumber:'11',photoUrl:'',position:'SG',gamesPlayed:5,wins:3,losses:2,points:44,mvpCount:0,badges:['⚡'],createdBy:PID,createdAt:'2026-05-04T10:00:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'cp_demo_6',communityId:CID,name:'Simone F.',nickname:'Sims',jerseyNumber:'14',photoUrl:'',position:'PF',gamesPlayed:5,wins:3,losses:2,points:41,mvpCount:0,badges:['🤝'],createdBy:PID,createdAt:'2026-05-04T10:01:00.000Z',isDemo:true,demoBatchId:D},
+  ];
+  saveAllCPlayers([...getAllCPlayers(),...dcp]);
+
+  // 7. Community ratings (3, attrs 1-5 scale each)
+  const dcr=[
+    {id:'rating_demo_1',playerId:'cp_demo_1',communityId:CID,raterProfileId:PID,shooting:5,defense:4,passing:4,speed:4,teamwork:4,clutch:5,sportsmanship:5,createdAt:'2026-05-10T10:00:00.000Z',updatedAt:'2026-05-10T10:00:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'rating_demo_2',playerId:'cp_demo_2',communityId:CID,raterProfileId:PID,shooting:4,defense:4,passing:5,speed:5,teamwork:4,clutch:4,sportsmanship:4,createdAt:'2026-05-10T10:01:00.000Z',updatedAt:'2026-05-10T10:01:00.000Z',isDemo:true,demoBatchId:D},
+    {id:'rating_demo_3',playerId:'cp_demo_3',communityId:CID,raterProfileId:'demo_marcus',shooting:3,defense:5,passing:3,speed:4,teamwork:4,clutch:3,sportsmanship:5,createdAt:'2026-05-10T10:02:00.000Z',updatedAt:'2026-05-10T10:02:00.000Z',isDemo:true,demoBatchId:D},
+  ];
+  saveAllCRatings([...getAllCRatings(),...dcr]);
+
+  // 8. Community posts (3)
+  const dpost=[
+    {id:'post_demo_1',communityId:CID,authorId:PID,authorName:'Vadi S.',type:'General Post',title:'Sunday runs are back!',body:"Great turnout this week — 10 players showed up. Brawlers took the trophy again. Same time next Sunday at Palisades Park!",imageUrl:'',pinned:true,createdAt:'2026-05-22T18:00:00.000Z',reactions:{like:['demo_marcus','demo_deja'],fire:['demo_zion'],clap:[]},comments:[{id:'cmt_demo_1',authorId:'demo_marcus',authorName:'Marcus T.',text:"Let's go!! Can't wait for next week 🔥",createdAt:'2026-05-22T18:30:00.000Z'}],isDemo:true,demoBatchId:D},
+    {id:'post_demo_2',communityId:CID,authorId:'demo_marcus',authorName:'Marcus T.',type:'General Post',title:'New pickup spot?',body:'Heard Venice Beach courts are open on Saturday mornings. Anyone want to try a different spot?',imageUrl:'',pinned:false,createdAt:'2026-05-20T12:00:00.000Z',reactions:{like:['demo_deja'],fire:[],clap:[PID]},comments:[],isDemo:true,demoBatchId:D},
+    {id:'post_demo_3',communityId:CID,authorId:'demo_deja',authorName:'Deja R.',type:'General Post',title:'Game recap: Titans vs Falcons',body:'That last game was WILD. Titans won 21-20 on a clutch bucket in the final seconds. Respect to both squads 🤝',imageUrl:'',pinned:false,createdAt:'2026-05-18T20:00:00.000Z',reactions:{like:[PID,'demo_marcus','demo_zion'],fire:[PID],clap:['demo_marcus']},comments:[{id:'cmt_demo_2',authorId:'demo_zion',authorName:'Zion K.',text:'That game was fire! Rematch soon!',createdAt:'2026-05-18T20:15:00.000Z'},{id:'cmt_demo_3',authorId:'demo_marcus',authorName:'Marcus T.',text:'Titans earned it. GG everyone 🏀',createdAt:'2026-05-18T20:30:00.000Z'}],isDemo:true,demoBatchId:D},
+  ];
+  saveAllPosts([...getAllPosts(),...dpost]);
+
+  // 9. Community gallery (2 items, placeholder images)
+  const dgal=[
+    {id:'gallery_demo_1',communityId:CID,imageSourceType:'upload',imageData:'',imageUrl:'',fileName:'team_photo.jpg',caption:'Westside Ballers crew — Sunday May 22nd 🏀',album:'Match Day Photos',taggedPlayers:['cp_demo_1','cp_demo_2'],uploadedBy:PID,uploaderName:'Vadi S.',createdAt:'2026-05-22T19:00:00.000Z',likes:['demo_marcus','demo_deja','demo_zion'],comments:[],isDemo:true,demoBatchId:D},
+    {id:'gallery_demo_2',communityId:CID,imageSourceType:'upload',imageData:'',imageUrl:'',fileName:'trophy_shot.jpg',caption:'Brawlers winning the Summer Hoops Classic 🏆',album:'Winners Gallery',taggedPlayers:['cp_demo_1'],uploadedBy:'demo_marcus',uploaderName:'Marcus T.',createdAt:'2026-05-22T19:30:00.000Z',likes:[PID,'demo_deja'],comments:[{id:'gal_cmt_demo_1',authorId:'demo_deja',authorName:'Deja R.',text:'Well deserved! 🔥',createdAt:'2026-05-22T20:00:00.000Z'}],isDemo:true,demoBatchId:D},
+  ];
+  saveAllGalItems([...getAllGalItems(),...dgal]);
+
+  // 10. Community events (2)
+  const devt=[
+    {id:'event_demo_1',communityId:CID,title:'Sunday Pickup Run',description:'Weekly pickup games at Palisades Park. All skill levels welcome!',type:'Pickup Game',date:'2026-06-01',time:'10:00 AM',location:'Palisades Park, Los Angeles',maxPlayers:10,createdBy:PID,creatorName:'Vadi S.',createdAt:'2026-05-22T18:00:00.000Z',rsvps:[{profileId:'demo_marcus',name:'Marcus T.',status:'going'},{profileId:'demo_deja',name:'Deja R.',status:'going'},{profileId:'demo_zion',name:'Zion K.',status:'maybe'},{profileId:'demo_aaliyah',name:'Aaliyah B.',status:'need_team'}],isDemo:true,demoBatchId:D},
+    {id:'event_demo_2',communityId:CID,title:'Summer Hoops Classic — Final',description:'Season-ending tournament. Single elimination. Top teams face off!',type:'Tournament',date:'2026-06-15',time:'2:00 PM',location:'Palisades Park, Los Angeles',maxPlayers:20,createdBy:PID,creatorName:'Vadi S.',createdAt:'2026-05-23T09:00:00.000Z',rsvps:[{profileId:'demo_marcus',name:'Marcus T.',status:'going'},{profileId:'demo_deja',name:'Deja R.',status:'going'},{profileId:'demo_zion',name:'Zion K.',status:'going'},{profileId:'demo_aaliyah',name:'Aaliyah B.',status:'going'},{profileId:'demo_tyrese',name:'Tyrese W.',status:'maybe'}],isDemo:true,demoBatchId:D},
+  ];
+  saveAllEvents([...getAllEvents(),...devt]);
+
+  // 11. Demo saved game — Brawlers 12-10 Titans, mid-Q2, only if no active game
+  if(!load()){
+    const dg={gameType:'5v5',winScore:21,ptsSmall:2,ptsLarge:3,allowFreeThrow:true,shotClockDuration:24,shotClockAutoReset:true,gameClockMode:'off',
+      teamA:{name:'Brawlers',score:12,fouls:2,colorKey:'orange'},
+      teamB:{name:'Titans',score:10,fouls:3,colorKey:'blue'},
+      quarter:2,possession:'a',
+      history:[
+        {type:'score',team:'a',pts:2,quarter:2},
+        {type:'score',team:'b',pts:2,quarter:2},
+        {type:'foul',team:'a',quarter:2},
+        {type:'score',team:'a',pts:1,quarter:2},
+        {type:'score',team:'b',pts:3,quarter:2},
+        {type:'foul',team:'b',quarter:2},
+        {type:'score',team:'a',pts:3,quarter:1},
+        {type:'foul',team:'b',quarter:1},
+        {type:'score',team:'b',pts:2,quarter:1},
+        {type:'foul',team:'a',quarter:1},
+        {type:'score',team:'a',pts:2,quarter:1},
+        {type:'score',team:'b',pts:3,quarter:1},
+        {type:'foul',team:'b',quarter:1},
+        {type:'score',team:'a',pts:2,quarter:1},
+        {type:'score',team:'a',pts:2,quarter:1},
+      ],
+      maxLead:{a:4,b:0},voiceActive:false,gameOver:false,
+      startTime:Date.now()-12*60*1000,
+      isDemo:true,demoBatchId:D};
+    try{localStorage.setItem(K.game,JSON.stringify(dg))}catch{}
+  }
+
+  // 12. Analytics — only if no existing analytics
+  try{
+    const st=getObj(STATS_KEY,{});
+    if(!st.appLaunchDate){
+      setObj(STATS_KEY,{appLaunchDate:'2026-05-01T10:00:00.000Z',lastVisitAt:new Date().toISOString(),totalVisits:47,profilesCreated:3,guestSessions:2,gamesStarted:12,gamesCompleted:5,matchesSaved:5,playersAdded:14,tournamentsCreated:1,communitiesCreated:1,voiceCommandsUsed:8});
+    }
+  }catch{}
+
+  _updDemoBtn();
+  showToast('Demo data loaded! 🧪 14 players, 5 matches, 1 community');
+}
+
+function clearDemoData(){
+  if(!confirm('Remove all demo/test data? Your real data will not be affected.'))return;
+  const D=DEMO_BATCH_ID;
+  const flt=arr=>(arr||[]).filter(x=>!(x.isDemo||x.demoBatchId===D));
+  setCol(K.players,flt(getCol(K.players)));
+  setCol(K.matches,flt(getCol(K.matches)));
+  setCol(K.tournaments,flt(getCol(K.tournaments)));
+  setComms(flt(getComms()));
+  setCommMembers(flt(getCommMembers()));
+  saveAllCPlayers(flt(getAllCPlayers()));
+  saveAllCRatings(flt(getAllCRatings()));
+  saveAllPosts(flt(getAllPosts()));
+  saveAllGalItems(flt(getAllGalItems()));
+  saveAllEvents(flt(getAllEvents()));
+  try{saveAllJoinReqs(flt(getAllJoinReqs()))}catch{}
+  try{
+    const bs=getObj('cc_builder',{players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0});
+    bs.players=flt(bs.players||[]);
+    setObj('cc_builder',bs);
+    if(typeof builderState!=='undefined')builderState.players=flt(builderState.players||[]);
+  }catch{}
+  try{const s=load();if(s&&s.isDemo)clearSave()}catch{}
+  _updDemoBtn();
+  showToast('Demo data cleared ✓');
 }
 </script>
 
