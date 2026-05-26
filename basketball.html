@@ -2264,14 +2264,16 @@ function createProfile(){
   setObj(K.profile,p);
   currentProfile=p;
   trackEvent('profile_created');
-  renderHub();showScreen('hub');
+  renderHub();
+  if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}else{showScreen('hub');}
 }
 function guestLogin(){
   const p={id:'guest',name:'Guest',nickname:'Guest',createdAt:'',gamesPlayed:0};
   setObj(K.profile,p);
   currentProfile=p;
   trackEvent('guest_started');
-  renderHub();showScreen('hub');
+  renderHub();
+  if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}else{showScreen('hub');}
 }
 function selectProfile(id){
   const profiles=getCol(K.profiles);
@@ -3524,7 +3526,7 @@ function checkOnboarding(){
 function obAction(type){
   localStorage.setItem(OB_KEY,'1');
   renderHub();
-  if(type==='game'){showScreen('hub');setTimeout(()=>goSetup(),60);}
+  if(type==='game'){goSetup();}
   else if(type==='teams'){showScreen('teams');}
   else if(type==='tournament'){showScreen('tournament');}
   else if(type==='community'){showScreen('communities');}
