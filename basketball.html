@@ -2862,7 +2862,7 @@ function toggleVoice(){
   else{clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{}document.getElementById('voice-panel').classList.add('hidden')}
   updateVoiceUI();
 }
-function stopVoice(){state.voiceActive=false;clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{};updateVoiceUI()}
+function stopVoice(){state.voiceActive=false;clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{};document.getElementById('voice-panel')?.classList.add('hidden');updateVoiceUI()}
 function updateVoiceUI(){
   const on=state.voiceActive;
   ['ctrl-mic','nav-mic'].forEach(id=>{const el=document.getElementById(id);if(!el)return;if(id==='ctrl-mic')el.classList.toggle('mic-on',on);if(id==='nav-mic'){el.classList.toggle('on',on);el.textContent=on?'🔴':'🎤'}});
