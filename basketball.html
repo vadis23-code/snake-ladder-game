@@ -2946,10 +2946,13 @@ function startListening(){
   try{recognition.start()}catch{state.voiceActive=false;updateVoiceUI();setVAction('❌ Could not start mic — tap Mic to retry')}
 }
 function toggleVoice(){
-  if(!voiceOK){document.getElementById('voice-panel').classList.remove('hidden');setVAction('❌ Voice not supported — open in Chrome or Edge');return}
+  const vp=document.getElementById('voice-panel');
+  if(!voiceOK){vp.classList.toggle('hidden',!vp.classList.contains('hidden'));if(!vp.classList.contains('hidden'))setVAction('❌ Voice not supported — open in Chrome or Edge');return}
+  // If panel is still showing after an error (voiceActive already false), just close it
+  if(!state.voiceActive&&!vp.classList.contains('hidden')){vp.classList.add('hidden');updateVoiceUI();return}
   state.voiceActive=!state.voiceActive;
-  if(state.voiceActive){document.getElementById('voice-panel').classList.remove('hidden');setVHeard('');setVAction('🎤 Listening… say a command');startListening()}
-  else{clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{}document.getElementById('voice-panel').classList.add('hidden')}
+  if(state.voiceActive){vp.classList.remove('hidden');setVHeard('');setVAction('🎤 Listening… say a command');startListening()}
+  else{clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{}vp.classList.add('hidden')}
   updateVoiceUI();
 }
 function stopVoice(){state.voiceActive=false;clearTimeout(restartTmr);try{if(recognition)recognition.abort()}catch{};document.getElementById('voice-panel')?.classList.add('hidden');updateVoiceUI()}
@@ -6017,7 +6020,7 @@ function _hcRenderSuggs(){
   const el=document.getElementById('help-suggs');
   if(!el)return;
   el.style.display='';
-  el.innerHTML=_HSUGGS.map(q=>`<button class="help-sugg" onclick="_hcSugg(${JSON.stringify(q)})">${escHtml(q)}</button>`).join('');
+  el.innerHTML=_HSUGGS.map(q=>`<button class="help-sugg" onclick="_hcSugg('${escHtml(q.replace(/'/g,"&#39;"))}')">${escHtml(q)}</button>`).join('');
 }
 
 // ── Help Center ───────────────────────────────────────────────────────
@@ -6025,7 +6028,7 @@ function renderHelpCenter(){
   const q=(document.getElementById('hc-search')?.value||'').toLowerCase().trim();
   const cats=['All',...[...new Set(COURTCALL_HELP_KB.map(a=>a.category))]];
   const catEl=document.getElementById('hc-cats');
-  if(catEl)catEl.innerHTML=cats.map(c=>`<button class="hc-cat${c===hcActiveCat?' on':''}" onclick="hcSetCat(${JSON.stringify(c)})">${escHtml(c)}</button>`).join('');
+  if(catEl)catEl.innerHTML=cats.map(c=>`<button class="hc-cat${c===hcActiveCat?' on':''}" onclick="hcSetCat('${escHtml(c.replace(/'/g,"&#39;"))}')">${escHtml(c)}</button>`).join('');
   let arts=COURTCALL_HELP_KB;
   if(hcActiveCat!=='All')arts=arts.filter(a=>a.category===hcActiveCat);
   if(q)arts=arts.filter(a=>
