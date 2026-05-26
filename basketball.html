@@ -1112,6 +1112,66 @@ table.standings tr:last-child td{border-bottom:none}
 .pwa-bar-cta{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;padding:6px 14px;background:var(--ca);border-radius:var(--r1);flex-shrink:0}
 .pwa-bar-x{background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px;flex-shrink:0}
 .pwa-bar-x:active{color:var(--text)}
+/* ── Help FAB ──────────────────────────────────────────── */
+.help-fab{position:fixed;bottom:76px;right:16px;z-index:210;background:var(--ca);color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.45);display:flex;align-items:center;gap:6px;transition:transform .15s,opacity .2s,box-shadow .15s;letter-spacing:.01em}
+.help-fab:active{transform:scale(.93)}
+.help-fab.hidden{opacity:0;pointer-events:none;transform:scale(.85) translateY(4px)}
+/* ── Help Chat Panel ───────────────────────────────────── */
+.help-chat-wrap{position:fixed;inset:0;z-index:400;pointer-events:none}
+.help-chat-wrap.open{pointer-events:auto}
+.help-chat-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .22s}
+.help-chat-wrap.open .help-chat-backdrop{opacity:1}
+.help-chat-panel{position:absolute;bottom:0;left:0;right:0;max-height:88dvh;background:var(--s1);border-radius:20px 20px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .26s cubic-bezier(.4,0,.2,1)}
+.help-chat-wrap.open .help-chat-panel{transform:translateY(0)}
+.help-chat-header{display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.help-chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--ca);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.help-chat-title{flex:1;min-width:0}
+.help-chat-title-main{font-size:15px;font-weight:700;color:var(--text)}
+.help-chat-title-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.help-chat-acts{display:flex;gap:4px;flex-shrink:0}
+.help-chat-act{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:5px 7px;border-radius:8px;line-height:1}
+.help-chat-act:active{background:var(--s2);color:var(--text)}
+.help-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:80px}
+.help-msg{max-width:90%;font-size:14px;line-height:1.55;padding:10px 13px;border-radius:14px;word-break:break-word}
+.help-msg.bot{background:var(--s2);color:var(--text);align-self:flex-start;border-radius:4px 14px 14px 14px}
+.help-msg.user{background:var(--ca);color:#fff;align-self:flex-end;border-radius:14px 14px 4px 14px}
+.help-msg-steps{padding-left:20px;margin:6px 0 2px;font-size:13px;line-height:1.75;color:var(--muted)}
+.help-msg-steps li{margin-bottom:1px}
+.help-msg-related{margin-top:7px;font-size:12px;color:var(--muted)}
+.help-fb-row{display:flex;align-items:center;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap}
+.help-fb-lbl{font-size:12px;color:var(--muted)}
+.help-fb-btn{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .1s}
+.help-fb-btn:active{background:var(--s2);color:var(--text)}
+.help-suggs{padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border);flex-shrink:0}
+.help-sugg{font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text);cursor:pointer;font-family:inherit;text-align:left;line-height:1.3;transition:background .1s,color .1s}
+.help-sugg:active{background:var(--ca);color:#fff;border-color:var(--ca)}
+.help-input-row{display:flex;gap:8px;padding:10px 14px;padding-bottom:max(14px,env(safe-area-inset-bottom));flex-shrink:0}
+.help-input{flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:22px;padding:10px 16px;font-size:14px;color:var(--text);outline:none;font-family:inherit}
+.help-input:focus{border-color:var(--ca)}
+.help-send{background:var(--ca);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .12s}
+.help-send:active{transform:scale(.9)}
+/* ── Help Center Screen ────────────────────────────────── */
+.hc-body{padding:14px;padding-bottom:90px;overflow-y:auto;flex:1}
+.hc-search-row{position:relative;margin-bottom:12px}
+.hc-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.hc-search{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px 11px 38px;font-size:14px;color:var(--text);outline:none;font-family:inherit;box-sizing:border-box}
+.hc-search:focus{border-color:var(--ca)}
+.hc-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.hc-cat{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .1s,color .1s}
+.hc-cat.on{background:var(--ca);color:#fff;border-color:var(--ca)}
+.hc-card{background:var(--s2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.hc-card-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
+.hc-card-cat{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ca);font-weight:700;margin-bottom:2px}
+.hc-card-title{font-size:14px;font-weight:700;color:var(--text)}
+.hc-card-arr{color:var(--muted2);font-size:15px;margin-left:auto;transition:transform .18s;flex-shrink:0}
+.hc-card-arr.open{transform:rotate(90deg)}
+.hc-card-body{padding:0 14px 14px;font-size:13px;color:var(--muted);line-height:1.6}
+.hc-card-body.hidden{display:none}
+.hc-card-short{margin-bottom:8px;color:var(--text)}
+.hc-card-steps{padding-left:20px;margin:0 0 4px;line-height:1.8}
+.hc-card-steps li{margin-bottom:2px}
+.hc-ask-bar{text-align:center;margin-top:16px}
+.hc-ask-btn{display:inline-block;padding:12px 24px;background:var(--ca);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -2058,6 +2118,19 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
+    <div class="hub-section-title" style="padding:8px 0">Help</div>
+    <div class="settings-sec">
+      <div class="setting-row" onclick="showScreen('help-center')">
+        <div class="sr-icon">📖</div>
+        <div class="sr-info"><div class="sr-label">Help Center</div><div class="sr-sub">Browse how-to guides and FAQs</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" onclick="openHelpChat()" style="border-bottom:none">
+        <div class="sr-icon">💬</div>
+        <div class="sr-info"><div class="sr-label">Ask CourtCall Assistant</div><div class="sr-sub">Get quick answers about any feature</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
     <div class="hub-section-title" style="padding:8px 0">Analytics</div>
     <div class="settings-sec">
       <div class="setting-row" onclick="showScreen('analytics')" style="border-bottom:none">
@@ -2263,6 +2336,10 @@ function showScreen(name){
   if(name==='comm-create')resetCommCreateForm();
   if(name==='comm-detail')renderCommDetail();
   if(name==='profile'){renderExistingProfiles();document.getElementById('inp-profile-name').value='';document.getElementById('inp-profile-nick').value=''}
+  if(name==='help-center'){hcActiveCat='All';renderHelpCenter();}
+  // Hide floating help button during live game
+  const fab=document.getElementById('help-fab');
+  if(fab)fab.classList.toggle('hidden',name==='game');
 }
 // ── Profile ──────────────────────────────────────────────
 let currentProfile=null;
@@ -5677,6 +5754,318 @@ function inviteFriends(){
   setTimeout(()=>document.addEventListener('click',function h(e){if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',h)}},{once:false}),100);
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   CourtCall Assistant — PHASE HELP-AI-1
+   Rule-based keyword matching. NOT real AI.
+
+   Future architecture (do not implement here):
+     Frontend chat → POST /api/help-chat → LLM with RAG over help docs
+     → answer returned to user. Never expose API keys in frontend.
+═══════════════════════════════════════════════════════════════════ */
+const HELP_CHAT_KEY='courtcall_help_chat_history';
+const HELP_FB_KEY='courtcall_help_feedback';
+const _HFE='vadi.s23@gmail.com';
+const _HFMSG=`I'm not fully sure about that yet. Please email <a href="mailto:${_HFE}" style="color:var(--ca)">${_HFE}</a> with your question.<br><br><em style="font-size:12px">Tip: Settings → Send Feedback also works.</em>`;
+
+// ── Help Knowledge Base ───────────────────────────────────────────────
+const COURTCALL_HELP_KB=[
+  {id:'getting-started',title:'Getting Started with CourtCall',category:'Getting Started',
+    keywords:['start','begin','what is courtcall','courtcall','offline','login','account','new user','first time','how to use','intro','sign up','no account','no login'],
+    shortAnswer:'CourtCall lets you score pickup games, build balanced teams, manage tournaments, create communities, and save match history — no login needed, fully offline.',
+    steps:['Open CourtCall — no sign-up required.','Tap Start Quick Game to score immediately.','Use Team Builder to split players into fair teams.','Use Tournament for round-robin or knockout fixtures.','Use Communities for your crew: feed, players, gallery, and events.'],
+    relatedFeatures:['Quick Game','Team Builder','Tournament','Communities']},
+  {id:'quick-game',title:'How to Start a Quick Game',category:'Quick Game',
+    keywords:['quick game','start game','new game','score game','3v3','4v4','5v5','game type','win score','team name','begin game','play game','setup game'],
+    shortAnswer:'Tap Start Quick Game from the Hub, configure the teams and win score, then tap Start Game.',
+    steps:['Tap Start Quick Game on the Hub.','Select game type: 3v3, 4v4, 5v5, or Custom.','Enter Team A and Team B names.','Select win score: 11, 15, 21, or Custom.','Choose scoring rule: 1s & 2s or 2s & 3s.','Tap Start Game — scoring begins immediately.'],
+    relatedFeatures:['Scoring','Voice Scoring','Shot Clock']},
+  {id:'scoring',title:'How to Add Points',category:'Scoring',
+    keywords:['score','points','add points','plus one','plus two','plus three','+1','+2','+3','free throw','bucket','basket','and one','technical','tap score'],
+    shortAnswer:'During a game, tap +1, +2, or +3 under the scoring team. +1 covers free throws, and-ones, and technicals.',
+    steps:['Tap +1, +2, or +3 on the scoring team panel.','The score updates instantly and appears in the event feed.','Use the Foul button to track fouls separately.','Tap ↩ Undo to reverse the latest entry.'],
+    relatedFeatures:['Fouls and Undo','Voice Scoring']},
+  {id:'fouls-undo',title:'Adding Fouls and Using Undo',category:'Fouls and Undo',
+    keywords:['foul','fouls','add foul','personal foul','undo','reverse','remove score','wrong score','take back','foul count','undo last'],
+    shortAnswer:'Tap the Foul button under a team to add a personal foul. Tap ↩ Undo to reverse the most recent score or foul.',
+    steps:['Tap the Foul button under the team that committed the foul.','The foul count shows on the score panel.','Tap ↩ Undo at the bottom of the game screen to reverse the latest action.','Undo works for both scores and fouls.','Undo is disabled after the game is over.'],
+    relatedFeatures:['Scoring','Match History']},
+  {id:'shot-clock',title:'Using the Shot Clock',category:'Shot Clock',
+    keywords:['shot clock','possession clock','24 second','30 second','14 second','12 second','clock','timer','reset clock','auto reset','possession time','shot clock reset','enable shot clock'],
+    shortAnswer:'Enable shot clock in Game Setup. Choose 12, 14, 24, 30 seconds, or a custom duration.',
+    steps:['On Game Setup, find the Shot Clock section.','Select a preset: 12, 14, 24, 30 s, or Custom.','Enable Auto-reset to restart automatically after each score.','In a live game, use ▶ to pause and ↺ to reset the shot clock.'],
+    relatedFeatures:['Game Clock','Quick Game']},
+  {id:'game-clock',title:'Using the Game Clock',category:'Game Clock',
+    keywords:['game clock','game timer','elapsed time','overall time','count up','count down','game time','clock mode'],
+    shortAnswer:'Game clock tracks total elapsed game time. Shot clock tracks per-possession time — they are independent.',
+    steps:['Enable game clock in Game Setup under Game Clock.','Choose count-up (elapsed time) mode.','The clock shows in the game screen header alongside the score.'],
+    relatedFeatures:['Shot Clock']},
+  {id:'voice-scoring',title:'How to Use Voice Scoring',category:'Voice Scoring',
+    keywords:['voice','microphone','mic','speak','say','voice scoring','voice command','speech','talk','voice input','orange two','team a two','undo voice','score check'],
+    shortAnswer:'Tap 🎤 Voice during a game and speak a scoring command. Works best on Chrome or Edge.',
+    steps:['During a game, tap 🎤 Voice.','Speak clearly after the mic activates. Example commands:','"Orange two" — +2 to the orange team.','"Black one" — +1 to the black team.','"Team A plus two" — +2 to Team A.','"Undo" — reverses the latest action.','"Score check" — reads the current score.','"Reset shot clock" — resets the possession clock.','Tap the mic button again to stop listening.','Voice scoring requires microphone permission. Works best on Chrome/Edge.'],
+    relatedFeatures:['Scoring','Shot Clock']},
+  {id:'team-builder',title:'How to Build Balanced Teams',category:'Team Builder',
+    keywords:['team builder','build team','add player','balanced teams','random teams','snake draft','draft','fair teams','team generator','create teams','split teams','player pool'],
+    shortAnswer:'Open Team Builder, add players with skill ratings, then generate Balanced, Random, or Snake Draft teams.',
+    steps:['Tap the Teams tab or More → Team Builder.','Tap + Add Player and enter a name.','Rate the player on Shooting, Defense, Speed, and Stamina (1–5).','Add all players, then tap Generate Teams.','Choose Balanced (by rating), Random, or Snake Draft.','Reshuffle to get different combinations.'],
+    relatedFeatures:['Player Ratings','Queue / Who Got Next']},
+  {id:'player-ratings',title:'How Player Ratings Work',category:'Player Ratings',
+    keywords:['rating','ratings','overall','shooting','defense','speed','stamina','attribute','skill','star rating','player skill','overall rating','rate player'],
+    shortAnswer:'Each player is rated 1–5 on Shooting, Defense, Speed, and Stamina. Overall is auto-calculated from all four.',
+    steps:['Shooting: scoring range and accuracy.','Defense: ability to guard and contest shots.','Speed: quickness and transition pace.','Stamina: endurance across a run.','Overall = calculated from the four attributes.','Higher overall means better balanced teams.'],
+    relatedFeatures:['Team Builder']},
+  {id:'queue',title:'Queue — Who Got Next',category:'Queue / Who Got Next',
+    keywords:['queue','who got next','next team','winners stay','losers out','rotation','waiting team','lineup','court queue','next up'],
+    shortAnswer:'The Queue manages which team plays next. Use Winners Stay or Rotation mode.',
+    steps:['Open Team Builder → Queue tab.','Add teams to the queue list.','Choose mode: Winners Stay (winning team stays on) or Rotation (teams take turns).','Update the queue after each game result.'],
+    relatedFeatures:['Team Builder']},
+  {id:'match-history',title:'Match History and Saved Games',category:'Match History',
+    keywords:['history','match history','saved game','past game','previous game','result','resume game','saved match','old game','match log','game log'],
+    shortAnswer:'Match history is saved automatically when a game ends. Browse it in the History tab.',
+    steps:['Tap 📋 History in the bottom navigation.','See all completed games in reverse order.','Tap a match to view the full score and event log.','If a game is paused mid-session, tap Resume on the Hub to continue.'],
+    relatedFeatures:['Quick Game','Tournament']},
+  {id:'tournament',title:'How to Create a Tournament',category:'Tournament',
+    keywords:['tournament','bracket','fixture','round robin','knockout','standings','create tournament','single elimination','generate fixtures','schedule','tournament result'],
+    shortAnswer:'Create a tournament from More → Tournament. Add teams and choose Round Robin or Knockout format.',
+    steps:['Tap More → Tournament.','Tap Create Tournament.','Enter tournament name and add at least 2 team names.','Choose format: Round Robin or Knockout.','Set win score.','Tap Create — fixtures are auto-generated.','Record results as games are played.','Standings update automatically for Round Robin.'],
+    relatedFeatures:['Quick Game','Match History']},
+  {id:'communities',title:'How to Create a Community',category:'Communities',
+    keywords:['community','create community','join community','public','private','admin','contributor','member','role','community settings','my community'],
+    shortAnswer:'Communities are spaces for your crew. Create one from More → Communities.',
+    steps:['Tap More → Communities.','Tap Create Community.','Enter name, city, court name, and description.','Choose Public or Private visibility.','Enable Join Approval to review new member requests.','Tap Create — you become the admin.','Share the community name so others can find and join.'],
+    relatedFeatures:['Community Feed','Community Players','Community Gallery','Community Events']},
+  {id:'community-feed',title:'Community Feed and Posts',category:'Community Feed',
+    keywords:['post','feed','announce','community post','comment','react','emoji','pin post','delete post','who can post','announcement','game recap'],
+    shortAnswer:'The Feed tab shows posts, announcements, and reactions. Admins and contributors can post.',
+    steps:['Open a community → Feed tab.','Tap + New Post.','Add title, body text, or an optional image URL.','Choose post type: General Post, Announcement, or Game Recap.','React with 👍 🔥 👏.','Tap the comment icon to add a comment.','Admins can pin or delete any post.'],
+    relatedFeatures:['Communities']},
+  {id:'community-players',title:'Community Players and Ratings',category:'Community Players',
+    keywords:['community player','add player','player profile','badge','jersey number','nickname','position','community rating','rate player','roster','player stats'],
+    shortAnswer:"Track your crew's player profiles, stats, and peer ratings in the Players tab.",
+    steps:['Open a community → Players tab.','Tap + Add Player.','Enter name, jersey number, nickname, position, and game stats.','Assign badges for achievements.','Admins and contributors can add players.','Any member can rate a player on 7 skill attributes.','Tap ⭐ next to a player to submit a rating.'],
+    relatedFeatures:['Community Feed','Player Ratings']},
+  {id:'community-gallery',title:'Community Gallery and Photos',category:'Community Gallery',
+    keywords:['gallery','photo','upload','picture','image','community photo','album','tag','image url','add photo','upload picture','gallery photo'],
+    shortAnswer:'Upload match day photos, highlights, or tournament shots to the community Gallery tab.',
+    steps:['Open a community → Gallery tab.','Tap 📸 Add Photo.','Choose Upload (from device) or Image URL.','Add a caption and select an album (Match Day Photos, Winners Gallery, etc.).','Tag players who appear in the photo.','Tap Upload to save.','Like photos with 👍 or add comments.'],
+    relatedFeatures:['Communities','Community Players']},
+  {id:'community-events',title:'Community Events and RSVP',category:'Community Events',
+    keywords:['event','create event','rsvp','going','not going','maybe','pickup event','tournament event','schedule','join event','community event','event date','rsvp status'],
+    shortAnswer:'Create pickup game events or tournaments in the Events tab. Members RSVP with a status.',
+    steps:['Open a community → Events tab.','Tap 📅 Create Event.','Enter title, date, time, location, and max player count.','Choose event type: Pickup Game, Tournament, Practice, etc.','Tap Create.','Members RSVP: Going, Maybe, Not Going, Need Team, or Running Late.'],
+    relatedFeatures:['Communities','Tournament']},
+  {id:'pulse',title:'CourtCall Pulse',category:'CourtCall Pulse',
+    keywords:['pulse','courtcall pulse','news','local news','basketball news','sports news','location news','search links','pulse screen'],
+    shortAnswer:'Pulse shows basketball and sports search links tailored to your location.',
+    steps:['Tap More → Pulse.','Allow location access for local news links.','Tap a category: Basketball, Local Sports, Tournament, Community, Weather, or National.','Tap a link to open live search results in your browser.','Pulse generates smart search links — it does not fetch live data directly.'],
+    relatedFeatures:['Basketball World']},
+  {id:'basketball-world',title:'Basketball World',category:'Basketball World',
+    keywords:['basketball world','world','nba','global basketball','leagues','international basketball','world screen'],
+    shortAnswer:'Basketball World provides global basketball info and links. Tap More → Basketball World.',
+    steps:['Tap More → Basketball World.','Browse global basketball links and content.'],
+    relatedFeatures:['CourtCall Pulse']},
+  {id:'settings',title:'App Settings',category:'Settings',
+    keywords:['settings','preferences','defaults','sound','vibration','change setting','default win score','switch profile','app settings','where settings'],
+    shortAnswer:'Access Settings from the Hub card or More → Settings.',
+    steps:['Tap More → Settings.','Profile: switch or create a player profile.','Game Defaults: set preferred win score, sound, and vibration.','Help: browse the Help Center or ask the Assistant.','Data: export or import a backup.','Analytics: view usage stats.','Feedback: send bug reports or suggestions.'],
+    relatedFeatures:['Backup / Export','Feedback']},
+  {id:'backup-export',title:'Exporting and Backing Up Data',category:'Backup / Export',
+    keywords:['backup','export','import','save data','restore','json','data file','download data','transfer data','data backup','export data','import data','data loss','local storage','cloud'],
+    shortAnswer:"Data is stored locally on this device. Export regularly using Settings → Export Data.",
+    steps:['Go to Settings → Data → Export Data.','A JSON file is downloaded with all your data.','To restore: Settings → Data → Import Data → select the JSON file.','Data lives in your browser localStorage — not in the cloud.','Use Clear All Data only as a last resort (irreversible).'],
+    relatedFeatures:['Settings']},
+  {id:'feedback',title:'Sending Feedback or Reporting a Bug',category:'Feedback',
+    keywords:['feedback','bug','report bug','suggest','feature request','problem','issue','contact','email','send feedback','report problem','bug report'],
+    shortAnswer:'Use Settings → Send Feedback, or email vadi.s23@gmail.com.',
+    steps:['Go to Settings → Send Feedback.','Choose type: Bug Report, Feature Request, or General Feedback.','Describe what happened and which screen you were on.','Tap Submit.','Or email vadi.s23@gmail.com directly for urgent issues.'],
+    relatedFeatures:['Settings','Troubleshooting']},
+  {id:'troubleshooting',title:'Troubleshooting Common Issues',category:'Troubleshooting',
+    keywords:['problem','issue','not working','bug','broken','error','crash','freeze','voice not working','data missing','game lost','score wrong','fix','trouble'],
+    shortAnswer:'Most issues resolve with a page refresh. Your in-progress game is auto-saved.',
+    steps:['Voice not working: use Chrome or Edge and allow microphone permission.','Score is wrong: tap Undo to reverse recent entries.','Game progress lost: check Hub for a Resume Game button.','Data missing: Settings → Import Data to restore a backup.','App frozen: refresh the page — your game state is auto-saved.','Still stuck: Settings → Send Feedback or email vadi.s23@gmail.com.'],
+    relatedFeatures:['Feedback','Voice Scoring','Backup / Export']},
+];
+
+// ── Answer Engine ─────────────────────────────────────────────────────
+function answerCourtCallQuestion(query){
+  const q=query.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  const words=q.split(' ').filter(w=>w.length>2);
+  let best=null,bestScore=0;
+  for(const art of COURTCALL_HELP_KB){
+    let score=0;
+    for(const kw of art.keywords){
+      const nkw=kw.toLowerCase();
+      if(q.includes(nkw))score+=nkw.split(' ').length*3; // phrase match
+      else for(const w of words)if(nkw===w||nkw.startsWith(w)||w.startsWith(nkw))score+=1;
+    }
+    if(score>bestScore){bestScore=score;best=art;}
+  }
+  const confidence=bestScore>=6?'high':bestScore>=2?'medium':'low';
+  return{article:confidence!=='low'?best:null,score:bestScore,confidence};
+}
+
+// ── Chat State ────────────────────────────────────────────────────────
+let _hcOpen=false;
+let _hcMsgs=[];
+let hcActiveCat='All';
+const _HSUGGS=[
+  'How do I start a quick game?','How does voice scoring work?',
+  'How do I add fouls?','How do I build balanced teams?',
+  'How do I create a tournament?','How do I create a community?',
+  'How do I upload pictures?','How do I export backup?',
+];
+
+function openHelpChat(){
+  _hcOpen=true;
+  try{_hcMsgs=JSON.parse(localStorage.getItem(HELP_CHAT_KEY)||'[]')}catch{_hcMsgs=[];}
+  document.getElementById('help-chat-wrap').classList.add('open');
+  document.body.style.overflow='hidden';
+  _hcRenderMsgs();
+  _hcRenderSuggs();
+  setTimeout(()=>document.getElementById('help-input')?.focus(),320);
+}
+
+function closeHelpChat(){
+  _hcOpen=false;
+  document.getElementById('help-chat-wrap').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function clearHelpChat(){
+  _hcMsgs=[];
+  localStorage.removeItem(HELP_CHAT_KEY);
+  _hcRenderMsgs();
+  _hcRenderSuggs();
+}
+
+function sendHelpMsg(){
+  const inp=document.getElementById('help-input');
+  if(!inp)return;
+  const q=inp.value.trim();
+  if(!q)return;
+  inp.value='';
+  document.getElementById('help-suggs').style.display='none';
+  _hcAddMsg({role:'user',content:q});
+  setTimeout(()=>_hcAnswer(q),280);
+}
+
+function _hcSugg(q){
+  document.getElementById('help-suggs').style.display='none';
+  _hcAddMsg({role:'user',content:q});
+  setTimeout(()=>_hcAnswer(q),280);
+}
+
+function _hcAddMsg(m){
+  _hcMsgs.push({...m,ts:Date.now()});
+  try{localStorage.setItem(HELP_CHAT_KEY,JSON.stringify(_hcMsgs.slice(-20)))}catch{}
+  _hcRenderMsgs();
+}
+
+function _hcAnswer(q){
+  const {article,confidence}=answerCourtCallQuestion(q);
+  let html='';
+  if(confidence==='low'||!article){
+    html=_HFMSG;
+  } else {
+    const pre=confidence==='medium'?'<em style="font-size:12px;color:var(--muted)">I think this is what you\'re looking for…</em><br><br>':'';
+    html=pre+'<strong>'+escHtml(article.title)+'</strong><br><br>'+escHtml(article.shortAnswer);
+    if(article.steps?.length)
+      html+='<ol class="help-msg-steps">'+article.steps.map(s=>`<li>${escHtml(s)}</li>`).join('')+'</ol>';
+    if(article.relatedFeatures?.length)
+      html+='<div class="help-msg-related">Related: '+article.relatedFeatures.map(escHtml).join(', ')+'</div>';
+  }
+  _hcMsgs.push({role:'bot',html,articleId:article?.id||null,confidence,ts:Date.now()});
+  try{localStorage.setItem(HELP_CHAT_KEY,JSON.stringify(_hcMsgs.slice(-20)))}catch{}
+  _hcRenderMsgs();
+}
+
+function _hcRenderMsgs(){
+  const el=document.getElementById('help-msgs');
+  if(!el)return;
+  if(!_hcMsgs.length){
+    el.innerHTML='<div class="help-msg bot">Hi! I can help you use CourtCall. Ask me about scoring, teams, tournaments, communities, or settings.<br><br><em style="font-size:12px;color:var(--muted)">Keyword-based assistant — not real AI.</em></div>';
+    return;
+  }
+  el.innerHTML=_hcMsgs.map((m,i)=>{
+    if(m.role==='user')return`<div class="help-msg user">${escHtml(m.content)}</div>`;
+    let fb='';
+    if(m.fbDone){
+      fb=m.fbDone==='yes'
+        ?`<div style="font-size:12px;color:var(--success);margin-top:8px">✓ Glad that helped!</div>`
+        :`<div style="font-size:12px;color:var(--muted);margin-top:8px">Sorry about that. Email <a href="mailto:${_HFE}" style="color:var(--ca)">${_HFE}</a> or use Settings → Feedback.</div>`;
+    } else if(m.articleId){
+      fb=`<div class="help-fb-row"><span class="help-fb-lbl">Was this helpful?</span><button class="help-fb-btn" onclick="_hcFb(${i},'yes')">👍 Yes</button><button class="help-fb-btn" onclick="_hcFb(${i},'no')">👎 No</button></div>`;
+    }
+    return`<div class="help-msg bot">${m.html||escHtml(m.content||'')}${fb}</div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+function _hcFb(idx,val){
+  if(!_hcMsgs[idx])return;
+  _hcMsgs[idx].fbDone=val;
+  try{
+    const fb=JSON.parse(localStorage.getItem(HELP_FB_KEY)||'[]');
+    fb.push({question:_hcMsgs[idx-1]?.content||'',articleId:_hcMsgs[idx].articleId,helpful:val==='yes',ts:Date.now()});
+    localStorage.setItem(HELP_FB_KEY,JSON.stringify(fb.slice(-50)));
+    localStorage.setItem(HELP_CHAT_KEY,JSON.stringify(_hcMsgs.slice(-20)));
+  }catch{}
+  _hcRenderMsgs();
+}
+
+function _hcRenderSuggs(){
+  const el=document.getElementById('help-suggs');
+  if(!el)return;
+  el.style.display='';
+  el.innerHTML=_HSUGGS.map(q=>`<button class="help-sugg" onclick="_hcSugg(${JSON.stringify(q)})">${escHtml(q)}</button>`).join('');
+}
+
+// ── Help Center ───────────────────────────────────────────────────────
+function renderHelpCenter(){
+  const q=(document.getElementById('hc-search')?.value||'').toLowerCase().trim();
+  const cats=['All',...[...new Set(COURTCALL_HELP_KB.map(a=>a.category))]];
+  const catEl=document.getElementById('hc-cats');
+  if(catEl)catEl.innerHTML=cats.map(c=>`<button class="hc-cat${c===hcActiveCat?' on':''}" onclick="hcSetCat(${JSON.stringify(c)})">${escHtml(c)}</button>`).join('');
+  let arts=COURTCALL_HELP_KB;
+  if(hcActiveCat!=='All')arts=arts.filter(a=>a.category===hcActiveCat);
+  if(q)arts=arts.filter(a=>
+    a.title.toLowerCase().includes(q)||
+    a.shortAnswer.toLowerCase().includes(q)||
+    a.category.toLowerCase().includes(q)||
+    a.keywords.some(k=>k.includes(q)));
+  const artEl=document.getElementById('hc-articles');
+  if(!artEl)return;
+  if(!arts.length){artEl.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">No articles found.<br><small>Try different keywords.</small></div>';return;}
+  artEl.innerHTML=arts.map(a=>`<div class="hc-card">
+    <div class="hc-card-head" onclick="hcToggle('${a.id}')">
+      <div style="flex:1;min-width:0">
+        <div class="hc-card-cat">${escHtml(a.category)}</div>
+        <div class="hc-card-title">${escHtml(a.title)}</div>
+      </div>
+      <div class="hc-card-arr" id="hca-${a.id}">›</div>
+    </div>
+    <div class="hc-card-body hidden" id="hcb-${a.id}">
+      <div class="hc-card-short">${escHtml(a.shortAnswer)}</div>
+      ${a.steps?.length?`<ol class="hc-card-steps">${a.steps.map(s=>`<li>${escHtml(s)}</li>`).join('')}</ol>`:''}
+      ${a.relatedFeatures?.length?`<div style="font-size:12px;color:var(--muted);margin-top:6px">Related: ${a.relatedFeatures.map(escHtml).join(', ')}</div>`:''}
+    </div>
+  </div>`).join('');
+}
+
+function hcSetCat(cat){
+  hcActiveCat=cat;
+  renderHelpCenter();
+}
+
+function hcToggle(id){
+  const body=document.getElementById('hcb-'+id);
+  const arr=document.getElementById('hca-'+id);
+  if(!body)return;
+  const wasOpen=!body.classList.contains('hidden');
+  body.classList.toggle('hidden',wasOpen);
+  if(arr)arr.classList.toggle('open',!wasOpen);
+}
+
 // ── Demo / Test Data Loader ─────────────────────────────────────────
 const DEMO_BATCH_ID='courtcall_demo_v1';
 const _DCID='community_demo_1';
@@ -5920,6 +6309,26 @@ function clearDemoData(){
   </div>
 </div>
 
+<!-- ══ HELP CENTER ══ -->
+<div id="s-help-center" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('settings')">← Settings</button>
+    <div class="page-title">Help Center</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="hc-body">
+    <div class="hc-search-row">
+      <span class="hc-search-icon">🔍</span>
+      <input class="hc-search" id="hc-search" type="text" placeholder="Search help articles…" oninput="renderHelpCenter()" autocomplete="off">
+    </div>
+    <div class="hc-cats" id="hc-cats"></div>
+    <div id="hc-articles"></div>
+    <div class="hc-ask-bar">
+      <button class="hc-ask-btn" onclick="closeHelpChat();showScreen('settings');setTimeout(openHelpChat,120)">💬 Ask CourtCall Assistant</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Bottom Navigation ─────────────────────────────── -->
 <nav class="btm-nav hidden" id="btm-nav">
   <button class="bn-btn active" data-nav="hub" onclick="showScreen('hub')">
@@ -5958,6 +6367,34 @@ function clearDemoData(){
     <button class="more-item" onclick="showScreen('settings');hideMoreMenu()"><span class="more-icon">⚙</span><span class="more-lbl">Settings</span></button>
     <button class="more-item" onclick="openFeedback();hideMoreMenu()"><span class="more-icon">💬</span><span class="more-lbl">Feedback</span></button>
     <button class="more-item" onclick="inviteFriends();hideMoreMenu()"><span class="more-icon">🔗</span><span class="more-lbl">Invite Friends</span></button>
+  </div>
+</div>
+
+<!-- ── Help FAB ─────────────────────────────────────── -->
+<button class="help-fab" id="help-fab" onclick="openHelpChat()" aria-label="Open help chat">💬 Help</button>
+
+<!-- ── Help Chat Panel ───────────────────────────────── -->
+<div class="help-chat-wrap" id="help-chat-wrap">
+  <div class="help-chat-backdrop" onclick="closeHelpChat()"></div>
+  <div class="help-chat-panel" role="dialog" aria-modal="true" aria-label="CourtCall Assistant">
+    <div class="help-chat-header">
+      <div class="help-chat-avatar">🏀</div>
+      <div class="help-chat-title">
+        <div class="help-chat-title-main">CourtCall Assistant</div>
+        <div class="help-chat-title-sub">Beta Help · Keyword matching · Not AI</div>
+      </div>
+      <div class="help-chat-acts">
+        <button class="help-chat-act" onclick="clearHelpChat()" title="Clear chat">↺</button>
+        <button class="help-chat-act" onclick="closeHelpChat()" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="help-msgs" id="help-msgs"></div>
+    <div class="help-suggs" id="help-suggs"></div>
+    <div class="help-input-row">
+      <input class="help-input" id="help-input" type="text" placeholder="Ask a question…" autocomplete="off"
+        onkeydown="if(event.key==='Enter')sendHelpMsg()">
+      <button class="help-send" onclick="sendHelpMsg()" aria-label="Send">➤</button>
+    </div>
   </div>
 </div>
 </body>
