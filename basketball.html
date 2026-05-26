@@ -2504,12 +2504,12 @@ function renderFeed(){
   const list=document.getElementById('feed-list');
   if(!state.history.length){list.innerHTML='<li class="feed-empty">Game starts when first point is scored</li>';return}
   let lastQ=null;const items=[];const run=getCurrentRun();
-  const chrono=[...state.history].reverse();
-  chrono.forEach(e=>{
+  // state.history is newest-first (unshift); iterate directly so dividers stay above their quarter's events
+  state.history.forEach(e=>{
     const qLabel=typeof e.quarter==='number'?`Q${e.quarter}`:e.quarter;
-    if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
     const name=e.team==='a'?state.teamA.name:state.teamB.name;
     const col=e.team==='a'?'var(--ca)':'var(--cb)';
+    if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
     if(e.type==='foul'){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
     } else {
@@ -2517,7 +2517,7 @@ function renderFeed(){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${inRun?'<span class="fe-run">🔥</span>':''}</li>`);
     }
   });
-  list.innerHTML=items.reverse().join('');list.scrollTop=0;
+  list.innerHTML=items.join('');list.scrollTop=0;
 }
 // Scoring
 function addScore(team,pts){
@@ -2618,8 +2618,9 @@ function checkWin(){
 function handleEndGame(){
   if(!confirm('End game now?'))return;
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
-  const winner=state.teamA.score>=state.teamB.score?state.teamA:state.teamB;
-  const loser=state.teamA.score>=state.teamB.score?state.teamB:state.teamA;
+  const isTie=state.teamA.score===state.teamB.score;
+  const winner=isTie?{...state.teamA,name:`${state.teamA.name} & ${state.teamB.name}`}:(state.teamA.score>state.teamB.score?state.teamA:state.teamB);
+  const loser=isTie?state.teamB:(state.teamA.score>state.teamB.score?state.teamB:state.teamA);
   const entry=buildMatchEntry(winner,loser);
   saveToMatches(entry);trackEvent('game_completed');
   if(gameContext.type==='tournament'&&gameContext.fixtureId)saveTournamentResult(entry);
