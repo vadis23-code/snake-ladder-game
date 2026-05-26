@@ -715,6 +715,19 @@ table.standings tr:last-child td{border-bottom:none}
 .btn-rsvp.going{border-color:var(--success);background:rgba(0,200,81,.14);color:var(--success)}
 .btn-rsvp.maybe{border-color:var(--gold);background:rgba(255,179,0,.14);color:var(--gold)}
 .btn-rsvp.not-going{border-color:var(--danger);background:rgba(255,59,48,.14);color:var(--danger)}
+.btn-rsvp.need-team{border-color:var(--cb);background:rgba(41,121,255,.14);color:var(--cb)}
+.btn-rsvp.running-late{border-color:rgba(220,150,0,.7);background:rgba(220,150,0,.12);color:#DCAF00}
+.btn-rsvp:disabled{opacity:.4;cursor:not-allowed}
+.evt-rsvp-row-2{padding-top:0;margin-top:-6px}
+.evt-counts-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px;align-items:center}
+.evt-count-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:12px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.evt-count-pill.c-going{background:rgba(0,200,81,.1);border-color:rgba(0,200,81,.3);color:var(--success)}
+.evt-count-pill.c-maybe{background:rgba(255,179,0,.1);border-color:rgba(255,179,0,.3);color:var(--gold)}
+.evt-count-pill.c-need{background:rgba(41,121,255,.1);border-color:rgba(41,121,255,.3);color:var(--cb)}
+.evt-count-pill.c-late{background:rgba(220,150,0,.1);border-color:rgba(220,150,0,.3);color:#DCAF00}
+.evt-format-strip{display:flex;align-items:center;gap:8px;padding:0 14px 12px;border-top:1px solid rgba(255,255,255,.05);padding-top:8px}
+.evt-format-label{font-size:11px;color:var(--muted)}
+.evt-format-chip{padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700;background:rgba(255,87,34,.15);color:var(--ca);border:1px solid rgba(255,87,34,.3)}
 .evt-attendees-toggle{padding:0 14px 10px}
 .btn-evt-attendees{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
 .evt-attendees-list{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px}
@@ -722,6 +735,8 @@ table.standings tr:last-child td{border-bottom:none}
 .chip-going{background:rgba(0,200,81,.14);color:var(--success)}
 .chip-maybe{background:rgba(255,179,0,.14);color:var(--gold)}
 .chip-not-going{background:rgba(255,59,48,.12);color:var(--danger)}
+.chip-need-team{background:rgba(41,121,255,.14);color:var(--cb)}
+.chip-running-late{background:rgba(220,150,0,.12);color:#DCAF00}
 .evt-admin-row{padding:0 14px 12px;display:flex;justify-content:flex-end}
 .btn-evt-del{background:none;border:1px solid var(--danger);border-radius:8px;color:var(--danger);font-size:12px;padding:5px 12px;cursor:pointer}
 .add-evt-form{background:var(--s1);border-radius:12px;border:1px solid var(--border);padding:14px;margin:0 14px 10px}
@@ -4920,6 +4935,7 @@ function renderEventsTabHTML(c,myRole){
 
 function buildEventCardHTML(evt,c,myRole,myId){
   const canDel=myRole==='admin'||evt.createdBy===myId;
+  const isAdmin=myRole==='admin'||myRole==='contributor';
   const now=new Date();
   const evtDt=new Date(evt.date+'T'+(evt.time||'23:59'));
   const isPast=evtDt<now;
@@ -4927,20 +4943,63 @@ function buildEventCardHTML(evt,c,myRole,myId){
   const dayNum=d.getDate();
   const monStr=d.toLocaleString('default',{month:'short'}).toUpperCase();
 
-  const myRsvp=(evt.rsvps||[]).find(r=>r.profileId===myId);
-  const goingCount=(evt.rsvps||[]).filter(r=>r.status==='going').length;
-  const maybeCount=(evt.rsvps||[]).filter(r=>r.status==='maybe').length;
-  const maxLabel=evt.maxPlayers&&evt.maxPlayers>0?` / ${evt.maxPlayers} max`:'';
-  const fullMsg=evt.maxPlayers&&evt.maxPlayers>0&&goingCount>=evt.maxPlayers&&(!myRsvp||myRsvp.status!=='going')?'<span style="color:var(--danger);font-size:11px">Event full</span>':'';
+  const rsvps=evt.rsvps||[];
+  const myRsvp=rsvps.find(r=>r.profileId===myId);
+  const goingCount=rsvps.filter(r=>r.status==='going').length;
+  const maybeCount=rsvps.filter(r=>r.status==='maybe').length;
+  const needTeamCount=rsvps.filter(r=>r.status==='need_team').length;
+  const lateCount=rsvps.filter(r=>r.status==='running_late').length;
+  const notGoingCount=rsvps.filter(r=>r.status==='not_going').length;
+  const maxP=evt.maxPlayers||0;
+  const maxLabel=maxP>0?` / ${maxP}`:'' ;
+  const isFull=maxP>0&&goingCount>=maxP&&(!myRsvp||myRsvp.status!=='going');
 
+  // Counts bar — only show non-zero buckets
+  const countPills=[
+    goingCount?`<span class="evt-count-pill c-going">✅ ${goingCount}${maxLabel}</span>`:'',
+    maybeCount?`<span class="evt-count-pill c-maybe">🤔 ${maybeCount}</span>`:'',
+    needTeamCount?`<span class="evt-count-pill c-need">🏀 ${needTeamCount} need team</span>`:'',
+    lateCount?`<span class="evt-count-pill c-late">⏰ ${lateCount} late</span>`:'',
+  ].filter(Boolean).join('');
+
+  // Format suggestion (admin/contributor only, upcoming events with enough data)
+  let formatStrip='';
+  if(!isPast&&isAdmin){
+    const total=goingCount+needTeamCount+lateCount;
+    let fmt='',fmtNote='';
+    if(total>=10){fmt='5v5';fmtNote=`${total} confirmed`;}
+    else if(total>=8){fmt='4v4';fmtNote=`${total} confirmed`;}
+    else if(total>=6){fmt='3v3';fmtNote=`${total} confirmed`;}
+    if(fmt){
+      formatStrip=`<div class="evt-format-strip">
+        <span class="evt-format-label">💡 Suggest</span>
+        <span class="evt-format-chip">${fmt}</span>
+        <span class="evt-format-label">${fmtNote}</span>
+      </div>`;
+    }
+  }
+
+  // Attendees list chips
   const rsvpOpen=expandedEventRsvps.has(evt.id);
-  const rsvpListHTML=rsvpOpen&&(evt.rsvps||[]).length?`<div class="evt-attendees-list">
-    ${(evt.rsvps||[]).map(r=>{
-      const cls=r.status==='going'?'chip-going':r.status==='maybe'?'chip-maybe':'chip-not-going';
-      const icon=r.status==='going'?'✅':r.status==='maybe'?'🤔':'❌';
-      return`<span class="evt-attendee-chip ${cls}">${icon} ${escHtml(r.profileName||'?')}</span>`;
-    }).join('')}
+  const chipMap={going:'chip-going',maybe:'chip-maybe',not_going:'chip-not-going',need_team:'chip-need-team',running_late:'chip-running-late'};
+  const iconMap={going:'✅',maybe:'🤔',not_going:'❌',need_team:'🏀',running_late:'⏰'};
+  const rsvpListHTML=rsvpOpen&&rsvps.length?`<div class="evt-attendees-list">
+    ${rsvps.map(r=>`<span class="evt-attendee-chip ${chipMap[r.status]||''}">${iconMap[r.status]||'•'} ${escHtml(r.profileName||'?')}</span>`).join('')}
   </div>`:'';
+
+  // RSVP buttons (two rows; Going row respects capacity cap)
+  const s=myRsvp?.status;
+  const rsvpHTML=isPast?'':`
+    <div class="evt-rsvp-row">
+      <button class="btn-rsvp${s==='going'?' going':''}" ${isFull?'disabled title="Event full"':''} onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','going')">✅<span>${isFull&&s!=='going'?'Full':'Going'}</span></button>
+      <button class="btn-rsvp${s==='maybe'?' maybe':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','maybe')">🤔<span>Maybe</span></button>
+      <button class="btn-rsvp${s==='not_going'?' not-going':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','not_going')">❌<span>Can't Go</span></button>
+    </div>
+    <div class="evt-rsvp-row evt-rsvp-row-2">
+      <button class="btn-rsvp${s==='need_team'?' need-team':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','need_team')">🏀<span>Need Team</span></button>
+      <button class="btn-rsvp${s==='running_late'?' running-late':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','running_late')">⏰<span>Running Late</span></button>
+      <div style="flex:2"></div>
+    </div>`;
 
   const typeBg=EVT_TYPE_COLORS[evt.type]||'rgba(255,255,255,.07)';
   const typeTxt=EVT_TYPE_TEXT[evt.type]||'var(--muted)';
@@ -4952,25 +5011,20 @@ function buildEventCardHTML(evt,c,myRole,myId){
         <div class="evt-date-mon">${monStr}</div>
       </div>
       <div class="evt-info">
-        <div class="evt-type-badge" style="background:${typeBg};color:${typeTxt}">${escHtml(evt.type)}${isPast?'<span class="past-badge">Past</span>':''}</div>
+        <div class="evt-type-badge" style="background:${typeBg};color:${typeTxt}">${escHtml(evt.type)}${isPast?'<span class="past-badge"> · Past</span>':''}</div>
         <div class="evt-title">${escHtml(evt.title)}</div>
         <div class="evt-meta-row">
           ${evt.time?`<span class="evt-meta-item">🕐 ${escHtml(evt.time)}</span>`:''}
           ${evt.location?`<span class="evt-meta-item">📍 ${escHtml(evt.location)}</span>`:''}
-          <span class="evt-meta-item">👤 ${goingCount} going${maxLabel}</span>
         </div>
       </div>
     </div>
     ${evt.description?`<div class="evt-desc">${escHtml(evt.description)}</div>`:''}
-    ${isPast?'':`<div class="evt-rsvp-row">
-      ${fullMsg||`
-      <button class="btn-rsvp${myRsvp&&myRsvp.status==='going'?' going':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','going')">✅<span>Going</span></button>
-      <button class="btn-rsvp${myRsvp&&myRsvp.status==='maybe'?' maybe':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','maybe')">🤔<span>Maybe</span></button>
-      <button class="btn-rsvp${myRsvp&&myRsvp.status==='not_going'?' not-going':''}" onclick="rsvpEvent('${escHtml(evt.id)}','${escHtml(c.id)}','not_going')">❌<span>Can't go</span></button>
-      `}
-    </div>`}
-    ${(evt.rsvps||[]).length?`<div class="evt-attendees-toggle">
-      <button class="btn-evt-attendees" onclick="toggleEventRsvps('${escHtml(evt.id)}','${escHtml(c.id)}')">${rsvpOpen?'Hide':'Show'} attendees (${(evt.rsvps||[]).length})</button>
+    ${countPills?`<div class="evt-counts-bar">${countPills}</div>`:''}
+    ${formatStrip}
+    ${rsvpHTML}
+    ${rsvps.length?`<div class="evt-attendees-toggle">
+      <button class="btn-evt-attendees" onclick="toggleEventRsvps('${escHtml(evt.id)}','${escHtml(c.id)}')">${rsvpOpen?'Hide':'Show'} attendees (${rsvps.length})</button>
     </div>`:''}
     ${rsvpListHTML}
     ${canDel?`<div class="evt-admin-row"><button class="btn-evt-del" onclick="deleteEvent('${escHtml(evt.id)}','${escHtml(c.id)}')">🗑 Delete Event</button></div>`:''}
@@ -5028,26 +5082,33 @@ function deleteEvent(eventId,communityId){
   showToast('Event deleted');
 }
 
+const VALID_RSVP_STATUSES=['going','maybe','not_going','need_team','running_late'];
 function rsvpEvent(eventId,communityId,status){
+  if(!VALID_RSVP_STATUSES.includes(status))return;
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name||'Guest';
   const all=getAllEvents();
   const idx=all.findIndex(e=>e.id===eventId);
   if(idx===-1)return;
-  const rsvps=all[idx].rsvps||[];
+  if(!all[idx].rsvps)all[idx].rsvps=[];
+  const rsvps=all[idx].rsvps;
   const existing=rsvps.findIndex(r=>r.profileId===myId);
   if(existing!==-1){
+    // tap same status = toggle off
     if(rsvps[existing].status===status){rsvps.splice(existing,1)}
     else{rsvps[existing].status=status;rsvps[existing].profileName=myName}
   }else{
-    const maxP=all[idx].maxPlayers;
+    // Enforce capacity only for 'going'
+    const maxP=all[idx].maxPlayers||0;
     if(status==='going'&&maxP>0&&rsvps.filter(r=>r.status==='going').length>=maxP){
-      showToast('Event is full!');return;
+      showToast('Event is full — try Need Team if you still want to come!');return;
     }
-    rsvps.push({profileId:myId,profileName:myName,status});
+    rsvps.push({profileId:myId,profileName:myName,status,updatedAt:new Date().toISOString()});
   }
   all[idx].rsvps=rsvps;
   saveAllEvents(all);
+  const labels={going:'Going ✅',maybe:'Maybe 🤔',not_going:"Can't Go ❌",need_team:'Need Team 🏀',running_late:'Running Late ⏰'};
+  showToast(existing!==-1&&rsvps.findIndex(r=>r.profileId===myId)===-1?'RSVP removed':`Marked as ${labels[status]||status}`);
   setCommTab('events');
 }
 
