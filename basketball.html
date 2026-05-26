@@ -1441,9 +1441,9 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="setup-sec">
       <span class="sec-label">Win Score</span>
       <div class="chip-row" id="cr-win">
-        <button class="chip" data-v="11" onclick="pickChip('cr-win',this)">11</button>
-        <button class="chip" data-v="15" onclick="pickChip('cr-win',this)">15</button>
-        <button class="chip on" data-v="21" onclick="pickChip('cr-win',this)">21</button>
+        <button class="chip" data-v="11" onclick="pickChip('cr-win',this);toggleCustomWin()">11</button>
+        <button class="chip" data-v="15" onclick="pickChip('cr-win',this);toggleCustomWin()">15</button>
+        <button class="chip on" data-v="21" onclick="pickChip('cr-win',this);toggleCustomWin()">21</button>
         <button class="chip" data-v="custom" onclick="pickChip('cr-win',this);toggleCustomWin()">Custom</button>
       </div>
       <input id="inp-win" class="custom-input" type="number" min="2" max="999" placeholder="e.g. 30">
