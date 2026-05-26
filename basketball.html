@@ -3446,7 +3446,9 @@ function handleImport(e){
 }
 function clearAllData(){
   if(!confirm('Clear ALL data? This cannot be undone.'))return;
-  [K.profile,K.profiles,K.players,'cc_builder',K.matches,K.tournaments,K.settings,K.game,K.games].forEach(k=>localStorage.removeItem(k));
+  [K.profile,K.profiles,K.players,'cc_builder',K.matches,K.tournaments,K.settings,K.game,K.games,
+   KC.communities,KC.members,KC.joins,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,
+   STATS_KEY,OB_KEY].forEach(k=>localStorage.removeItem(k));
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
   showToast('All data cleared');showScreen('profile');
 }
@@ -3606,7 +3608,7 @@ function closeChangelog(){
 const KC={
   communities:'courtcall_communities',
   members:'courtcall_community_members',
-  // reserved for future phases:
+  joins:'courtcall_community_joins',
   posts:'courtcall_community_posts',
   players:'courtcall_community_players',
   gallery:'courtcall_community_gallery',
@@ -4611,7 +4613,7 @@ function getJoinReqs(cid){return getAllJoinReqs().filter(r=>r.communityId===cid&
 function _buildJoinBarHTML(c,myRole){
   if(myRole!=='guest')return'';
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name;
   const pending=getAllJoinReqs().find(r=>r.communityId===c.id&&r.profileId===myId&&r.status==='pending');
 
   if(pending){
@@ -4661,7 +4663,7 @@ function joinCommunity(communityId){
   const c=getComms().find(x=>x.id===communityId);
   if(!c){showToast('Community not found');return}
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name;
   const members=getCommMembers();
   if(members.find(m=>m.communityId===communityId&&m.profileId===myId)){
     showToast('You are already a member');return;
@@ -5059,7 +5061,7 @@ function submitEvent(communityId){
   if(!title){showToast('Enter an event title');return}
   if(!date){showToast('Pick a date');return}
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name;
   const evt={
     id:'event_'+Date.now(),
     communityId,title,description:desc,type:selectedEventType,
@@ -5335,7 +5337,7 @@ function submitGalleryItem(communityId){
   const capEl=document.getElementById('gal-caption-input');
   const caption=(capEl?capEl.value.trim():'');
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name;
   let imageSourceType,imageData='',imageUrl='',fileName='';
   if(galImageMode==='upload'){
     if(!galPendingFile){showToast('Please select an image first');return}
@@ -5403,7 +5405,7 @@ function submitGalCmt(itemId,communityId){
   const text=inp.value.trim();
   if(!text)return;
   const myId=(currentProfile||{id:'guest'}).id;
-  const myName=(currentProfile||{profileName:'Guest'}).profileName;
+  const myName=(currentProfile||{name:'Guest'}).name;
   const all=getAllGalItems();
   const idx=all.findIndex(g=>g.id===itemId);
   if(idx===-1)return;
