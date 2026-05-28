@@ -73,11 +73,21 @@ create policy "communities: admin update" on public.communities
 create policy "communities: creator delete" on public.communities
   for delete using (auth.uid() = creator_id);
 
+-- Helper function to check membership without triggering RLS recursion
+-- (direct subquery on community_members inside its own policy causes infinite recursion)
+create or replace function public.is_community_member(comm_id text, uid uuid)
+returns boolean language sql security definer set search_path = public as $$
+  select exists (
+    select 1 from public.community_members
+    where community_id = comm_id and user_id = uid
+  );
+$$;
+
 -- Members: visible to other members of same community
 create policy "members: community read" on public.community_members
   for select using (
     user_id = auth.uid() or
-    exists (select 1 from public.community_members m2 where m2.community_id = community_members.community_id and m2.user_id = auth.uid())
+    public.is_community_member(community_id, auth.uid())
   );
 
 create policy "members: self insert" on public.community_members
