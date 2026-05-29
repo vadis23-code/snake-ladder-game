@@ -4169,8 +4169,6 @@ let activeCommTab='feed';
 function openCommunity(id){
   const c=getComms().find(x=>x.id===id);
   if(!c){showToast('Community not found');return}
-  // Sync posts from DB (non-blocking)
-  syncPostsFromDB(id);
   activeCommunityId=id;
   activeCommTab='feed';
   feedFilter='all';showCreateForm=false;editingPostId=null;
@@ -4182,6 +4180,11 @@ function openCommunity(id){
   if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
   renderCommDetail();
   showScreen('comm-detail');
+  // Sync member data from DB then re-render — fixes stale role on reload
+  if(supa&&supaUser){
+    Promise.all([syncCommunitiesFromDB(), syncPostsFromDB(id)])
+      .then(()=>{ if(activeCommunityId===id) renderCommDetail(); });
+  }
 }
 
 function renderCommDetail(){
@@ -4190,7 +4193,7 @@ function renderCommDetail(){
   const allMembers=getCommMembers();
   const myId=(currentProfile||{id:'guest'}).id;
   const myMember=allMembers.find(m=>m.communityId===c.id&&m.profileId===myId);
-  const myRole=myMember?myMember.role:'guest';
+  const myRole=(myMember&&myMember.role)||'guest';
   const isAdmin=myRole==='admin';
 
   // Update nav title
