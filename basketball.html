@@ -3952,8 +3952,44 @@ async function syncCommunitiesFromDB() {
     if (!comms) return;
     const commIds = comms.map(c => c.id);
     const { data: members } = commIds.length ? await supa.from('community_members').select('*').in('community_id', commIds) : { data: [] };
-    setComms(comms.map(c => ({ ...c, createdAt: c.created_at })));
-    setCommMembers(members || []);
+
+    // Merge DB communities with local (local has extra fields: memberCount, country, etc.)
+    const localComms = getComms();
+    const dbIds = new Set(comms.map(c => c.id));
+    const merged = comms.map(dbC => {
+      const lc = localComms.find(x => x.id === dbC.id) || {};
+      return {
+        ...lc,
+        id: dbC.id, name: dbC.name,
+        type: dbC.type || lc.type || 'Pickup Group',
+        description: dbC.description || lc.description || '',
+        logo: dbC.logo || lc.logo || '🏀',
+        visibility: dbC.visibility || lc.visibility || 'public',
+        inviteCode: dbC.invite_code || lc.inviteCode || null,
+        readOnly: dbC.read_only ?? lc.readOnly ?? false,
+        commentsLocked: dbC.comments_locked ?? lc.commentsLocked ?? false,
+        ratingsDisabled: dbC.ratings_disabled ?? lc.ratingsDisabled ?? false,
+        createdBy: dbC.creator_id || lc.createdBy,
+        createdAt: dbC.created_at || lc.createdAt,
+        memberCount: lc.memberCount || 1,
+      };
+    });
+    // Keep local-only communities not yet in DB
+    setComms([...merged, ...localComms.filter(c => !dbIds.has(c.id))]);
+
+    // Normalise members from snake_case (DB) → camelCase (local format)
+    const normMembers = (members || []).map(m => ({
+      id: m.community_id + '_' + m.user_id,
+      communityId: m.community_id,
+      profileId: m.user_id,
+      profileName: m.profile_name || '',
+      role: m.role || 'member',
+      joinedAt: m.joined_at,
+    }));
+    const dbMemberKeys = new Set(normMembers.map(m => m.communityId + '_' + m.profileId));
+    const localMembers = getCommMembers();
+    // Keep local-only members, DB wins for shared entries
+    setCommMembers([...normMembers, ...localMembers.filter(m => !dbMemberKeys.has((m.communityId||'') + '_' + (m.profileId||'')))]);
   } catch(e) { console.warn('syncCommunitiesFromDB:', e.message); }
 }
 
@@ -4015,6 +4051,8 @@ async function syncPostsFromDB(communityId) {
       createdAt: p.created_at
     })), ...all];
     saveAllPosts(merged);
+    // Re-render feed if still viewing this community
+    if(activeCommunityId===communityId) renderCommDetail();
   } catch(e) { console.warn('syncPostsFromDB:', e.message); }
 }
 
