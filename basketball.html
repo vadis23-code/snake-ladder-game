@@ -2303,6 +2303,10 @@ let supaUser = null; // tracks the logged-in Supabase auth user
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     supaUser = session?.user ?? null;
+    // Sync community membership whenever session becomes available
+    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
+      syncCommunitiesFromDB();
+    }
   });
 }
 
@@ -3944,7 +3948,12 @@ function closeChangelog(){
 // ── Supabase community sync helpers ──────────────────────
 
 async function syncCommunitiesFromDB() {
-  if (!supa || !supaUser) return;
+  if (!supa) return;
+  if (!supaUser) {
+    const { data: { session } } = await supa.auth.getSession();
+    supaUser = session?.user ?? null;
+  }
+  if (!supaUser) return;
   try {
     const { data: memberRows } = await supa.from('community_members').select('community_id').eq('user_id', supaUser.id);
     const myIds = (memberRows || []).map(r => r.community_id);
@@ -4515,7 +4524,7 @@ function fmtPostTime(iso){
 }
 
 function renderFeedTabHTML(c,myRole){
-  const canPost=myRole==='admin'||(myRole==='contributor'&&!c.readOnly);
+  const canPost=(myRole==='admin'||myRole==='contributor'||myRole==='member')&&!c.readOnly;
   const myId=(currentProfile||{id:'guest'}).id;
   // Build & sort posts
   let posts=getPosts(c.id);
