@@ -991,6 +991,22 @@ table.standings tr:last-child td{border-bottom:none}
 .lgc-act-main{background:linear-gradient(135deg,var(--ca),#c84000);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;transition:opacity var(--t1)}
 .lgc-act-main:active{opacity:.8}
 .lgc-act-sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:13px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+/* ── 3D Ball widget ── */
+.lp-ball-card{background:linear-gradient(160deg,#181832,#0e0e22);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:22px;box-shadow:0 24px 64px rgba(0,0,0,.55),0 0 0 1px rgba(255,107,53,.06);overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.lp-ball-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ca),rgba(255,107,53,.1),transparent)}
+.lp-ball-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,87,34,.14);border:1px solid rgba(255,87,34,.28);border-radius:50px;padding:4px 12px;font-size:10px;font-weight:700;color:var(--ca);letter-spacing:.1em;text-transform:uppercase;align-self:flex-start}
+.lp-ball-dot{width:6px;height:6px;border-radius:50%;background:var(--ca);animation:pulse 1.5s infinite}
+#ball-canvas{cursor:grab;display:block;touch-action:none;border-radius:50%}
+#ball-canvas:active{cursor:grabbing}
+.ball-ctrl{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:12px 16px}
+.ball-ctrl-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ball-ctrl-ttl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ball-ctrl-hint{font-size:10px;color:var(--muted2);font-style:italic}
+.ball-ctrl-row{display:flex;align-items:center;gap:10px}
+.ball-ctrl-ico{font-size:16px;line-height:1;flex-shrink:0}
+.ball-speed-sl{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:rgba(255,255,255,.12);outline:none;cursor:pointer}
+.ball-speed-sl::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ca);cursor:pointer;box-shadow:0 2px 8px rgba(255,87,34,.5)}
+.ball-speed-sl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ca);cursor:pointer;border:none}
 /* Section base */
 .lp-sec{padding:72px 0}
 .lp-sec-inner{max-width:1100px;margin:0 auto;padding:0 24px}
@@ -1434,45 +1450,21 @@ body.modal-open{overflow:hidden}
       </div>
     </div>
 
-    <!-- Right: live game preview card -->
-    <div class="lp-game-card" aria-hidden="true">
-      <div class="lgc-live"><div class="lgc-live-dot"></div>LIVE GAME</div>
-      <div class="lgc-board">
-        <div class="lgc-team">
-          <div class="lgc-tname">Orange</div>
-          <div class="lgc-score hi">12</div>
+    <!-- Right: interactive 3D basketball -->
+    <div class="lp-ball-card">
+      <div class="lp-ball-badge"><div class="lp-ball-dot"></div>Interactive 3D</div>
+      <canvas id="ball-canvas" aria-label="Rotating 3D basketball — drag to spin"></canvas>
+      <div class="ball-ctrl">
+        <div class="ball-ctrl-top">
+          <span class="ball-ctrl-ttl">Spin Speed</span>
+          <span class="ball-ctrl-hint">Drag ball to spin</span>
         </div>
-        <div class="lgc-mid">
-          <div class="lgc-timer">04:38</div>
-          <div class="lgc-gp">GAME POINT</div>
+        <div class="ball-ctrl-row">
+          <span class="ball-ctrl-ico">🐢</span>
+          <input type="range" id="ball-speed" class="ball-speed-sl" min="0" max="100" value="40"
+            aria-label="Basketball rotation speed">
+          <span class="ball-ctrl-ico">⚡</span>
         </div>
-        <div class="lgc-team lgc-team-r">
-          <div class="lgc-tname">Black</div>
-          <div class="lgc-score">10</div>
-        </div>
-      </div>
-      <div class="lgc-sbtn-row">
-        <div class="lgc-sbtn-grp">
-          <div class="lgc-sbtn hi">+1</div>
-          <div class="lgc-sbtn hi">+2</div>
-          <div class="lgc-sbtn hi">+3</div>
-        </div>
-        <div class="lgc-vs-lbl">VS</div>
-        <div class="lgc-sbtn-grp lgc-sbtn-grp-r">
-          <div class="lgc-sbtn">+1</div>
-          <div class="lgc-sbtn">+2</div>
-          <div class="lgc-sbtn">+3</div>
-        </div>
-      </div>
-      <div class="lgc-qrow">
-        <div class="lgc-q on">Q1</div>
-        <div class="lgc-q">Q2</div>
-        <div class="lgc-q">Q3</div>
-        <div class="lgc-q lgc-q-gc">GAME CLOCK<br>04:38</div>
-      </div>
-      <div class="lgc-actions">
-        <button class="lgc-act-main" onclick="goSetup()">▶ Add Score</button>
-        <button class="lgc-act-sec">↩ Undo</button>
       </div>
     </div>
   </div>
@@ -7248,6 +7240,164 @@ async function clearDemoData(){
   _updDemoBtn();
   showToast('Demo data cleared ✓');
 }
+
+/* ═══════════════════════════════════════════════════════════
+   3D Basketball Renderer
+   Pure canvas — no libraries. Y-axis rotation with spherical
+   projection of 3 seam curves and Phong-style shading.
+═══════════════════════════════════════════════════════════ */
+;(function(){
+  const BALL_PX=200;   // logical canvas size (CSS pixels)
+  const AMP=0.38;      // seam wave amplitude in radians (~22°)
+  const SEG=180;       // segments per seam curve
+
+  // Precompute 3 seam paths as [lat, lon] arrays.
+  // Seam 0: horizontal wavy (the classic equatorial seam)
+  // Seam 1: vertical wavy at lon≈0   (pole-to-pole)
+  // Seam 2: vertical wavy at lon≈π/2 (pole-to-pole, 90° offset)
+  const SEAMS=(()=>{
+    const s=[[],[],[]];
+    for(let i=0;i<=SEG;i++){
+      const lon1=(i/SEG)*Math.PI*2;
+      s[0].push([AMP*Math.sin(2*lon1), lon1]);
+      const lat2=(i/SEG)*Math.PI-Math.PI/2;
+      s[1].push([lat2, AMP*Math.sin(2*lat2)]);
+      const lat3=(i/SEG)*Math.PI-Math.PI/2;
+      s[2].push([lat3, Math.PI/2+AMP*Math.sin(2*lat3)]);
+    }
+    return s;
+  })();
+
+  let angle=0, speed=0.022, raf=null;
+  let drag=false, lastX=0, momentum=0;
+  let canvas, ctx;
+
+  function init(){
+    canvas=document.getElementById('ball-canvas');
+    if(!canvas)return;
+    // Hi-DPI / retina
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=BALL_PX*dpr;
+    canvas.height=BALL_PX*dpr;
+    canvas.style.width=BALL_PX+'px';
+    canvas.style.height=BALL_PX+'px';
+    ctx=canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+
+    // Slider → speed mapping: 0 = paused, 100 = fast
+    const sl=document.getElementById('ball-speed');
+    if(sl){
+      sl.addEventListener('input',()=>{speed=(+sl.value/100)*0.08;});
+    }
+
+    // Pointer drag to manually spin the ball
+    canvas.addEventListener('pointerdown',e=>{
+      drag=true; lastX=e.offsetX; momentum=0;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove',e=>{
+      if(!drag)return;
+      momentum=(e.offsetX-lastX)*0.018;
+      angle+=momentum;
+      lastX=e.offsetX;
+    });
+    canvas.addEventListener('pointerup',()=>{
+      drag=false;
+      // Coast to a stop after releasing (when auto-spin is off)
+      if(speed===0&&Math.abs(momentum)>5e-4){
+        let v=momentum;
+        const coast=()=>{v*=0.93;angle+=v;if(Math.abs(v)>5e-4)requestAnimationFrame(coast);};
+        coast();
+      }
+    });
+
+    loop();
+  }
+
+  function drawBall(a){
+    const W=BALL_PX, cx=W/2, cy=W/2, r=W*0.43;
+    ctx.clearRect(0,0,W,W);
+
+    // ── 1. Drop shadow beneath the sphere ──
+    ctx.shadowColor='rgba(0,0,0,0.6)';
+    ctx.shadowBlur=30; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
+
+    // ── 2. Sphere base: radial gradient for Phong-style lighting ──
+    const g=ctx.createRadialGradient(
+      cx-r*.30, cy-r*.32, r*.04,   // light source (top-left)
+      cx+r*.18, cy+r*.18, r*1.1    // dark edge (bottom-right)
+    );
+    g.addColorStop(0,  '#FFAA5A');  // highlight
+    g.addColorStop(.28,'#E55500');  // mid orange
+    g.addColorStop(.62,'#BF4200');  // deep orange
+    g.addColorStop(1,  '#591400');  // shadow
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+    ctx.shadowColor='transparent';
+
+    // ── 3. Seam curves clipped to sphere ──
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,r-.5,0,Math.PI*2); ctx.clip();
+    ctx.strokeStyle='rgba(20,5,0,0.72)';
+    ctx.lineWidth=Math.max(2, r*.028);
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    for(const seam of SEAMS){
+      let seg=[], segs=[];
+      for(const[lat,lon]of seam){
+        const cL=Math.cos(lat), sL=Math.sin(lat);
+        const x=cL*Math.sin(lon), y=sL, z=cL*Math.cos(lon);
+        // Rotate around Y axis by angle a
+        const x2=x*Math.cos(a)+z*Math.sin(a);
+        const z2=-x*Math.sin(a)+z*Math.cos(a);
+        // Only draw the front-facing hemisphere (z2 >= threshold)
+        if(z2>=-0.06){
+          seg.push([cx+r*x2, cy-r*y]);
+        }else{
+          if(seg.length>1) segs.push(seg);
+          seg=[];
+        }
+      }
+      if(seg.length>1) segs.push(seg);
+      for(const s of segs){
+        ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
+        for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // ── 4. Specular highlight (glossy sheen) ──
+    const sh=ctx.createRadialGradient(
+      cx-r*.28, cy-r*.31, .5,
+      cx-r*.1,  cy-r*.1,  r*.58
+    );
+    sh.addColorStop(0,   'rgba(255,255,255,.56)');
+    sh.addColorStop(.38, 'rgba(255,255,255,.13)');
+    sh.addColorStop(1,   'rgba(255,255,255,0)');
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=sh; ctx.fill();
+
+    // ── 5. Rim darkening (ambient occlusion illusion) ──
+    const rim=ctx.createRadialGradient(cx,cy,r*.6,cx,cy,r);
+    rim.addColorStop(0,'rgba(0,0,0,0)');
+    rim.addColorStop(1,'rgba(0,0,0,.28)');
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=rim; ctx.fill();
+  }
+
+  function loop(){
+    if(!drag) angle+=speed;
+    drawBall(angle);
+    raf=requestAnimationFrame(loop);
+  }
+
+  // Boot after DOM is ready
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init);
+  }else{
+    init();
+  }
+})();
 </script>
 
 <!-- ── Feedback Modal ────────────────────────────────── -->
