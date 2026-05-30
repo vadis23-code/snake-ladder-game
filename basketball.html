@@ -1171,6 +1171,20 @@ table.standings tr:last-child td{border-bottom:none}
 .help-send:active{transform:scale(.9)}
 /* ── Help Center Screen ────────────────────────────────── */
 .hc-body{padding:14px;padding-bottom:90px;overflow-y:auto;flex:1}
+.legal-body{padding:18px;padding-bottom:90px;overflow-y:auto;flex:1;font-size:14px;line-height:1.6;color:var(--text)}
+.legal-body h3{font-size:15px;font-weight:700;margin:18px 0 6px;color:var(--text)}
+.legal-body p{margin:0 0 10px;color:var(--text);opacity:.9}
+.legal-body ul{margin:0 0 10px;padding-left:20px}
+.legal-body li{margin-bottom:6px;color:var(--text);opacity:.9}
+.legal-body a{color:var(--ca);text-decoration:none}
+.legal-updated{font-size:12px;color:var(--muted)!important;opacity:1!important}
+.legal-note{font-size:12px;color:var(--muted)!important;margin-top:18px;border-top:1px solid var(--border);padding-top:12px}
+.legal-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.legal-links a{color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
+.consent-row{display:flex;align-items:flex-start;gap:9px;margin:4px 0 10px;text-align:left}
+.consent-row input{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--ca)}
+.consent-row label{font-size:12px;color:var(--muted);line-height:1.5}
+.consent-row label a{color:var(--ca);text-decoration:none}
 .hc-search-row{position:relative;margin-bottom:12px}
 .hc-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
 .hc-search{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px 11px 38px;font-size:14px;color:var(--text);outline:none;font-family:inherit;box-sizing:border-box}
@@ -1287,11 +1301,16 @@ table.standings tr:last-child td{border-bottom:none}
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
         </div>
+        <div class="consent-row">
+          <input type="checkbox" id="consent-cr" aria-label="Agree to Privacy Policy and Terms of Service">
+          <label for="consent-cr">I agree to the <a onclick="openLegal('privacy')">Privacy Policy</a> and <a onclick="openLegal('terms')">Terms of Service</a>.</label>
+        </div>
         <div id="auth-err-cr" class="auth-error hidden"></div>
         <button class="auth-btn" onclick="createAccount()">Create Account</button>
       </div>
 
       <div class="auth-device-note">🔒 Stored on this device only</div>
+      <div class="legal-links"><a onclick="openLegal('privacy')">Privacy</a><a onclick="openLegal('terms')">Terms</a></div>
       <div class="divider-or">or</div>
       <button class="btn-secondary" onclick="guestLogin()">Continue as Guest</button>
     </div>
@@ -2256,6 +2275,19 @@ table.standings tr:last-child td{border-bottom:none}
         </div>
       </div>
     </div>
+    <div class="hub-section-title" style="padding:8px 0">Legal</div>
+    <div class="settings-sec">
+      <div class="setting-row" onclick="openLegal('privacy')">
+        <div class="sr-icon">🔒</div>
+        <div class="sr-info"><div class="sr-label">Privacy Policy</div><div class="sr-sub">What we collect &amp; how it's used</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" onclick="openLegal('terms')" style="border-bottom:none">
+        <div class="sr-icon">📄</div>
+        <div class="sr-info"><div class="sr-label">Terms of Service</div><div class="sr-sub">Rules for using CourtCall</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+    </div>
     <div class="settings-ver" id="settings-ver-footer">CourtCall — Offline First 🏀</div>
   </div>
 </div>
@@ -2523,6 +2555,15 @@ function buildHubStatsHTML(){
 let toastTmr=null;
 function showToast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),dur)}
 // ── Screen ───────────────────────────────────────────────
+// Privacy/Terms are reachable from both Settings and the landing page;
+// remember where we came from so "← Back" returns there.
+let _legalReturnScreen='profile';
+function openLegal(which){
+  const active=document.querySelector('.screen.active');
+  if(active&&active.id)_legalReturnScreen=active.id.replace(/^s-/,'');
+  showScreen(which);
+}
+function closeLegal(){showScreen(_legalReturnScreen||'profile');}
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
@@ -2655,6 +2696,7 @@ async function createAccount(){
   if(!email||!email.includes('@')){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-cr','Choose a 6-digit PIN');return;}
   if(pin!==pinC){_setAuthErr('auth-err-cr','PINs don\'t match — try again');_clearPin('pin-cf');document.getElementById('pin-cf').querySelector('.pin-box').focus();return;}
+  if(!document.getElementById('consent-cr')?.checked){_setAuthErr('auth-err-cr','Please agree to the Privacy Policy and Terms to continue');return;}
 
   // Disable button while processing
   const btn=document.querySelector('#auth-create-form .auth-btn');
@@ -6903,6 +6945,70 @@ function clearDemoData(){
     <div class="hc-ask-bar">
       <button class="hc-ask-btn" onclick="closeHelpChat();showScreen('settings');setTimeout(openHelpChat,120)">💬 Ask CourtCall Assistant</button>
     </div>
+  </div>
+</div>
+
+<!-- ══ PRIVACY POLICY ══ -->
+<div id="s-privacy" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="closeLegal()">← Back</button>
+    <div class="page-title">Privacy Policy</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="legal-body">
+    <p class="legal-updated">Last updated: May 30, 2026</p>
+    <p>CourtCall ("we", "the app") is a pickup-basketball scoring app. This policy explains what data we collect and how we use it. We aim to collect as little as possible.</p>
+    <h3>What we collect</h3>
+    <ul>
+      <li><b>Account info:</b> the email address and display name you provide when you create an account. Your 6-digit PIN is never stored in plain text — it is used as your password and handled by our authentication provider.</li>
+      <li><b>App data:</b> games, teams, players, tournaments, and communities you create. This is stored locally on your device and, if you sign in, synced to our backend so you can access it across devices.</li>
+      <li><b>Guest mode:</b> if you continue as a guest, no email is collected and your data stays on your device only.</li>
+    </ul>
+    <h3>How we use it</h3>
+    <ul>
+      <li>To provide the app: saving your games, syncing your account, and showing communities you join.</li>
+      <li>We do <b>not</b> sell your data or use it for advertising.</li>
+    </ul>
+    <h3>Where it's stored</h3>
+    <p>Account and synced data are stored with our backend provider (Supabase). Local data lives in your browser's storage and is removed when you log out or clear data.</p>
+    <h3>Your choices</h3>
+    <ul>
+      <li><b>Export:</b> download all your data as JSON from Settings → Export Data.</li>
+      <li><b>Delete:</b> log out (clears this device) or use Clear All Data. To delete your account and server data, contact us at the email below.</li>
+    </ul>
+    <h3>Contact</h3>
+    <p>Questions about privacy or data deletion: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
+    <p class="legal-note">CourtCall is an independent beta project and is not affiliated with the NBA or any league. This document is provided for transparency and may be updated as the app evolves.</p>
+  </div>
+</div>
+
+<!-- ══ TERMS OF SERVICE ══ -->
+<div id="s-terms" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="closeLegal()">← Back</button>
+    <div class="page-title">Terms of Service</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="legal-body">
+    <p class="legal-updated">Last updated: May 30, 2026</p>
+    <p>By using CourtCall you agree to these terms. CourtCall is provided "as is" during its beta period.</p>
+    <h3>Using the app</h3>
+    <ul>
+      <li>You're responsible for the activity on your account and for keeping your PIN private.</li>
+      <li>Don't post unlawful, harassing, or infringing content in communities, and don't misuse or attempt to break the service.</li>
+      <li>You must be old enough to consent to data processing in your region (generally 13+, or 16+ in parts of the EU).</li>
+    </ul>
+    <h3>Your content</h3>
+    <p>You keep ownership of the games, teams, and posts you create. By posting in a community you allow other members of that community to see your content.</p>
+    <h3>Beta &amp; availability</h3>
+    <ul>
+      <li>Features may change, break, or be removed. Back up important data with Export.</li>
+      <li>We don't guarantee uninterrupted service or that data will never be lost.</li>
+    </ul>
+    <h3>Liability</h3>
+    <p>To the fullest extent permitted by law, CourtCall is not liable for any indirect or incidental damages arising from use of the app.</p>
+    <h3>Contact</h3>
+    <p>Questions about these terms: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
   </div>
 </div>
 
