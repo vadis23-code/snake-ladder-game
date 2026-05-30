@@ -2297,7 +2297,7 @@ body.modal-open{overflow:hidden}
     <div class="settings-sec">
       <div class="setting-row no-click">
         <div class="sr-icon">🏀</div>
-        <div class="sr-info"><div class="sr-label">CourtCall</div><div class="sr-sub" id="settings-version-label">v0.9 Beta</div></div>
+        <div class="sr-info"><div class="sr-label">CourtCall</div><div class="sr-sub" id="settings-version-label">v0.11 Beta</div></div>
       </div>
       <div class="setting-row no-click">
         <div class="sr-icon">🏗</div>
@@ -2547,10 +2547,16 @@ function setCol(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch
 function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.parse(r):def}catch{return def}}
 function setObj(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
 // ── App constants ─────────────────────────────────────────
-const APP_VERSION='v0.10 Beta';
-const APP_LAST_UPDATED='May 2026';
+const APP_VER={major:0,minor:11,patch:0,tag:'Beta',string:'v0.11 Beta',date:'May 2026'};
+const APP_VERSION=APP_VER.string;
+const APP_LAST_UPDATED=APP_VER.date;
 const APP_BUILD='GitHub Pages Beta';
 const CHANGELOG=[{
+  version:'v0.11 Beta',date:'May 2026',
+  items:['ARIA tablist/tab/tabpanel roles on all tab groups for screen-reader navigation','Arrow-key roving-tabindex on Sign-in, Tournament, and Community tabs','Escape key closes Feedback and Changelog modals','Community discover: auto-syncs from Supabase even before auth token is cached','Voice scoring enforces active scoring rule (no 3-pt voice in 1s&2s games)','Team fairness uses RMSD — accurate for 3+ teams','In-flight deduplication for Supabase community and post sync calls','Score displays and toasts announce via aria-live for screen readers','Mobile: touch-action:manipulation removes 300ms tap delay on all buttons','Empty community Discover section now shows a Create CTA'],
+  notes:['Export your data backup before updating or clearing storage','Voice scoring works best in Chrome / Edge'],
+  upcoming:['Real image upload via Supabase Storage','Push notifications','Player rating stability'],
+},{
   version:'v0.10 Beta',date:'May 2026',
   items:['Gallery badges render in orange (CSS variable fix)','Accessible labels on PIN inputs and all game buttons','Knockout bracket: full skeleton, bye-handling, multi-round winner advancement','Round-robin standings update after every result','Export/Import covers all data domains including communities','Run banner no longer shifts scoring buttons','Version string in Settings confirms build'],
   notes:['Export your data backup before updating or clearing storage','Voice scoring works best in Chrome / Edge'],
@@ -2659,6 +2665,8 @@ function _routeFromHash(){
     if(getComms().some(c=>c.id===parts[1])){openCommunity(parts[1]);return true;}
     showScreen('communities');return true;
   }
+  // Changelog deep-link: #/changelog
+  if(seg==='changelog'){openChangelog();return true;}
   if(!_validScreen(seg))return false;
   // Resuming a live game from a refresh
   if(seg==='game'){
@@ -6622,6 +6630,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   _wireTablist(document.querySelector('.auth-tabs'));
   _wireTablist(document.getElementById('tc-tabs'));
   _wireTablist(document.getElementById('cd-tabs'));
+  // "What's new" toast — shows once per version for returning users
+  const seenVer=localStorage.getItem('cc_seen_version');
+  if(seenVer&&seenVer!==APP_VERSION){
+    setTimeout(()=>showToast(`Updated to ${APP_VERSION} — tap Settings › What's New`,3500),800);
+  }
+  if(!seenVer||seenVer!==APP_VERSION)localStorage.setItem('cc_seen_version',APP_VERSION);
 });
 
 // ── PWA: Service Worker + Install Prompt ─────────────────────
