@@ -2399,10 +2399,15 @@ function setCol(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch
 function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.parse(r):def}catch{return def}}
 function setObj(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
 // ── App constants ─────────────────────────────────────────
-const APP_VERSION='v0.9 Beta';
+const APP_VERSION='v0.10 Beta';
 const APP_LAST_UPDATED='May 2026';
 const APP_BUILD='GitHub Pages Beta';
 const CHANGELOG=[{
+  version:'v0.10 Beta',date:'May 2026',
+  items:['Gallery badges render in orange (CSS variable fix)','Accessible labels on PIN inputs and all game buttons','Knockout bracket: full skeleton, bye-handling, multi-round winner advancement','Round-robin standings update after every result','Export/Import covers all data domains including communities','Run banner no longer shifts scoring buttons','Version string in Settings confirms build'],
+  notes:['Export your data backup before updating or clearing storage','Voice scoring works best in Chrome / Edge'],
+  upcoming:['Alphanumeric password option','Push notifications','Player rating stability'],
+},{
   version:'v0.9 Beta',date:'May 2026',
   items:['Redesigned Apple-style landing page','Shot clock and game clock','+1 free throw / foul point scoring','Team Builder with fair team generation','Communities with feed, players, gallery, events','CourtCall Pulse — community news feed','Match History and analytics','Export / Import data','PWA — installable on home screen','Community moderation tools'],
   notes:['Data is stored locally on this device only','Export backup regularly to avoid data loss','Voice scoring works best in Chrome / Edge','Some features are still in testing'],
