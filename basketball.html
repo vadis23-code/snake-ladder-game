@@ -3268,7 +3268,15 @@ function generateSummary(winner,loser){
   if(bigLead>=6)s+=` Biggest lead: +${bigLead}.`;
   return s;
 }
-function closePG(){document.getElementById('pg-overlay').classList.add('hidden')}
+// Back from the victory screen: the game is finished, so clear it and
+// return to the Hub rather than dropping the user back into a dead game.
+function closePG(){
+  document.getElementById('pg-overlay').classList.add('hidden');
+  clearSave();stopVoice();SC.stop();GC.stop();
+  gameContext={type:'pickup',tournamentId:null,fixtureId:null};
+  state=freshState();
+  renderHub();showScreen('hub');
+}
 function playAgain(){
   document.getElementById('pg-overlay').classList.add('hidden');
   state.teamA.score=0;state.teamB.score=0;state.teamA.fouls=0;state.teamB.fouls=0;
