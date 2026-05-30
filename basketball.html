@@ -1047,6 +1047,17 @@ table.standings tr:last-child td{border-bottom:none}
 /* More sheet */
 .more-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 body.modal-open{overflow:hidden}
+.cc-confirm-overlay{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.cc-confirm-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;max-width:340px;width:100%;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:popIn .16s ease-out}
+@keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.cc-confirm-msg{font-size:15px;line-height:1.5;color:var(--text);margin-bottom:18px;text-align:center}
+.cc-confirm-actions{display:flex;gap:10px}
+.cc-confirm-btn{flex:1;border:none;border-radius:11px;font:700 14px 'Inter',sans-serif;padding:13px;cursor:pointer;min-height:46px;transition:opacity var(--t1),background var(--t1)}
+.cc-confirm-btn.cancel{background:var(--s3);color:var(--text)}
+.cc-confirm-btn.cancel:active{opacity:.8}
+.cc-confirm-btn.ok{background:var(--ca);color:#fff}
+.cc-confirm-btn.ok.danger{background:var(--danger)}
+.cc-confirm-btn.ok:active{opacity:.85}
 .more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:301;padding-bottom:calc(env(safe-area-inset-bottom,0) + 12px);animation:slideUp .22s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .more-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:14px auto 18px}
@@ -2345,6 +2356,17 @@ body.modal-open{overflow:hidden}
   </div>
 </div>
 
+<!-- CONFIRM MODAL -->
+<div class="cc-confirm-overlay hidden" id="cc-confirm">
+  <div class="cc-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="cc-confirm-msg">
+    <div class="cc-confirm-msg" id="cc-confirm-msg"></div>
+    <div class="cc-confirm-actions">
+      <button class="cc-confirm-btn cancel" id="cc-confirm-cancel">Cancel</button>
+      <button class="cc-confirm-btn ok" id="cc-confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -2455,7 +2477,7 @@ async function switchProfile() {
 
 // Full logout: end Supabase session, wipe local state, return to landing.
 async function logOut() {
-  if(!confirm('Log out of CourtCall? Unsynced local data will be cleared from this device.'))return;
+  if(!await uiConfirm('Log out of CourtCall? Unsynced local data will be cleared from this device.'))return;
   try{await supaSignOut()}catch{}
   _wipeLocalStorage();
   currentProfile=null;
@@ -3009,6 +3031,31 @@ function hideMoreMenu(){
   document.body.classList.remove('modal-open');
 }
 function _moreMenuOpen(){return !document.getElementById('more-sheet')?.classList.contains('hidden');}
+// Promise-based in-app confirm modal (replaces native confirm()).
+let _confirmResolve=null,_confirmReject=null;
+function uiConfirm(message,{okText='Confirm',cancelText='Cancel',danger=true}={}){
+  return new Promise(resolve=>{
+    const ov=document.getElementById('cc-confirm');
+    const msg=document.getElementById('cc-confirm-msg');
+    const ok=document.getElementById('cc-confirm-ok');
+    const cancel=document.getElementById('cc-confirm-cancel');
+    if(!ov){resolve(window.confirm(message));return;} // safety fallback
+    msg.textContent=message;ok.textContent=okText;cancel.textContent=cancelText;
+    ok.classList.toggle('danger',!!danger);
+    ov.classList.remove('hidden');document.body.classList.add('modal-open');
+    const done=val=>{
+      ov.classList.add('hidden');
+      if(!_moreMenuOpen())document.body.classList.remove('modal-open');
+      ok.onclick=cancel.onclick=ov.onclick=null;_confirmResolve=_confirmReject=null;
+      resolve(val);
+    };
+    ok.onclick=()=>done(true);
+    cancel.onclick=()=>done(false);
+    ov.onclick=e=>{if(e.target===ov)done(false);};
+    _confirmResolve=()=>done(true);_confirmReject=()=>done(false);
+    setTimeout(()=>ok.focus(),30);
+  });
+}
 // ── Setup helpers ─────────────────────────────────────────
 let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-sc':'0','cr-sc-ar':'on','cr-gc':'off','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
 let teamColors={a:'orange',b:'blue'};
@@ -3069,8 +3116,8 @@ function handleStartGame(){
   state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
   applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
-function handleBackFromGame(){
-  if(state.history.length>0&&!state.gameOver){if(!confirm('Go back? Progress is saved.'))return}
+async function handleBackFromGame(){
+  if(state.history.length>0&&!state.gameOver){if(!await uiConfirm('Go back? Progress is saved.'))return}
   SC.stop();GC.stop();stopVoice();showScreen('hub');
   document.getElementById('resume-card').classList.toggle('hidden',!(state.history.length>0&&!state.gameOver));
 }
@@ -3238,8 +3285,8 @@ function checkWin(){
   if(gameContext.type==='tournament'&&gameContext.fixtureId)saveTournamentResult(entry);
   showPostGame(winner,loser,entry);
 }
-function handleEndGame(){
-  if(!confirm('End game now?'))return;
+async function handleEndGame(){
+  if(!await uiConfirm('End game now?'))return;
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const isTie=state.teamA.score===state.teamB.score;
   const winner=isTie?{...state.teamA,name:`${state.teamA.name} & ${state.teamB.name}`}:(state.teamA.score>state.teamB.score?state.teamA:state.teamB);
@@ -3442,7 +3489,7 @@ function parseVoiceCmd(rawText,confidence){
   if(/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)){speakScore();return true}
   if(/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)){nextQuarter();setVAction(`Now ${typeof state.quarter==='number'?'Q'+state.quarter:state.quarter}`);return true}
   if(/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)){handleEndGame();return true}
-  if(/\b(reset\s*game|start\s*over)\b/.test(t)){if(confirm('Reset scores?')){playAgain();setVAction('Reset!')}return true}
+  if(/\b(reset\s*game|start\s*over)\b/.test(t)){uiConfirm('Reset scores?').then(ok=>{if(ok){playAgain();setVAction('Reset!')}});return true}
   if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}setVAction(`Which team? Try "foul ${state.teamA.colorKey||'orange'}" or "foul ${state.teamB.colorKey||'blue'}"`);return true}
   if(/\b(start\s*shot\s*clock|go\s*shot\s*clock|shot\s*clock\s*go)\b/.test(t)){SC.start();setVAction('Shot clock started');return true}
   if(/\b(pause\s*shot\s*clock|stop\s*shot\s*clock|shot\s*clock\s*stop)\b/.test(t)){SC.pause();setVAction('Shot clock paused');return true}
@@ -3574,7 +3621,7 @@ function tbRemovePlayer(id){
   builderState.players=builderState.players.filter(p=>p.id!==id);
   saveBuilderState();renderPlayerList();
 }
-function clearBuilderSession(){if(!confirm('Clear all players and teams?'))return;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};saveBuilderState();renderTeamBuilder();showToast('Session cleared')}
+async function clearBuilderSession(){if(!await uiConfirm('Clear all players and teams?'))return;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};saveBuilderState();renderTeamBuilder();showToast('Session cleared')}
 function generateTeams(mode){
   const n=parseInt(cx['tb-num-teams']||'2',10);
   const players=[...builderState.players];
@@ -3867,9 +3914,9 @@ function openMatchDetail(id){
   document.getElementById('md-overlay').classList.remove('hidden');
 }
 function closeMd(){document.getElementById('md-overlay').classList.add('hidden');detailMatchId=null}
-function deleteMatchFromDetail(){
+async function deleteMatchFromDetail(){
   if(!detailMatchId)return;
-  if(!confirm('Delete this match?'))return;
+  if(!await uiConfirm('Delete this match?'))return;
   const matches=getCol(K.matches).filter(m=>m.id!==detailMatchId);
   setCol(K.matches,matches);
   const leg=getCol(K.games).filter(m=>m.id!==detailMatchId);
@@ -4081,8 +4128,8 @@ function saveTournamentResult(entry){
 
   setCol(K.tournaments,tours);
 }
-function deleteTournament(){
-  if(!confirm('Delete this tournament?'))return;
+async function deleteTournament(){
+  if(!await uiConfirm('Delete this tournament?'))return;
   const tours=getCol(K.tournaments).filter(t=>t.id!==activeTournId);
   setCol(K.tournaments,tours);activeTournId=null;
   showTournEmpty();showToast('Tournament deleted');
@@ -4179,8 +4226,8 @@ function handleImport(e){
   reader.readAsText(file);
   e.target.value='';
 }
-function clearAllData(){
-  if(!confirm('Clear ALL data? This cannot be undone.'))return;
+async function clearAllData(){
+  if(!await uiConfirm('Clear ALL data? This cannot be undone.'))return;
   supaSignOut();
   _wipeLocalStorage();
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
@@ -4244,8 +4291,8 @@ function exportAnalytics(){
   a.click();
   URL.revokeObjectURL(a.href);
 }
-function resetAnalytics(){
-  if(!confirm('Reset all analytics stats? This cannot be undone.'))return;
+async function resetAnalytics(){
+  if(!await uiConfirm('Reset all analytics stats? This cannot be undone.'))return;
   localStorage.removeItem(STATS_KEY);
   trackEvent('app_opened');
   showToast('Analytics reset');
@@ -4828,11 +4875,11 @@ function updateMemberRole(communityId,memberId,newRole){
   renderCommDetail();
 }
 
-function removeMemberFromComm(communityId,memberId){
+async function removeMemberFromComm(communityId,memberId){
   const members=getCommMembers();
   const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
   if(!m)return;
-  if(!confirm(`Remove ${m.profileName} from this community?`))return;
+  if(!await uiConfirm(`Remove ${m.profileName} from this community?`))return;
   setCommMembers(members.filter(x=>!(x.id===memberId&&x.communityId===communityId)));
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
@@ -4886,8 +4933,8 @@ function toggleRatingsDisabled(communityId){
   renderCommDetail();
 }
 
-function removePostPhoto(postId,communityId){
-  if(!confirm('Remove the photo from this post? The text will remain.'))return;
+async function removePostPhoto(postId,communityId){
+  if(!await uiConfirm('Remove the photo from this post? The text will remain.'))return;
   const all=getAllPosts();
   const post=all.find(x=>x.id===postId);
   if(!post)return;
@@ -4897,11 +4944,11 @@ function removePostPhoto(postId,communityId){
   showToast('Photo removed');
 }
 
-function deleteComm(communityId){
+async function deleteComm(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
-  if(!confirm(`Delete "${c.name}"? This cannot be undone.`))return;
+  if(!await uiConfirm(`Delete "${c.name}"? This cannot be undone.`))return;
   setComms(comms.filter(x=>x.id!==communityId));
   setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
   if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
@@ -5120,8 +5167,8 @@ function savePostEdit(postId){
   saveAllPosts(all);editingPostId=null;setCommTab('feed');showToast('Post updated');
 }
 
-function deletePost(postId){
-  if(!confirm('Delete this post?'))return;
+async function deletePost(postId){
+  if(!await uiConfirm('Delete this post?'))return;
   saveAllPosts(getAllPosts().filter(p=>p.id!==postId));
   expandedComments.delete(postId);
   if(editingPostId===postId)editingPostId=null;
@@ -5442,8 +5489,8 @@ function saveCPlayerEdit(playerId){
   setCommTab('players');showToast('Player updated');
 }
 
-function deleteCPlayer(playerId){
-  if(!confirm('Remove this player from the community?'))return;
+async function deleteCPlayer(playerId){
+  if(!await uiConfirm('Remove this player from the community?'))return;
   saveAllCPlayers(getAllCPlayers().filter(p=>p.id!==playerId));
   saveAllCRatings(getAllCRatings().filter(r=>r.playerId!==playerId));
   setCommTab('players');showToast('Player removed');
@@ -5579,10 +5626,10 @@ function cancelJoinReq(communityId){
   renderCommDetail();
 }
 
-function leaveComm(communityId){
+async function leaveComm(communityId){
   const c=getComms().find(x=>x.id===communityId);
   if(!c)return;
-  if(!confirm(`Leave "${c.name}"?`))return;
+  if(!await uiConfirm(`Leave "${c.name}"?`))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const members=getCommMembers();
   const myMember=members.find(m=>m.communityId===communityId&&m.profileId===myId);
@@ -5962,8 +6009,8 @@ function submitEvent(communityId){
   showToast('Event created! 📅');
 }
 
-function deleteEvent(eventId,communityId){
-  if(!confirm('Delete this event?'))return;
+async function deleteEvent(eventId,communityId){
+  if(!await uiConfirm('Delete this event?'))return;
   saveAllEvents(getAllEvents().filter(e=>e.id!==eventId));
   expandedEventRsvps.delete(eventId);
   setCommTab('events');
@@ -6255,8 +6302,8 @@ function submitGalleryItem(communityId){
   showToast('Photo added! 📸');
 }
 
-function deleteGalItem(itemId,communityId){
-  if(!confirm('Delete this photo?'))return;
+async function deleteGalItem(itemId,communityId){
+  if(!await uiConfirm('Delete this photo?'))return;
   saveAllGalItems(getAllGalItems().filter(g=>g.id!==itemId));
   expandedGalleryComments.delete(itemId);
   setCommTab('gallery');
@@ -7038,8 +7085,8 @@ function loadDemoData(){
   showToast('Demo data loaded! 🧪 14 players, 5 matches, 1 community');
 }
 
-function clearDemoData(){
-  if(!confirm('Remove all demo/test data? Your real data will not be affected.'))return;
+async function clearDemoData(){
+  if(!await uiConfirm('Remove all demo/test data? Your real data will not be affected.'))return;
   const D=DEMO_BATCH_ID;
   const flt=arr=>(arr||[]).filter(x=>!(x.isDemo||x.demoBatchId===D));
   setCol(K.players,flt(getCol(K.players)));
