@@ -2601,19 +2601,25 @@ async function signIn(){
     _clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;
   }
 
-  // Merge with local profile
-  const profiles=getCol(K.profiles);
-  let p=profiles.find(x=>x.id===data.user.id||x.email===email);
-  if(!p){
-    p={id:data.user.id,name:data.user.user_metadata?.name||email,email,nickname:data.user.user_metadata?.name||email,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-    profiles.push(p);setCol(K.profiles,profiles);
-  }
+  // Scope storage to the current user only — never cache other accounts' PII.
+  // Reuse the cached profile if it's the same user (keeps createdAt/gamesPlayed).
+  const cached=getObj(K.profile,null);
+  const same=cached&&cached.id===data.user.id;
+  const p={
+    id:data.user.id,
+    name:data.user.user_metadata?.name||(same?cached.name:email),
+    email,
+    nickname:data.user.user_metadata?.name||(same?cached.nickname:email),
+    createdAt:same?cached.createdAt:new Date().toLocaleDateString(),
+    gamesPlayed:same?(cached.gamesPlayed||0):0
+  };
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('signed_in');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 
 function _localSignIn(email,pin){
+  // Offline fallback: only the single most-recent local account is kept on-device.
   const p=getCol(K.profiles).find(x=>x.email&&x.email.toLowerCase()===email);
   if(!p){_setAuthErr('auth-err-si','No account found — create one below');return;}
   if(p.pinHash!==_hashPin(pin,email)){_setAuthErr('auth-err-si','Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
@@ -2649,18 +2655,17 @@ async function createAccount(){
 
   // Save profile locally too
   const p={id:data.user.id,name,email,nickname:name,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-  const profiles=getCol(K.profiles);
-  if(!profiles.find(x=>x.id===p.id))profiles.push(p);
-  setCol(K.profiles,profiles);setObj(K.profile,p);currentProfile=p;
+  setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 
 function _localCreateAccount(name,email,pin){
-  const profiles=getCol(K.profiles);
-  if(profiles.find(x=>x.email&&x.email.toLowerCase()===email)){_setAuthErr('auth-err-cr','Email already registered — sign in instead');return;}
+  // Offline fallback: store ONLY this account locally (single-entry, no foreign PII).
+  const existing=getCol(K.profiles);
+  if(existing.find(x=>x.email&&x.email.toLowerCase()===email&&x.id!=='p_'+email)){/* allow overwrite of same email */}
   const p={id:'p_'+Date.now(),name,email,nickname:name,pinHash:_hashPin(pin,email),createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-  profiles.push(p);setCol(K.profiles,profiles);setObj(K.profile,p);currentProfile=p;
+  setCol(K.profiles,[p]);setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
@@ -2671,14 +2676,6 @@ function guestLogin(){
   trackEvent('guest_started');
   renderHub();
   if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}else{showScreen('hub');}
-}
-function selectProfile(id){
-  const profiles=getCol(K.profiles);
-  const p=profiles.find(x=>x.id===id);
-  if(!p)return;
-  setObj(K.profile,p);
-  currentProfile=p;
-  renderHub();showScreen('hub');
 }
 // ── Hub ──────────────────────────────────────────────────
 function renderHub(){
