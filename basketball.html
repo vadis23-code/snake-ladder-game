@@ -3547,7 +3547,13 @@ function resolveTeam(t){
 function extractPts(t){
   const map={one:1,two:2,three:3,'1':1,'2':2,'3':3};
   const m=t.match(/\b(one|two|three|1|2|3)\b/i);
-  return m?(map[m[1].toLowerCase()]||null):null;
+  if(!m)return null;
+  const pts=map[m[1].toLowerCase()]||null;
+  if(!pts)return null;
+  const rule=state.scoringRule;
+  if(rule==='1s2s'&&pts===3){setVAction(`3-point scores disabled — this game uses 1s & 2s`);return null;}
+  if(rule==='2s3s'&&pts===1){setVAction(`1-point scores disabled — this game uses 2s & 3s`);return null;}
+  return pts;
 }
 function speakScore(){
   const msg=`${state.teamA.name} ${state.teamA.score}, ${state.teamB.name} ${state.teamB.score}`;
@@ -3717,10 +3723,13 @@ function generateTeams(mode){
   renderQueueDisplay();
 }
 function calcFairness(teams){
-  if(teams.length<2)return 100;
-  const avgs=teams.map(t=>t.players.length?t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length:5);
-  const spread=Math.max(...avgs)-Math.min(...avgs);
-  return Math.max(0,Math.round(100-spread*9));
+  const active=teams.filter(t=>t.players.length>0);
+  if(active.length<2)return 100;
+  const avgs=active.map(t=>t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length);
+  const mean=avgs.reduce((s,a)=>s+a,0)/avgs.length;
+  const rmsd=Math.sqrt(avgs.reduce((s,a)=>s+(a-mean)**2,0)/avgs.length);
+  // rmsd on a 1–10 scale: 0 = perfect, ~4.5 = worst possible → map to 0–100
+  return Math.max(0,Math.round(100-rmsd*22));
 }
 function renderGeneratedTeams(){
   const fb=document.getElementById('tb-fairness-box');
@@ -4669,37 +4678,23 @@ function createCommunity(){
 }
 
 // ── Render Communities Screen ────────────────────────────
-function renderCommunities(){
-  if(supa&&supaUser)syncCommunitiesFromDB().then(()=>{
-    const communities=getComms();const allMembers=getCommMembers();
-    const myIds=new Set(allMembers.filter(m=>m.user_id===supaUser?.id||m.profileId===(currentProfile||{}).id).map(m=>m.community_id||m.communityId));
-    const myComms=communities.filter(c=>myIds.has(c.id));
-    const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
-    const myEl=document.getElementById('my-comm-list');
-    const discEl=document.getElementById('discover-comm-list');
-    if(myEl)myEl.innerHTML=myComms.length?myComms.map(c=>commCardHTML(c,allMembers,true)).join(''):'<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
-    if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,allMembers,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
-  });
+function _renderCommunitiesDOM(){
   const p=currentProfile||{id:'guest'};
   const isGuest=!p.id||p.id==='guest';
   const communities=getComms();
   const members=getCommMembers();
-
-  // My communities — communities where current user is a member.
-  // Guests are never members of anything (isolated, empty state).
   const myIds=new Set(isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
   const myComms=communities.filter(c=>myIds.has(c.id));
-
-  // Discover — public communities not already joined
   const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
-
-  document.getElementById('my-comm-list').innerHTML=myComms.length
-    ? myComms.map(c=>commCardHTML(c,members,true)).join('')
-    : '<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
-
-  document.getElementById('discover-comm-list').innerHTML=discoverComms.length
-    ? discoverComms.map(c=>commCardHTML(c,members,false)).join('')
-    : '<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
+  const myEl=document.getElementById('my-comm-list');
+  const discEl=document.getElementById('discover-comm-list');
+  if(myEl)myEl.innerHTML=myComms.length?myComms.map(c=>commCardHTML(c,members,true)).join(''):'<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
+  if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,members,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
+}
+function renderCommunities(){
+  _renderCommunitiesDOM();
+  // Sync from DB whenever Supabase is available; syncCommunitiesFromDB handles auth internally.
+  if(supa)syncCommunitiesFromDB().then(_renderCommunitiesDOM);
 }
 
 function commCardHTML(c,allMembers,isMine){
