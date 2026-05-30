@@ -1300,13 +1300,13 @@ body.modal-open{overflow:hidden}
     <div class="ph-title">CourtCall</div>
     <div class="ph-sub">Voice-first pickup basketball OS</div>
     <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab on" id="auth-tab-signin" onclick="switchAuthMode('signin')">Sign In</button>
-        <button class="auth-tab" id="auth-tab-create" onclick="switchAuthMode('create')">Create Account</button>
+      <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
+        <button class="auth-tab on" id="auth-tab-signin" role="tab" aria-selected="true" aria-controls="auth-signin-form" onclick="switchAuthMode('signin')">Sign In</button>
+        <button class="auth-tab" id="auth-tab-create" role="tab" aria-selected="false" tabindex="-1" aria-controls="auth-create-form" onclick="switchAuthMode('create')">Create Account</button>
       </div>
 
       <!-- Sign In form -->
-      <div class="auth-form" id="auth-signin-form">
+      <div class="auth-form" id="auth-signin-form" role="tabpanel" aria-labelledby="auth-tab-signin">
         <input id="inp-si-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
         <div class="pin-label-row"><span class="pin-label">6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-si',this)" aria-label="Show PIN">👁</button></div>
         <div class="pin-row" id="pin-si" role="group" aria-label="Enter your 6-digit PIN">
@@ -1324,7 +1324,7 @@ body.modal-open{overflow:hidden}
       </div>
 
       <!-- Create Account form -->
-      <div class="auth-form hidden" id="auth-create-form">
+      <div class="auth-form hidden" id="auth-create-form" role="tabpanel" aria-labelledby="auth-tab-create">
         <input id="inp-cr-name" class="auth-input" type="text" placeholder="Your name" maxlength="24" autocomplete="off">
         <input id="inp-cr-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
         <div class="pin-label-row"><span class="pin-label">Choose a 6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cr',this)" aria-label="Show PIN">👁</button></div>
@@ -1947,11 +1947,11 @@ body.modal-open{overflow:hidden}
         <div class="tc-name" id="tc-name">Tournament</div>
         <div class="tc-meta" id="tc-meta">—</div>
       </div>
-      <div class="tc-tabs">
-        <button class="tc-tab on" onclick="switchTournTab('standings',this)">Standings</button>
-        <button class="tc-tab" onclick="switchTournTab('fixtures',this)">Fixtures</button>
+      <div class="tc-tabs" id="tc-tabs" role="tablist" aria-label="Tournament view">
+        <button class="tc-tab on" role="tab" aria-selected="true" aria-controls="tourn-tab-body" onclick="switchTournTab('standings',this)">Standings</button>
+        <button class="tc-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tourn-tab-body" onclick="switchTournTab('fixtures',this)">Fixtures</button>
       </div>
-      <div class="tc-body" id="tourn-tab-body"></div>
+      <div class="tc-body" id="tourn-tab-body" role="tabpanel"></div>
     </div>
     <div style="padding:0 16px 40px">
       <button class="btn-del-tourn" onclick="deleteTournament()">🗑 Delete Tournament</button>
@@ -2128,16 +2128,16 @@ body.modal-open{overflow:hidden}
   </div>
   <div class="cd-header" id="cd-header"></div>
   <div id="cd-join-bar"></div>
-  <div class="cd-tabs" id="cd-tabs">
-    <button class="cd-tab on" data-tab="feed"        onclick="setCommTab('feed')">Feed</button>
-    <button class="cd-tab"    data-tab="members"     onclick="setCommTab('members')">Members</button>
-    <button class="cd-tab"    data-tab="players"     onclick="setCommTab('players')">Players</button>
-    <button class="cd-tab"    data-tab="gallery"     onclick="setCommTab('gallery')">Gallery</button>
-    <button class="cd-tab"    data-tab="events"      onclick="setCommTab('events')">Events</button>
-    <button class="cd-tab"    data-tab="leaderboard" onclick="setCommTab('leaderboard')">Leaderboard</button>
-    <button class="cd-tab"    data-tab="settings"    onclick="setCommTab('settings')" id="cd-settings-tab">Settings</button>
+  <div class="cd-tabs" id="cd-tabs" role="tablist" aria-label="Community sections">
+    <button class="cd-tab on" data-tab="feed"        role="tab" aria-selected="true"  aria-controls="cd-tab-content" onclick="setCommTab('feed')">Feed</button>
+    <button class="cd-tab"    data-tab="members"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('members')">Members</button>
+    <button class="cd-tab"    data-tab="players"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('players')">Players</button>
+    <button class="cd-tab"    data-tab="gallery"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('gallery')">Gallery</button>
+    <button class="cd-tab"    data-tab="events"      role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('events')">Events</button>
+    <button class="cd-tab"    data-tab="leaderboard" role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('leaderboard')">Leaderboard</button>
+    <button class="cd-tab"    data-tab="settings"    role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('settings')" id="cd-settings-tab">Settings</button>
   </div>
-  <div id="cd-tab-content"></div>
+  <div id="cd-tab-content" role="tabpanel"></div>
 </div>
 
 <!-- ══ PULSE ══ -->
@@ -2677,6 +2677,10 @@ document.addEventListener('keydown',e=>{
   if(typeof _confirmReject==='function'){_confirmReject();return;}
   if(typeof _navDrawerOpen==='function'&&_navDrawerOpen()){closeNavDrawer();return;}
   if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
+  const fbMod=document.getElementById('feedback-modal');
+  if(fbMod&&!fbMod.classList.contains('hidden')){closeFeedback();return;}
+  const clMod=document.getElementById('changelog-modal');
+  if(clMod&&!clMod.classList.contains('hidden')){closeChangelog();return;}
 });
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
@@ -2716,10 +2720,12 @@ let currentProfile=null;
 let _authMode='signin';
 function switchAuthMode(mode){
   _authMode=mode;
-  document.getElementById('auth-tab-signin').classList.toggle('on',mode==='signin');
-  document.getElementById('auth-tab-create').classList.toggle('on',mode==='create');
+  const si=document.getElementById('auth-tab-signin'),cr=document.getElementById('auth-tab-create');
+  si.classList.toggle('on',mode==='signin');
+  cr.classList.toggle('on',mode==='create');
   document.getElementById('auth-signin-form').classList.toggle('hidden',mode!=='signin');
   document.getElementById('auth-create-form').classList.toggle('hidden',mode!=='create');
+  _setTabSelected(si.parentElement,mode==='signin'?si:cr);
   _clearAuthErrs();_clearAllPins();
 }
 function _initPinRow(rowId){
@@ -3073,6 +3079,31 @@ function closeNavDrawer(){
   document.getElementById('lp-burger')?.setAttribute('aria-expanded','false');
 }
 function _navDrawerOpen(){return !document.getElementById('nav-drawer')?.classList.contains('hidden');}
+// ── ARIA tablist helpers ─────────────────────────────────
+// Roving tabindex + aria-selected; arrow/Home/End keyboard navigation.
+function _setTabSelected(container,activeBtn){
+  if(!container)return;
+  container.querySelectorAll('[role="tab"]').forEach(t=>{
+    const on=t===activeBtn;
+    t.setAttribute('aria-selected',on?'true':'false');
+    t.tabIndex=on?0:-1;
+  });
+}
+function _wireTablist(container){
+  if(!container||container._tabsWired)return;container._tabsWired=true;
+  container.addEventListener('keydown',e=>{
+    const tabs=[...container.querySelectorAll('[role="tab"]')];
+    const i=tabs.indexOf(document.activeElement);
+    if(i<0)return;
+    let n=i;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')n=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp')n=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home')n=0;
+    else if(e.key==='End')n=tabs.length-1;
+    else return;
+    e.preventDefault();tabs[n].focus();tabs[n].click();
+  });
+}
 // Promise-based in-app confirm modal (replaces native confirm()).
 let _confirmResolve=null,_confirmReject=null;
 function uiConfirm(message,{okText='Confirm',cancelText='Cancel',danger=true}={}){
@@ -4078,6 +4109,7 @@ function showActiveTournament(t){
 function switchTournTab(name,btn){
   tournTab=name;
   document.querySelectorAll('.tc-tab').forEach(t=>t.classList.toggle('on',t===btn));
+  _setTabSelected(document.getElementById('tc-tabs'),btn);
   renderTournTab(name);
 }
 function renderTournTab(name){
@@ -4772,7 +4804,9 @@ function setCommTab(tab){
   if(tab!=='events'){showAddEventForm=false}
   if(tab==='leaderboard')lbCategory='rating';
   activeCommTab=tab;
+  const cdTabsCont=document.getElementById('cd-tabs');
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  _setTabSelected(cdTabsCont,cdTabsCont&&cdTabsCont.querySelector(`[data-tab="${tab}"]`));
   const c=getComms().find(x=>x.id===activeCommunityId);
   if(!c)return;
   const members=getCommMembers().filter(m=>m.communityId===c.id);
@@ -6572,6 +6606,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Load builder state from storage
   const bs=getObj('cc_builder',null);
   if(bs)builderState=bs;
+  // Wire ARIA roving-tabindex on all tablist containers
+  _wireTablist(document.querySelector('.auth-tabs'));
+  _wireTablist(document.getElementById('tc-tabs'));
+  _wireTablist(document.getElementById('cd-tabs'));
 });
 
 // ── PWA: Service Worker + Install Prompt ─────────────────────
