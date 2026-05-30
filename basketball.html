@@ -2638,10 +2638,12 @@ function _clearAllPins(){['pin-si','pin-cr','pin-cf'].forEach(_clearPin);}
 function _clearAuthErrs(){['auth-err-si','auth-err-cr'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.classList.add('hidden');}});}
 function _setAuthErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.toggle('hidden',!msg);}}
 function _hashPin(pin,email){return btoa(pin+'|'+email.toLowerCase().trim());}
+// Single source of truth for email validity (used by Sign In + Create Account).
+function _validEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
 async function signIn(){
   const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
   const pin=_getPinVal('pin-si');
-  if(!email){_setAuthErr('auth-err-si','Enter your email address');return;}
+  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-si','Enter your 6-digit PIN');return;}
 
   // If Supabase not configured, fall back to local
@@ -2693,7 +2695,7 @@ async function createAccount(){
   const pin=_getPinVal('pin-cr');
   const pinC=_getPinVal('pin-cf');
   if(!name){_setAuthErr('auth-err-cr','Enter your name');return;}
-  if(!email||!email.includes('@')){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
+  if(!_validEmail(email)){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-cr','Choose a 6-digit PIN');return;}
   if(pin!==pinC){_setAuthErr('auth-err-cr','PINs don\'t match — try again');_clearPin('pin-cf');document.getElementById('pin-cf').querySelector('.pin-box').focus();return;}
   if(!document.getElementById('consent-cr')?.checked){_setAuthErr('auth-err-cr','Please agree to the Privacy Policy and Terms to continue');return;}
