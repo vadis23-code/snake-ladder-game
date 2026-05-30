@@ -22,6 +22,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 html,body{height:100%}
 body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+button{touch-action:manipulation}
 .hidden{display:none!important}
 .screen{display:none;flex-direction:column;min-height:100dvh}
 .screen.active{display:flex}
@@ -1702,7 +1703,7 @@ body.modal-open{overflow:hidden}
   <div class="scoreboard">
     <div class="team-panel" id="tp-a" data-t="a">
       <div class="t-name" id="t-name-a">Team A</div>
-      <div class="t-score" id="t-score-a">0</div>
+      <div class="t-score" id="t-score-a" aria-live="polite" aria-atomic="true" aria-label="Team A score: 0">0</div>
       <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="addFoul('a')">F: 0</span></div>
     </div>
     <div class="vs-col">
@@ -1711,11 +1712,11 @@ body.modal-open{overflow:hidden}
     </div>
     <div class="team-panel" id="tp-b" data-t="b">
       <div class="t-name" id="t-name-b">Team B</div>
-      <div class="t-score" id="t-score-b">0</div>
+      <div class="t-score" id="t-score-b" aria-live="polite" aria-atomic="true" aria-label="Team B score: 0">0</div>
       <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="addFoul('b')">F: 0</span></div>
     </div>
   </div>
-  <div class="game-status" id="game-status">—</div>
+  <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">—</div>
   <div class="clock-bar" id="clock-bar">
     <div class="sc-wrap" id="sc-wrap">
       <div class="sc-label">Shot Clock</div>
@@ -1744,8 +1745,8 @@ body.modal-open{overflow:hidden}
   </div>
   <div class="voice-panel hidden" id="voice-panel">
     <div class="voice-inner">
-      <div id="v-heard"></div>
-      <div id="v-action">🎤 Listening… say a command</div>
+      <div id="v-heard" aria-live="polite" aria-atomic="true"></div>
+      <div id="v-action" role="status" aria-live="assertive" aria-atomic="true">🎤 Listening… say a command</div>
       <div class="voice-hint" id="v-hint">Try: "Orange two" · "Blue three" · "Undo" · "Score check"</div>
       <div class="voice-test-row">
         <input id="v-test-input" class="v-test-input" type="text" placeholder="Type a command to test…" autocomplete="off" onkeydown="if(event.key==='Enter')testVoiceCmd()">
@@ -2389,7 +2390,7 @@ body.modal-open{overflow:hidden}
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="./basketball-supa.js"></script>
 <script>
@@ -3199,8 +3200,9 @@ function renderGame(){
   const{teamA:a,teamB:b}=state;
   document.getElementById('t-name-a').textContent=a.name;
   document.getElementById('t-name-b').textContent=b.name;
-  document.getElementById('t-score-a').textContent=a.score;
-  document.getElementById('t-score-b').textContent=b.score;
+  const sa=document.getElementById('t-score-a'),sb=document.getElementById('t-score-b');
+  sa.textContent=a.score;sa.setAttribute('aria-label',`${a.name} score: ${a.score}`);
+  sb.textContent=b.score;sb.setAttribute('aria-label',`${b.name} score: ${b.score}`);
   updateFoulUI('a');
   updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
@@ -4704,7 +4706,7 @@ function _renderCommunitiesDOM(){
   const myEl=document.getElementById('my-comm-list');
   const discEl=document.getElementById('discover-comm-list');
   if(myEl)myEl.innerHTML=myComms.length?myComms.map(c=>commCardHTML(c,members,true)).join(''):'<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
-  if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,members,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
+  if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,members,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span><button class="btn-comm-create" style="margin-top:8px" onclick="showScreen(\'comm-create\')">+ Create one</button></div>';
 }
 function renderCommunities(){
   _renderCommunitiesDOM();
