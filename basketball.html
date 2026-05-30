@@ -2640,11 +2640,34 @@ function _setAuthErr(id,msg){const e=document.getElementById(id);if(e){e.textCon
 function _hashPin(pin,email){return btoa(pin+'|'+email.toLowerCase().trim());}
 // Single source of truth for email validity (used by Sign In + Create Account).
 function _validEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
+// Reject easily-guessed PINs at account creation.
+function _isTrivialPin(pin){
+  if(/^(\d)\1{5}$/.test(pin))return true;            // all same digit
+  if('0123456789'.includes(pin)||'9876543210'.includes(pin))return true; // sequential
+  return ['123456','654321','000000','121212','112233','123123','159753','147258','696969','420420'].includes(pin);
+}
+// Client-side sign-in throttling (UX speed-bump; Supabase enforces server-side too).
+const _AUTH_LOCK_KEY='cc_auth_lock';
+function _lockFor(email){const all=getObj(_AUTH_LOCK_KEY,{});return all[email]||{fails:0,until:0};}
+function _saveLock(email,st){const all=getObj(_AUTH_LOCK_KEY,{});all[email]=st;setObj(_AUTH_LOCK_KEY,all);}
+function _lockRemaining(email){const st=_lockFor(email);return st.until&&Date.now()<st.until?st.until-Date.now():0;}
+function _recordAuthFail(email){
+  const st=_lockFor(email);st.fails=(st.fails||0)+1;
+  // Lock after 5 fails; exponential backoff capped at 15 min.
+  if(st.fails>=5)st.until=Date.now()+Math.min(30000*Math.pow(2,st.fails-5),900000);
+  _saveLock(email,st);
+}
+function _clearAuthFail(email){const all=getObj(_AUTH_LOCK_KEY,{});delete all[email];setObj(_AUTH_LOCK_KEY,all);}
+function _fmtLockMsg(ms){const s=Math.ceil(ms/1000);return s>=60?`${Math.ceil(s/60)} min`:`${s}s`;}
 async function signIn(){
   const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
   const pin=_getPinVal('pin-si');
   if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-si','Enter your 6-digit PIN');return;}
+
+  // Rate limit: refuse while locked out after repeated failures.
+  const locked=_lockRemaining(email);
+  if(locked){_setAuthErr('auth-err-si',`Too many attempts. Try again in ${_fmtLockMsg(locked)}.`);_clearPin('pin-si');return;}
 
   // If Supabase not configured, fall back to local
   if(!supa||SUPA_URL==='YOUR_SUPABASE_URL'){
@@ -2659,9 +2682,13 @@ async function signIn(){
   if(btn){btn.disabled=false;btn.textContent='Sign In';}
 
   if(error){
-    _setAuthErr('auth-err-si',error.message==='Invalid login credentials'?'Incorrect email or PIN':error.message);
+    _recordAuthFail(email);
+    const left=_lockRemaining(email);
+    const base=error.message==='Invalid login credentials'?'Incorrect email or PIN':error.message;
+    _setAuthErr('auth-err-si',left?`${base}. Too many attempts — locked for ${_fmtLockMsg(left)}.`:base);
     _clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;
   }
+  _clearAuthFail(email);
 
   // Scope storage to the current user only — never cache other accounts' PII.
   // Reuse the cached profile if it's the same user (keeps createdAt/gamesPlayed).
@@ -2684,8 +2711,8 @@ function _localSignIn(email,pin){
   // Offline fallback: only the single most-recent local account is kept on-device.
   const p=getCol(K.profiles).find(x=>x.email&&x.email.toLowerCase()===email);
   if(!p){_setAuthErr('auth-err-si','No account found — create one below');return;}
-  if(p.pinHash!==_hashPin(pin,email)){_setAuthErr('auth-err-si','Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
-  _clearAllPins();setObj(K.profile,p);currentProfile=p;
+  if(p.pinHash!==_hashPin(pin,email)){_recordAuthFail(email);const left=_lockRemaining(email);_setAuthErr('auth-err-si',left?`Incorrect PIN. Locked for ${_fmtLockMsg(left)}.`:'Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
+  _clearAuthFail(email);_clearAllPins();setObj(K.profile,p);currentProfile=p;
   trackEvent('signed_in');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
@@ -2697,6 +2724,7 @@ async function createAccount(){
   if(!name){_setAuthErr('auth-err-cr','Enter your name');return;}
   if(!_validEmail(email)){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-cr','Choose a 6-digit PIN');return;}
+  if(_isTrivialPin(pin)){_setAuthErr('auth-err-cr','That PIN is too easy to guess — avoid 123456, 111111, etc.');_clearPin('pin-cr');_clearPin('pin-cf');document.getElementById('pin-cr').querySelector('.pin-box').focus();return;}
   if(pin!==pinC){_setAuthErr('auth-err-cr','PINs don\'t match — try again');_clearPin('pin-cf');document.getElementById('pin-cf').querySelector('.pin-box').focus();return;}
   if(!document.getElementById('consent-cr')?.checked){_setAuthErr('auth-err-cr','Please agree to the Privacy Policy and Terms to continue');return;}
 
