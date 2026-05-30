@@ -4470,8 +4470,17 @@ function closeChangelog(){
 ════════════════════════════════════════════════════════ */
 
 // ── Supabase community sync helpers ──────────────────────
+let _syncCommInFlight = null;
+let _syncPostsInFlight = {};
 
 async function syncCommunitiesFromDB() {
+  if (!supa) return;
+  // Deduplicate concurrent calls — share the in-flight promise
+  if (_syncCommInFlight) return _syncCommInFlight;
+  _syncCommInFlight = _doSyncCommunitiesFromDB().finally(() => { _syncCommInFlight = null; });
+  return _syncCommInFlight;
+}
+async function _doSyncCommunitiesFromDB() {
   if (!supa) return;
   if (!supaUser) {
     const { data: { session } } = await supa.auth.getSession();
@@ -4568,6 +4577,12 @@ async function supaSubmitPost(post) {
 }
 
 async function syncPostsFromDB(communityId) {
+  if (!supa || !supaUser) return;
+  if (_syncPostsInFlight[communityId]) return _syncPostsInFlight[communityId];
+  _syncPostsInFlight[communityId] = _doSyncPostsFromDB(communityId).finally(() => { delete _syncPostsInFlight[communityId]; });
+  return _syncPostsInFlight[communityId];
+}
+async function _doSyncPostsFromDB(communityId) {
   if (!supa || !supaUser) return;
   try {
     const { data: posts } = await supa.from('community_posts')
