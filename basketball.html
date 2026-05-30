@@ -57,6 +57,13 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .auth-device-note{font-size:11px;color:var(--muted2);text-align:center;letter-spacing:.01em}
 .auth-btn{background:linear-gradient(135deg,#FF5722,#FF8A50);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;padding:16px;cursor:pointer;min-height:56px;width:100%;box-shadow:0 4px 20px rgba(255,87,34,.3);transition:transform .12s}
 .auth-btn:active{transform:translateY(2px)}
+.auth-btn:disabled{opacity:.6;cursor:default}
+.auth-forgot{background:none;border:none;color:var(--muted);font:600 13px 'Inter',sans-serif;padding:10px;cursor:pointer;width:100%;text-align:center}
+.auth-forgot:hover{color:var(--ca)}
+.auth-forgot:disabled{opacity:.6;cursor:default}
+.pin-label-row{display:flex;align-items:center;justify-content:space-between}
+.pin-eye{background:none;border:none;cursor:pointer;font-size:15px;opacity:.5;padding:2px 6px;border-radius:6px;transition:opacity var(--t1)}
+.pin-eye.on,.pin-eye:hover{opacity:1}
 .btn-primary{background:linear-gradient(135deg,#FF5722,#FF8A50);color:#fff;border:none;border-radius:var(--r2);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:18px;cursor:pointer;min-height:60px;width:100%;box-shadow:0 6px 24px rgba(255,87,34,.35);transition:transform var(--t1)}
 .btn-primary:active{transform:translateY(3px)}
 .btn-secondary{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:var(--r2);font:700 15px 'Inter',sans-serif;padding:14px;cursor:pointer;min-height:50px;width:100%;transition:all var(--t1)}
@@ -1277,6 +1284,7 @@ table.standings tr:last-child td{border-bottom:none}
         <div id="auth-err-si" class="auth-error hidden"></div>
         <div class="auth-device-note" style="margin-top:6px;margin-bottom:0">🔒 PIN protects your data on this device</div>
         <button class="auth-btn" onclick="signIn()">Sign In</button>
+        <button class="auth-forgot" onclick="forgotPin()">Forgot PIN?</button>
       </div>
 
       <!-- Create Account form -->
@@ -2355,6 +2363,11 @@ async function ensureSupaUser() {
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     supaUser = session?.user ?? null;
+    // User arrived via a password-recovery email link → let them set a new PIN.
+    if (event === 'PASSWORD_RECOVERY') {
+      if (typeof showScreen === 'function') showScreen('reset-pin');
+      return;
+    }
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
       syncCommunitiesFromDB().then(() => {
         const active = document.querySelector('.screen.active')?.id;
@@ -2589,6 +2602,7 @@ function showScreen(name){
   if(name==='comm-create')resetCommCreateForm();
   if(name==='comm-detail')renderCommDetail();
   if(name==='profile'){_clearAllPins();_clearAuthErrs();const si=document.getElementById('inp-si-email');if(si)si.value='';const cn=document.getElementById('inp-cr-name');if(cn)cn.value='';const ce=document.getElementById('inp-cr-email');if(ce)ce.value='';switchAuthMode('signin');['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);}
+  if(name==='reset-pin'){_setAuthErr('auth-err-rs','');['pin-rs','pin-rsc'].forEach(_initPinRow);}
   if(name==='help-center'){hcActiveCat='All';renderHelpCenter();}
   // Hide floating help button during live game
   const fab=document.getElementById('help-fab');
@@ -2633,6 +2647,44 @@ function _initPinRow(rowId){
   });
 }
 function _getPinVal(rowId){return[...document.getElementById(rowId).querySelectorAll('.pin-box')].map(b=>b.value).join('');}
+// Show/hide a PIN group by flipping its inputs between password and text.
+function togglePinVis(rowId,btn){
+  const boxes=document.getElementById(rowId)?.querySelectorAll('.pin-box');
+  if(!boxes||!boxes.length)return;
+  const reveal=boxes[0].type==='password';
+  boxes.forEach(b=>b.type=reveal?'text':'password');
+  if(btn){btn.classList.toggle('on',reveal);btn.setAttribute('aria-label',reveal?'Hide PIN':'Show PIN');}
+}
+// Forgot PIN → send a Supabase recovery email (magic link).
+async function forgotPin(){
+  const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
+  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter your email above, then tap Forgot PIN');return;}
+  if(!supa){_setAuthErr('auth-err-si','PIN reset needs an internet connection');return;}
+  const btn=document.querySelector('#auth-signin-form .auth-forgot');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    const {error}=await supa.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});
+    if(error)_setAuthErr('auth-err-si',error.message);
+    else{_setAuthErr('auth-err-si','');showToast('Check your email for a reset link',3200);}
+  }catch{_setAuthErr('auth-err-si','Could not send reset email — try again');}
+  if(btn){btn.disabled=false;btn.textContent='Forgot PIN?';}
+}
+// Set a new PIN after arriving via the recovery link (PASSWORD_RECOVERY event).
+async function submitNewPin(){
+  const pin=_getPinVal('pin-rs'),pinC=_getPinVal('pin-rsc');
+  if(pin.length<6){_setAuthErr('auth-err-rs','Enter a 6-digit PIN');return;}
+  if(_isTrivialPin(pin)){_setAuthErr('auth-err-rs','That PIN is too easy to guess — pick another');_clearPin('pin-rs');_clearPin('pin-rsc');return;}
+  if(pin!==pinC){_setAuthErr('auth-err-rs','PINs don\'t match — try again');_clearPin('pin-rsc');return;}
+  if(!supa){_setAuthErr('auth-err-rs','Reset needs an internet connection');return;}
+  const btn=document.querySelector('#s-reset-pin .auth-btn');
+  if(btn){btn.disabled=true;btn.textContent='Updating…';}
+  try{
+    const {error}=await supa.auth.updateUser({password:pin});
+    if(error)_setAuthErr('auth-err-rs',error.message);
+    else{_clearPin('pin-rs');_clearPin('pin-rsc');showToast('PIN updated — you\'re signed in');renderHub();showScreen(localStorage.getItem(OB_KEY)?'hub':'onboarding');}
+  }catch{_setAuthErr('auth-err-rs','Could not update PIN — try again');}
+  if(btn){btn.disabled=false;btn.textContent='Update PIN';}
+}
 function _clearPin(rowId){document.getElementById(rowId)?.querySelectorAll('.pin-box').forEach(b=>{b.value='';b.classList.remove('filled');});}
 function _clearAllPins(){['pin-si','pin-cr','pin-cf'].forEach(_clearPin);}
 function _clearAuthErrs(){['auth-err-si','auth-err-cr'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.classList.add('hidden');}});}
@@ -7039,6 +7091,43 @@ function clearDemoData(){
     <p>To the fullest extent permitted by law, CourtCall is not liable for any indirect or incidental damages arising from use of the app.</p>
     <h3>Contact</h3>
     <p>Questions about these terms: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
+  </div>
+</div>
+
+<!-- ══ SET NEW PIN (password recovery) ══ -->
+<div id="s-reset-pin" class="screen">
+  <div class="profile-hero">
+    <span class="ph-ball">🔑</span>
+    <div class="ph-title">Set a New PIN</div>
+    <div class="ph-sub">Choose a new 6-digit PIN for your account</div>
+    <div class="auth-card">
+      <div class="auth-form">
+        <div class="pin-label-row">
+          <span class="pin-label">New 6-digit PIN</span>
+          <button type="button" class="pin-eye" onclick="togglePinVis('pin-rs',this)" aria-label="Show or hide PIN">👁</button>
+        </div>
+        <div class="pin-row" id="pin-rs" role="group" aria-label="Choose a new 6-digit PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 6">
+        </div>
+        <div class="pin-label">Confirm new PIN</div>
+        <div class="pin-row" id="pin-rsc" role="group" aria-label="Confirm new PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
+        </div>
+        <div id="auth-err-rs" class="auth-error hidden"></div>
+        <button class="auth-btn" onclick="submitNewPin()">Update PIN</button>
+        <button class="auth-forgot" onclick="showScreen('profile')">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 
