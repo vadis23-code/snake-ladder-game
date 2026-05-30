@@ -2584,6 +2584,49 @@ function openLegal(which){
   showScreen(which);
 }
 function closeLegal(){showScreen(_legalReturnScreen||'profile');}
+
+// ── Hash routing ─────────────────────────────────────────
+// Maps each screen to a URL hash so browser back/forward, refresh, and
+// deep-links all work. Hash-based so it runs on static GitHub Pages.
+let _settingHash=false;
+// Screens that should NOT be deep-linked/restored from a cold URL because
+// they need live state or an auth identity we can't assume on first load.
+const _PUBLIC_SCREENS=new Set(['profile','onboarding','privacy','terms','communities','world']);
+function _validScreen(name){return !!document.getElementById('s-'+name);}
+function _screenToHash(name){
+  if(name==='comm-detail'&&activeCommunityId)return `#/community/${activeCommunityId}`;
+  return `#/${name}`;
+}
+function _syncHash(name){
+  const h=_screenToHash(name);
+  if(location.hash!==h){_settingHash=true;location.hash=h;}
+}
+// Dispatch the current location.hash to the right screen. Returns true if handled.
+function _routeFromHash(){
+  const raw=location.hash.replace(/^#\/?/,'');
+  if(!raw)return false;
+  const parts=raw.split('/');
+  const seg=parts[0];
+  // Auth gate: without an identity, only public screens are reachable by URL.
+  if(!currentProfile&&seg!=='community'&&!_PUBLIC_SCREENS.has(seg)){showScreen('profile');return true;}
+  // Community deep link: #/community/<id>
+  if(seg==='community'&&parts[1]){
+    if(getComms().some(c=>c.id===parts[1])){openCommunity(parts[1]);return true;}
+    showScreen('communities');return true;
+  }
+  if(!_validScreen(seg))return false;
+  // Resuming a live game from a refresh
+  if(seg==='game'){
+    const saved=load();
+    if(saved&&!saved.gameOver){handleResume();return true;}
+    showScreen(currentProfile?'hub':'profile');return true;
+  }
+  showScreen(seg);return true;
+}
+window.addEventListener('hashchange',()=>{
+  if(_settingHash){_settingHash=false;return;} // ignore hashes we wrote ourselves
+  _routeFromHash();
+});
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
@@ -2614,6 +2657,8 @@ function showScreen(name){
   // Hide floating help button during live game
   const fab=document.getElementById('help-fab');
   if(fab)fab.classList.toggle('hidden',name==='game');
+  // Keep the URL in sync so back/forward/refresh/deep-link work.
+  _syncHash(name);
 }
 // ── Profile / Auth ────────────────────────────────────────
 let currentProfile=null;
@@ -6392,15 +6437,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     applySetupColors();
     renderHub();
     syncCommunitiesFromDB();
-    if(!localStorage.getItem(OB_KEY)){
+    // Returning user: honor a deep-link / restore the screen from the URL hash.
+    if(location.hash&&_routeFromHash()){
+      /* routed from hash */
+    }else if(!localStorage.getItem(OB_KEY)){
       showScreen('onboarding');
     }else{
       showScreen('hub');
     }
   }else{
-    // First time — show profile screen (onboarding runs after profile is set)
+    // First time — show profile screen (onboarding runs after profile is set).
+    // Still honor public deep-links (privacy/terms/communities/world).
     ['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
-    showScreen('profile');
+    const seg=location.hash.replace(/^#\/?/,'').split('/')[0];
+    if(seg&&_PUBLIC_SCREENS.has(seg)&&_routeFromHash()){
+      /* routed to a public screen */
+    }else{
+      showScreen('profile');
+    }
   }
   // Apply saved settings
   const s=getObj(K.settings,{defaultWinScore:21});
