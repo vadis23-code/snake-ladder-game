@@ -3660,11 +3660,48 @@ function genRoundRobin(teams){
   return fx;
 }
 function genKnockout(teams){
+  if(teams.length<2)return[];
   const shuffled=[...teams].sort(()=>Math.random()-.5);
-  const fx=[];
-  for(let i=0;i<shuffled.length-1;i+=2)
-    fx.push({id:`fx_${Date.now()}_${i}`,teamA:shuffled[i],teamB:shuffled[i+1]||'TBD',round:1,scoreA:null,scoreB:null,winner:null,played:false});
-  return fx;
+  // Pad to next power of 2 so every match has a partner
+  let size=1;while(size<shuffled.length)size*=2;
+  while(shuffled.length<size)shuffled.push('BYE');
+
+  const base=Date.now();let idx=0;
+  const allMatches=[];
+
+  // Round 1 — pair seeded teams
+  let prevRound=[];
+  for(let i=0;i<shuffled.length;i+=2){
+    const m={id:`fx_${base}_${idx++}`,teamA:shuffled[i],teamB:shuffled[i+1],
+      round:1,scoreA:null,scoreB:null,winner:null,played:false,nextMatchId:null,nextSlot:null};
+    // Auto-advance byes immediately
+    if(m.teamB==='BYE'){m.winner=m.teamA;m.played=true;}
+    else if(m.teamA==='BYE'){m.winner=m.teamB;m.played=true;}
+    prevRound.push(m);allMatches.push(m);
+  }
+
+  // Generate subsequent rounds until we have a final
+  let round=1;
+  while(prevRound.length>1){
+    round++;
+    const nextRound=[];
+    for(let i=0;i<prevRound.length;i+=2){
+      const m={id:`fx_${base}_${idx++}`,teamA:'TBD',teamB:'TBD',
+        round,scoreA:null,scoreB:null,winner:null,played:false,nextMatchId:null,nextSlot:null};
+      // Wire feeds from previous round
+      prevRound[i].nextMatchId=m.id;prevRound[i].nextSlot='home';
+      prevRound[i+1].nextMatchId=m.id;prevRound[i+1].nextSlot='away';
+      // Pre-fill slots where previous match already has a winner (bye)
+      if(prevRound[i].winner)m.teamA=prevRound[i].winner;
+      if(prevRound[i+1].winner)m.teamB=prevRound[i+1].winner;
+      // Auto-advance byes in this round too
+      if(m.teamB==='BYE'){m.winner=m.teamA;m.played=true;}
+      else if(m.teamA==='BYE'){m.winner=m.teamB;m.played=true;}
+      nextRound.push(m);allMatches.push(m);
+    }
+    prevRound=nextRound;
+  }
+  return allMatches;
 }
 function showActiveTournament(t){
   document.getElementById('tourn-empty').classList.add('hidden');
@@ -3693,11 +3730,19 @@ function renderTournTab(name){
       std.map((s,i)=>`<tr><td class="s-rank">${i+1}</td><td style="font-weight:700">${escHtml(s.name)}</td><td>${s.won}</td><td>${s.lost}</td><td>${s.pf}</td><td>${s.pa}</td><td class="s-pts">${s.pts}</td></tr>`).join('')+
       '</tbody></table>';
   }else{
-    body.innerHTML=t.fixtures.map(fx=>`<div class="fixture-card">
+    // Show champion banner for completed knockouts
+    const championBanner=t.format==='knockout'&&t.completed
+      ?`<div style="text-align:center;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:.08em">🏆 Champion: ${escHtml(t.fixtures.find(f=>!f.nextMatchId)?.winner||'')}</div>`:'';
+    // Skip BYE auto-advance matches from display (they are internal bracket scaffolding)
+    const visible=t.fixtures.filter(fx=>!(fx.played&&(fx.teamA==='BYE'||fx.teamB==='BYE')&&fx.scoreA===null));
+    body.innerHTML=championBanner+visible.map(fx=>{
+      // Guard for legacy tournaments without nextMatchId field
+      const canScore=!fx.played&&fx.teamA!=='TBD'&&fx.teamB!=='TBD'&&fx.teamA!=='BYE'&&fx.teamB!=='BYE';
+      return`<div class="fixture-card">
       <div class="fx-row"><span class="fx-badge${fx.played?' played':''}">${fx.played?'Played':'Pending'}</span>${fx.round?`<span class="fx-badge">R${fx.round}</span>`:''}</div>
       <div class="fx-row"><span class="fx-teams">${escHtml(fx.teamA)}<span class="fx-vs">vs</span>${escHtml(fx.teamB)}</span>${fx.played?`<span class="fx-score">${fx.scoreA}–${fx.scoreB}</span>`:''}</div>
-      ${!fx.played?`<button class="btn-score-match" onclick="startTournMatch('${activeTournId}','${fx.id}')">▶ Score This Match</button>`:`<button class="btn-score-match done" disabled>✓ ${escHtml(fx.winner||'Done')}</button>`}
-    </div>`).join('');
+      ${canScore?`<button class="btn-score-match" onclick="startTournMatch('${activeTournId}','${fx.id}')">▶ Score This Match</button>`:fx.played?`<button class="btn-score-match done" disabled>✓ ${escHtml(fx.winner||'Done')}</button>`:`<button class="btn-score-match" disabled style="opacity:.4">Waiting…</button>`}
+    </div>`;}).join('');
   }
 }
 function calcStandings(fixtures,teamNames){
@@ -3738,6 +3783,28 @@ function saveTournamentResult(entry){
   if(!fx)return;
   fx.scoreA=entry.teamA.score;fx.scoreB=entry.teamB.score;
   fx.winner=entry.winner.name;fx.played=true;
+
+  // Knockout: advance winner into next round slot
+  if(t.format==='knockout'&&fx.nextMatchId){
+    const next=t.fixtures.find(f=>f.id===fx.nextMatchId);
+    if(next&&!next.played){
+      if(fx.nextSlot==='home')next.teamA=fx.winner;
+      else next.teamB=fx.winner;
+      // If both slots are now real teams, mark as ready (remove TBD)
+    }
+  }
+
+  // Mark tournament complete when final match (no nextMatchId) is played
+  if(t.format==='knockout'){
+    const final=t.fixtures.find(f=>!f.nextMatchId);
+    if(final&&final.played)t.completed=true;
+  }
+  // Round-robin: standings are computed live from fixtures in calcStandings()
+  if(t.format==='roundrobin'){
+    const allPlayed=t.fixtures.every(f=>f.played);
+    if(allPlayed)t.completed=true;
+  }
+
   setCol(K.tournaments,tours);
 }
 function deleteTournament(){
