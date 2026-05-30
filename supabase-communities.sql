@@ -137,3 +137,9 @@ create policy "events: creator delete" on public.community_events
 -- Migration: add title and image_url to existing community_posts tables
 alter table public.community_posts add column if not exists title text;
 alter table public.community_posts add column if not exists image_url text;
+
+-- Performance indexes
+create index if not exists idx_communities_creator_id     on public.communities(creator_id);
+create index if not exists idx_comm_members_user_id       on public.community_members(user_id);
+create index if not exists idx_comm_posts_community_id    on public.community_posts(community_id, created_at desc);
+create index if not exists idx_comm_events_community_id   on public.community_events(community_id);

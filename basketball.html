@@ -14,7 +14,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#8A8AA8;--muted2:#54547A;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--orange:#FF6B35;--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
+:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#9A9AB8;--muted2:#7A7A9A;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--orange:#FF6B35;--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
+/* Skip link (a11y) */
+.skip-link{position:absolute;left:-9999px;top:4px;z-index:9999;background:var(--s1);color:var(--ca);padding:8px 16px;border-radius:var(--r1);font:700 14px 'Inter',sans-serif;text-decoration:none;border:2px solid var(--ca)}
+.skip-link:focus{left:4px}
+/* Offline banner */
+.offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:#E65100;color:#fff;font:700 12px 'Inter',sans-serif;text-align:center;padding:7px 16px;letter-spacing:.03em}
+.offline-banner.show{display:block}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* Keyboard-only focus ring for every interactive element (a11y). */
 :focus-visible{outline:2px solid var(--ca);outline-offset:2px;border-radius:4px}
@@ -1252,9 +1258,11 @@ body.modal-open{overflow:hidden}
 </style>
 </head>
 <body>
+<a class="skip-link" id="skip-link" href="#s-hub">Skip to content</a>
+<div class="offline-banner" id="offline-banner" role="status" aria-live="polite" aria-atomic="true">📶 You're offline — changes saved locally</div>
 
 <!-- ══ ONBOARDING ══ -->
-<div id="s-onboarding" class="screen">
+<div id="s-onboarding" class="screen" tabindex="-1">
   <div class="ob-wrap">
     <div class="ob-logo">🏀</div>
     <h1 class="ob-h1">Welcome to<br>CourtCall</h1>
@@ -1363,7 +1371,7 @@ body.modal-open{overflow:hidden}
 </div>
 
 <!-- ══ HUB ══ -->
-<div id="s-hub" class="screen">
+<div id="s-hub" class="screen" tabindex="-1">
 
   <!-- TOP NAV -->
   <header class="lp-topnav">
@@ -1683,6 +1691,13 @@ body.modal-open{overflow:hidden}
       <div class="chip-row" id="cr-gc">
         <button class="chip on" data-v="off" onclick="pickChip('cr-gc',this)">Off</button>
         <button class="chip" data-v="up" onclick="pickChip('cr-gc',this)">Count Up</button>
+      </div>
+    </div>
+    <div class="setup-sec">
+      <span class="sec-label">Win Condition</span>
+      <div class="chip-row" id="cr-w2">
+        <button class="chip on" data-v="off" onclick="pickChip('cr-w2',this)">First to N</button>
+        <button class="chip" data-v="on" onclick="pickChip('cr-w2',this)">Win by 2</button>
       </div>
     </div>
   </div>
@@ -3167,7 +3182,7 @@ let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
    Game State & Engine
 ════════════════════════════════════════════════════════ */
 let state=freshState();
-function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
+function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',winBy2:false,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
 function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext,_gce:GC.elapsed}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
@@ -3195,7 +3210,8 @@ function handleStartGame(){
   if(cx['cr-sc']==='custom')shotClockDuration=parseInt(document.getElementById('inp-sc').value,10)||24;
   const shotClockAutoReset=cx['cr-sc-ar']!=='off';
   const gameClockMode=cx['cr-gc']||'off';
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
+  const winBy2=cx['cr-w2']==='on';
+  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,winBy2,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
   applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
 async function handleBackFromGame(){
@@ -3241,8 +3257,10 @@ function updateLeadUI(){
   document.getElementById('tp-b').classList.toggle('leading',bv>a);
   const bar=document.getElementById('game-status');
   // Game point detection
-  const gpA=a===state.winScore-1,gpB=bv===state.winScore-1;
-  if(a===bv){bar.textContent=`TIED — First to ${state.winScore}`;bar.className='game-status'}
+  const winLabel=state.winBy2?`Win by 2`:`First to ${state.winScore}`;
+  const gpA=state.winBy2?(a>=state.winScore&&a-bv===1):(a===state.winScore-1);
+  const gpB=state.winBy2?(bv>=state.winScore&&bv-a===1):(bv===state.winScore-1);
+  if(a===bv){bar.textContent=`TIED — ${winLabel}`;bar.className='game-status'}
   else if(gpA||gpB){const gpt=(gpA&&a>bv)?state.teamA.name:(gpB&&bv>a)?state.teamB.name:null;if(gpt){bar.textContent=`🎯 GAME POINT — ${gpt.toUpperCase()}`;bar.className='game-status lead'}else{const ldr=a>bv?state.teamA.name:state.teamB.name;bar.textContent=`${ldr.toUpperCase()} LEADS BY ${Math.abs(a-bv)}`;bar.className='game-status lead'}}
   else{const ldr=a>bv?state.teamA.name:state.teamB.name;bar.textContent=`${ldr.toUpperCase()} LEADS BY ${Math.abs(a-bv)}`;bar.className='game-status lead'}
 }
@@ -3359,8 +3377,10 @@ function buildMatchEntry(winner,loser){
 }
 function fmtDur(ms){return`${Math.floor(ms/60000)}m ${Math.floor((ms%60000)/1000)}s`}
 function checkWin(){
-  const aWon=state.teamA.score>=state.winScore,bWon=state.teamB.score>=state.winScore;
+  const a=state.teamA.score,b=state.teamB.score;
+  const aWon=a>=state.winScore,bWon=b>=state.winScore;
   if(!aWon&&!bWon)return;
+  if(state.winBy2&&Math.abs(a-b)<2)return;
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const winner=aWon?state.teamA:state.teamB,loser=aWon?state.teamB:state.teamA;
   const entry=buildMatchEntry(winner,loser);
@@ -3383,7 +3403,7 @@ async function handleEndGame(){
 function showPostGame(winner,loser,entry){
   document.getElementById('pg-winner').textContent=winner.name;
   document.getElementById('pg-score').textContent=`${winner.score} – ${loser.score}`;
-  document.getElementById('pg-meta').textContent=`${state.gameType} · First to ${state.winScore}`;
+  document.getElementById('pg-meta').textContent=`${state.gameType} · ${state.winBy2?`Win by 2 (${state.winScore}+)`:`First to ${state.winScore}`}`;
   document.getElementById('pg-wins').style.color=COLORS[winner===state.teamA?state.teamA.colorKey:state.teamB.colorKey].hex;
   document.getElementById('st-dur').textContent=entry?entry.duration:fmtDur(Date.now()-(state.startTime||Date.now()));
   const bigLead=Math.max(state.maxLead.a,state.maxLead.b);
@@ -6637,6 +6657,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   if(!seenVer||seenVer!==APP_VERSION)localStorage.setItem('cc_seen_version',APP_VERSION);
 });
+
+// ── Offline Indicator ─────────────────────────────────────────
+function _updateOnlineStatus(){
+  const b=document.getElementById('offline-banner');
+  if(!b)return;
+  const offline=!navigator.onLine;
+  b.classList.toggle('show',offline);
+  if(typeof showToast==='function'&&offline)showToast('You\'re offline — changes saved locally',3000);
+}
+window.addEventListener('online',_updateOnlineStatus);
+window.addEventListener('offline',_updateOnlineStatus);
+_updateOnlineStatus();
 
 // ── PWA: Service Worker + Install Prompt ─────────────────────
 let _deferredInstall=null;

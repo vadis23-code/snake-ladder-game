@@ -55,3 +55,7 @@ $$;
 create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Performance indexes
+create index if not exists idx_games_user_id    on public.games(user_id);
+create index if not exists idx_games_created_at on public.games(created_at desc);
