@@ -1272,7 +1272,7 @@ table.standings tr:last-child td{border-bottom:none}
       <!-- Sign In form -->
       <div class="auth-form" id="auth-signin-form">
         <input id="inp-si-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
-        <div class="pin-label">6-digit PIN</div>
+        <div class="pin-label-row"><span class="pin-label">6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-si',this)" aria-label="Show PIN">👁</button></div>
         <div class="pin-row" id="pin-si" role="group" aria-label="Enter your 6-digit PIN">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
@@ -1291,7 +1291,7 @@ table.standings tr:last-child td{border-bottom:none}
       <div class="auth-form hidden" id="auth-create-form">
         <input id="inp-cr-name" class="auth-input" type="text" placeholder="Your name" maxlength="24" autocomplete="off">
         <input id="inp-cr-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
-        <div class="pin-label">Choose a 6-digit PIN</div>
+        <div class="pin-label-row"><span class="pin-label">Choose a 6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cr',this)" aria-label="Show PIN">👁</button></div>
         <div class="pin-row" id="pin-cr" role="group" aria-label="Choose a 6-digit PIN">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
@@ -1300,14 +1300,14 @@ table.standings tr:last-child td{border-bottom:none}
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
         </div>
-        <div class="pin-label">Confirm PIN</div>
+        <div class="pin-label-row"><span class="pin-label">Confirm PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cf',this)" aria-label="Show PIN">👁</button></div>
         <div class="pin-row" id="pin-cf" role="group" aria-label="Confirm PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
         </div>
         <div class="consent-row">
           <input type="checkbox" id="consent-cr" aria-label="Agree to Privacy Policy and Terms of Service">
@@ -2625,6 +2625,10 @@ function _initPinRow(rowId){
   boxes.forEach((box,i)=>{
     const fresh=box.cloneNode(true);box.parentNode.replaceChild(fresh,box);boxes[i]=fresh;
   });
+  // Always start hidden; reset any show/hide eye toggle for this row.
+  boxes.forEach(b=>b.type='password');
+  const eye=row.parentElement?.querySelector('.pin-label-row .pin-eye');
+  if(eye){eye.classList.remove('on');eye.setAttribute('aria-label','Show PIN');}
   boxes.forEach((box,i)=>{
     box.addEventListener('input',()=>{
       box.value=box.value.replace(/\D/g,'').slice(-1);
