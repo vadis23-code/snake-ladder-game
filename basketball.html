@@ -3844,7 +3844,7 @@ function exportData(){
     metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString(),schemaVersion:2},
     // Core
     profile:getObj(K.profile),profiles:getCol(K.profiles),
-    players:getCol(K.players),builder:getObj('cc_builder'),
+    players:getCol(K.players),builder:getObj(K.builder),
     matches:getCol(K.matches),legacyGames:getCol(K.games),
     tournaments:getCol(K.tournaments),settings:getObj(K.settings),
     // Communities
@@ -3864,7 +3864,8 @@ function handleImport(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      // Validate this is a CourtCall backup
+      // Validate this is a CourtCall backup before writing anything
+      if(!data||typeof data!=='object')throw new Error('File is not valid JSON');
       if(data?.metadata?.appName!=='CourtCall')throw new Error('Not a CourtCall backup file');
       // Validate arrays/objects before writing (guard against malformed files)
       const isArr=v=>Array.isArray(v);
@@ -3872,7 +3873,7 @@ function handleImport(e){
       if(data.profile&&isObj(data.profile))setObj(K.profile,data.profile);
       if(data.profiles&&isArr(data.profiles))setCol(K.profiles,data.profiles);
       if(data.players&&isArr(data.players))setCol(K.players,data.players);
-      if(data.builder&&isObj(data.builder))setObj('cc_builder',data.builder);
+      if(data.builder&&isObj(data.builder))setObj(K.builder,data.builder);
       if(data.matches&&isArr(data.matches))setCol(K.matches,data.matches);
       if(data.legacyGames&&isArr(data.legacyGames))setCol(K.games,data.legacyGames);
       if(data.tournaments&&isArr(data.tournaments))setCol(K.tournaments,data.tournaments);
