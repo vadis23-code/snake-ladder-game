@@ -3762,7 +3762,7 @@ function startTournMatch(tournId,fixtureId){
   const t=tours.find(x=>x.id===tournId);
   if(!t)return;
   const fx=t.fixtures.find(f=>f.id===fixtureId);
-  if(!fx)return;
+  if(!fx||fx.teamA==='TBD'||fx.teamB==='TBD'||fx.teamA==='BYE'||fx.teamB==='BYE')return;
   // Pre-fill setup
   document.getElementById('inp-a').value=fx.teamA;
   document.getElementById('inp-b').value=fx.teamB;
