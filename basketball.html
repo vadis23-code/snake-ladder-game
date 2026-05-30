@@ -3841,9 +3841,16 @@ function toggleSetting(key,btn){
 }
 function exportData(){
   const data={
-    metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString()},
-    profile:getObj(K.profile),profiles:getCol(K.profiles),players:getCol(K.players),
-    builder:getObj('cc_builder'),matches:getCol(K.matches),tournaments:getCol(K.tournaments),settings:getObj(K.settings)
+    metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString(),schemaVersion:2},
+    // Core
+    profile:getObj(K.profile),profiles:getCol(K.profiles),
+    players:getCol(K.players),builder:getObj('cc_builder'),
+    matches:getCol(K.matches),legacyGames:getCol(K.games),
+    tournaments:getCol(K.tournaments),settings:getObj(K.settings),
+    // Communities
+    communities:getCol(KC.communities),communityMembers:getCol(KC.members),
+    communityPosts:getCol(KC.posts),communityGallery:getCol(KC.gallery),
+    communityEvents:getCol(KC.events),communityRatings:getCol(KC.ratings),
   };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`courtcall-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
@@ -3857,14 +3864,29 @@ function handleImport(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      if(data.profile)setObj(K.profile,data.profile);
-      if(data.profiles)setCol(K.profiles,data.profiles);
-      if(data.players)setCol(K.players,data.players);
-      if(data.matches)setCol(K.matches,data.matches);
-      if(data.tournaments)setCol(K.tournaments,data.tournaments);
-      if(data.settings)setObj(K.settings,data.settings);
+      // Validate this is a CourtCall backup
+      if(data?.metadata?.appName!=='CourtCall')throw new Error('Not a CourtCall backup file');
+      // Validate arrays/objects before writing (guard against malformed files)
+      const isArr=v=>Array.isArray(v);
+      const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+      if(data.profile&&isObj(data.profile))setObj(K.profile,data.profile);
+      if(data.profiles&&isArr(data.profiles))setCol(K.profiles,data.profiles);
+      if(data.players&&isArr(data.players))setCol(K.players,data.players);
+      if(data.builder&&isObj(data.builder))setObj('cc_builder',data.builder);
+      if(data.matches&&isArr(data.matches))setCol(K.matches,data.matches);
+      if(data.legacyGames&&isArr(data.legacyGames))setCol(K.games,data.legacyGames);
+      if(data.tournaments&&isArr(data.tournaments))setCol(K.tournaments,data.tournaments);
+      if(data.settings&&isObj(data.settings))setObj(K.settings,data.settings);
+      // Communities
+      if(data.communities&&isArr(data.communities))setCol(KC.communities,data.communities);
+      if(data.communityMembers&&isArr(data.communityMembers))setCol(KC.members,data.communityMembers);
+      if(data.communityPosts&&isArr(data.communityPosts))setCol(KC.posts,data.communityPosts);
+      if(data.communityGallery&&isArr(data.communityGallery))setCol(KC.gallery,data.communityGallery);
+      if(data.communityEvents&&isArr(data.communityEvents))setCol(KC.events,data.communityEvents);
+      if(data.communityRatings&&isArr(data.communityRatings))setCol(KC.ratings,data.communityRatings);
+      currentProfile=getObj(K.profile,null);
       showToast('Data imported!');renderSettings();
-    }catch{showToast('Invalid backup file')}
+    }catch(err){showToast('Import failed: '+(err.message||'invalid file'))}
   };
   reader.readAsText(file);
   e.target.value='';
