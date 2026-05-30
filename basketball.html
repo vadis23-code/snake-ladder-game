@@ -7243,39 +7243,43 @@ async function clearDemoData(){
 
 /* ═══════════════════════════════════════════════════════════
    3D Basketball Renderer
-   Pure canvas — no libraries. Y-axis rotation with spherical
-   projection of 3 seam curves and Phong-style shading.
+   Pure canvas — no libraries. Three orthogonal great-circle
+   seams (coordinate planes), pre-tilted 24° on X so seams
+   never appear perfectly edge-on while rotating.
 ═══════════════════════════════════════════════════════════ */
 ;(function(){
-  const BALL_PX=200;   // logical canvas size (CSS pixels)
-  const AMP=0.38;      // seam wave amplitude in radians (~22°)
-  const SEG=180;       // segments per seam curve
+  const BALL_PX=200;
+  const SEG=180;
 
-  // Precompute 3 seam paths as [lat, lon] arrays.
-  // Seam 0: horizontal wavy (the classic equatorial seam)
-  // Seam 1: vertical wavy at lon≈0   (pole-to-pole)
-  // Seam 2: vertical wavy at lon≈π/2 (pole-to-pole, 90° offset)
+  // Pre-tilt 24° around X-axis so seams look natural at all Y-rotation angles
+  const TILT=24*Math.PI/180;
+  const cosTilt=Math.cos(TILT), sinTilt=Math.sin(TILT);
+  function applyTilt(x,y,z){ return [x, y*cosTilt-z*sinTilt, y*sinTilt+z*cosTilt]; }
+
+  // 3 great circles = 3 coordinate-plane intersections with the unit sphere
   const SEAMS=(()=>{
-    const s=[[],[],[]];
-    for(let i=0;i<=SEG;i++){
-      const lon1=(i/SEG)*Math.PI*2;
-      s[0].push([AMP*Math.sin(2*lon1), lon1]);
-      const lat2=(i/SEG)*Math.PI-Math.PI/2;
-      s[1].push([lat2, AMP*Math.sin(2*lat2)]);
-      const lat3=(i/SEG)*Math.PI-Math.PI/2;
-      s[2].push([lat3, Math.PI/2+AMP*Math.sin(2*lat3)]);
-    }
-    return s;
+    const defs=[
+      t=>[Math.sin(t),  0,           Math.cos(t)],  // equatorial (XZ plane)
+      t=>[0,            Math.sin(t), Math.cos(t)],  // meridian   (YZ plane)
+      t=>[Math.cos(t),  Math.sin(t), 0          ],  // meridian   (XY plane)
+    ];
+    return defs.map(fn=>{
+      const pts=[];
+      for(let i=0;i<=SEG;i++){
+        const t=(i/SEG)*Math.PI*2;
+        pts.push(applyTilt(...fn(t)));
+      }
+      return pts;
+    });
   })();
 
-  let angle=0, speed=0.022, raf=null;
+  let angle=0, speed=0.022;
   let drag=false, lastX=0, momentum=0;
   let canvas, ctx;
 
   function init(){
     canvas=document.getElementById('ball-canvas');
     if(!canvas)return;
-    // Hi-DPI / retina
     const dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=BALL_PX*dpr;
     canvas.height=BALL_PX*dpr;
@@ -7284,13 +7288,9 @@ async function clearDemoData(){
     ctx=canvas.getContext('2d');
     ctx.scale(dpr,dpr);
 
-    // Slider → speed mapping: 0 = paused, 100 = fast
     const sl=document.getElementById('ball-speed');
-    if(sl){
-      sl.addEventListener('input',()=>{speed=(+sl.value/100)*0.08;});
-    }
+    if(sl) sl.addEventListener('input',()=>{ speed=(+sl.value/100)*0.08; });
 
-    // Pointer drag to manually spin the ball
     canvas.addEventListener('pointerdown',e=>{
       drag=true; lastX=e.offsetX; momentum=0;
       canvas.setPointerCapture(e.pointerId);
@@ -7303,10 +7303,9 @@ async function clearDemoData(){
     });
     canvas.addEventListener('pointerup',()=>{
       drag=false;
-      // Coast to a stop after releasing (when auto-spin is off)
       if(speed===0&&Math.abs(momentum)>5e-4){
         let v=momentum;
-        const coast=()=>{v*=0.93;angle+=v;if(Math.abs(v)>5e-4)requestAnimationFrame(coast);};
+        const coast=()=>{ v*=0.93; angle+=v; if(Math.abs(v)>5e-4) requestAnimationFrame(coast); };
         coast();
       }
     });
@@ -7318,66 +7317,69 @@ async function clearDemoData(){
     const W=BALL_PX, cx=W/2, cy=W/2, r=W*0.43;
     ctx.clearRect(0,0,W,W);
 
-    // ── 1. Drop shadow beneath the sphere ──
+    // ── 1. Drop shadow ──
     ctx.shadowColor='rgba(0,0,0,0.6)';
     ctx.shadowBlur=30; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
 
-    // ── 2. Sphere base: radial gradient for Phong-style lighting ──
-    const g=ctx.createRadialGradient(
-      cx-r*.30, cy-r*.32, r*.04,   // light source (top-left)
-      cx+r*.18, cy+r*.18, r*1.1    // dark edge (bottom-right)
-    );
-    g.addColorStop(0,  '#FFAA5A');  // highlight
-    g.addColorStop(.28,'#E55500');  // mid orange
-    g.addColorStop(.62,'#BF4200');  // deep orange
-    g.addColorStop(1,  '#591400');  // shadow
+    // ── 2. Sphere base — Phong-style radial gradient ──
+    const g=ctx.createRadialGradient(cx-r*.30,cy-r*.32,r*.04, cx+r*.18,cy+r*.18,r*1.1);
+    g.addColorStop(0,   '#FFAA5A');
+    g.addColorStop(.28, '#E55500');
+    g.addColorStop(.62, '#BF4200');
+    g.addColorStop(1,   '#591400');
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
     ctx.fillStyle=g; ctx.fill();
     ctx.shadowColor='transparent';
 
-    // ── 3. Seam curves clipped to sphere ──
+    // ── 3. Great-circle seam lines ──
     ctx.save();
     ctx.beginPath(); ctx.arc(cx,cy,r-.5,0,Math.PI*2); ctx.clip();
-    ctx.strokeStyle='rgba(20,5,0,0.72)';
-    ctx.lineWidth=Math.max(2, r*.028);
-    ctx.lineCap='round'; ctx.lineJoin='round';
+
+    const cosA=Math.cos(a), sinA=Math.sin(a);
+    const seamW=Math.max(3, r*0.055);   // ~11 px at 200px
+
     for(const seam of SEAMS){
-      let seg=[], segs=[];
-      for(const[lat,lon]of seam){
-        const cL=Math.cos(lat), sL=Math.sin(lat);
-        const x=cL*Math.sin(lon), y=sL, z=cL*Math.cos(lon);
-        // Rotate around Y axis by angle a
-        const x2=x*Math.cos(a)+z*Math.sin(a);
-        const z2=-x*Math.sin(a)+z*Math.cos(a);
-        // Only draw the front-facing hemisphere (z2 >= threshold)
-        if(z2>=-0.06){
-          seg.push([cx+r*x2, cy-r*y]);
-        }else{
+      const segs=[];
+      let seg=[];
+      for(const [px,py,pz] of seam){
+        const x2= px*cosA + pz*sinA;   // Y-axis rotation
+        const z2=-px*sinA + pz*cosA;
+        if(z2>=-0.06){                 // visible front hemisphere
+          seg.push([cx+r*x2, cy-r*py]);
+        } else {
           if(seg.length>1) segs.push(seg);
           seg=[];
         }
       }
       if(seg.length>1) segs.push(seg);
+
       for(const s of segs){
+        // Outer dark groove
         ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
         for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
+        ctx.strokeStyle='rgba(18,4,0,0.88)';
+        ctx.lineWidth=seamW;
+        ctx.lineCap='round'; ctx.lineJoin='round';
+        ctx.stroke();
+        // Inner groove highlight (gives the seam a 3-D inset look)
+        ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
+        for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
+        ctx.strokeStyle='rgba(110,35,0,0.32)';
+        ctx.lineWidth=seamW*0.36;
         ctx.stroke();
       }
     }
     ctx.restore();
 
-    // ── 4. Specular highlight (glossy sheen) ──
-    const sh=ctx.createRadialGradient(
-      cx-r*.28, cy-r*.31, .5,
-      cx-r*.1,  cy-r*.1,  r*.58
-    );
+    // ── 4. Specular highlight ──
+    const sh=ctx.createRadialGradient(cx-r*.28,cy-r*.31,.5, cx-r*.1,cy-r*.1,r*.58);
     sh.addColorStop(0,   'rgba(255,255,255,.56)');
     sh.addColorStop(.38, 'rgba(255,255,255,.13)');
     sh.addColorStop(1,   'rgba(255,255,255,0)');
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
     ctx.fillStyle=sh; ctx.fill();
 
-    // ── 5. Rim darkening (ambient occlusion illusion) ──
+    // ── 5. Rim darkening (ambient occlusion) ──
     const rim=ctx.createRadialGradient(cx,cy,r*.6,cx,cy,r);
     rim.addColorStop(0,'rgba(0,0,0,0)');
     rim.addColorStop(1,'rgba(0,0,0,.28)');
@@ -7388,13 +7390,12 @@ async function clearDemoData(){
   function loop(){
     if(!drag) angle+=speed;
     drawBall(angle);
-    raf=requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   }
 
-  // Boot after DOM is ready
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',init);
-  }else{
+  } else {
     init();
   }
 })();
