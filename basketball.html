@@ -2241,17 +2241,19 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
-    <div class="hub-section-title" style="padding:8px 0">Developer / Test Tools</div>
-    <div class="settings-sec">
-      <div class="setting-row" onclick="loadDemoData()">
-        <div class="sr-icon">🧪</div>
-        <div class="sr-info"><div class="sr-label">Load Demo Data</div><div class="sr-sub" id="demo-load-sub">Populate app with sample players, matches &amp; community</div></div>
-        <div style="color:var(--muted2)">›</div>
-      </div>
-      <div class="setting-row" onclick="clearDemoData()" style="border-bottom:none">
-        <div class="sr-icon">🗑</div>
-        <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Clear Demo Data</div><div class="sr-sub">Remove only demo/test records — real data untouched</div></div>
-        <div style="color:var(--muted2)">›</div>
+    <div id="dev-tools-block" class="hidden">
+      <div class="hub-section-title" style="padding:8px 0">Developer / Test Tools</div>
+      <div class="settings-sec">
+        <div class="setting-row" onclick="loadDemoData()">
+          <div class="sr-icon">🧪</div>
+          <div class="sr-info"><div class="sr-label">Load Demo Data</div><div class="sr-sub" id="demo-load-sub">Populate app with sample players, matches &amp; community</div></div>
+          <div style="color:var(--muted2)">›</div>
+        </div>
+        <div class="setting-row" onclick="clearDemoData()" style="border-bottom:none">
+          <div class="sr-icon">🗑</div>
+          <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Clear Demo Data</div><div class="sr-sub">Remove only demo/test records — real data untouched</div></div>
+          <div style="color:var(--muted2)">›</div>
+        </div>
       </div>
     </div>
     <div class="settings-ver" id="settings-ver-footer">CourtCall — Offline First 🏀</div>
@@ -3887,6 +3889,19 @@ function renderSettings(){
   if(bl)bl.textContent=APP_BUILD;
   const vf=document.getElementById('settings-ver-footer');
   if(vf)vf.textContent=`CourtCall ${APP_VERSION} · ${APP_BUILD} 🏀`;
+  // Developer/Test tools are hidden in production — only shown in dev mode
+  const devBlock=document.getElementById('dev-tools-block');
+  if(devBlock)devBlock.classList.toggle('hidden',!_isDevMode());
+}
+// Dev mode: URL ?dev=1, window.__CC_DEV__, or a persisted local flag.
+// Visiting with ?dev=1 sticks the flag; ?dev=0 clears it.
+function _isDevMode(){
+  try{
+    const qs=new URLSearchParams(location.search);
+    if(qs.get('dev')==='1'){localStorage.setItem('cc_dev','1');}
+    else if(qs.get('dev')==='0'){localStorage.removeItem('cc_dev');}
+    return window.__CC_DEV__===true||localStorage.getItem('cc_dev')==='1';
+  }catch{return window.__CC_DEV__===true;}
 }
 function saveSetting(key,val){const s=getObj(K.settings,{});s[key]=val;setObj(K.settings,s)}
 function toggleSetting(key,btn){
