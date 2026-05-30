@@ -2299,9 +2299,6 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const supa = (typeof supabase !== 'undefined') ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
 let supaUser = null; // tracks the logged-in Supabase auth user
 
-// Resolve the current auth user, restoring the persisted session if needed.
-// On a cold page load supaUser is null until Supabase rehydrates the session,
-// so any sync that runs early must await this rather than bail out.
 async function ensureSupaUser() {
   if (supaUser) return supaUser;
   if (!supa) return null;
@@ -2312,12 +2309,11 @@ async function ensureSupaUser() {
   return supaUser;
 }
 
+
 // Listen for auth state changes
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     supaUser = session?.user ?? null;
-    // Sync community membership whenever session becomes available, then
-    // re-render whatever community screen is currently showing.
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
       syncCommunitiesFromDB().then(() => {
         const active = document.querySelector('.screen.active')?.id;
