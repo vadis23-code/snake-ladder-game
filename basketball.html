@@ -2696,7 +2696,13 @@ async function submitNewPin(){
   }catch{_setAuthErr('auth-err-rs','Could not update PIN — try again');}
   if(btn){btn.disabled=false;btn.textContent='Update PIN';}
 }
-function _clearPin(rowId){document.getElementById(rowId)?.querySelectorAll('.pin-box').forEach(b=>{b.value='';b.classList.remove('filled');});}
+function _clearPin(rowId){
+  const row=document.getElementById(rowId);if(!row)return;
+  // Clearing also re-hides the PIN and resets the show/hide eye.
+  row.querySelectorAll('.pin-box').forEach(b=>{b.value='';b.classList.remove('filled');b.type='password';});
+  const eye=row.parentElement?.querySelector('.pin-label-row .pin-eye');
+  if(eye){eye.classList.remove('on');eye.setAttribute('aria-label','Show PIN');}
+}
 function _clearAllPins(){['pin-si','pin-cr','pin-cf'].forEach(_clearPin);}
 function _clearAuthErrs(){['auth-err-si','auth-err-cr'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.classList.add('hidden');}});}
 function _setAuthErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.toggle('hidden',!msg);}}
