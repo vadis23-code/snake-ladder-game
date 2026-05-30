@@ -2134,7 +2134,7 @@ table.standings tr:last-child td{border-bottom:none}
         <div class="sr-icon">👤</div>
         <div class="sr-info"><div class="sr-label" id="settings-profile-name">Guest</div><div class="sr-sub" id="settings-profile-meta">Tap to change profile</div></div>
       </div>
-      <div class="setting-row" onclick="supaSignOut().then(()=>showScreen('profile'))">
+      <div class="setting-row" onclick="switchProfile()">
         <div class="sr-icon">🔄</div>
         <div class="sr-info"><div class="sr-label">Switch Profile</div><div class="sr-sub">Change or create profile</div></div>
         <div style="color:var(--muted2)">›</div>
@@ -2379,6 +2379,23 @@ function _wipeLocalStorage() {
       .filter(k=>/^(cc_|courtcall_|sb-)/.test(k))
       .forEach(k=>localStorage.removeItem(k));
   }catch{}
+}
+
+// Clears the local community mirror (synced from Supabase for the
+// signed-in user). Called when switching identity / entering guest mode
+// so one account's communities never leak into another's view.
+function _clearCommunityMirror() {
+  [KC.communities,KC.members,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,KC.joins]
+    .forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+}
+
+// Switch profile: end the Supabase session and clear the prior identity
+// (in-memory + community mirror) before returning to the landing page.
+async function switchProfile() {
+  try{await supaSignOut()}catch{}
+  currentProfile=null;
+  _clearCommunityMirror();
+  showScreen('profile');
 }
 
 // Full logout: end Supabase session, wipe local state, return to landing.
@@ -2670,6 +2687,9 @@ function _localCreateAccount(name,email,pin){
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 function guestLogin(){
+  // Guests get an isolated, empty community state — never inherit a
+  // previously signed-in account's synced communities/memberships.
+  _clearCommunityMirror();
   const p={id:'guest',name:'Guest',nickname:'Guest',createdAt:'',gamesPlayed:0};
   setObj(K.profile,p);
   currentProfile=p;
@@ -4308,11 +4328,13 @@ function renderCommunities(){
     if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,allMembers,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
   });
   const p=currentProfile||{id:'guest'};
+  const isGuest=!p.id||p.id==='guest';
   const communities=getComms();
   const members=getCommMembers();
 
-  // My communities — communities where current user is a member
-  const myIds=new Set(members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
+  // My communities — communities where current user is a member.
+  // Guests are never members of anything (isolated, empty state).
+  const myIds=new Set(isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
   const myComms=communities.filter(c=>myIds.has(c.id));
 
   // Discover — public communities not already joined
