@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#FF5722">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,8 +14,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#606080;--muted2:#3A3A60;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--orange:#FF6B35;--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
+:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#8A8AA8;--muted2:#54547A;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--orange:#FF6B35;--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Keyboard-only focus ring for every interactive element (a11y). */
+:focus-visible{outline:2px solid var(--ca);outline-offset:2px;border-radius:4px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ca);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 html,body{height:100%}
 body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 .hidden{display:none!important}
@@ -905,8 +909,23 @@ table.standings tr:last-child td{border-bottom:none}
 .lp-tnav-ball{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,87,34,.3)}
 .lp-tnav-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);line-height:1}
 .lp-tnav-links{display:flex;gap:28px;align-items:center}
-.lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:0}
+.lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:10px 4px;min-height:44px;display:inline-flex;align-items:center}
 .lp-tnav-link:hover{color:var(--text)}
+/* Hamburger — hidden on desktop, shown ≤900px (see media query) */
+.lp-tnav-burger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;width:44px;height:44px;border-radius:10px;align-items:center;justify-content:center}
+.lp-tnav-burger:active{background:var(--s2)}
+/* Slide-in mobile nav drawer */
+.nav-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:320;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.nav-drawer{position:fixed;top:0;right:0;bottom:0;width:min(78vw,280px);background:var(--s1);border-left:1px solid var(--border);z-index:321;display:flex;flex-direction:column;transform:translateX(0);animation:drawerIn .2s ease-out;padding:env(safe-area-inset-top,0) 0 0}
+@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.nav-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+.nav-drawer-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;color:var(--text)}
+.nav-drawer-x{background:none;border:none;color:var(--muted);font-size:28px;line-height:1;cursor:pointer;width:44px;height:44px;border-radius:10px}
+.nav-drawer-x:active{background:var(--s2)}
+.nav-drawer-links{display:flex;flex-direction:column;padding:8px}
+.nav-drawer-links button{background:none;border:none;color:var(--text);font:600 16px 'Inter',sans-serif;text-align:left;padding:14px 14px;min-height:50px;border-radius:10px;cursor:pointer;transition:background var(--t1)}
+.nav-drawer-links button:hover{background:var(--s2)}
+.nav-drawer-links button:last-child{margin-top:8px;background:var(--ca);color:#fff;text-align:center;font-weight:700}
 .lp-tnav-actions{display:flex;align-items:center;gap:10px}
 .lp-tnav-login{background:none;border:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:8px 12px;transition:color var(--t1)}
 .lp-tnav-login:hover{color:var(--text)}
@@ -1076,6 +1095,7 @@ body.modal-open{overflow:hidden}
   .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{grid-template-columns:1fr;gap:32px}
   .lp-s6-ctas{max-width:none}
   .lp-tnav-links{display:none}
+  .lp-tnav-burger{display:inline-flex}
   .lp-sec,.lp-s4,.lp-s5,.lp-s6{padding:48px 0}
   .lp-sec-inner{padding:0 20px}
   .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{padding:0 20px}
@@ -1363,6 +1383,7 @@ body.modal-open{overflow:hidden}
           <span class="lp-pf-av" id="lp-pf-av">🏀</span><span class="lp-pf-nm" id="lp-pf-nm"></span>
         </button>
         <button class="lp-tnav-start" onclick="goSetup()">Start Game</button>
+        <button class="lp-tnav-burger" id="lp-burger" onclick="openNavDrawer()" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">☰</button>
       </div>
     </div>
   </header>
@@ -2654,6 +2675,7 @@ window.addEventListener('hashchange',()=>{
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(typeof _confirmReject==='function'){_confirmReject();return;}
+  if(typeof _navDrawerOpen==='function'&&_navDrawerOpen()){closeNavDrawer();return;}
   if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
 });
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
@@ -3031,6 +3053,26 @@ function hideMoreMenu(){
   document.body.classList.remove('modal-open');
 }
 function _moreMenuOpen(){return !document.getElementById('more-sheet')?.classList.contains('hidden');}
+// ── Mobile nav drawer ────────────────────────────────────
+function openNavDrawer(){
+  const authed=!!(currentProfile&&currentProfile.id&&currentProfile.id!=='guest');
+  const authRow=document.getElementById('nav-drawer-auth');
+  if(authRow){
+    authRow.textContent=authed?'Profile & Settings':'Log In';
+    authRow.onclick=()=>{closeNavDrawer();showScreen(authed?'settings':'profile');};
+  }
+  document.getElementById('nav-drawer-overlay').classList.remove('hidden');
+  document.getElementById('nav-drawer').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  document.getElementById('lp-burger')?.setAttribute('aria-expanded','true');
+}
+function closeNavDrawer(){
+  document.getElementById('nav-drawer-overlay').classList.add('hidden');
+  document.getElementById('nav-drawer').classList.add('hidden');
+  if(!_moreMenuOpen())document.body.classList.remove('modal-open');
+  document.getElementById('lp-burger')?.setAttribute('aria-expanded','false');
+}
+function _navDrawerOpen(){return !document.getElementById('nav-drawer')?.classList.contains('hidden');}
 // Promise-based in-app confirm modal (replaces native confirm()).
 let _confirmResolve=null,_confirmReject=null;
 function uiConfirm(message,{okText='Confirm',cancelText='Cancel',danger=true}={}){
@@ -7305,6 +7347,22 @@ async function clearDemoData(){
 </nav>
 
 <!-- ── More Sheet ────────────────────────────────────── -->
+<!-- ── Mobile nav drawer (≤900px) ──────────────────────── -->
+<div class="nav-drawer-overlay hidden" id="nav-drawer-overlay" onclick="closeNavDrawer()"></div>
+<aside class="nav-drawer hidden" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <div class="nav-drawer-head">
+    <span class="nav-drawer-title">Menu</span>
+    <button class="nav-drawer-x" onclick="closeNavDrawer()" aria-label="Close menu">×</button>
+  </div>
+  <nav class="nav-drawer-links">
+    <button onclick="closeNavDrawer();scrollToSection('lp-features')">Features</button>
+    <button onclick="closeNavDrawer();scrollToSection('lp-s5')">How it Works</button>
+    <button onclick="closeNavDrawer();showScreen('communities')">Communities</button>
+    <button onclick="closeNavDrawer();showScreen('world')">Discover</button>
+    <button id="nav-drawer-auth" onclick="closeNavDrawer();showScreen('profile')">Log In</button>
+  </nav>
+</aside>
+
 <div class="more-overlay hidden" id="more-overlay" onclick="hideMoreMenu()"></div>
 <div class="more-sheet hidden" id="more-sheet" role="dialog" aria-modal="true" aria-label="More menu">
   <div class="more-handle"></div>
