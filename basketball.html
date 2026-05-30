@@ -910,6 +910,10 @@ table.standings tr:last-child td{border-bottom:none}
 .lp-tnav-actions{display:flex;align-items:center;gap:10px}
 .lp-tnav-login{background:none;border:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:8px 12px;transition:color var(--t1)}
 .lp-tnav-login:hover{color:var(--text)}
+.lp-tnav-profile{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:50px;padding:5px 12px 5px 5px;cursor:pointer;transition:border-color var(--t1)}
+.lp-tnav-profile:hover{border-color:var(--ca)}
+.lp-tnav-profile .lp-pf-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ca),#c94000);display:flex;align-items:center;justify-content:center;font:700 13px 'Bebas Neue',sans-serif;color:#fff;flex-shrink:0}
+.lp-tnav-profile .lp-pf-nm{font-size:13px;font-weight:600;color:var(--text);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lp-tnav-start{background:var(--ca);color:#fff;border:none;border-radius:50px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity var(--t1)}
 .lp-tnav-start:active{opacity:.8}
 /* Hero */
@@ -1342,7 +1346,10 @@ table.standings tr:last-child td{border-bottom:none}
         <button class="lp-tnav-link" onclick="showScreen('world')">Discover</button>
       </nav>
       <div class="lp-tnav-actions">
-        <button class="lp-tnav-login" onclick="showScreen('profile')">Log In</button>
+        <button class="lp-tnav-login" id="lp-login-btn" onclick="showScreen('profile')">Log In</button>
+        <button class="lp-tnav-profile hidden" id="lp-profile-btn" onclick="showScreen('settings')" aria-label="Open your profile settings">
+          <span class="lp-pf-av" id="lp-pf-av">🏀</span><span class="lp-pf-nm" id="lp-pf-nm"></span>
+        </button>
         <button class="lp-tnav-start" onclick="goSetup()">Start Game</button>
       </div>
     </div>
@@ -2836,6 +2843,19 @@ function renderHub(){
     const nameEl=document.getElementById('hub-name');
     if(avatarEl)avatarEl.textContent=init;
     if(nameEl)nameEl.textContent=p.name==='Guest'?'CourtCall':`Hey, ${p.name}!`;
+  }
+  // Header auth state: signed-in users get a profile chip; otherwise "Log In".
+  const authed=!!(p&&p.id&&p.id!=='guest');
+  const loginBtn=document.getElementById('lp-login-btn');
+  const profBtn=document.getElementById('lp-profile-btn');
+  if(loginBtn)loginBtn.classList.toggle('hidden',authed);
+  if(profBtn){
+    profBtn.classList.toggle('hidden',!authed);
+    if(authed){
+      const av=document.getElementById('lp-pf-av'),nm=document.getElementById('lp-pf-nm');
+      if(av)av.textContent=(p.name&&p.name[0]?p.name[0].toUpperCase():'🏀');
+      if(nm)nm.textContent=p.name||'Profile';
+    }
   }
   // Resume card
   const saved=load();
