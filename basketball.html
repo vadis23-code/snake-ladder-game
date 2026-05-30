@@ -1046,6 +1046,7 @@ table.standings tr:last-child td{border-bottom:none}
 .has-btm-nav{padding-bottom:72px!important}
 /* More sheet */
 .more-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+body.modal-open{overflow:hidden}
 .more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:301;padding-bottom:calc(env(safe-area-inset-bottom,0) + 12px);animation:slideUp .22s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .more-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:14px auto 18px}
@@ -2627,6 +2628,12 @@ window.addEventListener('hashchange',()=>{
   if(_settingHash){_settingHash=false;return;} // ignore hashes we wrote ourselves
   _routeFromHash();
 });
+// Global Escape: close the topmost open modal/overlay.
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(typeof _confirmReject==='function'){_confirmReject();return;}
+  if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
+});
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
@@ -2994,11 +3001,14 @@ function handleGameNav(){
 function showMoreMenu(){
   document.getElementById('more-overlay').classList.remove('hidden');
   document.getElementById('more-sheet').classList.remove('hidden');
+  document.body.classList.add('modal-open');
 }
 function hideMoreMenu(){
   document.getElementById('more-overlay').classList.add('hidden');
   document.getElementById('more-sheet').classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
+function _moreMenuOpen(){return !document.getElementById('more-sheet')?.classList.contains('hidden');}
 // ── Setup helpers ─────────────────────────────────────────
 let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-sc':'0','cr-sc-ar':'on','cr-gc':'off','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
 let teamColors={a:'orange',b:'blue'};
@@ -7249,7 +7259,7 @@ function clearDemoData(){
 
 <!-- ── More Sheet ────────────────────────────────────── -->
 <div class="more-overlay hidden" id="more-overlay" onclick="hideMoreMenu()"></div>
-<div class="more-sheet hidden" id="more-sheet">
+<div class="more-sheet hidden" id="more-sheet" role="dialog" aria-modal="true" aria-label="More menu">
   <div class="more-handle"></div>
   <div class="more-title">More</div>
   <div class="more-grid">
