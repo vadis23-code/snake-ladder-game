@@ -2299,13 +2299,34 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const supa = (typeof supabase !== 'undefined') ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
 let supaUser = null; // tracks the logged-in Supabase auth user
 
+// Resolve the current auth user, restoring the persisted session if needed.
+// On a cold page load supaUser is null until Supabase rehydrates the session,
+// so any sync that runs early must await this rather than bail out.
+async function ensureSupaUser() {
+  if (supaUser) return supaUser;
+  if (!supa) return null;
+  try {
+    const { data: { session } } = await supa.auth.getSession();
+    supaUser = session?.user ?? null;
+  } catch {}
+  return supaUser;
+}
+
 // Listen for auth state changes
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     supaUser = session?.user ?? null;
-    // Sync community membership whenever session becomes available
+    // Sync community membership whenever session becomes available, then
+    // re-render whatever community screen is currently showing.
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
-      syncCommunitiesFromDB();
+      syncCommunitiesFromDB().then(() => {
+        const active = document.querySelector('.screen.active')?.id;
+        if (active === 's-communities') renderCommunities();
+        else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
+          syncPostsFromDB(activeCommunityId).then(() => renderCommDetail());
+          renderCommDetail();
+        }
+      });
     }
   });
 }
@@ -3961,8 +3982,41 @@ async function syncCommunitiesFromDB() {
     if (!comms) return;
     const commIds = comms.map(c => c.id);
     const { data: members } = commIds.length ? await supa.from('community_members').select('*').in('community_id', commIds) : { data: [] };
-    setComms(comms.map(c => ({ ...c, createdAt: c.created_at })));
-    setCommMembers(members || []);
+
+    // Normalize DB snake_case → local camelCase, preserving any extra local fields
+    const localComms = getComms();
+    const dbIds = new Set(comms.map(c => c.id));
+    const mergedComms = comms.map(dbC => {
+      const lc = localComms.find(x => x.id === dbC.id) || {};
+      return {
+        ...lc,
+        id: dbC.id, name: dbC.name,
+        type: dbC.type || lc.type || 'Pickup Group',
+        description: dbC.description || lc.description || '',
+        logo: dbC.logo || lc.logo || '🏀',
+        visibility: dbC.visibility || lc.visibility || 'public',
+        inviteCode: dbC.invite_code || lc.inviteCode || null,
+        readOnly: dbC.read_only ?? lc.readOnly ?? false,
+        commentsLocked: dbC.comments_locked ?? lc.commentsLocked ?? false,
+        ratingsDisabled: dbC.ratings_disabled ?? lc.ratingsDisabled ?? false,
+        createdBy: dbC.creator_id || lc.createdBy,
+        createdAt: dbC.created_at || lc.createdAt,
+        memberCount: lc.memberCount || 1,
+      };
+    });
+    setComms([...mergedComms, ...localComms.filter(c => !dbIds.has(c.id))]);
+
+    const normMembers = (members || []).map(m => ({
+      id: m.community_id + '_' + m.user_id,
+      communityId: m.community_id,
+      profileId: m.user_id,
+      profileName: m.profile_name || '',
+      role: m.role || 'member',
+      joinedAt: m.joined_at,
+    }));
+    const dbMemberKeys = new Set(normMembers.map(m => m.communityId + '_' + m.profileId));
+    const localMembers = getCommMembers();
+    setCommMembers([...normMembers, ...localMembers.filter(m => !dbMemberKeys.has((m.communityId||'') + '_' + (m.profileId||'')))]);
   } catch(e) { console.warn('syncCommunitiesFromDB:', e.message); }
 }
 
@@ -4001,7 +4055,8 @@ async function supaSubmitPost(post) {
     const { error } = await supa.from('community_posts').insert({
       id: post.id, community_id: post.communityId, user_id: supaUser.id,
       author_name: post.authorName || post.authorName || currentProfile?.name || '',
-      content: post.body || post.text || post.content || '', type: post.type || 'text',
+      title: post.title || null, content: post.body || post.text || post.content || '',
+      image_url: post.imageUrl || null, type: post.type || 'text',
       reactions: post.reactions || {}, comments: post.comments || []
     });
     if (error) { console.warn('supaSubmitPost:', error.message); return false; }
@@ -4019,7 +4074,7 @@ async function syncPostsFromDB(communityId) {
     const all = getAllPosts().filter(p => p.communityId !== communityId);
     const merged = [...posts.map(p => ({
       id: p.id, communityId: p.community_id, authorId: p.user_id,
-      authorName: p.author_name, text: p.content, type: p.type,
+      authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || '', type: p.type,
       reactions: p.reactions || {}, comments: p.comments || [],
       createdAt: p.created_at
     })), ...all];

@@ -31,7 +31,9 @@ create table if not exists public.community_posts (
   community_id text references public.communities(id) on delete cascade,
   user_id uuid references public.profiles(id) on delete set null,
   author_name text,
+  title text,
   content text,
+  image_url text,
   type text default 'text',
   reactions jsonb default '{}',
   comments jsonb default '[]',
@@ -120,3 +122,7 @@ create policy "events: member insert" on public.community_events
 create policy "events: creator delete" on public.community_events
   for delete using (auth.uid() = creator_id or
     exists (select 1 from public.communities c where c.id = community_events.community_id and c.creator_id = auth.uid()));
+
+-- Migration: add title and image_url to existing community_posts tables
+alter table public.community_posts add column if not exists title text;
+alter table public.community_posts add column if not exists image_url text;
