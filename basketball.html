@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#FF5722">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,10 +14,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#606080;--muted2:#3A3A60;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
+:root{--bg:#07070F;--s1:#0E0E1C;--s2:#161628;--s3:#1E1E38;--border:rgba(255,255,255,0.07);--text:#E0E0F0;--muted:#8A8AA8;--muted2:#54547A;--gold:#FFB300;--danger:#FF1744;--success:#00E676;--ca:#FF5722;--cb:#2979FF;--ga:rgba(255,87,34,0.35);--gb:rgba(41,121,255,0.35);--orange:#FF6B35;--r1:8px;--r2:14px;--r3:22px;--r4:32px;--t1:0.12s ease;--t2:0.25s ease}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Keyboard-only focus ring for every interactive element (a11y). */
+:focus-visible{outline:2px solid var(--ca);outline-offset:2px;border-radius:4px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ca);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 html,body{height:100%}
 body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+button{touch-action:manipulation}
 .hidden{display:none!important}
 .screen{display:none;flex-direction:column;min-height:100dvh}
 .screen.active{display:flex}
@@ -57,6 +62,13 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .auth-device-note{font-size:11px;color:var(--muted2);text-align:center;letter-spacing:.01em}
 .auth-btn{background:linear-gradient(135deg,#FF5722,#FF8A50);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;padding:16px;cursor:pointer;min-height:56px;width:100%;box-shadow:0 4px 20px rgba(255,87,34,.3);transition:transform .12s}
 .auth-btn:active{transform:translateY(2px)}
+.auth-btn:disabled{opacity:.6;cursor:default}
+.auth-forgot{background:none;border:none;color:var(--muted);font:600 13px 'Inter',sans-serif;padding:10px;cursor:pointer;width:100%;text-align:center}
+.auth-forgot:hover{color:var(--ca)}
+.auth-forgot:disabled{opacity:.6;cursor:default}
+.pin-label-row{display:flex;align-items:center;justify-content:space-between}
+.pin-eye{background:none;border:none;cursor:pointer;font-size:15px;opacity:.5;padding:2px 6px;border-radius:6px;transition:opacity var(--t1)}
+.pin-eye.on,.pin-eye:hover{opacity:1}
 .btn-primary{background:linear-gradient(135deg,#FF5722,#FF8A50);color:#fff;border:none;border-radius:var(--r2);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:18px;cursor:pointer;min-height:60px;width:100%;box-shadow:0 6px 24px rgba(255,87,34,.35);transition:transform var(--t1)}
 .btn-primary:active{transform:translateY(3px)}
 .btn-secondary{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:var(--r2);font:700 15px 'Inter',sans-serif;padding:14px;cursor:pointer;min-height:50px;width:100%;transition:all var(--t1)}
@@ -195,7 +207,8 @@ body{min-height:100dvh;background:var(--bg);color:var(--text);font-family:'Inter
 .vs-text{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--muted2)}
 .poss-btn{font-size:20px;background:var(--s2);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--t1);color:var(--gold)}
 .poss-btn:active{background:var(--s3);transform:scale(.9)}
-.run-banner{width:100%;padding:9px 16px;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:clamp(16px,4vw,22px);letter-spacing:.12em;text-align:center;color:#fff;background:linear-gradient(90deg,var(--rc,var(--ca)) 0%,rgba(0,0,0,0) 100%);animation:runPulse .9s ease-in-out infinite alternate}
+.run-banner{width:100%;max-height:0;overflow:hidden;padding:0 16px;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:clamp(16px,4vw,22px);letter-spacing:.12em;text-align:center;color:#fff;background:linear-gradient(90deg,var(--rc,var(--ca)) 0%,rgba(0,0,0,0) 100%);transition:max-height .18s ease,padding .18s ease}
+.run-banner.active{max-height:56px;padding:9px 16px;animation:runPulse .9s ease-in-out infinite alternate}
 @keyframes runPulse{from{opacity:.85}to{opacity:1}}
 .game-status{width:100%;background:var(--s1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9px 16px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);min-height:38px;flex-shrink:0}
 .game-status.lead{color:var(--gold)}
@@ -897,11 +910,30 @@ table.standings tr:last-child td{border-bottom:none}
 .lp-tnav-ball{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,87,34,.3)}
 .lp-tnav-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);line-height:1}
 .lp-tnav-links{display:flex;gap:28px;align-items:center}
-.lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:0}
+.lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:10px 4px;min-height:44px;display:inline-flex;align-items:center}
 .lp-tnav-link:hover{color:var(--text)}
+/* Hamburger — hidden on desktop, shown ≤900px (see media query) */
+.lp-tnav-burger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;width:44px;height:44px;border-radius:10px;align-items:center;justify-content:center}
+.lp-tnav-burger:active{background:var(--s2)}
+/* Slide-in mobile nav drawer */
+.nav-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:320;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.nav-drawer{position:fixed;top:0;right:0;bottom:0;width:min(78vw,280px);background:var(--s1);border-left:1px solid var(--border);z-index:321;display:flex;flex-direction:column;transform:translateX(0);animation:drawerIn .2s ease-out;padding:env(safe-area-inset-top,0) 0 0}
+@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.nav-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+.nav-drawer-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;color:var(--text)}
+.nav-drawer-x{background:none;border:none;color:var(--muted);font-size:28px;line-height:1;cursor:pointer;width:44px;height:44px;border-radius:10px}
+.nav-drawer-x:active{background:var(--s2)}
+.nav-drawer-links{display:flex;flex-direction:column;padding:8px}
+.nav-drawer-links button{background:none;border:none;color:var(--text);font:600 16px 'Inter',sans-serif;text-align:left;padding:14px 14px;min-height:50px;border-radius:10px;cursor:pointer;transition:background var(--t1)}
+.nav-drawer-links button:hover{background:var(--s2)}
+.nav-drawer-links button:last-child{margin-top:8px;background:var(--ca);color:#fff;text-align:center;font-weight:700}
 .lp-tnav-actions{display:flex;align-items:center;gap:10px}
 .lp-tnav-login{background:none;border:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:8px 12px;transition:color var(--t1)}
 .lp-tnav-login:hover{color:var(--text)}
+.lp-tnav-profile{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:50px;padding:5px 12px 5px 5px;cursor:pointer;transition:border-color var(--t1)}
+.lp-tnav-profile:hover{border-color:var(--ca)}
+.lp-tnav-profile .lp-pf-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ca),#c94000);display:flex;align-items:center;justify-content:center;font:700 13px 'Bebas Neue',sans-serif;color:#fff;flex-shrink:0}
+.lp-tnav-profile .lp-pf-nm{font-size:13px;font-weight:600;color:var(--text);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lp-tnav-start{background:var(--ca);color:#fff;border:none;border-radius:50px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity var(--t1)}
 .lp-tnav-start:active{opacity:.8}
 /* Hero */
@@ -1034,6 +1066,18 @@ table.standings tr:last-child td{border-bottom:none}
 .has-btm-nav{padding-bottom:72px!important}
 /* More sheet */
 .more-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+body.modal-open{overflow:hidden}
+.cc-confirm-overlay{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.cc-confirm-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;max-width:340px;width:100%;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:popIn .16s ease-out}
+@keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.cc-confirm-msg{font-size:15px;line-height:1.5;color:var(--text);margin-bottom:18px;text-align:center}
+.cc-confirm-actions{display:flex;gap:10px}
+.cc-confirm-btn{flex:1;border:none;border-radius:11px;font:700 14px 'Inter',sans-serif;padding:13px;cursor:pointer;min-height:46px;transition:opacity var(--t1),background var(--t1)}
+.cc-confirm-btn.cancel{background:var(--s3);color:var(--text)}
+.cc-confirm-btn.cancel:active{opacity:.8}
+.cc-confirm-btn.ok{background:var(--ca);color:#fff}
+.cc-confirm-btn.ok.danger{background:var(--danger)}
+.cc-confirm-btn.ok:active{opacity:.85}
 .more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);border-radius:20px 20px 0 0;z-index:301;padding-bottom:calc(env(safe-area-inset-bottom,0) + 12px);animation:slideUp .22s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .more-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:14px auto 18px}
@@ -1052,6 +1096,7 @@ table.standings tr:last-child td{border-bottom:none}
   .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{grid-template-columns:1fr;gap:32px}
   .lp-s6-ctas{max-width:none}
   .lp-tnav-links{display:none}
+  .lp-tnav-burger{display:inline-flex}
   .lp-sec,.lp-s4,.lp-s5,.lp-s6{padding:48px 0}
   .lp-sec-inner{padding:0 20px}
   .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{padding:0 20px}
@@ -1170,6 +1215,20 @@ table.standings tr:last-child td{border-bottom:none}
 .help-send:active{transform:scale(.9)}
 /* ── Help Center Screen ────────────────────────────────── */
 .hc-body{padding:14px;padding-bottom:90px;overflow-y:auto;flex:1}
+.legal-body{padding:18px;padding-bottom:90px;overflow-y:auto;flex:1;font-size:14px;line-height:1.6;color:var(--text)}
+.legal-body h3{font-size:15px;font-weight:700;margin:18px 0 6px;color:var(--text)}
+.legal-body p{margin:0 0 10px;color:var(--text);opacity:.9}
+.legal-body ul{margin:0 0 10px;padding-left:20px}
+.legal-body li{margin-bottom:6px;color:var(--text);opacity:.9}
+.legal-body a{color:var(--ca);text-decoration:none}
+.legal-updated{font-size:12px;color:var(--muted)!important;opacity:1!important}
+.legal-note{font-size:12px;color:var(--muted)!important;margin-top:18px;border-top:1px solid var(--border);padding-top:12px}
+.legal-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.legal-links a{color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
+.consent-row{display:flex;align-items:flex-start;gap:9px;margin:4px 0 10px;text-align:left}
+.consent-row input{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--ca)}
+.consent-row label{font-size:12px;color:var(--muted);line-height:1.5}
+.consent-row label a{color:var(--ca);text-decoration:none}
 .hc-search-row{position:relative;margin-bottom:12px}
 .hc-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
 .hc-search{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px 11px 38px;font-size:14px;color:var(--text);outline:none;font-family:inherit;box-sizing:border-box}
@@ -1242,54 +1301,61 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="ph-title">CourtCall</div>
     <div class="ph-sub">Voice-first pickup basketball OS</div>
     <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab on" id="auth-tab-signin" onclick="switchAuthMode('signin')">Sign In</button>
-        <button class="auth-tab" id="auth-tab-create" onclick="switchAuthMode('create')">Create Account</button>
+      <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
+        <button class="auth-tab on" id="auth-tab-signin" role="tab" aria-selected="true" aria-controls="auth-signin-form" onclick="switchAuthMode('signin')">Sign In</button>
+        <button class="auth-tab" id="auth-tab-create" role="tab" aria-selected="false" tabindex="-1" aria-controls="auth-create-form" onclick="switchAuthMode('create')">Create Account</button>
       </div>
 
       <!-- Sign In form -->
-      <div class="auth-form" id="auth-signin-form">
+      <div class="auth-form" id="auth-signin-form" role="tabpanel" aria-labelledby="auth-tab-signin">
         <input id="inp-si-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
-        <div class="pin-label">6-digit PIN</div>
-        <div class="pin-row" id="pin-si">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
+        <div class="pin-label-row"><span class="pin-label">6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-si',this)" aria-label="Show PIN">👁</button></div>
+        <div class="pin-row" id="pin-si" role="group" aria-label="Enter your 6-digit PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
         </div>
         <div id="auth-err-si" class="auth-error hidden"></div>
+        <div class="auth-device-note" style="margin-top:6px;margin-bottom:0">🔒 PIN protects your data on this device</div>
         <button class="auth-btn" onclick="signIn()">Sign In</button>
+        <button class="auth-forgot" onclick="forgotPin()">Forgot PIN?</button>
       </div>
 
       <!-- Create Account form -->
-      <div class="auth-form hidden" id="auth-create-form">
+      <div class="auth-form hidden" id="auth-create-form" role="tabpanel" aria-labelledby="auth-tab-create">
         <input id="inp-cr-name" class="auth-input" type="text" placeholder="Your name" maxlength="24" autocomplete="off">
         <input id="inp-cr-email" class="auth-input" type="email" placeholder="Email address" autocomplete="email">
-        <div class="pin-label">Choose a 6-digit PIN</div>
-        <div class="pin-row" id="pin-cr">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
+        <div class="pin-label-row"><span class="pin-label">Choose a 6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cr',this)" aria-label="Show PIN">👁</button></div>
+        <div class="pin-row" id="pin-cr" role="group" aria-label="Choose a 6-digit PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
         </div>
-        <div class="pin-label">Confirm PIN</div>
-        <div class="pin-row" id="pin-cf">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1">
+        <div class="pin-label-row"><span class="pin-label">Confirm PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cf',this)" aria-label="Show PIN">👁</button></div>
+        <div class="pin-row" id="pin-cf" role="group" aria-label="Confirm PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
+        </div>
+        <div class="consent-row">
+          <input type="checkbox" id="consent-cr" aria-label="Agree to Privacy Policy and Terms of Service">
+          <label for="consent-cr">I agree to the <a onclick="openLegal('privacy')">Privacy Policy</a> and <a onclick="openLegal('terms')">Terms of Service</a>.</label>
         </div>
         <div id="auth-err-cr" class="auth-error hidden"></div>
         <button class="auth-btn" onclick="createAccount()">Create Account</button>
       </div>
 
       <div class="auth-device-note">🔒 Stored on this device only</div>
+      <div class="legal-links"><a onclick="openLegal('privacy')">Privacy</a><a onclick="openLegal('terms')">Terms</a></div>
       <div class="divider-or">or</div>
       <button class="btn-secondary" onclick="guestLogin()">Continue as Guest</button>
     </div>
@@ -1313,8 +1379,12 @@ table.standings tr:last-child td{border-bottom:none}
         <button class="lp-tnav-link" onclick="showScreen('world')">Discover</button>
       </nav>
       <div class="lp-tnav-actions">
-        <button class="lp-tnav-login" onclick="showScreen('profile')">Log In</button>
+        <button class="lp-tnav-login" id="lp-login-btn" onclick="showScreen('profile')">Log In</button>
+        <button class="lp-tnav-profile hidden" id="lp-profile-btn" onclick="showScreen('settings')" aria-label="Open your profile settings">
+          <span class="lp-pf-av" id="lp-pf-av">🏀</span><span class="lp-pf-nm" id="lp-pf-nm"></span>
+        </button>
         <button class="lp-tnav-start" onclick="goSetup()">Start Game</button>
+        <button class="lp-tnav-burger" id="lp-burger" onclick="openNavDrawer()" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">☰</button>
       </div>
     </div>
   </header>
@@ -1629,11 +1699,11 @@ table.standings tr:last-child td{border-bottom:none}
     <button class="nav-mic" id="nav-mic" onclick="toggleVoice()">🎤</button>
   </div>
   <div class="momentum-bar"><div class="m-fill-a" id="m-fill-a" style="width:50%"></div><div class="m-fill-b"></div></div>
-  <div class="run-banner hidden" id="run-banner"></div>
+  <div class="run-banner" id="run-banner"></div>
   <div class="scoreboard">
     <div class="team-panel" id="tp-a" data-t="a">
       <div class="t-name" id="t-name-a">Team A</div>
-      <div class="t-score" id="t-score-a">0</div>
+      <div class="t-score" id="t-score-a" aria-live="polite" aria-atomic="true" aria-label="Team A score: 0">0</div>
       <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="addFoul('a')">F: 0</span></div>
     </div>
     <div class="vs-col">
@@ -1642,18 +1712,18 @@ table.standings tr:last-child td{border-bottom:none}
     </div>
     <div class="team-panel" id="tp-b" data-t="b">
       <div class="t-name" id="t-name-b">Team B</div>
-      <div class="t-score" id="t-score-b">0</div>
+      <div class="t-score" id="t-score-b" aria-live="polite" aria-atomic="true" aria-label="Team B score: 0">0</div>
       <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="addFoul('b')">F: 0</span></div>
     </div>
   </div>
-  <div class="game-status" id="game-status">—</div>
+  <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">—</div>
   <div class="clock-bar" id="clock-bar">
     <div class="sc-wrap" id="sc-wrap">
       <div class="sc-label">Shot Clock</div>
       <div class="sc-digits" id="sc-digits">—</div>
       <div class="sc-btns">
-        <button class="sc-btn go" id="sc-start-btn" onclick="SC.toggle()">▶</button>
-        <button class="sc-btn" onclick="SC.reset()">↺</button>
+        <button class="sc-btn go" id="sc-start-btn" onclick="SC.toggle()" aria-label="Start shot clock">▶</button>
+        <button class="sc-btn" onclick="SC.reset()" aria-label="Reset shot clock">↺</button>
       </div>
     </div>
     <div class="gc-wrap" id="gc-wrap">
@@ -1667,16 +1737,16 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="score-pad" id="pad-b" data-t="b"></div>
   </div>
   <div class="controls-bar">
-    <button class="ctrl" onclick="undoScore()"><span class="ctrl-icon">↩</span><span class="ctrl-lbl">Undo</span></button>
-    <button class="ctrl" id="ctrl-mic" onclick="toggleVoice()"><span class="ctrl-icon" id="mic-icon">🎤</span><span class="ctrl-lbl" id="mic-lbl">Mic Off</span></button>
-    <button class="ctrl" onclick="addFoul('a')" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl" id="ctrl-fa-lbl">Foul A</span></button>
-    <button class="ctrl" onclick="addFoul('b')" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl" id="ctrl-fb-lbl">Foul B</span></button>
-    <button class="ctrl danger" onclick="handleEndGame()"><span class="ctrl-icon">🏁</span><span class="ctrl-lbl">End</span></button>
+    <button class="ctrl" onclick="undoScore()" aria-label="Undo last action"><span class="ctrl-icon">↩</span><span class="ctrl-lbl">Undo</span></button>
+    <button class="ctrl" id="ctrl-mic" onclick="toggleVoice()" aria-label="Toggle voice scoring"><span class="ctrl-icon" id="mic-icon">🎤</span><span class="ctrl-lbl" id="mic-lbl">Mic Off</span></button>
+    <button class="ctrl" onclick="addFoul('a')" aria-label="Foul, team A" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl" id="ctrl-fa-lbl">Foul A</span></button>
+    <button class="ctrl" onclick="addFoul('b')" aria-label="Foul, team B" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl" id="ctrl-fb-lbl">Foul B</span></button>
+    <button class="ctrl danger" onclick="handleEndGame()" aria-label="End game"><span class="ctrl-icon">🏁</span><span class="ctrl-lbl">End</span></button>
   </div>
   <div class="voice-panel hidden" id="voice-panel">
     <div class="voice-inner">
-      <div id="v-heard"></div>
-      <div id="v-action">🎤 Listening… say a command</div>
+      <div id="v-heard" aria-live="polite" aria-atomic="true"></div>
+      <div id="v-action" role="status" aria-live="assertive" aria-atomic="true">🎤 Listening… say a command</div>
       <div class="voice-hint" id="v-hint">Try: "Orange two" · "Blue three" · "Undo" · "Score check"</div>
       <div class="voice-test-row">
         <input id="v-test-input" class="v-test-input" type="text" placeholder="Type a command to test…" autocomplete="off" onkeydown="if(event.key==='Enter')testVoiceCmd()">
@@ -1878,11 +1948,11 @@ table.standings tr:last-child td{border-bottom:none}
         <div class="tc-name" id="tc-name">Tournament</div>
         <div class="tc-meta" id="tc-meta">—</div>
       </div>
-      <div class="tc-tabs">
-        <button class="tc-tab on" onclick="switchTournTab('standings',this)">Standings</button>
-        <button class="tc-tab" onclick="switchTournTab('fixtures',this)">Fixtures</button>
+      <div class="tc-tabs" id="tc-tabs" role="tablist" aria-label="Tournament view">
+        <button class="tc-tab on" role="tab" aria-selected="true" aria-controls="tourn-tab-body" onclick="switchTournTab('standings',this)">Standings</button>
+        <button class="tc-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tourn-tab-body" onclick="switchTournTab('fixtures',this)">Fixtures</button>
       </div>
-      <div class="tc-body" id="tourn-tab-body"></div>
+      <div class="tc-body" id="tourn-tab-body" role="tabpanel"></div>
     </div>
     <div style="padding:0 16px 40px">
       <button class="btn-del-tourn" onclick="deleteTournament()">🗑 Delete Tournament</button>
@@ -2059,16 +2129,16 @@ table.standings tr:last-child td{border-bottom:none}
   </div>
   <div class="cd-header" id="cd-header"></div>
   <div id="cd-join-bar"></div>
-  <div class="cd-tabs" id="cd-tabs">
-    <button class="cd-tab on" data-tab="feed"        onclick="setCommTab('feed')">Feed</button>
-    <button class="cd-tab"    data-tab="members"     onclick="setCommTab('members')">Members</button>
-    <button class="cd-tab"    data-tab="players"     onclick="setCommTab('players')">Players</button>
-    <button class="cd-tab"    data-tab="gallery"     onclick="setCommTab('gallery')">Gallery</button>
-    <button class="cd-tab"    data-tab="events"      onclick="setCommTab('events')">Events</button>
-    <button class="cd-tab"    data-tab="leaderboard" onclick="setCommTab('leaderboard')">Leaderboard</button>
-    <button class="cd-tab"    data-tab="settings"    onclick="setCommTab('settings')" id="cd-settings-tab">Settings</button>
+  <div class="cd-tabs" id="cd-tabs" role="tablist" aria-label="Community sections">
+    <button class="cd-tab on" data-tab="feed"        role="tab" aria-selected="true"  aria-controls="cd-tab-content" onclick="setCommTab('feed')">Feed</button>
+    <button class="cd-tab"    data-tab="members"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('members')">Members</button>
+    <button class="cd-tab"    data-tab="players"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('players')">Players</button>
+    <button class="cd-tab"    data-tab="gallery"     role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('gallery')">Gallery</button>
+    <button class="cd-tab"    data-tab="events"      role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('events')">Events</button>
+    <button class="cd-tab"    data-tab="leaderboard" role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('leaderboard')">Leaderboard</button>
+    <button class="cd-tab"    data-tab="settings"    role="tab" aria-selected="false" aria-controls="cd-tab-content" tabindex="-1" onclick="setCommTab('settings')" id="cd-settings-tab">Settings</button>
   </div>
-  <div id="cd-tab-content"></div>
+  <div id="cd-tab-content" role="tabpanel"></div>
 </div>
 
 <!-- ══ PULSE ══ -->
@@ -2132,9 +2202,14 @@ table.standings tr:last-child td{border-bottom:none}
         <div class="sr-icon">👤</div>
         <div class="sr-info"><div class="sr-label" id="settings-profile-name">Guest</div><div class="sr-sub" id="settings-profile-meta">Tap to change profile</div></div>
       </div>
-      <div class="setting-row" onclick="supaSignOut().then(()=>showScreen('profile'))">
+      <div class="setting-row" onclick="switchProfile()">
         <div class="sr-icon">🔄</div>
         <div class="sr-info"><div class="sr-label">Switch Profile</div><div class="sr-sub">Change or create profile</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
+      <div class="setting-row" id="settings-logout-row" onclick="logOut()" style="border-bottom:none">
+        <div class="sr-icon">🚪</div>
+        <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Log Out</div><div class="sr-sub">End session &amp; clear this device</div></div>
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
@@ -2222,7 +2297,7 @@ table.standings tr:last-child td{border-bottom:none}
     <div class="settings-sec">
       <div class="setting-row no-click">
         <div class="sr-icon">🏀</div>
-        <div class="sr-info"><div class="sr-label">CourtCall</div><div class="sr-sub" id="settings-version-label">v0.9 Beta</div></div>
+        <div class="sr-info"><div class="sr-label">CourtCall</div><div class="sr-sub" id="settings-version-label">v0.11 Beta</div></div>
       </div>
       <div class="setting-row no-click">
         <div class="sr-icon">🏗</div>
@@ -2234,16 +2309,31 @@ table.standings tr:last-child td{border-bottom:none}
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
-    <div class="hub-section-title" style="padding:8px 0">Developer / Test Tools</div>
+    <div id="dev-tools-block" class="hidden">
+      <div class="hub-section-title" style="padding:8px 0">Developer / Test Tools</div>
+      <div class="settings-sec">
+        <div class="setting-row" onclick="loadDemoData()">
+          <div class="sr-icon">🧪</div>
+          <div class="sr-info"><div class="sr-label">Load Demo Data</div><div class="sr-sub" id="demo-load-sub">Populate app with sample players, matches &amp; community</div></div>
+          <div style="color:var(--muted2)">›</div>
+        </div>
+        <div class="setting-row" onclick="clearDemoData()" style="border-bottom:none">
+          <div class="sr-icon">🗑</div>
+          <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Clear Demo Data</div><div class="sr-sub">Remove only demo/test records — real data untouched</div></div>
+          <div style="color:var(--muted2)">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="hub-section-title" style="padding:8px 0">Legal</div>
     <div class="settings-sec">
-      <div class="setting-row" onclick="loadDemoData()">
-        <div class="sr-icon">🧪</div>
-        <div class="sr-info"><div class="sr-label">Load Demo Data</div><div class="sr-sub" id="demo-load-sub">Populate app with sample players, matches &amp; community</div></div>
+      <div class="setting-row" onclick="openLegal('privacy')">
+        <div class="sr-icon">🔒</div>
+        <div class="sr-info"><div class="sr-label">Privacy Policy</div><div class="sr-sub">What we collect &amp; how it's used</div></div>
         <div style="color:var(--muted2)">›</div>
       </div>
-      <div class="setting-row" onclick="clearDemoData()" style="border-bottom:none">
-        <div class="sr-icon">🗑</div>
-        <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Clear Demo Data</div><div class="sr-sub">Remove only demo/test records — real data untouched</div></div>
+      <div class="setting-row" onclick="openLegal('terms')" style="border-bottom:none">
+        <div class="sr-icon">📄</div>
+        <div class="sr-info"><div class="sr-label">Terms of Service</div><div class="sr-sub">Rules for using CourtCall</div></div>
         <div style="color:var(--muted2)">›</div>
       </div>
     </div>
@@ -2288,8 +2378,19 @@ table.standings tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- CONFIRM MODAL -->
+<div class="cc-confirm-overlay hidden" id="cc-confirm">
+  <div class="cc-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="cc-confirm-msg">
+    <div class="cc-confirm-msg" id="cc-confirm-msg"></div>
+    <div class="cc-confirm-actions">
+      <button class="cc-confirm-btn cancel" id="cc-confirm-cancel">Cancel</button>
+      <button class="cc-confirm-btn ok" id="cc-confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="./basketball-supa.js"></script>
 <script>
@@ -2299,13 +2400,35 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const supa = (typeof supabase !== 'undefined') ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
 let supaUser = null; // tracks the logged-in Supabase auth user
 
+async function ensureSupaUser() {
+  if (supaUser) return supaUser;
+  if (!supa) return null;
+  try {
+    const { data: { session } } = await supa.auth.getSession();
+    supaUser = session?.user ?? null;
+  } catch {}
+  return supaUser;
+}
+
+
 // Listen for auth state changes
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     supaUser = session?.user ?? null;
-    // Sync community membership whenever session becomes available
+    // User arrived via a password-recovery email link → let them set a new PIN.
+    if (event === 'PASSWORD_RECOVERY') {
+      if (typeof showScreen === 'function') showScreen('reset-pin');
+      return;
+    }
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
-      syncCommunitiesFromDB();
+      syncCommunitiesFromDB().then(() => {
+        const active = document.querySelector('.screen.active')?.id;
+        if (active === 's-communities') renderCommunities();
+        else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
+          syncPostsFromDB(activeCommunityId).then(() => renderCommDetail());
+          renderCommDetail();
+        }
+      });
     }
   });
 }
@@ -2339,6 +2462,50 @@ async function supaSignIn(email, pin) {
 async function supaSignOut() {
   if (supa) await supa.auth.signOut();
   supaUser = null;
+}
+
+// Clears every CourtCall + Supabase key from localStorage.
+// Used by logOut() and clearAllData() so no token or PII survives.
+function _wipeLocalStorage() {
+  // Known app keys
+  [K.profile,K.profiles,K.players,K.builder,K.matches,K.tournaments,K.settings,K.game,K.games,
+   KC.communities,KC.members,KC.joins,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,
+   STATS_KEY,OB_KEY,K_PULSE,HELP_CHAT_KEY,HELP_FB_KEY,'cc_builder','pwa_dismissed']
+    .forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+  // Any prefixed keys we may have missed, incl. Supabase session tokens (sb-*)
+  try{
+    Object.keys(localStorage)
+      .filter(k=>/^(cc_|courtcall_|sb-)/.test(k))
+      .forEach(k=>localStorage.removeItem(k));
+  }catch{}
+}
+
+// Clears the local community mirror (synced from Supabase for the
+// signed-in user). Called when switching identity / entering guest mode
+// so one account's communities never leak into another's view.
+function _clearCommunityMirror() {
+  [KC.communities,KC.members,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,KC.joins]
+    .forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+}
+
+// Switch profile: end the Supabase session and clear the prior identity
+// (in-memory + community mirror) before returning to the landing page.
+async function switchProfile() {
+  try{await supaSignOut()}catch{}
+  currentProfile=null;
+  _clearCommunityMirror();
+  showScreen('profile');
+}
+
+// Full logout: end Supabase session, wipe local state, return to landing.
+async function logOut() {
+  if(!await uiConfirm('Log out of CourtCall? Unsynced local data will be cleared from this device.'))return;
+  try{await supaSignOut()}catch{}
+  _wipeLocalStorage();
+  currentProfile=null;
+  builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
+  showToast('Logged out');
+  showScreen('profile');
 }
 
 async function supaSaveGame(game) {
@@ -2380,10 +2547,21 @@ function setCol(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch
 function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.parse(r):def}catch{return def}}
 function setObj(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
 // ── App constants ─────────────────────────────────────────
-const APP_VERSION='v0.9 Beta';
-const APP_LAST_UPDATED='May 2026';
+const APP_VER={major:0,minor:11,patch:0,tag:'Beta',string:'v0.11 Beta',date:'May 2026'};
+const APP_VERSION=APP_VER.string;
+const APP_LAST_UPDATED=APP_VER.date;
 const APP_BUILD='GitHub Pages Beta';
 const CHANGELOG=[{
+  version:'v0.11 Beta',date:'May 2026',
+  items:['ARIA tablist/tab/tabpanel roles on all tab groups for screen-reader navigation','Arrow-key roving-tabindex on Sign-in, Tournament, and Community tabs','Escape key closes Feedback and Changelog modals','Community discover: auto-syncs from Supabase even before auth token is cached','Voice scoring enforces active scoring rule (no 3-pt voice in 1s&2s games)','Team fairness uses RMSD — accurate for 3+ teams','In-flight deduplication for Supabase community and post sync calls','Score displays and toasts announce via aria-live for screen readers','Mobile: touch-action:manipulation removes 300ms tap delay on all buttons','Empty community Discover section now shows a Create CTA'],
+  notes:['Export your data backup before updating or clearing storage','Voice scoring works best in Chrome / Edge'],
+  upcoming:['Real image upload via Supabase Storage','Push notifications','Player rating stability'],
+},{
+  version:'v0.10 Beta',date:'May 2026',
+  items:['Gallery badges render in orange (CSS variable fix)','Accessible labels on PIN inputs and all game buttons','Knockout bracket: full skeleton, bye-handling, multi-round winner advancement','Round-robin standings update after every result','Export/Import covers all data domains including communities','Run banner no longer shifts scoring buttons','Version string in Settings confirms build'],
+  notes:['Export your data backup before updating or clearing storage','Voice scoring works best in Chrome / Edge'],
+  upcoming:['Alphanumeric password option','Push notifications','Player rating stability'],
+},{
   version:'v0.9 Beta',date:'May 2026',
   items:['Redesigned Apple-style landing page','Shot clock and game clock','+1 free throw / foul point scoring','Team Builder with fair team generation','Communities with feed, players, gallery, events','CourtCall Pulse — community news feed','Match History and analytics','Export / Import data','PWA — installable on home screen','Community moderation tools'],
   notes:['Data is stored locally on this device only','Export backup regularly to avoid data loss','Voice scoring works best in Chrome / Edge','Some features are still in testing'],
@@ -2448,6 +2626,71 @@ function buildHubStatsHTML(){
 let toastTmr=null;
 function showToast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),dur)}
 // ── Screen ───────────────────────────────────────────────
+// Privacy/Terms are reachable from both Settings and the landing page;
+// remember where we came from so "← Back" returns there.
+let _legalReturnScreen='profile';
+function openLegal(which){
+  const active=document.querySelector('.screen.active');
+  if(active&&active.id)_legalReturnScreen=active.id.replace(/^s-/,'');
+  showScreen(which);
+}
+function closeLegal(){showScreen(_legalReturnScreen||'profile');}
+
+// ── Hash routing ─────────────────────────────────────────
+// Maps each screen to a URL hash so browser back/forward, refresh, and
+// deep-links all work. Hash-based so it runs on static GitHub Pages.
+let _settingHash=false;
+// Screens that should NOT be deep-linked/restored from a cold URL because
+// they need live state or an auth identity we can't assume on first load.
+const _PUBLIC_SCREENS=new Set(['profile','onboarding','privacy','terms','communities','world']);
+function _validScreen(name){return !!document.getElementById('s-'+name);}
+function _screenToHash(name){
+  if(name==='comm-detail'&&activeCommunityId)return `#/community/${activeCommunityId}`;
+  return `#/${name}`;
+}
+function _syncHash(name){
+  const h=_screenToHash(name);
+  if(location.hash!==h){_settingHash=true;location.hash=h;}
+}
+// Dispatch the current location.hash to the right screen. Returns true if handled.
+function _routeFromHash(){
+  const raw=location.hash.replace(/^#\/?/,'');
+  if(!raw)return false;
+  const parts=raw.split('/');
+  const seg=parts[0];
+  // Auth gate: without an identity, only public screens are reachable by URL.
+  if(!currentProfile&&seg!=='community'&&!_PUBLIC_SCREENS.has(seg)){showScreen('profile');return true;}
+  // Community deep link: #/community/<id>
+  if(seg==='community'&&parts[1]){
+    if(getComms().some(c=>c.id===parts[1])){openCommunity(parts[1]);return true;}
+    showScreen('communities');return true;
+  }
+  // Changelog deep-link: #/changelog
+  if(seg==='changelog'){openChangelog();return true;}
+  if(!_validScreen(seg))return false;
+  // Resuming a live game from a refresh
+  if(seg==='game'){
+    const saved=load();
+    if(saved&&!saved.gameOver){handleResume();return true;}
+    showScreen(currentProfile?'hub':'profile');return true;
+  }
+  showScreen(seg);return true;
+}
+window.addEventListener('hashchange',()=>{
+  if(_settingHash){_settingHash=false;return;} // ignore hashes we wrote ourselves
+  _routeFromHash();
+});
+// Global Escape: close the topmost open modal/overlay.
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(typeof _confirmReject==='function'){_confirmReject();return;}
+  if(typeof _navDrawerOpen==='function'&&_navDrawerOpen()){closeNavDrawer();return;}
+  if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
+  const fbMod=document.getElementById('feedback-modal');
+  if(fbMod&&!fbMod.classList.contains('hidden')){closeFeedback();return;}
+  const clMod=document.getElementById('changelog-modal');
+  if(clMod&&!clMod.classList.contains('hidden')){closeChangelog();return;}
+});
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
@@ -2473,20 +2716,25 @@ function showScreen(name){
   if(name==='comm-create')resetCommCreateForm();
   if(name==='comm-detail')renderCommDetail();
   if(name==='profile'){_clearAllPins();_clearAuthErrs();const si=document.getElementById('inp-si-email');if(si)si.value='';const cn=document.getElementById('inp-cr-name');if(cn)cn.value='';const ce=document.getElementById('inp-cr-email');if(ce)ce.value='';switchAuthMode('signin');['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);}
+  if(name==='reset-pin'){_setAuthErr('auth-err-rs','');['pin-rs','pin-rsc'].forEach(_initPinRow);}
   if(name==='help-center'){hcActiveCat='All';renderHelpCenter();}
   // Hide floating help button during live game
   const fab=document.getElementById('help-fab');
   if(fab)fab.classList.toggle('hidden',name==='game');
+  // Keep the URL in sync so back/forward/refresh/deep-link work.
+  _syncHash(name);
 }
 // ── Profile / Auth ────────────────────────────────────────
 let currentProfile=null;
 let _authMode='signin';
 function switchAuthMode(mode){
   _authMode=mode;
-  document.getElementById('auth-tab-signin').classList.toggle('on',mode==='signin');
-  document.getElementById('auth-tab-create').classList.toggle('on',mode==='create');
+  const si=document.getElementById('auth-tab-signin'),cr=document.getElementById('auth-tab-create');
+  si.classList.toggle('on',mode==='signin');
+  cr.classList.toggle('on',mode==='create');
   document.getElementById('auth-signin-form').classList.toggle('hidden',mode!=='signin');
   document.getElementById('auth-create-form').classList.toggle('hidden',mode!=='create');
+  _setTabSelected(si.parentElement,mode==='signin'?si:cr);
   _clearAuthErrs();_clearAllPins();
 }
 function _initPinRow(rowId){
@@ -2495,6 +2743,10 @@ function _initPinRow(rowId){
   boxes.forEach((box,i)=>{
     const fresh=box.cloneNode(true);box.parentNode.replaceChild(fresh,box);boxes[i]=fresh;
   });
+  // Always start hidden; reset any show/hide eye toggle for this row.
+  boxes.forEach(b=>b.type='password');
+  const eye=row.parentElement?.querySelector('.pin-label-row .pin-eye');
+  if(eye){eye.classList.remove('on');eye.setAttribute('aria-label','Show PIN');}
   boxes.forEach((box,i)=>{
     box.addEventListener('input',()=>{
       box.value=box.value.replace(/\D/g,'').slice(-1);
@@ -2517,16 +2769,85 @@ function _initPinRow(rowId){
   });
 }
 function _getPinVal(rowId){return[...document.getElementById(rowId).querySelectorAll('.pin-box')].map(b=>b.value).join('');}
-function _clearPin(rowId){document.getElementById(rowId)?.querySelectorAll('.pin-box').forEach(b=>{b.value='';b.classList.remove('filled');});}
+// Show/hide a PIN group by flipping its inputs between password and text.
+function togglePinVis(rowId,btn){
+  const boxes=document.getElementById(rowId)?.querySelectorAll('.pin-box');
+  if(!boxes||!boxes.length)return;
+  const reveal=boxes[0].type==='password';
+  boxes.forEach(b=>b.type=reveal?'text':'password');
+  if(btn){btn.classList.toggle('on',reveal);btn.setAttribute('aria-label',reveal?'Hide PIN':'Show PIN');}
+}
+// Forgot PIN → send a Supabase recovery email (magic link).
+async function forgotPin(){
+  const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
+  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter your email above, then tap Forgot PIN');return;}
+  if(!supa){_setAuthErr('auth-err-si','PIN reset needs an internet connection');return;}
+  const btn=document.querySelector('#auth-signin-form .auth-forgot');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    const {error}=await supa.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});
+    if(error)_setAuthErr('auth-err-si',error.message);
+    else{_setAuthErr('auth-err-si','');showToast('Check your email for a reset link',3200);}
+  }catch{_setAuthErr('auth-err-si','Could not send reset email — try again');}
+  if(btn){btn.disabled=false;btn.textContent='Forgot PIN?';}
+}
+// Set a new PIN after arriving via the recovery link (PASSWORD_RECOVERY event).
+async function submitNewPin(){
+  const pin=_getPinVal('pin-rs'),pinC=_getPinVal('pin-rsc');
+  if(pin.length<6){_setAuthErr('auth-err-rs','Enter a 6-digit PIN');return;}
+  if(_isTrivialPin(pin)){_setAuthErr('auth-err-rs','That PIN is too easy to guess — pick another');_clearPin('pin-rs');_clearPin('pin-rsc');return;}
+  if(pin!==pinC){_setAuthErr('auth-err-rs','PINs don\'t match — try again');_clearPin('pin-rsc');return;}
+  if(!supa){_setAuthErr('auth-err-rs','Reset needs an internet connection');return;}
+  const btn=document.querySelector('#s-reset-pin .auth-btn');
+  if(btn){btn.disabled=true;btn.textContent='Updating…';}
+  try{
+    const {error}=await supa.auth.updateUser({password:pin});
+    if(error)_setAuthErr('auth-err-rs',error.message);
+    else{_clearPin('pin-rs');_clearPin('pin-rsc');showToast('PIN updated — you\'re signed in');renderHub();showScreen(localStorage.getItem(OB_KEY)?'hub':'onboarding');}
+  }catch{_setAuthErr('auth-err-rs','Could not update PIN — try again');}
+  if(btn){btn.disabled=false;btn.textContent='Update PIN';}
+}
+function _clearPin(rowId){
+  const row=document.getElementById(rowId);if(!row)return;
+  // Clearing also re-hides the PIN and resets the show/hide eye.
+  row.querySelectorAll('.pin-box').forEach(b=>{b.value='';b.classList.remove('filled');b.type='password';});
+  const eye=row.parentElement?.querySelector('.pin-label-row .pin-eye');
+  if(eye){eye.classList.remove('on');eye.setAttribute('aria-label','Show PIN');}
+}
 function _clearAllPins(){['pin-si','pin-cr','pin-cf'].forEach(_clearPin);}
 function _clearAuthErrs(){['auth-err-si','auth-err-cr'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.classList.add('hidden');}});}
 function _setAuthErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.toggle('hidden',!msg);}}
 function _hashPin(pin,email){return btoa(pin+'|'+email.toLowerCase().trim());}
+// Single source of truth for email validity (used by Sign In + Create Account).
+function _validEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
+// Reject easily-guessed PINs at account creation.
+function _isTrivialPin(pin){
+  if(/^(\d)\1{5}$/.test(pin))return true;            // all same digit
+  if('0123456789'.includes(pin)||'9876543210'.includes(pin))return true; // sequential
+  return ['123456','654321','000000','121212','112233','123123','159753','147258','696969','420420'].includes(pin);
+}
+// Client-side sign-in throttling (UX speed-bump; Supabase enforces server-side too).
+const _AUTH_LOCK_KEY='cc_auth_lock';
+function _lockFor(email){const all=getObj(_AUTH_LOCK_KEY,{});return all[email]||{fails:0,until:0};}
+function _saveLock(email,st){const all=getObj(_AUTH_LOCK_KEY,{});all[email]=st;setObj(_AUTH_LOCK_KEY,all);}
+function _lockRemaining(email){const st=_lockFor(email);return st.until&&Date.now()<st.until?st.until-Date.now():0;}
+function _recordAuthFail(email){
+  const st=_lockFor(email);st.fails=(st.fails||0)+1;
+  // Lock after 5 fails; exponential backoff capped at 15 min.
+  if(st.fails>=5)st.until=Date.now()+Math.min(30000*Math.pow(2,st.fails-5),900000);
+  _saveLock(email,st);
+}
+function _clearAuthFail(email){const all=getObj(_AUTH_LOCK_KEY,{});delete all[email];setObj(_AUTH_LOCK_KEY,all);}
+function _fmtLockMsg(ms){const s=Math.ceil(ms/1000);return s>=60?`${Math.ceil(s/60)} min`:`${s}s`;}
 async function signIn(){
   const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
   const pin=_getPinVal('pin-si');
-  if(!email){_setAuthErr('auth-err-si','Enter your email address');return;}
+  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-si','Enter your 6-digit PIN');return;}
+
+  // Rate limit: refuse while locked out after repeated failures.
+  const locked=_lockRemaining(email);
+  if(locked){_setAuthErr('auth-err-si',`Too many attempts. Try again in ${_fmtLockMsg(locked)}.`);_clearPin('pin-si');return;}
 
   // If Supabase not configured, fall back to local
   if(!supa||SUPA_URL==='YOUR_SUPABASE_URL'){
@@ -2541,27 +2862,37 @@ async function signIn(){
   if(btn){btn.disabled=false;btn.textContent='Sign In';}
 
   if(error){
-    _setAuthErr('auth-err-si',error.message==='Invalid login credentials'?'Incorrect email or PIN':error.message);
+    _recordAuthFail(email);
+    const left=_lockRemaining(email);
+    const base=error.message==='Invalid login credentials'?'Incorrect email or PIN':error.message;
+    _setAuthErr('auth-err-si',left?`${base}. Too many attempts — locked for ${_fmtLockMsg(left)}.`:base);
     _clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;
   }
+  _clearAuthFail(email);
 
-  // Merge with local profile
-  const profiles=getCol(K.profiles);
-  let p=profiles.find(x=>x.id===data.user.id||x.email===email);
-  if(!p){
-    p={id:data.user.id,name:data.user.user_metadata?.name||email,email,nickname:data.user.user_metadata?.name||email,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-    profiles.push(p);setCol(K.profiles,profiles);
-  }
+  // Scope storage to the current user only — never cache other accounts' PII.
+  // Reuse the cached profile if it's the same user (keeps createdAt/gamesPlayed).
+  const cached=getObj(K.profile,null);
+  const same=cached&&cached.id===data.user.id;
+  const p={
+    id:data.user.id,
+    name:data.user.user_metadata?.name||(same?cached.name:email),
+    email,
+    nickname:data.user.user_metadata?.name||(same?cached.nickname:email),
+    createdAt:same?cached.createdAt:new Date().toLocaleDateString(),
+    gamesPlayed:same?(cached.gamesPlayed||0):0
+  };
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('signed_in');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 
 function _localSignIn(email,pin){
+  // Offline fallback: only the single most-recent local account is kept on-device.
   const p=getCol(K.profiles).find(x=>x.email&&x.email.toLowerCase()===email);
   if(!p){_setAuthErr('auth-err-si','No account found — create one below');return;}
-  if(p.pinHash!==_hashPin(pin,email)){_setAuthErr('auth-err-si','Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
-  _clearAllPins();setObj(K.profile,p);currentProfile=p;
+  if(p.pinHash!==_hashPin(pin,email)){_recordAuthFail(email);const left=_lockRemaining(email);_setAuthErr('auth-err-si',left?`Incorrect PIN. Locked for ${_fmtLockMsg(left)}.`:'Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
+  _clearAuthFail(email);_clearAllPins();setObj(K.profile,p);currentProfile=p;
   trackEvent('signed_in');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
@@ -2571,9 +2902,11 @@ async function createAccount(){
   const pin=_getPinVal('pin-cr');
   const pinC=_getPinVal('pin-cf');
   if(!name){_setAuthErr('auth-err-cr','Enter your name');return;}
-  if(!email||!email.includes('@')){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
+  if(!_validEmail(email)){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
   if(pin.length<6){_setAuthErr('auth-err-cr','Choose a 6-digit PIN');return;}
+  if(_isTrivialPin(pin)){_setAuthErr('auth-err-cr','That PIN is too easy to guess — avoid 123456, 111111, etc.');_clearPin('pin-cr');_clearPin('pin-cf');document.getElementById('pin-cr').querySelector('.pin-box').focus();return;}
   if(pin!==pinC){_setAuthErr('auth-err-cr','PINs don\'t match — try again');_clearPin('pin-cf');document.getElementById('pin-cf').querySelector('.pin-box').focus();return;}
+  if(!document.getElementById('consent-cr')?.checked){_setAuthErr('auth-err-cr','Please agree to the Privacy Policy and Terms to continue');return;}
 
   // Disable button while processing
   const btn=document.querySelector('#auth-create-form .auth-btn');
@@ -2593,36 +2926,30 @@ async function createAccount(){
 
   // Save profile locally too
   const p={id:data.user.id,name,email,nickname:name,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-  const profiles=getCol(K.profiles);
-  if(!profiles.find(x=>x.id===p.id))profiles.push(p);
-  setCol(K.profiles,profiles);setObj(K.profile,p);currentProfile=p;
+  setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 
 function _localCreateAccount(name,email,pin){
-  const profiles=getCol(K.profiles);
-  if(profiles.find(x=>x.email&&x.email.toLowerCase()===email)){_setAuthErr('auth-err-cr','Email already registered — sign in instead');return;}
+  // Offline fallback: store ONLY this account locally (single-entry, no foreign PII).
+  const existing=getCol(K.profiles);
+  if(existing.find(x=>x.email&&x.email.toLowerCase()===email&&x.id!=='p_'+email)){/* allow overwrite of same email */}
   const p={id:'p_'+Date.now(),name,email,nickname:name,pinHash:_hashPin(pin,email),createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
-  profiles.push(p);setCol(K.profiles,profiles);setObj(K.profile,p);currentProfile=p;
+  setCol(K.profiles,[p]);setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 function guestLogin(){
+  // Guests get an isolated, empty community state — never inherit a
+  // previously signed-in account's synced communities/memberships.
+  _clearCommunityMirror();
   const p={id:'guest',name:'Guest',nickname:'Guest',createdAt:'',gamesPlayed:0};
   setObj(K.profile,p);
   currentProfile=p;
   trackEvent('guest_started');
   renderHub();
   if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}else{showScreen('hub');}
-}
-function selectProfile(id){
-  const profiles=getCol(K.profiles);
-  const p=profiles.find(x=>x.id===id);
-  if(!p)return;
-  setObj(K.profile,p);
-  currentProfile=p;
-  renderHub();showScreen('hub');
 }
 // ── Hub ──────────────────────────────────────────────────
 function renderHub(){
@@ -2633,6 +2960,19 @@ function renderHub(){
     const nameEl=document.getElementById('hub-name');
     if(avatarEl)avatarEl.textContent=init;
     if(nameEl)nameEl.textContent=p.name==='Guest'?'CourtCall':`Hey, ${p.name}!`;
+  }
+  // Header auth state: signed-in users get a profile chip; otherwise "Log In".
+  const authed=!!(p&&p.id&&p.id!=='guest');
+  const loginBtn=document.getElementById('lp-login-btn');
+  const profBtn=document.getElementById('lp-profile-btn');
+  if(loginBtn)loginBtn.classList.toggle('hidden',authed);
+  if(profBtn){
+    profBtn.classList.toggle('hidden',!authed);
+    if(authed){
+      const av=document.getElementById('lp-pf-av'),nm=document.getElementById('lp-pf-nm');
+      if(av)av.textContent=(p.name&&p.name[0]?p.name[0].toUpperCase():'🏀');
+      if(nm)nm.textContent=p.name||'Profile';
+    }
   }
   // Resume card
   const saved=load();
@@ -2720,10 +3060,83 @@ function handleGameNav(){
 function showMoreMenu(){
   document.getElementById('more-overlay').classList.remove('hidden');
   document.getElementById('more-sheet').classList.remove('hidden');
+  document.body.classList.add('modal-open');
 }
 function hideMoreMenu(){
   document.getElementById('more-overlay').classList.add('hidden');
   document.getElementById('more-sheet').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+function _moreMenuOpen(){return !document.getElementById('more-sheet')?.classList.contains('hidden');}
+// ── Mobile nav drawer ────────────────────────────────────
+function openNavDrawer(){
+  const authed=!!(currentProfile&&currentProfile.id&&currentProfile.id!=='guest');
+  const authRow=document.getElementById('nav-drawer-auth');
+  if(authRow){
+    authRow.textContent=authed?'Profile & Settings':'Log In';
+    authRow.onclick=()=>{closeNavDrawer();showScreen(authed?'settings':'profile');};
+  }
+  document.getElementById('nav-drawer-overlay').classList.remove('hidden');
+  document.getElementById('nav-drawer').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  document.getElementById('lp-burger')?.setAttribute('aria-expanded','true');
+}
+function closeNavDrawer(){
+  document.getElementById('nav-drawer-overlay').classList.add('hidden');
+  document.getElementById('nav-drawer').classList.add('hidden');
+  if(!_moreMenuOpen())document.body.classList.remove('modal-open');
+  document.getElementById('lp-burger')?.setAttribute('aria-expanded','false');
+}
+function _navDrawerOpen(){return !document.getElementById('nav-drawer')?.classList.contains('hidden');}
+// ── ARIA tablist helpers ─────────────────────────────────
+// Roving tabindex + aria-selected; arrow/Home/End keyboard navigation.
+function _setTabSelected(container,activeBtn){
+  if(!container)return;
+  container.querySelectorAll('[role="tab"]').forEach(t=>{
+    const on=t===activeBtn;
+    t.setAttribute('aria-selected',on?'true':'false');
+    t.tabIndex=on?0:-1;
+  });
+}
+function _wireTablist(container){
+  if(!container||container._tabsWired)return;container._tabsWired=true;
+  container.addEventListener('keydown',e=>{
+    const tabs=[...container.querySelectorAll('[role="tab"]')];
+    const i=tabs.indexOf(document.activeElement);
+    if(i<0)return;
+    let n=i;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')n=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp')n=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home')n=0;
+    else if(e.key==='End')n=tabs.length-1;
+    else return;
+    e.preventDefault();tabs[n].focus();tabs[n].click();
+  });
+}
+// Promise-based in-app confirm modal (replaces native confirm()).
+let _confirmResolve=null,_confirmReject=null;
+function uiConfirm(message,{okText='Confirm',cancelText='Cancel',danger=true}={}){
+  return new Promise(resolve=>{
+    const ov=document.getElementById('cc-confirm');
+    const msg=document.getElementById('cc-confirm-msg');
+    const ok=document.getElementById('cc-confirm-ok');
+    const cancel=document.getElementById('cc-confirm-cancel');
+    if(!ov){resolve(window.confirm(message));return;} // safety fallback
+    msg.textContent=message;ok.textContent=okText;cancel.textContent=cancelText;
+    ok.classList.toggle('danger',!!danger);
+    ov.classList.remove('hidden');document.body.classList.add('modal-open');
+    const done=val=>{
+      ov.classList.add('hidden');
+      if(!_moreMenuOpen())document.body.classList.remove('modal-open');
+      ok.onclick=cancel.onclick=ov.onclick=null;_confirmResolve=_confirmReject=null;
+      resolve(val);
+    };
+    ok.onclick=()=>done(true);
+    cancel.onclick=()=>done(false);
+    ov.onclick=e=>{if(e.target===ov)done(false);};
+    _confirmResolve=()=>done(true);_confirmReject=()=>done(false);
+    setTimeout(()=>ok.focus(),30);
+  });
 }
 // ── Setup helpers ─────────────────────────────────────────
 let cx={'cr-type':'3v3','cr-win':'21','cr-rule':'1s2s','cr-ft':'on','cr-sc':'0','cr-sc-ar':'on','cr-gc':'off','cr-tourn-format':'roundrobin','cr-tourn-win':'21','tb-num-teams':'2','cr-default-win':'21'};
@@ -2785,8 +3198,8 @@ function handleStartGame(){
   state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
   applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
-function handleBackFromGame(){
-  if(state.history.length>0&&!state.gameOver){if(!confirm('Go back? Progress is saved.'))return}
+async function handleBackFromGame(){
+  if(state.history.length>0&&!state.gameOver){if(!await uiConfirm('Go back? Progress is saved.'))return}
   SC.stop();GC.stop();stopVoice();showScreen('hub');
   document.getElementById('resume-card').classList.toggle('hidden',!(state.history.length>0&&!state.gameOver));
 }
@@ -2795,8 +3208,9 @@ function renderGame(){
   const{teamA:a,teamB:b}=state;
   document.getElementById('t-name-a').textContent=a.name;
   document.getElementById('t-name-b').textContent=b.name;
-  document.getElementById('t-score-a').textContent=a.score;
-  document.getElementById('t-score-b').textContent=b.score;
+  const sa=document.getElementById('t-score-a'),sb=document.getElementById('t-score-b');
+  sa.textContent=a.score;sa.setAttribute('aria-label',`${a.name} score: ${a.score}`);
+  sb.textContent=b.score;sb.setAttribute('aria-label',`${b.name} score: ${b.score}`);
   updateFoulUI('a');
   updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
@@ -2811,7 +3225,8 @@ function renderScorePads(){
   // Deduplicate and sort ascending
   pts=[...new Set(pts)].sort((a,b)=>a-b);
   ['a','b'].forEach(t=>{
-    document.getElementById(`pad-${t}`).innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}">+${p}</button>`).join('');
+    const tName=t==='a'?state.teamA.name:state.teamB.name;
+    document.getElementById(`pad-${t}`).innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}" aria-label="Add ${p} point${p>1?'s':''} to ${tName}">+${p}</button>`).join('');
   });
   wireScorePads();
 }
@@ -2835,8 +3250,8 @@ function updateMomentumBar(){const scored=state.history.filter(e=>!e.type||e.typ
 function getCurrentRun(){const scored=state.history.filter(e=>!e.type||e.type==='score');if(!scored.length)return null;const team=scored[0].team;let pts=0,count=0;for(const e of scored){if(e.team!==team)break;pts+=e.pts;count++}return pts>=4?{team,pts,count}:null}
 function updateRunBanner(){
   const run=getCurrentRun(),banner=document.getElementById('run-banner');
-  if(run&&!state.gameOver){const name=run.team==='a'?state.teamA.name:state.teamB.name;const col=COLORS[run.team==='a'?state.teamA.colorKey:state.teamB.colorKey].hex;banner.textContent=`🔥 ${name.toUpperCase()} ON A ${run.pts}-0 RUN`;banner.style.setProperty('--rc',col);banner.classList.remove('hidden')}
-  else{banner.classList.add('hidden')}
+  if(run&&!state.gameOver){const name=run.team==='a'?state.teamA.name:state.teamB.name;const col=COLORS[run.team==='a'?state.teamA.colorKey:state.teamB.colorKey].hex;banner.textContent=`🔥 ${name.toUpperCase()} ON A ${run.pts}-0 RUN`;banner.style.setProperty('--rc',col);banner.classList.add('active')}
+  else{banner.classList.remove('active')}
 }
 function renderFeed(){
   const list=document.getElementById('feed-list');
@@ -2953,8 +3368,8 @@ function checkWin(){
   if(gameContext.type==='tournament'&&gameContext.fixtureId)saveTournamentResult(entry);
   showPostGame(winner,loser,entry);
 }
-function handleEndGame(){
-  if(!confirm('End game now?'))return;
+async function handleEndGame(){
+  if(!await uiConfirm('End game now?'))return;
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const isTie=state.teamA.score===state.teamB.score;
   const winner=isTie?{...state.teamA,name:`${state.teamA.name} & ${state.teamB.name}`}:(state.teamA.score>state.teamB.score?state.teamA:state.teamB);
@@ -2993,7 +3408,15 @@ function generateSummary(winner,loser){
   if(bigLead>=6)s+=` Biggest lead: +${bigLead}.`;
   return s;
 }
-function closePG(){document.getElementById('pg-overlay').classList.add('hidden')}
+// Back from the victory screen: the game is finished, so clear it and
+// return to the Hub rather than dropping the user back into a dead game.
+function closePG(){
+  document.getElementById('pg-overlay').classList.add('hidden');
+  clearSave();stopVoice();SC.stop();GC.stop();
+  gameContext={type:'pickup',tournamentId:null,fixtureId:null};
+  state=freshState();
+  renderHub();showScreen('hub');
+}
 function playAgain(){
   document.getElementById('pg-overlay').classList.add('hidden');
   state.teamA.score=0;state.teamB.score=0;state.teamA.fouls=0;state.teamB.fouls=0;
@@ -3134,7 +3557,13 @@ function resolveTeam(t){
 function extractPts(t){
   const map={one:1,two:2,three:3,'1':1,'2':2,'3':3};
   const m=t.match(/\b(one|two|three|1|2|3)\b/i);
-  return m?(map[m[1].toLowerCase()]||null):null;
+  if(!m)return null;
+  const pts=map[m[1].toLowerCase()]||null;
+  if(!pts)return null;
+  const rule=state.scoringRule;
+  if(rule==='1s2s'&&pts===3){setVAction(`3-point scores disabled — this game uses 1s & 2s`);return null;}
+  if(rule==='2s3s'&&pts===1){setVAction(`1-point scores disabled — this game uses 2s & 3s`);return null;}
+  return pts;
 }
 function speakScore(){
   const msg=`${state.teamA.name} ${state.teamA.score}, ${state.teamB.name} ${state.teamB.score}`;
@@ -3149,7 +3578,7 @@ function parseVoiceCmd(rawText,confidence){
   if(/\b(score\s*check|what'?s?\s*the\s*score|current\s*score|check\s*score)\b/.test(t)){speakScore();return true}
   if(/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)){nextQuarter();setVAction(`Now ${typeof state.quarter==='number'?'Q'+state.quarter:state.quarter}`);return true}
   if(/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)){handleEndGame();return true}
-  if(/\b(reset\s*game|start\s*over)\b/.test(t)){if(confirm('Reset scores?')){playAgain();setVAction('Reset!')}return true}
+  if(/\b(reset\s*game|start\s*over)\b/.test(t)){uiConfirm('Reset scores?').then(ok=>{if(ok){playAgain();setVAction('Reset!')}});return true}
   if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}setVAction(`Which team? Try "foul ${state.teamA.colorKey||'orange'}" or "foul ${state.teamB.colorKey||'blue'}"`);return true}
   if(/\b(start\s*shot\s*clock|go\s*shot\s*clock|shot\s*clock\s*go)\b/.test(t)){SC.start();setVAction('Shot clock started');return true}
   if(/\b(pause\s*shot\s*clock|stop\s*shot\s*clock|shot\s*clock\s*stop)\b/.test(t)){SC.pause();setVAction('Shot clock paused');return true}
@@ -3281,7 +3710,7 @@ function tbRemovePlayer(id){
   builderState.players=builderState.players.filter(p=>p.id!==id);
   saveBuilderState();renderPlayerList();
 }
-function clearBuilderSession(){if(!confirm('Clear all players and teams?'))return;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};saveBuilderState();renderTeamBuilder();showToast('Session cleared')}
+async function clearBuilderSession(){if(!await uiConfirm('Clear all players and teams?'))return;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};saveBuilderState();renderTeamBuilder();showToast('Session cleared')}
 function generateTeams(mode){
   const n=parseInt(cx['tb-num-teams']||'2',10);
   const players=[...builderState.players];
@@ -3304,10 +3733,13 @@ function generateTeams(mode){
   renderQueueDisplay();
 }
 function calcFairness(teams){
-  if(teams.length<2)return 100;
-  const avgs=teams.map(t=>t.players.length?t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length:5);
-  const spread=Math.max(...avgs)-Math.min(...avgs);
-  return Math.max(0,Math.round(100-spread*9));
+  const active=teams.filter(t=>t.players.length>0);
+  if(active.length<2)return 100;
+  const avgs=active.map(t=>t.players.reduce((s,p)=>s+effectiveRating(p),0)/t.players.length);
+  const mean=avgs.reduce((s,a)=>s+a,0)/avgs.length;
+  const rmsd=Math.sqrt(avgs.reduce((s,a)=>s+(a-mean)**2,0)/avgs.length);
+  // rmsd on a 1–10 scale: 0 = perfect, ~4.5 = worst possible → map to 0–100
+  return Math.max(0,Math.round(100-rmsd*22));
 }
 function renderGeneratedTeams(){
   const fb=document.getElementById('tb-fairness-box');
@@ -3574,9 +4006,9 @@ function openMatchDetail(id){
   document.getElementById('md-overlay').classList.remove('hidden');
 }
 function closeMd(){document.getElementById('md-overlay').classList.add('hidden');detailMatchId=null}
-function deleteMatchFromDetail(){
+async function deleteMatchFromDetail(){
   if(!detailMatchId)return;
-  if(!confirm('Delete this match?'))return;
+  if(!await uiConfirm('Delete this match?'))return;
   const matches=getCol(K.matches).filter(m=>m.id!==detailMatchId);
   setCol(K.matches,matches);
   const leg=getCol(K.games).filter(m=>m.id!==detailMatchId);
@@ -3641,11 +4073,48 @@ function genRoundRobin(teams){
   return fx;
 }
 function genKnockout(teams){
+  if(teams.length<2)return[];
   const shuffled=[...teams].sort(()=>Math.random()-.5);
-  const fx=[];
-  for(let i=0;i<shuffled.length-1;i+=2)
-    fx.push({id:`fx_${Date.now()}_${i}`,teamA:shuffled[i],teamB:shuffled[i+1]||'TBD',round:1,scoreA:null,scoreB:null,winner:null,played:false});
-  return fx;
+  // Pad to next power of 2 so every match has a partner
+  let size=1;while(size<shuffled.length)size*=2;
+  while(shuffled.length<size)shuffled.push('BYE');
+
+  const base=Date.now();let idx=0;
+  const allMatches=[];
+
+  // Round 1 — pair seeded teams
+  let prevRound=[];
+  for(let i=0;i<shuffled.length;i+=2){
+    const m={id:`fx_${base}_${idx++}`,teamA:shuffled[i],teamB:shuffled[i+1],
+      round:1,scoreA:null,scoreB:null,winner:null,played:false,nextMatchId:null,nextSlot:null};
+    // Auto-advance byes immediately
+    if(m.teamB==='BYE'){m.winner=m.teamA;m.played=true;}
+    else if(m.teamA==='BYE'){m.winner=m.teamB;m.played=true;}
+    prevRound.push(m);allMatches.push(m);
+  }
+
+  // Generate subsequent rounds until we have a final
+  let round=1;
+  while(prevRound.length>1){
+    round++;
+    const nextRound=[];
+    for(let i=0;i<prevRound.length;i+=2){
+      const m={id:`fx_${base}_${idx++}`,teamA:'TBD',teamB:'TBD',
+        round,scoreA:null,scoreB:null,winner:null,played:false,nextMatchId:null,nextSlot:null};
+      // Wire feeds from previous round
+      prevRound[i].nextMatchId=m.id;prevRound[i].nextSlot='home';
+      prevRound[i+1].nextMatchId=m.id;prevRound[i+1].nextSlot='away';
+      // Pre-fill slots where previous match already has a winner (bye)
+      if(prevRound[i].winner)m.teamA=prevRound[i].winner;
+      if(prevRound[i+1].winner)m.teamB=prevRound[i+1].winner;
+      // Auto-advance byes in this round too
+      if(m.teamB==='BYE'){m.winner=m.teamA;m.played=true;}
+      else if(m.teamA==='BYE'){m.winner=m.teamB;m.played=true;}
+      nextRound.push(m);allMatches.push(m);
+    }
+    prevRound=nextRound;
+  }
+  return allMatches;
 }
 function showActiveTournament(t){
   document.getElementById('tourn-empty').classList.add('hidden');
@@ -3659,6 +4128,7 @@ function showActiveTournament(t){
 function switchTournTab(name,btn){
   tournTab=name;
   document.querySelectorAll('.tc-tab').forEach(t=>t.classList.toggle('on',t===btn));
+  _setTabSelected(document.getElementById('tc-tabs'),btn);
   renderTournTab(name);
 }
 function renderTournTab(name){
@@ -3674,11 +4144,19 @@ function renderTournTab(name){
       std.map((s,i)=>`<tr><td class="s-rank">${i+1}</td><td style="font-weight:700">${escHtml(s.name)}</td><td>${s.won}</td><td>${s.lost}</td><td>${s.pf}</td><td>${s.pa}</td><td class="s-pts">${s.pts}</td></tr>`).join('')+
       '</tbody></table>';
   }else{
-    body.innerHTML=t.fixtures.map(fx=>`<div class="fixture-card">
+    // Show champion banner for completed knockouts
+    const championBanner=t.format==='knockout'&&t.completed
+      ?`<div style="text-align:center;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:.08em">🏆 Champion: ${escHtml(t.fixtures.find(f=>!f.nextMatchId)?.winner||'')}</div>`:'';
+    // Skip BYE auto-advance matches from display (they are internal bracket scaffolding)
+    const visible=t.fixtures.filter(fx=>!(fx.played&&(fx.teamA==='BYE'||fx.teamB==='BYE')&&fx.scoreA===null));
+    body.innerHTML=championBanner+visible.map(fx=>{
+      // Guard for legacy tournaments without nextMatchId field
+      const canScore=!fx.played&&fx.teamA!=='TBD'&&fx.teamB!=='TBD'&&fx.teamA!=='BYE'&&fx.teamB!=='BYE';
+      return`<div class="fixture-card">
       <div class="fx-row"><span class="fx-badge${fx.played?' played':''}">${fx.played?'Played':'Pending'}</span>${fx.round?`<span class="fx-badge">R${fx.round}</span>`:''}</div>
       <div class="fx-row"><span class="fx-teams">${escHtml(fx.teamA)}<span class="fx-vs">vs</span>${escHtml(fx.teamB)}</span>${fx.played?`<span class="fx-score">${fx.scoreA}–${fx.scoreB}</span>`:''}</div>
-      ${!fx.played?`<button class="btn-score-match" onclick="startTournMatch('${activeTournId}','${fx.id}')">▶ Score This Match</button>`:`<button class="btn-score-match done" disabled>✓ ${escHtml(fx.winner||'Done')}</button>`}
-    </div>`).join('');
+      ${canScore?`<button class="btn-score-match" onclick="startTournMatch('${activeTournId}','${fx.id}')">▶ Score This Match</button>`:fx.played?`<button class="btn-score-match done" disabled>✓ ${escHtml(fx.winner||'Done')}</button>`:`<button class="btn-score-match" disabled style="opacity:.4">Waiting…</button>`}
+    </div>`;}).join('');
   }
 }
 function calcStandings(fixtures,teamNames){
@@ -3698,7 +4176,7 @@ function startTournMatch(tournId,fixtureId){
   const t=tours.find(x=>x.id===tournId);
   if(!t)return;
   const fx=t.fixtures.find(f=>f.id===fixtureId);
-  if(!fx)return;
+  if(!fx||fx.teamA==='TBD'||fx.teamB==='TBD'||fx.teamA==='BYE'||fx.teamB==='BYE')return;
   // Pre-fill setup
   document.getElementById('inp-a').value=fx.teamA;
   document.getElementById('inp-b').value=fx.teamB;
@@ -3719,10 +4197,32 @@ function saveTournamentResult(entry){
   if(!fx)return;
   fx.scoreA=entry.teamA.score;fx.scoreB=entry.teamB.score;
   fx.winner=entry.winner.name;fx.played=true;
+
+  // Knockout: advance winner into next round slot
+  if(t.format==='knockout'&&fx.nextMatchId){
+    const next=t.fixtures.find(f=>f.id===fx.nextMatchId);
+    if(next&&!next.played){
+      if(fx.nextSlot==='home')next.teamA=fx.winner;
+      else next.teamB=fx.winner;
+      // If both slots are now real teams, mark as ready (remove TBD)
+    }
+  }
+
+  // Mark tournament complete when final match (no nextMatchId) is played
+  if(t.format==='knockout'){
+    const final=t.fixtures.find(f=>!f.nextMatchId);
+    if(final&&final.played)t.completed=true;
+  }
+  // Round-robin: standings are computed live from fixtures in calcStandings()
+  if(t.format==='roundrobin'){
+    const allPlayed=t.fixtures.every(f=>f.played);
+    if(allPlayed)t.completed=true;
+  }
+
   setCol(K.tournaments,tours);
 }
-function deleteTournament(){
-  if(!confirm('Delete this tournament?'))return;
+async function deleteTournament(){
+  if(!await uiConfirm('Delete this tournament?'))return;
   const tours=getCol(K.tournaments).filter(t=>t.id!==activeTournId);
   setCol(K.tournaments,tours);activeTournId=null;
   showTournEmpty();showToast('Tournament deleted');
@@ -3746,6 +4246,19 @@ function renderSettings(){
   if(bl)bl.textContent=APP_BUILD;
   const vf=document.getElementById('settings-ver-footer');
   if(vf)vf.textContent=`CourtCall ${APP_VERSION} · ${APP_BUILD} 🏀`;
+  // Developer/Test tools are hidden in production — only shown in dev mode
+  const devBlock=document.getElementById('dev-tools-block');
+  if(devBlock)devBlock.classList.toggle('hidden',!_isDevMode());
+}
+// Dev mode: URL ?dev=1, window.__CC_DEV__, or a persisted local flag.
+// Visiting with ?dev=1 sticks the flag; ?dev=0 clears it.
+function _isDevMode(){
+  try{
+    const qs=new URLSearchParams(location.search);
+    if(qs.get('dev')==='1'){localStorage.setItem('cc_dev','1');}
+    else if(qs.get('dev')==='0'){localStorage.removeItem('cc_dev');}
+    return window.__CC_DEV__===true||localStorage.getItem('cc_dev')==='1';
+  }catch{return window.__CC_DEV__===true;}
 }
 function saveSetting(key,val){const s=getObj(K.settings,{});s[key]=val;setObj(K.settings,s)}
 function toggleSetting(key,btn){
@@ -3755,9 +4268,16 @@ function toggleSetting(key,btn){
 }
 function exportData(){
   const data={
-    metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString()},
-    profile:getObj(K.profile),profiles:getCol(K.profiles),players:getCol(K.players),
-    builder:getObj('cc_builder'),matches:getCol(K.matches),tournaments:getCol(K.tournaments),settings:getObj(K.settings)
+    metadata:{appName:'CourtCall',appVersion:APP_VERSION,exportedAt:new Date().toISOString(),schemaVersion:2},
+    // Core
+    profile:getObj(K.profile),profiles:getCol(K.profiles),
+    players:getCol(K.players),builder:getObj(K.builder),
+    matches:getCol(K.matches),legacyGames:getCol(K.games),
+    tournaments:getCol(K.tournaments),settings:getObj(K.settings),
+    // Communities
+    communities:getCol(KC.communities),communityMembers:getCol(KC.members),
+    communityPosts:getCol(KC.posts),communityGallery:getCol(KC.gallery),
+    communityEvents:getCol(KC.events),communityRatings:getCol(KC.ratings),
   };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`courtcall-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
@@ -3771,24 +4291,38 @@ function handleImport(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      if(data.profile)setObj(K.profile,data.profile);
-      if(data.profiles)setCol(K.profiles,data.profiles);
-      if(data.players)setCol(K.players,data.players);
-      if(data.matches)setCol(K.matches,data.matches);
-      if(data.tournaments)setCol(K.tournaments,data.tournaments);
-      if(data.settings)setObj(K.settings,data.settings);
+      // Validate this is a CourtCall backup before writing anything
+      if(!data||typeof data!=='object')throw new Error('File is not valid JSON');
+      if(data?.metadata?.appName!=='CourtCall')throw new Error('Not a CourtCall backup file');
+      // Validate arrays/objects before writing (guard against malformed files)
+      const isArr=v=>Array.isArray(v);
+      const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+      if(data.profile&&isObj(data.profile))setObj(K.profile,data.profile);
+      if(data.profiles&&isArr(data.profiles))setCol(K.profiles,data.profiles);
+      if(data.players&&isArr(data.players))setCol(K.players,data.players);
+      if(data.builder&&isObj(data.builder))setObj(K.builder,data.builder);
+      if(data.matches&&isArr(data.matches))setCol(K.matches,data.matches);
+      if(data.legacyGames&&isArr(data.legacyGames))setCol(K.games,data.legacyGames);
+      if(data.tournaments&&isArr(data.tournaments))setCol(K.tournaments,data.tournaments);
+      if(data.settings&&isObj(data.settings))setObj(K.settings,data.settings);
+      // Communities
+      if(data.communities&&isArr(data.communities))setCol(KC.communities,data.communities);
+      if(data.communityMembers&&isArr(data.communityMembers))setCol(KC.members,data.communityMembers);
+      if(data.communityPosts&&isArr(data.communityPosts))setCol(KC.posts,data.communityPosts);
+      if(data.communityGallery&&isArr(data.communityGallery))setCol(KC.gallery,data.communityGallery);
+      if(data.communityEvents&&isArr(data.communityEvents))setCol(KC.events,data.communityEvents);
+      if(data.communityRatings&&isArr(data.communityRatings))setCol(KC.ratings,data.communityRatings);
+      currentProfile=getObj(K.profile,null);
       showToast('Data imported!');renderSettings();
-    }catch{showToast('Invalid backup file')}
+    }catch(err){showToast('Import failed: '+(err.message||'invalid file'))}
   };
   reader.readAsText(file);
   e.target.value='';
 }
-function clearAllData(){
-  if(!confirm('Clear ALL data? This cannot be undone.'))return;
+async function clearAllData(){
+  if(!await uiConfirm('Clear ALL data? This cannot be undone.'))return;
   supaSignOut();
-  [K.profile,K.profiles,K.players,'cc_builder',K.matches,K.tournaments,K.settings,K.game,K.games,
-   KC.communities,KC.members,KC.joins,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,
-   STATS_KEY,OB_KEY].forEach(k=>localStorage.removeItem(k));
+  _wipeLocalStorage();
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
   showToast('All data cleared');showScreen('profile');
 }
@@ -3850,8 +4384,8 @@ function exportAnalytics(){
   a.click();
   URL.revokeObjectURL(a.href);
 }
-function resetAnalytics(){
-  if(!confirm('Reset all analytics stats? This cannot be undone.'))return;
+async function resetAnalytics(){
+  if(!await uiConfirm('Reset all analytics stats? This cannot be undone.'))return;
   localStorage.removeItem(STATS_KEY);
   trackEvent('app_opened');
   showToast('Analytics reset');
@@ -3946,8 +4480,17 @@ function closeChangelog(){
 ════════════════════════════════════════════════════════ */
 
 // ── Supabase community sync helpers ──────────────────────
+let _syncCommInFlight = null;
+let _syncPostsInFlight = {};
 
 async function syncCommunitiesFromDB() {
+  if (!supa) return;
+  // Deduplicate concurrent calls — share the in-flight promise
+  if (_syncCommInFlight) return _syncCommInFlight;
+  _syncCommInFlight = _doSyncCommunitiesFromDB().finally(() => { _syncCommInFlight = null; });
+  return _syncCommInFlight;
+}
+async function _doSyncCommunitiesFromDB() {
   if (!supa) return;
   if (!supaUser) {
     const { data: { session } } = await supa.auth.getSession();
@@ -3961,8 +4504,41 @@ async function syncCommunitiesFromDB() {
     if (!comms) return;
     const commIds = comms.map(c => c.id);
     const { data: members } = commIds.length ? await supa.from('community_members').select('*').in('community_id', commIds) : { data: [] };
-    setComms(comms.map(c => ({ ...c, createdAt: c.created_at })));
-    setCommMembers(members || []);
+
+    // Normalize DB snake_case → local camelCase, preserving any extra local fields
+    const localComms = getComms();
+    const dbIds = new Set(comms.map(c => c.id));
+    const mergedComms = comms.map(dbC => {
+      const lc = localComms.find(x => x.id === dbC.id) || {};
+      return {
+        ...lc,
+        id: dbC.id, name: dbC.name,
+        type: dbC.type || lc.type || 'Pickup Group',
+        description: dbC.description || lc.description || '',
+        logo: dbC.logo || lc.logo || '🏀',
+        visibility: dbC.visibility || lc.visibility || 'public',
+        inviteCode: dbC.invite_code || lc.inviteCode || null,
+        readOnly: dbC.read_only ?? lc.readOnly ?? false,
+        commentsLocked: dbC.comments_locked ?? lc.commentsLocked ?? false,
+        ratingsDisabled: dbC.ratings_disabled ?? lc.ratingsDisabled ?? false,
+        createdBy: dbC.creator_id || lc.createdBy,
+        createdAt: dbC.created_at || lc.createdAt,
+        memberCount: lc.memberCount || 1,
+      };
+    });
+    setComms([...mergedComms, ...localComms.filter(c => !dbIds.has(c.id))]);
+
+    const normMembers = (members || []).map(m => ({
+      id: m.community_id + '_' + m.user_id,
+      communityId: m.community_id,
+      profileId: m.user_id,
+      profileName: m.profile_name || '',
+      role: m.role || 'member',
+      joinedAt: m.joined_at,
+    }));
+    const dbMemberKeys = new Set(normMembers.map(m => m.communityId + '_' + m.profileId));
+    const localMembers = getCommMembers();
+    setCommMembers([...normMembers, ...localMembers.filter(m => !dbMemberKeys.has((m.communityId||'') + '_' + (m.profileId||'')))]);
   } catch(e) { console.warn('syncCommunitiesFromDB:', e.message); }
 }
 
@@ -4001,7 +4577,8 @@ async function supaSubmitPost(post) {
     const { error } = await supa.from('community_posts').insert({
       id: post.id, community_id: post.communityId, user_id: supaUser.id,
       author_name: post.authorName || post.authorName || currentProfile?.name || '',
-      content: post.body || post.text || post.content || '', type: post.type || 'text',
+      title: post.title || null, content: post.body || post.text || post.content || '',
+      image_url: post.imageUrl || null, type: post.type || 'text',
       reactions: post.reactions || {}, comments: post.comments || []
     });
     if (error) { console.warn('supaSubmitPost:', error.message); return false; }
@@ -4011,6 +4588,12 @@ async function supaSubmitPost(post) {
 
 async function syncPostsFromDB(communityId) {
   if (!supa || !supaUser) return;
+  if (_syncPostsInFlight[communityId]) return _syncPostsInFlight[communityId];
+  _syncPostsInFlight[communityId] = _doSyncPostsFromDB(communityId).finally(() => { delete _syncPostsInFlight[communityId]; });
+  return _syncPostsInFlight[communityId];
+}
+async function _doSyncPostsFromDB(communityId) {
+  if (!supa || !supaUser) return;
   try {
     const { data: posts } = await supa.from('community_posts')
       .select('*').eq('community_id', communityId)
@@ -4019,7 +4602,7 @@ async function syncPostsFromDB(communityId) {
     const all = getAllPosts().filter(p => p.communityId !== communityId);
     const merged = [...posts.map(p => ({
       id: p.id, communityId: p.community_id, authorId: p.user_id,
-      authorName: p.author_name, text: p.content, type: p.type,
+      authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || '', type: p.type,
       reactions: p.reactions || {}, comments: p.comments || [],
       createdAt: p.created_at
     })), ...all];
@@ -4120,35 +4703,23 @@ function createCommunity(){
 }
 
 // ── Render Communities Screen ────────────────────────────
-function renderCommunities(){
-  if(supa&&supaUser)syncCommunitiesFromDB().then(()=>{
-    const communities=getComms();const allMembers=getCommMembers();
-    const myIds=new Set(allMembers.filter(m=>m.user_id===supaUser?.id||m.profileId===(currentProfile||{}).id).map(m=>m.community_id||m.communityId));
-    const myComms=communities.filter(c=>myIds.has(c.id));
-    const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
-    const myEl=document.getElementById('my-comm-list');
-    const discEl=document.getElementById('discover-comm-list');
-    if(myEl)myEl.innerHTML=myComms.length?myComms.map(c=>commCardHTML(c,allMembers,true)).join(''):'<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
-    if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,allMembers,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
-  });
+function _renderCommunitiesDOM(){
   const p=currentProfile||{id:'guest'};
+  const isGuest=!p.id||p.id==='guest';
   const communities=getComms();
   const members=getCommMembers();
-
-  // My communities — communities where current user is a member
-  const myIds=new Set(members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
+  const myIds=new Set(isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
   const myComms=communities.filter(c=>myIds.has(c.id));
-
-  // Discover — public communities not already joined
   const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
-
-  document.getElementById('my-comm-list').innerHTML=myComms.length
-    ? myComms.map(c=>commCardHTML(c,members,true)).join('')
-    : '<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
-
-  document.getElementById('discover-comm-list').innerHTML=discoverComms.length
-    ? discoverComms.map(c=>commCardHTML(c,members,false)).join('')
-    : '<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span></div>';
+  const myEl=document.getElementById('my-comm-list');
+  const discEl=document.getElementById('discover-comm-list');
+  if(myEl)myEl.innerHTML=myComms.length?myComms.map(c=>commCardHTML(c,members,true)).join(''):'<div class="comm-empty"><span class="comm-empty-icon">🏘</span><span>No communities yet.<br>Create one or discover public groups.</span></div>';
+  if(discEl)discEl.innerHTML=discoverComms.length?discoverComms.map(c=>commCardHTML(c,members,false)).join(''):'<div class="comm-empty"><span style="font-size:28px">🔍</span><span>No public communities found.</span><button class="btn-comm-create" style="margin-top:8px" onclick="showScreen(\'comm-create\')">+ Create one</button></div>';
+}
+function renderCommunities(){
+  _renderCommunitiesDOM();
+  // Sync from DB whenever Supabase is available; syncCommunitiesFromDB handles auth internally.
+  if(supa)syncCommunitiesFromDB().then(_renderCommunitiesDOM);
 }
 
 function commCardHTML(c,allMembers,isMine){
@@ -4253,7 +4824,9 @@ function setCommTab(tab){
   if(tab!=='events'){showAddEventForm=false}
   if(tab==='leaderboard')lbCategory='rating';
   activeCommTab=tab;
+  const cdTabsCont=document.getElementById('cd-tabs');
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  _setTabSelected(cdTabsCont,cdTabsCont&&cdTabsCont.querySelector(`[data-tab="${tab}"]`));
   const c=getComms().find(x=>x.id===activeCommunityId);
   if(!c)return;
   const members=getCommMembers().filter(m=>m.communityId===c.id);
@@ -4398,11 +4971,11 @@ function updateMemberRole(communityId,memberId,newRole){
   renderCommDetail();
 }
 
-function removeMemberFromComm(communityId,memberId){
+async function removeMemberFromComm(communityId,memberId){
   const members=getCommMembers();
   const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
   if(!m)return;
-  if(!confirm(`Remove ${m.profileName} from this community?`))return;
+  if(!await uiConfirm(`Remove ${m.profileName} from this community?`))return;
   setCommMembers(members.filter(x=>!(x.id===memberId&&x.communityId===communityId)));
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
@@ -4456,8 +5029,8 @@ function toggleRatingsDisabled(communityId){
   renderCommDetail();
 }
 
-function removePostPhoto(postId,communityId){
-  if(!confirm('Remove the photo from this post? The text will remain.'))return;
+async function removePostPhoto(postId,communityId){
+  if(!await uiConfirm('Remove the photo from this post? The text will remain.'))return;
   const all=getAllPosts();
   const post=all.find(x=>x.id===postId);
   if(!post)return;
@@ -4467,11 +5040,11 @@ function removePostPhoto(postId,communityId){
   showToast('Photo removed');
 }
 
-function deleteComm(communityId){
+async function deleteComm(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
-  if(!confirm(`Delete "${c.name}"? This cannot be undone.`))return;
+  if(!await uiConfirm(`Delete "${c.name}"? This cannot be undone.`))return;
   setComms(comms.filter(x=>x.id!==communityId));
   setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
   if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
@@ -4690,8 +5263,8 @@ function savePostEdit(postId){
   saveAllPosts(all);editingPostId=null;setCommTab('feed');showToast('Post updated');
 }
 
-function deletePost(postId){
-  if(!confirm('Delete this post?'))return;
+async function deletePost(postId){
+  if(!await uiConfirm('Delete this post?'))return;
   saveAllPosts(getAllPosts().filter(p=>p.id!==postId));
   expandedComments.delete(postId);
   if(editingPostId===postId)editingPostId=null;
@@ -5012,8 +5585,8 @@ function saveCPlayerEdit(playerId){
   setCommTab('players');showToast('Player updated');
 }
 
-function deleteCPlayer(playerId){
-  if(!confirm('Remove this player from the community?'))return;
+async function deleteCPlayer(playerId){
+  if(!await uiConfirm('Remove this player from the community?'))return;
   saveAllCPlayers(getAllCPlayers().filter(p=>p.id!==playerId));
   saveAllCRatings(getAllCRatings().filter(r=>r.playerId!==playerId));
   setCommTab('players');showToast('Player removed');
@@ -5149,10 +5722,10 @@ function cancelJoinReq(communityId){
   renderCommDetail();
 }
 
-function leaveComm(communityId){
+async function leaveComm(communityId){
   const c=getComms().find(x=>x.id===communityId);
   if(!c)return;
-  if(!confirm(`Leave "${c.name}"?`))return;
+  if(!await uiConfirm(`Leave "${c.name}"?`))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const members=getCommMembers();
   const myMember=members.find(m=>m.communityId===communityId&&m.profileId===myId);
@@ -5532,8 +6105,8 @@ function submitEvent(communityId){
   showToast('Event created! 📅');
 }
 
-function deleteEvent(eventId,communityId){
-  if(!confirm('Delete this event?'))return;
+async function deleteEvent(eventId,communityId){
+  if(!await uiConfirm('Delete this event?'))return;
   saveAllEvents(getAllEvents().filter(e=>e.id!==eventId));
   expandedEventRsvps.delete(eventId);
   setCommTab('events');
@@ -5825,8 +6398,8 @@ function submitGalleryItem(communityId){
   showToast('Photo added! 📸');
 }
 
-function deleteGalItem(itemId,communityId){
-  if(!confirm('Delete this photo?'))return;
+async function deleteGalItem(itemId,communityId){
+  if(!await uiConfirm('Delete this photo?'))return;
   saveAllGalItems(getAllGalItems().filter(g=>g.id!==itemId));
   expandedGalleryComments.delete(itemId);
   setCommTab('gallery');
@@ -6025,15 +6598,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     applySetupColors();
     renderHub();
     syncCommunitiesFromDB();
-    if(!localStorage.getItem(OB_KEY)){
+    // Returning user: honor a deep-link / restore the screen from the URL hash.
+    if(location.hash&&_routeFromHash()){
+      /* routed from hash */
+    }else if(!localStorage.getItem(OB_KEY)){
       showScreen('onboarding');
     }else{
       showScreen('hub');
     }
   }else{
-    // First time — show profile screen (onboarding runs after profile is set)
+    // First time — show profile screen (onboarding runs after profile is set).
+    // Still honor public deep-links (privacy/terms/communities/world).
     ['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
-    showScreen('profile');
+    const seg=location.hash.replace(/^#\/?/,'').split('/')[0];
+    if(seg&&_PUBLIC_SCREENS.has(seg)&&_routeFromHash()){
+      /* routed to a public screen */
+    }else{
+      showScreen('profile');
+    }
   }
   // Apply saved settings
   const s=getObj(K.settings,{defaultWinScore:21});
@@ -6044,6 +6626,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Load builder state from storage
   const bs=getObj('cc_builder',null);
   if(bs)builderState=bs;
+  // Wire ARIA roving-tabindex on all tablist containers
+  _wireTablist(document.querySelector('.auth-tabs'));
+  _wireTablist(document.getElementById('tc-tabs'));
+  _wireTablist(document.getElementById('cd-tabs'));
+  // "What's new" toast — shows once per version for returning users
+  const seenVer=localStorage.getItem('cc_seen_version');
+  if(seenVer&&seenVer!==APP_VERSION){
+    setTimeout(()=>showToast(`Updated to ${APP_VERSION} — tap Settings › What's New`,3500),800);
+  }
+  if(!seenVer||seenVer!==APP_VERSION)localStorage.setItem('cc_seen_version',APP_VERSION);
 });
 
 // ── PWA: Service Worker + Install Prompt ─────────────────────
@@ -6599,8 +7191,8 @@ function loadDemoData(){
   showToast('Demo data loaded! 🧪 14 players, 5 matches, 1 community');
 }
 
-function clearDemoData(){
-  if(!confirm('Remove all demo/test data? Your real data will not be affected.'))return;
+async function clearDemoData(){
+  if(!await uiConfirm('Remove all demo/test data? Your real data will not be affected.'))return;
   const D=DEMO_BATCH_ID;
   const flt=arr=>(arr||[]).filter(x=>!(x.isDemo||x.demoBatchId===D));
   setCol(K.players,flt(getCol(K.players)));
@@ -6693,6 +7285,107 @@ function clearDemoData(){
   </div>
 </div>
 
+<!-- ══ PRIVACY POLICY ══ -->
+<div id="s-privacy" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="closeLegal()">← Back</button>
+    <div class="page-title">Privacy Policy</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="legal-body">
+    <p class="legal-updated">Last updated: May 30, 2026</p>
+    <p>CourtCall ("we", "the app") is a pickup-basketball scoring app. This policy explains what data we collect and how we use it. We aim to collect as little as possible.</p>
+    <h3>What we collect</h3>
+    <ul>
+      <li><b>Account info:</b> the email address and display name you provide when you create an account. Your 6-digit PIN is never stored in plain text — it is used as your password and handled by our authentication provider.</li>
+      <li><b>App data:</b> games, teams, players, tournaments, and communities you create. This is stored locally on your device and, if you sign in, synced to our backend so you can access it across devices.</li>
+      <li><b>Guest mode:</b> if you continue as a guest, no email is collected and your data stays on your device only.</li>
+    </ul>
+    <h3>How we use it</h3>
+    <ul>
+      <li>To provide the app: saving your games, syncing your account, and showing communities you join.</li>
+      <li>We do <b>not</b> sell your data or use it for advertising.</li>
+    </ul>
+    <h3>Where it's stored</h3>
+    <p>Account and synced data are stored with our backend provider (Supabase). Local data lives in your browser's storage and is removed when you log out or clear data.</p>
+    <h3>Your choices</h3>
+    <ul>
+      <li><b>Export:</b> download all your data as JSON from Settings → Export Data.</li>
+      <li><b>Delete:</b> log out (clears this device) or use Clear All Data. To delete your account and server data, contact us at the email below.</li>
+    </ul>
+    <h3>Contact</h3>
+    <p>Questions about privacy or data deletion: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
+    <p class="legal-note">CourtCall is an independent beta project and is not affiliated with the NBA or any league. This document is provided for transparency and may be updated as the app evolves.</p>
+  </div>
+</div>
+
+<!-- ══ TERMS OF SERVICE ══ -->
+<div id="s-terms" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="closeLegal()">← Back</button>
+    <div class="page-title">Terms of Service</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="legal-body">
+    <p class="legal-updated">Last updated: May 30, 2026</p>
+    <p>By using CourtCall you agree to these terms. CourtCall is provided "as is" during its beta period.</p>
+    <h3>Using the app</h3>
+    <ul>
+      <li>You're responsible for the activity on your account and for keeping your PIN private.</li>
+      <li>Don't post unlawful, harassing, or infringing content in communities, and don't misuse or attempt to break the service.</li>
+      <li>You must be old enough to consent to data processing in your region (generally 13+, or 16+ in parts of the EU).</li>
+    </ul>
+    <h3>Your content</h3>
+    <p>You keep ownership of the games, teams, and posts you create. By posting in a community you allow other members of that community to see your content.</p>
+    <h3>Beta &amp; availability</h3>
+    <ul>
+      <li>Features may change, break, or be removed. Back up important data with Export.</li>
+      <li>We don't guarantee uninterrupted service or that data will never be lost.</li>
+    </ul>
+    <h3>Liability</h3>
+    <p>To the fullest extent permitted by law, CourtCall is not liable for any indirect or incidental damages arising from use of the app.</p>
+    <h3>Contact</h3>
+    <p>Questions about these terms: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
+  </div>
+</div>
+
+<!-- ══ SET NEW PIN (password recovery) ══ -->
+<div id="s-reset-pin" class="screen">
+  <div class="profile-hero">
+    <span class="ph-ball">🔑</span>
+    <div class="ph-title">Set a New PIN</div>
+    <div class="ph-sub">Choose a new 6-digit PIN for your account</div>
+    <div class="auth-card">
+      <div class="auth-form">
+        <div class="pin-label-row">
+          <span class="pin-label">New 6-digit PIN</span>
+          <button type="button" class="pin-eye" onclick="togglePinVis('pin-rs',this)" aria-label="Show or hide PIN">👁</button>
+        </div>
+        <div class="pin-row" id="pin-rs" role="group" aria-label="Choose a new 6-digit PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 6">
+        </div>
+        <div class="pin-label">Confirm new PIN</div>
+        <div class="pin-row" id="pin-rsc" role="group" aria-label="Confirm new PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
+        </div>
+        <div id="auth-err-rs" class="auth-error hidden"></div>
+        <button class="auth-btn" onclick="submitNewPin()">Update PIN</button>
+        <button class="auth-forgot" onclick="showScreen('profile')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Bottom Navigation ─────────────────────────────── -->
 <nav class="btm-nav hidden" id="btm-nav">
   <button class="bn-btn active" data-nav="hub" onclick="showScreen('hub')">
@@ -6718,8 +7411,24 @@ function clearDemoData(){
 </nav>
 
 <!-- ── More Sheet ────────────────────────────────────── -->
+<!-- ── Mobile nav drawer (≤900px) ──────────────────────── -->
+<div class="nav-drawer-overlay hidden" id="nav-drawer-overlay" onclick="closeNavDrawer()"></div>
+<aside class="nav-drawer hidden" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <div class="nav-drawer-head">
+    <span class="nav-drawer-title">Menu</span>
+    <button class="nav-drawer-x" onclick="closeNavDrawer()" aria-label="Close menu">×</button>
+  </div>
+  <nav class="nav-drawer-links">
+    <button onclick="closeNavDrawer();scrollToSection('lp-features')">Features</button>
+    <button onclick="closeNavDrawer();scrollToSection('lp-s5')">How it Works</button>
+    <button onclick="closeNavDrawer();showScreen('communities')">Communities</button>
+    <button onclick="closeNavDrawer();showScreen('world')">Discover</button>
+    <button id="nav-drawer-auth" onclick="closeNavDrawer();showScreen('profile')">Log In</button>
+  </nav>
+</aside>
+
 <div class="more-overlay hidden" id="more-overlay" onclick="hideMoreMenu()"></div>
-<div class="more-sheet hidden" id="more-sheet">
+<div class="more-sheet hidden" id="more-sheet" role="dialog" aria-modal="true" aria-label="More menu">
   <div class="more-handle"></div>
   <div class="more-title">More</div>
   <div class="more-grid">

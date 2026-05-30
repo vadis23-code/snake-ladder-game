@@ -31,7 +31,9 @@ create table if not exists public.community_posts (
   community_id text references public.communities(id) on delete cascade,
   user_id uuid references public.profiles(id) on delete set null,
   author_name text,
+  title text,
   content text,
+  image_url text,
   type text default 'text',
   reactions jsonb default '{}',
   comments jsonb default '[]',
@@ -56,6 +58,16 @@ alter table public.community_members enable row level security;
 alter table public.community_posts   enable row level security;
 alter table public.community_events  enable row level security;
 
+-- SECURITY DEFINER helper: checks membership WITHOUT triggering the
+-- community_members SELECT policy, avoiding infinite recursion.
+create or replace function public.is_community_member(comm_id text, uid uuid)
+returns boolean language sql security definer set search_path = public as $$
+  select exists (
+    select 1 from public.community_members
+    where community_id = comm_id and user_id = uid
+  );
+$$;
+
 -- Anyone can read public communities
 create policy "communities: public read" on public.communities
   for select using (visibility = 'public' or creator_id = auth.uid() or
@@ -73,11 +85,12 @@ create policy "communities: admin update" on public.communities
 create policy "communities: creator delete" on public.communities
   for delete using (auth.uid() = creator_id);
 
--- Members: visible to other members of same community
+-- Members: visible to self and to other members of the same community.
+-- Uses the SECURITY DEFINER helper to avoid recursing on this same policy.
 create policy "members: community read" on public.community_members
   for select using (
     user_id = auth.uid() or
-    exists (select 1 from public.community_members m2 where m2.community_id = community_members.community_id and m2.user_id = auth.uid())
+    public.is_community_member(community_id, auth.uid())
   );
 
 create policy "members: self insert" on public.community_members
@@ -120,3 +133,7 @@ create policy "events: member insert" on public.community_events
 create policy "events: creator delete" on public.community_events
   for delete using (auth.uid() = creator_id or
     exists (select 1 from public.communities c where c.id = community_events.community_id and c.creator_id = auth.uid()));
+
+-- Migration: add title and image_url to existing community_posts tables
+alter table public.community_posts add column if not exists title text;
+alter table public.community_posts add column if not exists image_url text;
