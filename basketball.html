@@ -2139,6 +2139,11 @@ table.standings tr:last-child td{border-bottom:none}
         <div class="sr-info"><div class="sr-label">Switch Profile</div><div class="sr-sub">Change or create profile</div></div>
         <div style="color:var(--muted2)">›</div>
       </div>
+      <div class="setting-row" id="settings-logout-row" onclick="logOut()" style="border-bottom:none">
+        <div class="sr-icon">🚪</div>
+        <div class="sr-info"><div class="sr-label" style="color:var(--danger)">Log Out</div><div class="sr-sub">End session &amp; clear this device</div></div>
+        <div style="color:var(--muted2)">›</div>
+      </div>
     </div>
     <div class="hub-section-title" style="padding:8px 0">Game Defaults</div>
     <div class="settings-sec">
@@ -2358,6 +2363,33 @@ async function supaSignIn(email, pin) {
 async function supaSignOut() {
   if (supa) await supa.auth.signOut();
   supaUser = null;
+}
+
+// Clears every CourtCall + Supabase key from localStorage.
+// Used by logOut() and clearAllData() so no token or PII survives.
+function _wipeLocalStorage() {
+  // Known app keys
+  [K.profile,K.profiles,K.players,K.builder,K.matches,K.tournaments,K.settings,K.game,K.games,
+   KC.communities,KC.members,KC.joins,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,
+   STATS_KEY,OB_KEY,K_PULSE,HELP_CHAT_KEY,HELP_FB_KEY,'cc_builder','pwa_dismissed']
+    .forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+  // Any prefixed keys we may have missed, incl. Supabase session tokens (sb-*)
+  try{
+    Object.keys(localStorage)
+      .filter(k=>/^(cc_|courtcall_|sb-)/.test(k))
+      .forEach(k=>localStorage.removeItem(k));
+  }catch{}
+}
+
+// Full logout: end Supabase session, wipe local state, return to landing.
+async function logOut() {
+  if(!confirm('Log out of CourtCall? Unsynced local data will be cleared from this device.'))return;
+  try{await supaSignOut()}catch{}
+  _wipeLocalStorage();
+  currentProfile=null;
+  builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
+  showToast('Logged out');
+  showScreen('profile');
 }
 
 async function supaSaveGame(game) {
@@ -3901,9 +3933,7 @@ function handleImport(e){
 function clearAllData(){
   if(!confirm('Clear ALL data? This cannot be undone.'))return;
   supaSignOut();
-  [K.profile,K.profiles,K.players,'cc_builder',K.matches,K.tournaments,K.settings,K.game,K.games,
-   KC.communities,KC.members,KC.joins,KC.posts,KC.players,KC.gallery,KC.events,KC.ratings,
-   STATS_KEY,OB_KEY].forEach(k=>localStorage.removeItem(k));
+  _wipeLocalStorage();
   currentProfile=null;builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
   showToast('All data cleared');showScreen('profile');
 }
