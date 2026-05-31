@@ -2762,6 +2762,8 @@ document.addEventListener('keydown',e=>{
   if(typeof _confirmReject==='function'){_confirmReject();return;}
   if(typeof _navDrawerOpen==='function'&&_navDrawerOpen()){closeNavDrawer();return;}
   if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
+  const ppMod=document.getElementById('player-picker');
+  if(ppMod&&!ppMod.classList.contains('hidden')){closePlayerPicker();return;}
   const fbMod=document.getElementById('feedback-modal');
   if(fbMod&&!fbMod.classList.contains('hidden')){closeFeedback();return;}
   const clMod=document.getElementById('changelog-modal');
@@ -3296,7 +3298,7 @@ function renderGame(){
   updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
   document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';
-  renderScorePads();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();
+  renderScorePads();if(state.withPlayers)renderPlayerRosters();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();
 }
 function renderScorePads(){
   // Build the base points array from the scoring rule
@@ -3350,7 +3352,8 @@ function renderFeed(){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
     } else {
       const inRun=run&&e.team===run.team;
-      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${inRun?'<span class="fe-run">🔥</span>':''}</li>`);
+      const scorer=e.playerName?escHtml(e.playerName):escHtml(name);
+      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${scorer}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${inRun?'<span class="fe-run">🔥</span>':''}</li>`);
     }
   });
   list.innerHTML=items.join('');list.scrollTop=0;
@@ -3377,10 +3380,12 @@ function undoScore(){
   const T=`team${last.team.toUpperCase()}`;
   if(last.type==='foul'){
     state[T].fouls=Math.max(0,state[T].fouls-1);
+    if(last.playerId){const p=state[T].players?.find(p=>p.id===last.playerId);if(p)p.fouls=Math.max(0,p.fouls-1);}
     updateFoulUI(last.team);
     save();renderGame();setVAction('↩ Last foul removed.');
   } else {
     state[T].score=Math.max(0,state[T].score-(last.pts||0));
+    if(last.playerId){const p=state[T].players?.find(p=>p.id===last.playerId);if(p)p.score=Math.max(0,p.score-(last.pts||0));}
     save();renderGame();setVAction('↩ Last score removed.');
   }
 }
@@ -3511,6 +3516,9 @@ function closePG(){
 function playAgain(){
   document.getElementById('pg-overlay').classList.add('hidden');
   state.teamA.score=0;state.teamB.score=0;state.teamA.fouls=0;state.teamB.fouls=0;
+  if(state.withPlayers){
+    [state.teamA,state.teamB].forEach(t=>{(t.players||[]).forEach(p=>{p.score=0;p.fouls=0;});});
+  }
   ['a','b'].forEach(t=>{const l=document.getElementById(`ctrl-f${t}-lbl`);if(l)l.textContent=`Foul ${t.toUpperCase()}`});
   state.history=[];state.maxLead={a:0,b:0};state.quarter=1;state.possession='a';
   state.gameOver=false;state.startTime=Date.now();state.voiceActive=false;
@@ -3682,6 +3690,126 @@ function parseVoiceCmd(rawText,confidence){
   setVAction(`+${pts} to ${team==='a'?state.teamA.name:state.teamB.name} ✓`);
   return true;
 }
+/* ═══════════════════════════════════════════════════════════
+   Player Mode — Setup, Picker, Roster
+═══════════════════════════════════════════════════════════ */
+let setupPlayers={a:[],b:[]};
+
+function togglePlayerSection(){
+  const on=cx['cr-players']==='on';
+  document.getElementById('player-setup-wrap').style.display=on?'block':'none';
+  if(!on){setupPlayers={a:[],b:[]};['a','b'].forEach(t=>{const el=document.getElementById(`setup-players-${t}`);if(el)el.innerHTML=''});}
+  // Update sub-labels to match current team names
+  const na=(document.getElementById('inp-a')?.value.trim()||'Team A');
+  const nb=(document.getElementById('inp-b')?.value.trim()||'Team B');
+  const la=document.getElementById('setup-plabel-a');const lb=document.getElementById('setup-plabel-b');
+  if(la)la.textContent=na+' Players';if(lb)lb.textContent=nb+' Players';
+}
+
+function addSetupPlayer(team){
+  const inp=document.getElementById(`inp-p-${team}`);
+  const name=(inp?.value||'').trim();
+  if(!name){showToast('Enter a player name');return;}
+  if(setupPlayers[team].find(p=>p.name.toLowerCase()===name.toLowerCase())){showToast('Player already added');return;}
+  setupPlayers[team].push({id:'sp_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),name});
+  inp.value='';inp.focus();
+  renderSetupPlayerList(team);
+}
+
+function removeSetupPlayer(team,id){
+  setupPlayers[team]=setupPlayers[team].filter(p=>p.id!==id);
+  renderSetupPlayerList(team);
+}
+
+function renderSetupPlayerList(team){
+  const el=document.getElementById(`setup-players-${team}`);if(!el)return;
+  el.innerHTML=setupPlayers[team].map((p,i)=>`<div class="setup-player-item"><span>${i+1}. ${escHtml(p.name)}</span><button class="setup-player-remove" onclick="removeSetupPlayer('${team}','${escHtml(p.id)}')" aria-label="Remove ${escHtml(p.name)}">✕</button></div>`).join('');
+}
+
+// ── Player picker ────────────────────────────────────
+let _pickerCtx=null;
+
+function openPlayerPicker(team,pts,type){
+  const T=`team${team.toUpperCase()}`;
+  const players=state[T].players||[];
+  const color=team==='a'?'var(--ca)':'var(--cb)';
+  const titleEl=document.getElementById('pp-title');
+  const listEl=document.getElementById('pp-players-list');
+  titleEl.textContent=type==='foul'?`Foul — ${state[T].name}`:`+${pts} — Who scored?`;
+  titleEl.style.color=color;
+  listEl.innerHTML=players.map(p=>`<button class="pp-player-btn" onclick="_pickerSelect('${p.id}')"><span>${escHtml(p.name)}</span><span class="pp-player-stat">${p.score}pts${p.fouls?' &middot; <span class=\'pr-fouls\'>'+p.fouls+'F</span>':''}</span></button>`).join('');
+  _pickerCtx={team,pts,type};
+  document.getElementById('player-picker').classList.remove('hidden');
+  // Focus first player button for keyboard
+  requestAnimationFrame(()=>listEl.querySelector('button')?.focus());
+}
+
+function closePlayerPicker(){
+  document.getElementById('player-picker').classList.add('hidden');
+  _pickerCtx=null;
+}
+
+function _pickerSelect(playerId){
+  if(!_pickerCtx)return;
+  const{team,pts,type}=_pickerCtx;
+  closePlayerPicker();
+  if(type==='foul')_addFoulPlayer(team,playerId);
+  else _addScorePlayer(team,pts,playerId);
+}
+
+function _pickerSkip(){
+  if(!_pickerCtx)return;
+  const{team,pts,type}=_pickerCtx;
+  closePlayerPicker();
+  if(type==='foul')addFoul(team);else addScore(team,pts);
+}
+
+function _addScorePlayer(team,pts,playerId){
+  if(state.gameOver)return;
+  const T=`team${team.toUpperCase()}`;
+  const player=state[T].players?.find(p=>p.id===playerId);
+  state[T].score+=pts;
+  if(player)player.score+=pts;
+  state.history.unshift({type:'score',team,pts,quarter:state.quarter,playerId,playerName:player?.name});
+  const lead=Math.abs(state.teamA.score-state.teamB.score);
+  if(state.teamA.score>state.teamB.score)state.maxLead.a=Math.max(state.maxLead.a,lead);
+  else if(state.teamB.score>state.teamA.score)state.maxLead.b=Math.max(state.maxLead.b,lead);
+  const el=document.getElementById(`t-score-${team}`);
+  el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+  const s=getObj(K.settings,{vibration:true});
+  if(s.vibration&&navigator.vibrate)navigator.vibrate(40);
+  if(state.shotClockDuration>0&&state.shotClockAutoReset)SC.reset(SC.running);
+  save();renderGame();checkWin();
+}
+
+function _addFoulPlayer(team,playerId){
+  const T=`team${team.toUpperCase()}`;
+  const player=state[T].players?.find(p=>p.id===playerId);
+  if(state[T].fouls>=10)return;
+  state[T].fouls++;
+  if(player)player.fouls++;
+  state.history.unshift({type:'foul',team,quarter:state.quarter,playerId,playerName:player?.name});
+  save();renderGame();
+}
+
+function handleFoulTap(team){
+  const T=`team${team.toUpperCase()}`;
+  if(state.withPlayers&&state[T].players?.length>0)openPlayerPicker(team,0,'foul');
+  else addFoul(team);
+}
+
+function renderPlayerRosters(){
+  ['a','b'].forEach(team=>{
+    const T=`team${team.toUpperCase()}`;
+    const players=(state[T].players||[]);
+    const pad=document.getElementById(`pad-${team}`);
+    if(!pad||!players.length)return;
+    let roster=pad.querySelector('.player-roster');
+    if(!roster){roster=document.createElement('div');roster.className='player-roster';pad.appendChild(roster);}
+    roster.innerHTML=players.map(p=>`<div class="player-roster-row"><span class="pr-name">${escHtml(p.name)}</span><span class="pr-stats">${p.score}pts${p.fouls?' &middot; <span class="pr-fouls">'+p.fouls+'F</span>':''}</span></div>`).join('');
+  });
+}
+
 function startListening(){
   if(!voiceOK||!state.voiceActive||state.gameOver)return;
   clearTimeout(restartTmr);
