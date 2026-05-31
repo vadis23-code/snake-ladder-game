@@ -375,6 +375,25 @@ button{touch-action:manipulation}
 .mc-meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
 .mc-winner-tag{font-size:11px;font-weight:700;color:var(--success);background:rgba(0,230,118,.1);border-radius:10px;padding:2px 8px}
 .mc-spicy{font-size:11px;font-weight:700;color:var(--gold);background:rgba(255,179,0,.1);border-radius:10px;padding:2px 8px}
+.mc-topscorer{font-size:11px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,.1);border-radius:10px;padding:2px 8px}
+
+/* ── Player stats — post-game overlay ───────────── */
+.pg-player-stats{width:100%;max-width:420px;margin-bottom:20px}
+.pps-team-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:12px 0 5px;padding-left:2px}
+.pps-row{display:flex;align-items:center;padding:9px 12px;border-radius:var(--r1);background:var(--s2);margin-bottom:3px;gap:8px}
+.pps-rank{font-size:11px;color:var(--muted);width:18px;text-align:center;flex-shrink:0}
+.pps-name{font-weight:700;font-size:14px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pps-pts{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.02em;min-width:44px;text-align:right;flex-shrink:0}
+.pps-fouls{font-size:11px;color:var(--danger);min-width:26px;text-align:right;flex-shrink:0}
+.pps-mvp{text-align:center;padding:10px 14px;background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3);border-radius:var(--r2);margin-top:10px;font-size:13px;font-weight:700;color:var(--gold)}
+
+/* ── Player stats — match detail overlay ────────── */
+.md-player-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.md-player-row:last-child{border-bottom:none}
+.md-pr-rank{font-size:11px;color:var(--muted);width:16px;text-align:center;flex-shrink:0}
+.md-pr-name{font-weight:600;font-size:14px;color:var(--text);flex:1}
+.md-pr-pts{font-family:'Bebas Neue',sans-serif;font-size:17px;flex-shrink:0}
+.md-pr-fouls{font-size:11px;color:var(--danger);min-width:22px;text-align:right;flex-shrink:0}
 .history-empty{text-align:center;padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .history-empty-icon{font-size:48px}
 .history-empty-text{font-size:14px;color:var(--muted);line-height:1.6}
@@ -1964,6 +1983,10 @@ body.modal-open{overflow:hidden}
       <div class="md-sec-title">Game Summary</div>
       <div class="md-summary" id="md-summary">—</div>
     </div>
+    <div class="md-section" id="md-players-section" style="display:none">
+      <div class="md-sec-title">Player Stats</div>
+      <div id="md-players-content"></div>
+    </div>
     <div class="md-section">
       <div class="md-sec-title">Scoring Timeline</div>
       <ul class="md-timeline" id="md-timeline"></ul>
@@ -2446,6 +2469,7 @@ body.modal-open{overflow:hidden}
       <div class="stat-cell"><div class="stat-val" id="st-fa">0</div><div class="stat-lbl" id="st-fa-lbl">Fouls A</div></div>
       <div class="stat-cell"><div class="stat-val" id="st-fb">0</div><div class="stat-lbl" id="st-fb-lbl">Fouls B</div></div>
     </div>
+    <div id="pg-players" class="pg-player-stats" style="display:none"></div>
     <div class="pg-actions">
       <button class="btn-pg-share" onclick="shareScore()">📤 Share Score</button>
       <button class="btn-pg-2" onclick="playAgain()">▶ Play Again</button>
@@ -3443,7 +3467,12 @@ function computeWasTrailing(hist,winnerTeam){
 function buildMatchEntry(winner,loser){
   const dur=state.startTime?fmtDur(Date.now()-state.startTime):'—';
   const h=state.history;
-  return{id:'m_'+Date.now(),teamA:{name:state.teamA.name,score:state.teamA.score},teamB:{name:state.teamB.name,score:state.teamB.score},winner:{name:winner.name,score:winner.score},loser:{name:loser.name,score:loser.score},gameType:state.gameType,winScore:state.winScore,date:new Date().toLocaleDateString(),duration:dur,history:[...h],foulsA:state.teamA.fouls,foulsB:state.teamB.fouls,maxLead:state.maxLead,leadChanges:computeLeadChanges(h),biggestRun:computeBiggestRun(h),tournamentId:gameContext.tournamentId,fixtureId:gameContext.fixtureId};
+  const entry={id:'m_'+Date.now(),teamA:{name:state.teamA.name,score:state.teamA.score},teamB:{name:state.teamB.name,score:state.teamB.score},winner:{name:winner.name,score:winner.score},loser:{name:loser.name,score:loser.score},gameType:state.gameType,winScore:state.winScore,date:new Date().toLocaleDateString(),duration:dur,history:[...h],foulsA:state.teamA.fouls,foulsB:state.teamB.fouls,maxLead:state.maxLead,leadChanges:computeLeadChanges(h),biggestRun:computeBiggestRun(h),tournamentId:gameContext.tournamentId,fixtureId:gameContext.fixtureId};
+  if(state.withPlayers){
+    entry.playersA=(state.teamA.players||[]).map(p=>({name:p.name,score:p.score,fouls:p.fouls}));
+    entry.playersB=(state.teamB.players||[]).map(p=>({name:p.name,score:p.score,fouls:p.fouls}));
+  }
+  return entry;
 }
 function fmtDur(ms){return`${Math.floor(ms/60000)}m ${Math.floor((ms%60000)/1000)}s`}
 function checkWin(){
@@ -3483,6 +3512,19 @@ function showPostGame(winner,loser,entry){
   document.getElementById('st-fa-lbl').textContent=`${state.teamA.name} Fouls`;
   document.getElementById('st-fb-lbl').textContent=`${state.teamB.name} Fouls`;
   document.getElementById('pg-summary').textContent=generateSummary(winner,loser);
+  // Player stats panel
+  const ppEl=document.getElementById('pg-players');
+  if(ppEl){
+    if(state.withPlayers&&((state.teamA.players||[]).length||(state.teamB.players||[]).length)){
+      const renderRows=(team,colorVar)=>[...(team.players||[])].sort((a,b)=>b.score-a.score).map((p,i)=>`<div class="pps-row"><span class="pps-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</span><span class="pps-name">${escHtml(p.name)}</span><span class="pps-pts" style="color:${colorVar}">${p.score}</span><span class="pps-fouls">${p.fouls?p.fouls+'F':''}</span></div>`).join('');
+      const allP=[...(state.teamA.players||[]),...(state.teamB.players||[])];
+      const top=allP.length?allP.reduce((t,p)=>p.score>t.score?p:t,allP[0]):null;
+      let html=`<div class="pps-team-label" style="color:var(--ca)">${escHtml(state.teamA.name)}</div>${renderRows(state.teamA,'var(--ca)')}`;
+      html+=`<div class="pps-team-label" style="color:var(--cb)">${escHtml(state.teamB.name)}</div>${renderRows(state.teamB,'var(--cb)')}`;
+      if(top&&top.score>0)html+=`<div class="pps-mvp">🏅 MVP: ${escHtml(top.name)} — ${top.score} pts</div>`;
+      ppEl.innerHTML=html;ppEl.style.display='';
+    }else{ppEl.innerHTML='';ppEl.style.display='none';}
+  }
   launchConfetti('pg-confetti');
   document.getElementById('pg-overlay').classList.remove('hidden');
   // Reveal bottom nav so users can navigate directly from the result screen.
@@ -3502,6 +3544,15 @@ function generateSummary(winner,loser){
   if(dur>0)s+=` Game lasted ${dur} minute${dur!==1?'s':''}.`;
   const bigLead=Math.max(state.maxLead.a,state.maxLead.b);
   if(bigLead>=6)s+=` Biggest lead: +${bigLead}.`;
+  if(state.withPlayers){
+    const all=[...(state.teamA.players||[]).map(p=>({...p,team:state.teamA.name})),...(state.teamB.players||[]).map(p=>({...p,team:state.teamB.name}))];
+    if(all.length){
+      const top=all.reduce((t,p)=>p.score>t.score?p:t,all[0]);
+      if(top.score>0)s+=` Top scorer: ${top.name} with ${top.score} pts (${top.team}).`;
+      const topFouler=all.reduce((t,p)=>p.fouls>t.fouls?p:t,all[0]);
+      if(topFouler.fouls>=3)s+=` ${topFouler.name} committed the most fouls (${topFouler.fouls}).`;
+    }
+  }
   return s;
 }
 // Back from the victory screen: the game is finished, so clear it and
@@ -4161,9 +4212,12 @@ function renderHistory(){
     let spicy='';
     if(m.biggestRun>=6)spicy=`<span class="mc-spicy">🔥 ${m.biggestRun}-0 run</span>`;
     else if(m.leadChanges>=4)spicy=`<span class="mc-spicy">↕ ${m.leadChanges} lead changes</span>`;
+    const allPs=[...(m.playersA||[]),...(m.playersB||[])];
+    const topP=allPs.length?allPs.reduce((t,p)=>p.score>t.score?p:t,allPs[0]):null;
+    const topTag2=topP&&topP.score>0?`<span class="mc-topscorer">🏅 ${escHtml(topP.name)} ${topP.score}pts</span>`:'';
     return`<div class="match-card"${m.id?` onclick="openMatchDetail('${m.id}')"`:''}>
       <div class="mc-top"><span class="mc-teams">${escHtml(aName)} vs ${escHtml(bName)}</span><span class="mc-score">${aScore}–${bScore}</span></div>
-      <div class="mc-meta"><span class="mc-winner-tag">🏆 ${escHtml(winner)}</span>${tTag}<span>${m.gameType||'pickup'}</span><span>·</span><span>${m.date||''}</span><span>·</span><span>${m.duration||'—'}</span>${spicy}</div>
+      <div class="mc-meta"><span class="mc-winner-tag">🏆 ${escHtml(winner)}</span>${tTag}<span>${m.gameType||'pickup'}</span><span>·</span><span>${m.date||''}</span><span>·</span><span>${m.duration||'—'}</span>${spicy}${topTag2}</div>
     </div>`;
   }).join('');
 }
@@ -4207,6 +4261,25 @@ function openMatchDetail(id){
   if(leadChanges>=3)sum+=` The lead changed hands ${leadChanges} times.`;
   if(biggestRun>=6)sum+=` Biggest run: ${biggestRun} straight.`;
   document.getElementById('md-summary').textContent=sum;
+  // Player stats section
+  const plSec=document.getElementById('md-players-section');
+  const plCont=document.getElementById('md-players-content');
+  if(plSec&&plCont){
+    const hasPlayers=(m.playersA&&m.playersA.length)||(m.playersB&&m.playersB.length);
+    if(hasPlayers){
+      const renderMdRows=(players,color,teamName)=>{
+        const sorted=[...(players||[])].sort((a,b)=>b.score-a.score);
+        const rows=sorted.map((p,i)=>`<div class="md-player-row"><span class="md-pr-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</span><span class="md-pr-name">${escHtml(p.name)}</span><span class="md-pr-pts" style="color:${color}">${p.score}pts</span><span class="md-pr-fouls">${p.fouls?p.fouls+'F':''}</span></div>`).join('');
+        return`<div style="font-size:11px;font-weight:700;color:${color};letter-spacing:.07em;text-transform:uppercase;margin:10px 0 4px">${escHtml(teamName)}</div>${rows}`;
+      };
+      const allP=[...(m.playersA||[]),...(m.playersB||[])];
+      const top=allP.length?allP.reduce((t,p)=>p.score>t.score?p:t,allP[0]):null;
+      let html=renderMdRows(m.playersA,'var(--ca)',m.teamA?.name||'Team A');
+      html+=renderMdRows(m.playersB,'var(--cb)',m.teamB?.name||'Team B');
+      if(top&&top.score>0)html+=`<div style="margin-top:10px;padding:8px 12px;background:rgba(255,179,0,.08);border-radius:var(--r1);font-size:13px;font-weight:700;color:var(--gold)">🏅 Top Scorer: ${escHtml(top.name)} — ${top.score} pts</div>`;
+      plCont.innerHTML=html;plSec.style.display='';
+    }else{plSec.style.display='none';}
+  }
   // Timeline
   const tl=document.getElementById('md-timeline');
   if(!hist.length){tl.innerHTML='<li style="font-size:13px;color:var(--muted);padding:8px">No timeline recorded</li>'}
@@ -4214,7 +4287,7 @@ function openMatchDetail(id){
     let sa=0,sb=0;
     tl.innerHTML=[...hist].reverse().map(e=>{
       const qL=typeof e.quarter==='number'?`Q${e.quarter}`:e.quarter||'Q1';
-      const eName=e.team==='a'?aName:bName;
+      const eName=e.playerName||(e.team==='a'?aName:bName);
       const col=e.team==='a'?'var(--ca)':'var(--cb)';
       if(e.type==='foul'){
         return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:var(--muted)">Foul</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
