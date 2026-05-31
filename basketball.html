@@ -903,7 +903,14 @@ table.standings tr:last-child td{border-bottom:none}
 .pulse-disclaimer{margin:0 16px 14px;font-size:11px;color:var(--muted2);line-height:1.5;text-align:center;padding:0 8px}
 .pulse-empty{text-align:center;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;line-height:1.6}
 /* RESPONSIVE */
-@media(max-width:360px){.t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}}
+@media(max-width:360px){
+  .t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}
+  .comm-card{padding:10px 12px}.comm-name{font-size:14px}
+  .pg-winner{font-size:clamp(28px,8vw,44px)}.pg-actions{gap:8px}
+  .bn-btn{font-size:9px;gap:1px}.bn-btn .bn-icon{font-size:18px}
+  .lp-hero{padding:20px 12px 16px}.lp-features-grid{grid-template-columns:1fr}
+  .auth-card{padding:14px}
+}
 @media(max-height:700px){.t-score{font-size:64px}.btn-score{min-height:66px}.team-panel{padding:10px 8px 8px}.score-pad{padding:6px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important}}
 /* ─── Landing Page v2 ────────────────────────────────── */
@@ -1378,7 +1385,7 @@ body.modal-open{overflow:hidden}
         <button class="auth-btn" onclick="createAccount()">Create Account</button>
       </div>
 
-      <div class="auth-device-note">🔒 Stored on this device only</div>
+      <div class="auth-device-note">🔒 Local by default · Cloud sync when signed in</div>
       <div class="legal-links"><a onclick="openLegal('privacy')">Privacy</a><a onclick="openLegal('terms')">Terms</a></div>
       <div class="divider-or">or</div>
       <button class="btn-secondary" onclick="guestLogin()">Continue as Guest</button>
@@ -2571,7 +2578,7 @@ const CHANGELOG=[{
 },{
   version:'v0.9 Beta',date:'May 2026',
   items:['Redesigned Apple-style landing page','Shot clock and game clock','+1 free throw / foul point scoring','Team Builder with fair team generation','Communities with feed, players, gallery, events','CourtCall Pulse — community news feed','Match History and analytics','Export / Import data','PWA — installable on home screen','Community moderation tools'],
-  notes:['Data is stored locally on this device only','Export backup regularly to avoid data loss','Voice scoring works best in Chrome / Edge','Some features are still in testing'],
+  notes:['Data stored locally; cloud sync enabled when signed in','Export backup regularly to avoid data loss','Voice scoring works best in Chrome / Edge','Some features are still in testing'],
   upcoming:['Player rating stability','Core gameplay QA polish','Community feature polish','Push notifications'],
 }];
 // ── App-level keys ───────────────────────────────────────
@@ -2948,6 +2955,8 @@ function _localCreateAccount(name,email,pin){
   if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
 }
 function guestLogin(){
+  // Clear any lingering Supabase session so tokens don't persist in localStorage.
+  supaSignOut().catch(()=>{});
   // Guests get an isolated, empty community state — never inherit a
   // previously signed-in account's synced communities/memberships.
   _clearCommunityMirror();
@@ -3407,6 +3416,12 @@ function showPostGame(winner,loser,entry){
   document.getElementById('pg-summary').textContent=generateSummary(winner,loser);
   launchConfetti('pg-confetti');
   document.getElementById('pg-overlay').classList.remove('hidden');
+  // Reveal bottom nav so users can navigate directly from the result screen.
+  const _pgnav=document.getElementById('btm-nav');
+  if(_pgnav){
+    _pgnav.classList.remove('hidden');
+    _pgnav.querySelectorAll('.bn-btn').forEach(b=>b.classList.toggle('active',b.dataset.nav==='hub'));
+  }
 }
 function generateSummary(winner,loser){
   const diff=winner.score-loser.score;
@@ -3661,8 +3676,9 @@ function testVoiceCmd(){
 }
 function updateVoiceHint(){
   const h=document.getElementById('v-hint');if(!h)return;
-  const ca=state.teamA.colorKey||'orange',cb=state.teamB.colorKey||'blue';
-  h.textContent=`Try: "${cap(ca)} two" · "${cap(cb)} three" · "Undo" · "Score check"`;
+  const na=state.teamA.name||state.teamA.colorKey||'Orange';
+  const nb=state.teamB.name||state.teamB.colorKey||'Blue';
+  h.textContent=`Try: "${na} two" · "${nb} three" · "Undo" · "Score check"`;
 }
 function cap(s){return s?s[0].toUpperCase()+s.slice(1):s}
 /* ════════════════════════════════════════════════════════
@@ -4432,6 +4448,7 @@ function showOnboarding(){
 function openFeedback(){
   document.getElementById('feedback-overlay').classList.remove('hidden');
   document.getElementById('feedback-modal').classList.remove('hidden');
+  requestAnimationFrame(()=>document.getElementById('fb-type')?.focus());
 }
 function closeFeedback(){
   document.getElementById('feedback-overlay').classList.add('hidden');
@@ -4481,6 +4498,7 @@ function openChangelog(){
   }
   document.getElementById('changelog-overlay').classList.remove('hidden');
   document.getElementById('changelog-modal').classList.remove('hidden');
+  requestAnimationFrame(()=>document.getElementById('changelog-modal')?.querySelector('.modal-close')?.focus());
 }
 function closeChangelog(){
   document.getElementById('changelog-overlay').classList.add('hidden');
@@ -4604,6 +4622,23 @@ async function syncPostsFromDB(communityId) {
   _syncPostsInFlight[communityId] = _doSyncPostsFromDB(communityId).finally(() => { delete _syncPostsInFlight[communityId]; });
   return _syncPostsInFlight[communityId];
 }
+// Merges the current user's local reaction toggles on top of the DB reactions,
+// so a toggle is never lost just because the DB hasn't been updated yet.
+function _mergeReactions(localReactions, dbReactions) {
+  const result = { ...(dbReactions || {}) };
+  if (!localReactions) return result;
+  const myId = (currentProfile || { id: 'guest' }).id;
+  const emojis = new Set([...Object.keys(localReactions), ...Object.keys(result)]);
+  for (const emoji of emojis) {
+    if (!result[emoji]) result[emoji] = [];
+    const inLocal = (localReactions[emoji] || []).includes(myId);
+    const inRemote = result[emoji].includes(myId);
+    if (inLocal && !inRemote) result[emoji] = [...result[emoji], myId];
+    else if (!inLocal && inRemote) result[emoji] = result[emoji].filter(id => id !== myId);
+  }
+  return result;
+}
+
 async function _doSyncPostsFromDB(communityId) {
   if (!supa || !supaUser) return;
   try {
@@ -4611,13 +4646,19 @@ async function _doSyncPostsFromDB(communityId) {
       .select('*').eq('community_id', communityId)
       .order('created_at', { ascending: false }).limit(50);
     if (!posts) return;
-    const all = getAllPosts().filter(p => p.communityId !== communityId);
-    const merged = [...posts.map(p => ({
-      id: p.id, communityId: p.community_id, authorId: p.user_id,
-      authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || '', type: p.type,
-      reactions: p.reactions || {}, comments: p.comments || [],
-      createdAt: p.created_at
-    })), ...all];
+    const localAll = getAllPosts();
+    const localMap = new Map(localAll.filter(p => p.communityId === communityId).map(p => [p.id, p]));
+    const all = localAll.filter(p => p.communityId !== communityId);
+    const merged = [...posts.map(p => {
+      const local = localMap.get(p.id);
+      return {
+        id: p.id, communityId: p.community_id, authorId: p.user_id,
+        authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || '', type: p.type,
+        reactions: _mergeReactions(local?.reactions, p.reactions || {}),
+        comments: p.comments || [],
+        createdAt: p.created_at
+      };
+    }), ...all];
     saveAllPosts(merged);
   } catch(e) { console.warn('syncPostsFromDB:', e.message); }
 }
@@ -4720,7 +4761,9 @@ function _renderCommunitiesDOM(){
   const isGuest=!p.id||p.id==='guest';
   const communities=getComms();
   const members=getCommMembers();
-  const myIds=new Set(isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId));
+  const memberIds=isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId);
+  const createdIds=isGuest?[]:communities.filter(c=>c.createdBy===p.id).map(c=>c.id);
+  const myIds=new Set([...memberIds,...createdIds]);
   const myComms=communities.filter(c=>myIds.has(c.id));
   const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
   const myEl=document.getElementById('my-comm-list');
@@ -6851,7 +6894,7 @@ const COURTCALL_HELP_KB=[
     relatedFeatures:['Backup / Export','Feedback']},
   {id:'backup-export',title:'Exporting and Backing Up Data',category:'Backup / Export',
     keywords:['backup','export','import','save data','restore','json','data file','download data','transfer data','data backup','export data','import data','data loss','local storage','cloud'],
-    shortAnswer:"Data is stored locally on this device. Export regularly using Settings → Export Data.",
+    shortAnswer:"Data is stored locally by default. When you sign in, it syncs to the cloud so you can access it across devices. Export regularly using Settings → Export Data.",
     steps:['Go to Settings → Data → Export Data.','A JSON file is downloaded with all your data.','To restore: Settings → Data → Import Data → select the JSON file.','Data lives in your browser localStorage — not in the cloud.','Use Clear All Data only as a last resort (irreversible).'],
     relatedFeatures:['Settings']},
   {id:'feedback',title:'Sending Feedback or Reporting a Bug',category:'Feedback',
