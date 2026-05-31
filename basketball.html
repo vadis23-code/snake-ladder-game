@@ -394,6 +394,23 @@ button{touch-action:manipulation}
 .md-pr-name{font-weight:600;font-size:14px;color:var(--text);flex:1}
 .md-pr-pts{font-family:'Bebas Neue',sans-serif;font-size:17px;flex-shrink:0}
 .md-pr-fouls{font-size:11px;color:var(--danger);min-width:22px;text-align:right;flex-shrink:0}
+/* Timeout badge */
+.to-badge{font-size:11px;font-weight:700;cursor:pointer;background:rgba(255,255,255,.07);border-radius:8px;padding:2px 8px;margin-left:6px;color:var(--muted);transition:background .15s;user-select:none}
+.to-badge:active{background:rgba(255,255,255,.18)}
+.to-empty{color:var(--danger)!important;opacity:.7}
+/* Career Player Stats */
+.career-sort-bar{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;margin-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.career-sort-bar::-webkit-scrollbar{display:none}
+.cs-sort-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0}
+.cs-sort-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.career-card{background:var(--s1);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.cs-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--muted);width:26px;text-align:center;flex-shrink:0}
+.cs-name{font-weight:700;font-size:15px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-stats{display:flex;gap:12px;flex-shrink:0}
+.cs-stat{text-align:center}
+.cs-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);line-height:1.1}
+.cs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.career-empty{text-align:center;padding:56px 20px;color:var(--muted);font-size:14px;line-height:1.8}
 .history-empty{text-align:center;padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .history-empty-icon{font-size:48px}
 .history-empty-text{font-size:14px;color:var(--muted);line-height:1.6}
@@ -1745,6 +1762,15 @@ body.modal-open{overflow:hidden}
       </div>
     </div>
     <div class="setup-sec">
+      <span class="sec-label">Timeouts per Team</span>
+      <div class="chip-row" id="cr-to">
+        <button class="chip on" data-v="0" onclick="pickChip('cr-to',this)">Off</button>
+        <button class="chip" data-v="1" onclick="pickChip('cr-to',this)">1</button>
+        <button class="chip" data-v="2" onclick="pickChip('cr-to',this)">2</button>
+        <button class="chip" data-v="3" onclick="pickChip('cr-to',this)">3</button>
+      </div>
+    </div>
+    <div class="setup-sec">
       <span class="sec-label">Players</span>
       <div class="chip-row" id="cr-players">
         <button class="chip on" data-v="off" onclick="pickChip('cr-players',this);togglePlayerSection()">No Players</button>
@@ -1790,7 +1816,7 @@ body.modal-open{overflow:hidden}
     <div class="team-panel" id="tp-a" data-t="a">
       <div class="t-name" id="t-name-a">Team A</div>
       <div class="t-score" id="t-score-a" aria-live="polite" aria-atomic="true" aria-label="Team A score: 0">0</div>
-      <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="handleFoulTap('a')">F: 0</span></div>
+      <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="handleFoulTap('a')">F: 0</span><span class="to-badge" id="to-badge-a" onclick="addTimeout('a')" style="display:none" title="Use timeout"></span></div>
     </div>
     <div class="vs-col">
       <span class="vs-text">VS</span>
@@ -1799,7 +1825,7 @@ body.modal-open{overflow:hidden}
     <div class="team-panel" id="tp-b" data-t="b">
       <div class="t-name" id="t-name-b">Team B</div>
       <div class="t-score" id="t-score-b" aria-live="polite" aria-atomic="true" aria-label="Team B score: 0">0</div>
-      <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="handleFoulTap('b')">F: 0</span></div>
+      <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="handleFoulTap('b')">F: 0</span><span class="to-badge" id="to-badge-b" onclick="addTimeout('b')" style="display:none" title="Use timeout"></span></div>
     </div>
   </div>
   <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">—</div>
@@ -1951,8 +1977,18 @@ body.modal-open{overflow:hidden}
     <button class="hf-chip on" data-f="all" onclick="historyFilter('all',this)">All</button>
     <button class="hf-chip" data-f="pickup" onclick="historyFilter('pickup',this)">Pickup</button>
     <button class="hf-chip" data-f="tournament" onclick="historyFilter('tournament',this)">Tournament</button>
+    <button class="hf-chip" data-f="players" onclick="historyFilter('players',this)">Players</button>
   </div>
   <div class="history-list" id="history-list"></div>
+  <div id="career-wrap" style="display:none;padding:4px 0 16px">
+    <div class="career-sort-bar">
+      <button class="cs-sort-btn on" onclick="careerSort('pts',this)">Top Scorers</button>
+      <button class="cs-sort-btn" onclick="careerSort('avg',this)">Avg/Game</button>
+      <button class="cs-sort-btn" onclick="careerSort('games',this)">Most Games</button>
+      <button class="cs-sort-btn" onclick="careerSort('fouls',this)">Fouls</button>
+    </div>
+    <div id="career-list"></div>
+  </div>
 </div>
 
 <!-- ══ MATCH DETAIL OVERLAY ══ -->
@@ -2472,7 +2508,8 @@ body.modal-open{overflow:hidden}
     <div id="pg-players" class="pg-player-stats" style="display:none"></div>
     <div class="pg-actions">
       <button class="btn-pg-share" onclick="shareScore()">📤 Share Score</button>
-      <button class="btn-pg-2" onclick="playAgain()">▶ Play Again</button>
+      <button class="btn-pg-2" onclick="playAgain()">🔄 Rematch (Same Teams)</button>
+      <button class="btn-pg-2" onclick="swapRematch()">↔ Swap &amp; Rematch</button>
       <button class="btn-pg-2" onclick="newGame()">⚙ New Game</button>
     </div>
   </div>
@@ -2808,7 +2845,16 @@ function showScreen(name){
     document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('has-btm-nav',showNav&&s.classList.contains('active')));
   }
   if(name==='hub')renderHub();
-  if(name==='history')renderHistory();
+  if(name==='history'){
+    // reset to All tab when navigating to history
+    if(historyFilterMode==='players'){
+      historyFilterMode='all';
+      document.querySelectorAll('.hf-chip').forEach(c=>c.classList.toggle('on',c.dataset.f==='all'));
+      document.getElementById('history-list').style.display='';
+      document.getElementById('career-wrap').style.display='none';
+    }
+    renderHistory();
+  }
   if(name==='tournament')renderTournament();
   if(name==='teams')renderTeamBuilder();
   if(name==='settings')renderSettings();
@@ -3271,7 +3317,7 @@ let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
    Game State & Engine
 ════════════════════════════════════════════════════════ */
 let state=freshState();
-function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',winBy2:false,withPlayers:false,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange',players:[]},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue',players:[]},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
+function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',winBy2:false,withPlayers:false,timeoutsPerTeam:0,timeoutsUsedA:0,timeoutsUsedB:0,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange',players:[]},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue',players:[]},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
 function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext,_gce:GC.elapsed}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
@@ -3301,8 +3347,9 @@ function handleStartGame(){
   const gameClockMode=cx['cr-gc']||'off';
   const winBy2=cx['cr-w2']==='on';
   const withPlayers=cx['cr-players']==='on';
+  const timeoutsPerTeam=parseInt(cx['cr-to'],10)||0;
   const mkPlayers=team=>withPlayers?setupPlayers[team].map(p=>({id:p.id,name:p.name,score:0,fouls:0})):[];
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,winBy2,withPlayers,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a,players:mkPlayers('a')},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b,players:mkPlayers('b')},startTime:Date.now()};
+  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,winBy2,withPlayers,timeoutsPerTeam,timeoutsUsedA:0,timeoutsUsedB:0,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a,players:mkPlayers('a')},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b,players:mkPlayers('b')},startTime:Date.now()};
   applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
 async function handleBackFromGame(){
@@ -3322,7 +3369,7 @@ function renderGame(){
   updateFoulUI('b');
   document.getElementById('q-label').textContent=typeof state.quarter==='number'?`Q${state.quarter}`:state.quarter;
   document.getElementById('poss-btn').textContent=state.possession==='a'?'◀':'▶';
-  renderScorePads();if(state.withPlayers)renderPlayerRosters();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();
+  renderScorePads();if(state.withPlayers)renderPlayerRosters();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();renderTimeouts();
 }
 function renderScorePads(){
   // Build the base points array from the scoring rule
@@ -3362,6 +3409,29 @@ function updateRunBanner(){
   if(run&&!state.gameOver){const name=run.team==='a'?state.teamA.name:state.teamB.name;const col=COLORS[run.team==='a'?state.teamA.colorKey:state.teamB.colorKey].hex;banner.textContent=`🔥 ${name.toUpperCase()} ON A ${run.pts}-0 RUN`;banner.style.setProperty('--rc',col);banner.classList.add('active')}
   else{banner.classList.remove('active')}
 }
+function renderTimeouts(){
+  ['a','b'].forEach(t=>{
+    const el=document.getElementById(`to-badge-${t}`);
+    if(!el)return;
+    if(!state.timeoutsPerTeam){el.style.display='none';return}
+    const used=t==='a'?state.timeoutsUsedA:state.timeoutsUsedB;
+    const rem=state.timeoutsPerTeam-used;
+    el.style.display='';
+    el.textContent=`⏱ ${rem}`;
+    el.classList.toggle('to-empty',rem===0);
+  });
+}
+function addTimeout(t){
+  if(state.gameOver||!state.timeoutsPerTeam)return;
+  const used=t==='a'?state.timeoutsUsedA:state.timeoutsUsedB;
+  const rem=state.timeoutsPerTeam-used;
+  if(rem<=0){showToast(`No timeouts left for ${t==='a'?state.teamA.name:state.teamB.name}`);return}
+  if(t==='a')state.timeoutsUsedA++;else state.timeoutsUsedB++;
+  const newRem=state.timeoutsPerTeam-(t==='a'?state.timeoutsUsedA:state.timeoutsUsedB);
+  state.history.unshift({type:'timeout',team:t,quarter:state.quarter,ts:Date.now()});
+  save();renderTimeouts();renderFeed();
+  showToast(`⏱ ${t==='a'?state.teamA.name:state.teamB.name} timeout — ${newRem} left`);
+}
 function renderFeed(){
   const list=document.getElementById('feed-list');
   if(!state.history.length){list.innerHTML='<li class="feed-empty">Game starts when first point is scored</li>';return}
@@ -3374,6 +3444,8 @@ function renderFeed(){
     if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
     if(e.type==='foul'){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
+    } else if(e.type==='timeout'){
+      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">⏱ Timeout</span></li>`);
     } else {
       const inRun=run&&e.team===run.team;
       const scorer=e.playerName?escHtml(e.playerName):escHtml(name);
@@ -3407,6 +3479,10 @@ function undoScore(){
     if(last.playerId){const p=state[T].players?.find(p=>p.id===last.playerId);if(p)p.fouls=Math.max(0,p.fouls-1);}
     updateFoulUI(last.team);
     save();renderGame();setVAction('↩ Last foul removed.');
+  } else if(last.type==='timeout'){
+    if(last.team==='a')state.timeoutsUsedA=Math.max(0,state.timeoutsUsedA-1);
+    else state.timeoutsUsedB=Math.max(0,state.timeoutsUsedB-1);
+    save();renderGame();setVAction('↩ Timeout restored.');
   } else {
     state[T].score=Math.max(0,state[T].score-(last.pts||0));
     if(last.playerId){const p=state[T].players?.find(p=>p.id===last.playerId);if(p)p.score=Math.max(0,p.score-(last.pts||0));}
@@ -3573,8 +3649,25 @@ function playAgain(){
   ['a','b'].forEach(t=>{const l=document.getElementById(`ctrl-f${t}-lbl`);if(l)l.textContent=`Foul ${t.toUpperCase()}`});
   state.history=[];state.maxLead={a:0,b:0};state.quarter=1;state.possession='a';
   state.gameOver=false;state.startTime=Date.now();state.voiceActive=false;
+  state.timeoutsUsedA=0;state.timeoutsUsedB=0;
   gameContext={type:'pickup',tournamentId:null,fixtureId:null};
   save();renderGame();SC.init();GC.init();showScreen('game');
+}
+function swapRematch(){
+  document.getElementById('pg-overlay').classList.add('hidden');
+  // swap team A and B (names, colors, players list)
+  const tmpName=state.teamA.name,tmpColor=state.teamA.colorKey;
+  const tmpPlayers=(state.teamA.players||[]).map(p=>({...p,score:0,fouls:0}));
+  state.teamA.name=state.teamB.name;state.teamA.colorKey=state.teamB.colorKey;
+  state.teamA.players=(state.teamB.players||[]).map(p=>({...p,score:0,fouls:0}));
+  state.teamB.name=tmpName;state.teamB.colorKey=tmpColor;state.teamB.players=tmpPlayers;
+  state.teamA.score=0;state.teamA.fouls=0;state.teamB.score=0;state.teamB.fouls=0;
+  ['a','b'].forEach(t=>{const l=document.getElementById(`ctrl-f${t}-lbl`);if(l)l.textContent=`Foul ${t.toUpperCase()}`});
+  state.history=[];state.maxLead={a:0,b:0};state.quarter=1;state.possession='a';
+  state.gameOver=false;state.startTime=Date.now();state.voiceActive=false;
+  state.timeoutsUsedA=0;state.timeoutsUsedB=0;
+  gameContext={type:'pickup',tournamentId:null,fixtureId:null};
+  applyTeamColors();save();renderGame();SC.init();GC.init();showScreen('game');
 }
 function newGame(){document.getElementById('pg-overlay').classList.add('hidden');clearSave();stopVoice();gameContext={type:'pickup',tournamentId:null,fixtureId:null};renderHub();showScreen('hub')}
 async function shareScore(){
@@ -4224,7 +4317,68 @@ function renderHistory(){
 function historyFilter(mode,btn){
   historyFilterMode=mode;
   document.querySelectorAll('.hf-chip').forEach(c=>c.classList.toggle('on',c===btn));
-  renderHistory();
+  const isPlayers=mode==='players';
+  document.getElementById('history-list').style.display=isPlayers?'none':'';
+  document.getElementById('career-wrap').style.display=isPlayers?'':'none';
+  if(isPlayers)renderCareerStats();else renderHistory();
+}
+let careerSortBy='pts';
+function buildCareerStats(){
+  const map={};
+  getCol(K.matches).forEach(m=>{
+    const wName=m.winner?.name||'';
+    const processPlayers=(players,teamName)=>{
+      const isWinner=teamName===wName;
+      (players||[]).forEach(p=>{
+        if(!p.name)return;
+        const key=p.name.trim().toLowerCase();
+        if(!map[key])map[key]={name:p.name,games:0,pts:0,fouls:0,wins:0};
+        map[key].games++;
+        map[key].pts+=p.score||0;
+        map[key].fouls+=p.fouls||0;
+        if(isWinner)map[key].wins++;
+      });
+    };
+    processPlayers(m.playersA,m.teamA?.name);
+    processPlayers(m.playersB,m.teamB?.name);
+  });
+  return Object.values(map);
+}
+function renderCareerStats(){
+  const players=buildCareerStats();
+  const wrap=document.getElementById('career-list');
+  if(!wrap)return;
+  if(!players.length){
+    wrap.innerHTML=`<div class="career-empty">📊<br>No player stats yet.<br>Play a game with <b>Add Players</b> mode<br>to start building career stats.</div>`;
+    return;
+  }
+  const sorted=[...players].sort((a,b)=>{
+    if(careerSortBy==='pts')return b.pts-a.pts;
+    if(careerSortBy==='avg'){const ba=b.games?b.pts/b.games:0,aa=a.games?a.pts/a.games:0;return ba-aa;}
+    if(careerSortBy==='games')return b.games-a.games;
+    if(careerSortBy==='fouls')return b.fouls-a.fouls;
+    return 0;
+  });
+  const medals=['🥇','🥈','🥉'];
+  wrap.innerHTML=sorted.map((p,i)=>{
+    const avg=p.games?(p.pts/p.games).toFixed(1):0;
+    const rank=medals[i]||`${i+1}`;
+    return`<div class="career-card">
+      <div class="cs-rank">${rank}</div>
+      <div class="cs-name">${escHtml(p.name)}</div>
+      <div class="cs-stats">
+        <div class="cs-stat"><div class="cs-val">${p.pts}</div><div class="cs-lbl">PTS</div></div>
+        <div class="cs-stat"><div class="cs-val">${avg}</div><div class="cs-lbl">AVG</div></div>
+        <div class="cs-stat"><div class="cs-val">${p.games}</div><div class="cs-lbl">GP</div></div>
+        <div class="cs-stat"><div class="cs-val">${p.wins}</div><div class="cs-lbl">W</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function careerSort(by,btn){
+  careerSortBy=by;
+  document.querySelectorAll('.cs-sort-btn').forEach(b=>b.classList.toggle('on',b===btn));
+  renderCareerStats();
 }
 function openMatchDetail(id){
   const all=[...getCol(K.matches),...getCol(K.games)];
@@ -4291,6 +4445,9 @@ function openMatchDetail(id){
       const col=e.team==='a'?'var(--ca)':'var(--cb)';
       if(e.type==='foul'){
         return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:var(--muted)">Foul</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
+      }
+      if(e.type==='timeout'){
+        return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:var(--muted)">⏱ Timeout</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
       }
       if(e.team==='a')sa+=e.pts;else sb+=e.pts;
       return`<li class="md-tl-entry"><span class="md-tl-q">${qL}</span><span class="md-tl-team" style="color:${col}">${escHtml(eName)}</span><span class="md-tl-pts" style="color:${col}">+${e.pts}</span><span class="md-tl-score">${sa}–${sb}</span></li>`;
