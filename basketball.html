@@ -902,6 +902,32 @@ table.standings tr:last-child td{border-bottom:none}
 .psl-arrow{color:var(--muted);font-size:14px;margin-left:auto}
 .pulse-disclaimer{margin:0 16px 14px;font-size:11px;color:var(--muted2);line-height:1.5;text-align:center;padding:0 8px}
 .pulse-empty{text-align:center;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:13px;line-height:1.6}
+/* ── Player-mode setup ───────────────────────────── */
+.player-add-row{display:flex;gap:8px;margin-top:8px}
+.player-inp{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:var(--r1);color:var(--text);font-size:14px;padding:10px 12px;outline:none;font-family:'Inter',sans-serif}
+.player-inp:focus{border-color:var(--accent)}
+.btn-add-player{background:var(--accent);color:#fff;border:none;border-radius:var(--r1);padding:10px 14px;font:700 14px 'Inter',sans-serif;cursor:pointer;white-space:nowrap;touch-action:manipulation}
+.setup-sub-sec{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.setup-sub-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.setup-player-list{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.setup-player-item{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:var(--r1);padding:8px 12px;font-size:13px;gap:8px}
+.setup-player-remove{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0}
+/* ── Player picker bottom-sheet ─────────────────── */
+.player-picker{position:fixed;inset:0;z-index:290;display:flex;flex-direction:column;justify-content:flex-end}
+.player-picker.hidden{display:none}
+.pp-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.pp-sheet{position:relative;background:var(--s1);border-radius:20px 20px 0 0;padding:20px 16px max(28px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;max-height:72vh;overflow-y:auto;animation:slideUp .22s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.pp-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;text-align:center;margin-bottom:4px}
+.pp-player-btn{background:var(--s2);border:2px solid var(--border);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:background var(--t1);touch-action:manipulation}
+.pp-player-btn:active{background:var(--s3)}
+.pp-player-stat{font-size:12px;color:var(--muted);font-weight:400}
+.pp-skip-btn{background:transparent;border:2px solid var(--border);border-radius:var(--r2);padding:12px;font-size:14px;color:var(--muted);cursor:pointer;touch-action:manipulation;margin-top:2px}
+/* ── Per-player roster in score pads ────────────── */
+.player-roster{padding:4px 4px 2px;width:100%}
+.player-roster-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:var(--r1);background:rgba(255,255,255,.04);margin:2px 0;font-size:12px}
+.pr-name{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.pr-stats{color:var(--muted);font-size:11px;white-space:nowrap}.pr-fouls{color:var(--danger);font-weight:700}
 /* RESPONSIVE */
 @media(max-width:360px){
   .t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}
@@ -1699,6 +1725,33 @@ body.modal-open{overflow:hidden}
         <button class="chip" data-v="on" onclick="pickChip('cr-w2',this)">Win by 2</button>
       </div>
     </div>
+    <div class="setup-sec">
+      <span class="sec-label">Players</span>
+      <div class="chip-row" id="cr-players">
+        <button class="chip on" data-v="off" onclick="pickChip('cr-players',this);togglePlayerSection()">No Players</button>
+        <button class="chip" data-v="on" onclick="pickChip('cr-players',this);togglePlayerSection()">Add Players</button>
+      </div>
+      <div id="player-setup-wrap" style="display:none">
+        <div class="setup-sub-sec">
+          <div class="setup-sub-label" id="setup-plabel-a" style="color:var(--ca)">Team A Players</div>
+          <div class="player-add-row">
+            <input id="inp-p-a" class="player-inp" type="text" placeholder="Player name" maxlength="20" autocomplete="off"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addSetupPlayer('a')}">
+            <button class="btn-add-player" onclick="addSetupPlayer('a')">+ Add</button>
+          </div>
+          <div id="setup-players-a" class="setup-player-list"></div>
+        </div>
+        <div class="setup-sub-sec">
+          <div class="setup-sub-label" id="setup-plabel-b" style="color:var(--cb)">Team B Players</div>
+          <div class="player-add-row">
+            <input id="inp-p-b" class="player-inp" type="text" placeholder="Player name" maxlength="20" autocomplete="off"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addSetupPlayer('b')}">
+            <button class="btn-add-player" onclick="addSetupPlayer('b')">+ Add</button>
+          </div>
+          <div id="setup-players-b" class="setup-player-list"></div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="setup-actions">
     <button class="btn-start" onclick="handleStartGame()">Start Game</button>
@@ -1718,7 +1771,7 @@ body.modal-open{overflow:hidden}
     <div class="team-panel" id="tp-a" data-t="a">
       <div class="t-name" id="t-name-a">Team A</div>
       <div class="t-score" id="t-score-a" aria-live="polite" aria-atomic="true" aria-label="Team A score: 0">0</div>
-      <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="addFoul('a')">F: 0</span></div>
+      <div class="t-meta"><span class="foul-badge" id="foul-a" onclick="handleFoulTap('a')">F: 0</span></div>
     </div>
     <div class="vs-col">
       <span class="vs-text">VS</span>
@@ -1727,7 +1780,7 @@ body.modal-open{overflow:hidden}
     <div class="team-panel" id="tp-b" data-t="b">
       <div class="t-name" id="t-name-b">Team B</div>
       <div class="t-score" id="t-score-b" aria-live="polite" aria-atomic="true" aria-label="Team B score: 0">0</div>
-      <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="addFoul('b')">F: 0</span></div>
+      <div class="t-meta"><span class="foul-badge" id="foul-b" onclick="handleFoulTap('b')">F: 0</span></div>
     </div>
   </div>
   <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">—</div>
@@ -1753,8 +1806,8 @@ body.modal-open{overflow:hidden}
   <div class="controls-bar">
     <button class="ctrl" onclick="undoScore()" aria-label="Undo last action"><span class="ctrl-icon">↩</span><span class="ctrl-lbl">Undo</span></button>
     <button class="ctrl" id="ctrl-mic" onclick="toggleVoice()" aria-label="Toggle voice scoring"><span class="ctrl-icon" id="mic-icon">🎤</span><span class="ctrl-lbl" id="mic-lbl">Mic Off</span></button>
-    <button class="ctrl" onclick="addFoul('a')" aria-label="Foul, team A" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl" id="ctrl-fa-lbl">Foul A</span></button>
-    <button class="ctrl" onclick="addFoul('b')" aria-label="Foul, team B" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl" id="ctrl-fb-lbl">Foul B</span></button>
+    <button class="ctrl" onclick="handleFoulTap('a')" aria-label="Foul, team A" style="border-color:color-mix(in srgb,var(--ca) 40%,transparent)"><span class="ctrl-icon">🟥</span><span class="ctrl-lbl" id="ctrl-fa-lbl">Foul A</span></button>
+    <button class="ctrl" onclick="handleFoulTap('b')" aria-label="Foul, team B" style="border-color:color-mix(in srgb,var(--cb) 40%,transparent)"><span class="ctrl-icon">🟦</span><span class="ctrl-lbl" id="ctrl-fb-lbl">Foul B</span></button>
     <button class="ctrl danger" onclick="handleEndGame()" aria-label="End game"><span class="ctrl-icon">🏁</span><span class="ctrl-lbl">End</span></button>
   </div>
   <div class="voice-panel hidden" id="voice-panel">
@@ -1771,6 +1824,15 @@ body.modal-open{overflow:hidden}
   <div class="feed-wrap">
     <div class="feed-head">Live Feed</div>
     <ul class="feed-list" id="feed-list"><li class="feed-empty">Game starts when first point is scored</li></ul>
+  </div>
+</div>
+
+<div id="player-picker" class="player-picker hidden" role="dialog" aria-modal="true">
+  <div class="pp-backdrop" onclick="closePlayerPicker()"></div>
+  <div class="pp-sheet">
+    <div class="pp-title" id="pp-title">Who scored?</div>
+    <div class="pp-players" id="pp-players-list"></div>
+    <button class="pp-skip-btn" onclick="_pickerSkip()">Team (no player attribution)</button>
   </div>
 </div>
 
@@ -3183,7 +3245,7 @@ let gameContext={type:'pickup',tournamentId:null,fixtureId:null};
    Game State & Engine
 ════════════════════════════════════════════════════════ */
 let state=freshState();
-function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',winBy2:false,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange'},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue'},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
+function freshState(){return{gameType:'3v3',winScore:21,ptsSmall:1,ptsLarge:2,allowFreeThrow:true,shotClockDuration:0,shotClockAutoReset:true,gameClockMode:'off',winBy2:false,withPlayers:false,teamA:{name:'Team A',score:0,fouls:0,colorKey:'orange',players:[]},teamB:{name:'Team B',score:0,fouls:0,colorKey:'blue',players:[]},quarter:1,possession:'a',history:[],maxLead:{a:0,b:0},voiceActive:false,gameOver:false,startTime:null}}
 // Persistence
 function save(){try{localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext,_gce:GC.elapsed}))}catch{}}
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
@@ -3212,7 +3274,9 @@ function handleStartGame(){
   const shotClockAutoReset=cx['cr-sc-ar']!=='off';
   const gameClockMode=cx['cr-gc']||'off';
   const winBy2=cx['cr-w2']==='on';
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,winBy2,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b},startTime:Date.now()};
+  const withPlayers=cx['cr-players']==='on';
+  const mkPlayers=team=>withPlayers?setupPlayers[team].map(p=>({id:p.id,name:p.name,score:0,fouls:0})):[];
+  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall,ptsLarge,allowFreeThrow,shotClockDuration,shotClockAutoReset,gameClockMode,winBy2,withPlayers,teamA:{name:nameA,score:0,fouls:0,colorKey:teamColors.a,players:mkPlayers('a')},teamB:{name:nameB,score:0,fouls:0,colorKey:teamColors.b,players:mkPlayers('b')},startTime:Date.now()};
   applyTeamColors();save();renderGame();SC.init();GC.init();trackEvent('game_started');showScreen('game');
 }
 async function handleBackFromGame(){
@@ -3250,7 +3314,7 @@ function renderScorePads(){
 let _padWired=false;
 function wireScorePads(){
   if(_padWired)return;_padWired=true;
-  document.getElementById('score-zone').addEventListener('click',e=>{const b=e.target.closest('.btn-score');if(!b||state.gameOver)return;addScore(b.dataset.t,parseInt(b.dataset.p,10));b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),200)});
+  document.getElementById('score-zone').addEventListener('click',e=>{const b=e.target.closest('.btn-score');if(!b||state.gameOver)return;const team=b.dataset.t,pts=parseInt(b.dataset.p,10);const hasPlayers=state.withPlayers&&state[`team${team.toUpperCase()}`].players.length>0;if(hasPlayers){openPlayerPicker(team,pts,'score');}else{addScore(team,pts);}b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),200)});
 }
 function updateLeadUI(){
   const a=state.teamA.score,bv=state.teamB.score;
