@@ -1412,7 +1412,7 @@ body.modal-open{overflow:hidden}
           <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
         </div>
         <div id="auth-err-si" class="auth-error hidden"></div>
-        <div class="auth-device-note" style="margin-top:6px;margin-bottom:0">🔒 PIN protects your data on this device</div>
+        <div class="auth-device-note" style="margin-top:6px;margin-bottom:0">🔒 Your PIN unlocks this device — data syncs to the cloud when signed in</div>
         <button class="auth-btn" onclick="signIn()">Sign In</button>
         <button class="auth-forgot" onclick="forgotPin()">Forgot PIN?</button>
       </div>
@@ -1861,7 +1861,7 @@ body.modal-open{overflow:hidden}
       <div id="v-action" role="status" aria-live="assertive" aria-atomic="true">🎤 Listening… say a command</div>
       <div class="voice-hint" id="v-hint">Try: "Orange two" · "Blue three" · "Undo" · "Score check"</div>
       <div class="voice-test-row">
-        <input id="v-test-input" class="v-test-input" type="text" placeholder="Type a command to test…" autocomplete="off" onkeydown="if(event.key==='Enter')testVoiceCmd()">
+        <input id="v-test-input" class="v-test-input" type="text" placeholder="Type a command to test…" autocomplete="off" aria-label="Voice command test input" onkeydown="if(event.key==='Enter')testVoiceCmd()">
         <button class="v-test-btn" onclick="testVoiceCmd()">→</button>
       </div>
     </div>
@@ -1888,10 +1888,10 @@ body.modal-open{overflow:hidden}
     <div class="page-title">Team Builder</div>
     <button class="btn-icon" onclick="clearBuilderSession()" title="Clear session">🗑</button>
   </div>
-  <div class="tb-tabs">
-    <button class="tb-tab on" onclick="switchTbTab('players',this)">Players</button>
-    <button class="tb-tab" onclick="switchTbTab('teams',this)">Teams</button>
-    <button class="tb-tab" onclick="switchTbTab('queue',this)">Queue</button>
+  <div class="tb-tabs" role="tablist" aria-label="Team builder sections" id="tb-tabs-bar">
+    <button class="tb-tab on" role="tab" aria-selected="true" aria-controls="tb-players" onclick="switchTbTab('players',this)">Players</button>
+    <button class="tb-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tb-teams" onclick="switchTbTab('teams',this)">Teams</button>
+    <button class="tb-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tb-queue" onclick="switchTbTab('queue',this)">Queue</button>
   </div>
   <!-- Players Tab -->
   <div class="tb-panel on" id="tb-players">
@@ -1973,11 +1973,11 @@ body.modal-open{overflow:hidden}
     <div class="page-title">Match History</div>
     <div style="width:60px"></div>
   </div>
-  <div class="filter-bar">
-    <button class="hf-chip on" data-f="all" onclick="historyFilter('all',this)">All</button>
-    <button class="hf-chip" data-f="pickup" onclick="historyFilter('pickup',this)">Pickup</button>
-    <button class="hf-chip" data-f="tournament" onclick="historyFilter('tournament',this)">Tournament</button>
-    <button class="hf-chip" data-f="players" onclick="historyFilter('players',this)">Players</button>
+  <div class="filter-bar" role="tablist" aria-label="Match history filters" id="history-filter-bar">
+    <button class="hf-chip on" data-f="all" role="tab" aria-selected="true" onclick="historyFilter('all',this)">All</button>
+    <button class="hf-chip" data-f="pickup" role="tab" aria-selected="false" tabindex="-1" onclick="historyFilter('pickup',this)">Pickup</button>
+    <button class="hf-chip" data-f="tournament" role="tab" aria-selected="false" tabindex="-1" onclick="historyFilter('tournament',this)">Tournament</button>
+    <button class="hf-chip" data-f="players" role="tab" aria-selected="false" tabindex="-1" onclick="historyFilter('players',this)">Players</button>
   </div>
   <div class="history-list" id="history-list"></div>
   <div id="career-wrap" style="display:none;padding:4px 0 16px">
@@ -2821,6 +2821,8 @@ window.addEventListener('hashchange',()=>{
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(typeof _confirmReject==='function'){_confirmReject();return;}
+  const pgOv2=document.getElementById('pg-overlay');
+  if(pgOv2&&!pgOv2.classList.contains('hidden')){closePG();return;}
   if(typeof _navDrawerOpen==='function'&&_navDrawerOpen()){closeNavDrawer();return;}
   if(typeof _moreMenuOpen==='function'&&_moreMenuOpen()){hideMoreMenu();return;}
   const ppMod=document.getElementById('player-picker');
@@ -2833,6 +2835,14 @@ document.addEventListener('keydown',e=>{
 const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
 const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
 function showScreen(name){
+  // Dismiss post-game overlay when user navigates away from game result
+  const _pgOv=document.getElementById('pg-overlay');
+  if(_pgOv&&!_pgOv.classList.contains('hidden')&&name!=='game'){
+    _pgOv.classList.add('hidden');
+    clearSave();stopVoice();SC.stop();GC.stop();
+    gameContext={type:'pickup',tournamentId:null,fixtureId:null};
+    state=freshState();
+  }
   document.querySelectorAll('.screen').forEach(s=>{s.classList.toggle('active',s.id===`s-${name}`)});
   // Bottom nav visibility + active state
   const nav=document.getElementById('btm-nav');
@@ -3781,6 +3791,12 @@ function resolveTeam(t){
   const a=state.teamA.name.toLowerCase(),b=state.teamB.name.toLowerCase();
   if(a&&t.includes(a))return'a';
   if(b&&t.includes(b))return'b';
+  // Word-level matching: split multi-word names, skip generic words
+  const skip=new Set(['the','team','a','b','1','2','and','or']);
+  const aWords=a.split(/\s+/).filter(w=>w.length>1&&!skip.has(w));
+  const bWords=b.split(/\s+/).filter(w=>w.length>1&&!skip.has(w));
+  if(aWords.length&&aWords.some(w=>t.includes(w)))return'a';
+  if(bWords.length&&bWords.some(w=>t.includes(w)))return'b';
   // Color-key aliases (e.g. "orange two" when team A color is orange)
   const ca=state.teamA.colorKey?.toLowerCase(),cb=state.teamB.colorKey?.toLowerCase();
   if(ca&&t.includes(ca))return'a';
@@ -3793,7 +3809,6 @@ function resolveTeam(t){
   }
   if(/\b(team\s*a|team\s*1|first|left)\b/.test(t))return'a';
   if(/\b(team\s*b|team\s*2|second|right)\b/.test(t))return'b';
-  // Possessive shortcuts
   if(/\b(them|they|theirs)\b/.test(t))return'b';
   return null;
 }
@@ -3822,7 +3837,7 @@ function parseVoiceCmd(rawText,confidence){
   if(/\b(next\s*quarter|quarter|next\s*period)\b/.test(t)){nextQuarter();setVAction(`Now ${typeof state.quarter==='number'?'Q'+state.quarter:state.quarter}`);return true}
   if(/\b(game\s*over|end\s*game|that'?s?\s*game|we'?re?\s*done)\b/.test(t)){handleEndGame();return true}
   if(/\b(reset\s*game|start\s*over)\b/.test(t)){uiConfirm('Reset scores?').then(ok=>{if(ok){playAgain();setVAction('Reset!')}});return true}
-  if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}setVAction(`Which team? Try "foul ${state.teamA.colorKey||'orange'}" or "foul ${state.teamB.colorKey||'blue'}"`);return true}
+  if(/\b(foul)\b/.test(t)){const tm=resolveTeam(t);if(tm){addFoul(tm);setVAction(`Foul on ${tm==='a'?state.teamA.name:state.teamB.name}`);return true}setVAction(`Which team? Say "foul ${state.teamA.name}" or "foul ${state.teamB.name}"`);return true}
   if(/\b(start\s*shot\s*clock|go\s*shot\s*clock|shot\s*clock\s*go)\b/.test(t)){SC.start();setVAction('Shot clock started');return true}
   if(/\b(pause\s*shot\s*clock|stop\s*shot\s*clock|shot\s*clock\s*stop)\b/.test(t)){SC.pause();setVAction('Shot clock paused');return true}
   if(/\b(reset\s*shot\s*clock|restart\s*shot\s*clock|shot\s*clock\s*reset)\b/.test(t)){SC.reset(SC.running);setVAction('Shot clock reset');return true}
@@ -3967,7 +3982,7 @@ function startListening(){
       ok=parseVoiceCmd(alt.transcript.trim(),alt.confidence);
     }
     if(ok)trackEvent('voice_command_used');
-    else setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
+    else setVAction(`Didn't catch that — try "${state.teamA.name} two" or "Undo"`);
   };
   recognition.onend=()=>{if(state.voiceActive&&!state.gameOver)restartTmr=setTimeout(startListening,600)};
   recognition.onerror=e=>{
@@ -4007,7 +4022,7 @@ function testVoiceCmd(){
   if(!inp||!inp.value.trim())return;
   document.getElementById('voice-panel').classList.remove('hidden');
   const ok=parseVoiceCmd(inp.value.trim());
-  if(!ok)setVAction('Didn\'t catch that — try "Orange two" or "Undo"');
+  if(!ok)setVAction(`Didn't catch that — try "${state.teamA.name} two" or "Undo"`);
   inp.value='';inp.focus();
 }
 function updateVoiceHint(){
@@ -4090,6 +4105,30 @@ function generateTeams(mode){
     teams[idx].players.push(p);teams[idx].totalRating+=effectiveRating(p);
   });
   builderState.teams=teams;
+  // Swap-optimization: keep swapping players to minimize average-rating gap
+  if(mode==='balanced'&&n===2){
+    let improved=true;
+    while(improved){
+      improved=false;
+      const a0=teams[0].players.reduce((s,p)=>s+effectiveRating(p),0)/(teams[0].players.length||1);
+      const a1=teams[1].players.reduce((s,p)=>s+effectiveRating(p),0)/(teams[1].players.length||1);
+      const gap=Math.abs(a0-a1);
+      for(let i=0;i<teams[0].players.length&&!improved;i++){
+        for(let j=0;j<teams[1].players.length&&!improved;j++){
+          const r0=effectiveRating(teams[0].players[i]),r1=effectiveRating(teams[1].players[j]);
+          if(r0===r1)continue;
+          const na0=(teams[0].totalRating-r0+r1)/teams[0].players.length;
+          const na1=(teams[1].totalRating-r1+r0)/teams[1].players.length;
+          if(Math.abs(na0-na1)<gap-0.01){
+            [teams[0].players[i],teams[1].players[j]]=[teams[1].players[j],teams[0].players[i]];
+            teams[0].totalRating=teams[0].totalRating-r0+r1;
+            teams[1].totalRating=teams[1].totalRating-r1+r0;
+            improved=true;
+          }
+        }
+      }
+    }
+  }
   builderState.queue=teams.map(t=>t.name);
   builderState.queuePointer=0;
   saveBuilderState();
@@ -4111,11 +4150,11 @@ function renderGeneratedTeams(){
   const useBtn=document.getElementById('btn-use-teams');
   if(!builderState.teams.length){fb.classList.add('hidden');display.innerHTML='';useBtn.classList.add('hidden');return}
   const fair=calcFairness(builderState.teams);
-  const cls=fair>=80?'great':fair>=60?'ok':'bad';
+  const cls=fair>=85?'great':fair>=70?'ok':'bad';
   fb.classList.remove('hidden');
   document.getElementById('tb-fairness-pct').textContent=`${fair}%`;
   document.getElementById('tb-fairness-pct').className=`fairness-pct ${cls}`;
-  document.getElementById('tb-fairness-label').textContent=fair>=80?'Well Balanced':fair>=60?'Mostly Fair':'May Be Unbalanced';
+  document.getElementById('tb-fairness-label').textContent=fair>=85?'Well Balanced':fair>=70?'Mostly Fair':'Unbalanced — consider swapping players';
   document.getElementById('tb-fairness-fill').style.width=`${fair}%`;
   document.getElementById('tb-fairness-fill').className=`fairness-bar-fill ${cls}`;
   display.innerHTML=builderState.teams.map(t=>{
@@ -4200,6 +4239,7 @@ function pickQueueMode(btn){
 function switchTbTab(name,btn){
   document.querySelectorAll('.tb-tab').forEach(t=>t.classList.toggle('on',t===btn));
   document.querySelectorAll('.tb-panel').forEach(p=>p.classList.toggle('on',p.id===`tb-${name}`));
+  _setTabSelected(document.getElementById('tb-tabs-bar'),btn);
   if(name==='queue')renderQueueDisplay();
 }
 // ── Captain Draft ─────────────────────────────────────
@@ -4317,6 +4357,7 @@ function renderHistory(){
 function historyFilter(mode,btn){
   historyFilterMode=mode;
   document.querySelectorAll('.hf-chip').forEach(c=>c.classList.toggle('on',c===btn));
+  _setTabSelected(document.getElementById('history-filter-bar'),btn);
   const isPlayers=mode==='players';
   document.getElementById('history-list').style.display=isPlayers?'none':'';
   document.getElementById('career-wrap').style.display=isPlayers?'':'none';
@@ -5595,9 +5636,17 @@ function renderFeedTabHTML(c,myRole){
   const createFormHTML=showCreateForm&&canPost?`<div class="post-form" id="create-post-form">
   <span class="comm-form-label">Post Type</span>
   <div class="post-form-type-row">${typeChips}</div>
-  <input id="pp-title" class="post-inp" type="text" placeholder="Title (optional)" maxlength="80" autocomplete="off">
-  <textarea id="pp-body" class="post-inp post-textarea" placeholder="What's on the court?…" maxlength="600"></textarea>
-  <input id="pp-img" class="post-inp" type="url" placeholder="Image URL (optional)" autocomplete="off">
+  <input id="pp-title" class="post-inp" type="text" placeholder="Title (optional)" maxlength="80" autocomplete="off" aria-label="Post title">
+  <textarea id="pp-body" class="post-inp post-textarea" placeholder="What's on the court?…" maxlength="600" aria-label="Post body"></textarea>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <label style="font-size:12px;color:var(--muted)">Photo (optional)</label>
+    <input type="file" id="pp-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handlePostFileSelect(this)">
+    <div style="display:flex;gap:8px;align-items:center">
+      <button type="button" class="btn-post-action" onclick="document.getElementById('pp-file').click()">📎 Upload Photo</button>
+      <span id="pp-file-name" style="font-size:12px;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    </div>
+    <input id="pp-img" class="post-inp" type="text" placeholder="Or paste an image URL" autocomplete="off" aria-label="Image URL">
+  </div>
   <div class="post-form-actions">
     <button class="btn-post-submit" onclick="submitPost('${escHtml(c.id)}')">Publish</button>
     <button class="btn-post-cancel" onclick="cancelCreatePost()">Cancel</button>
@@ -5730,6 +5779,17 @@ function submitPost(communityId){
   setCommTab('feed');showToast('Post published!');
 }
 
+function handlePostFileSelect(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>2*1024*1024){showToast('Image must be under 2 MB');input.value='';return}
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showToast('Only JPG, PNG, or WebP allowed');input.value='';return}
+  const nameEl=document.getElementById('pp-file-name');
+  if(nameEl)nameEl.textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{const imgEl=document.getElementById('pp-img');if(imgEl)imgEl.value=e.target.result};
+  reader.readAsDataURL(file);
+}
 function editPostInline(postId){editingPostId=postId;setCommTab('feed')}
 function cancelPostEdit(){editingPostId=null;setCommTab('feed')}
 function savePostEdit(postId){
@@ -7107,6 +7167,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   _wireTablist(document.querySelector('.auth-tabs'));
   _wireTablist(document.getElementById('tc-tabs'));
   _wireTablist(document.getElementById('cd-tabs'));
+  _wireTablist(document.getElementById('history-filter-bar'));
+  _wireTablist(document.getElementById('tb-tabs-bar'));
   // "What's new" toast — shows once per version for returning users
   const seenVer=localStorage.getItem('cc_seen_version');
   if(seenVer&&seenVer!==APP_VERSION){
