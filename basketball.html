@@ -2756,7 +2756,7 @@ if (supa) {
       return;
     }
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
-      syncCommunitiesFromDB().then(() => {
+      syncAllUserDataFromDB().then(() => {
         const active = document.querySelector('.screen.active')?.id;
         if (active === 's-communities') renderCommunities();
         else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
@@ -2845,19 +2845,33 @@ async function logOut() {
 
 async function supaSaveGame(game) {
   if (!supa || !supaUser) return;
-  await supa.from('games').insert({
-    id: game.id || ('g_' + Date.now()),
-    user_id: supaUser.id,
-    team_a_name: game.teamA?.name || '',
-    team_b_name: game.teamB?.name || '',
-    score_a: game.teamA?.score ?? 0,
-    score_b: game.teamB?.score ?? 0,
-    winner: game.winner || '',
-    game_type: game.gameType || '',
-    win_score: game.winScore ?? 21,
-    scoring_rule: game.scoringRule || '',
-    created_at: game.date ? new Date(game.date).toISOString() : new Date().toISOString()
-  });
+  try {
+    await supa.from('games').insert({
+      id: game.id || ('g_' + Date.now()),
+      user_id: supaUser.id,
+      team_a_name: game.teamA?.name || '',
+      team_b_name: game.teamB?.name || '',
+      score_a: game.teamA?.score ?? 0,
+      score_b: game.teamB?.score ?? 0,
+      winner: game.winner?.name || game.winner || '',
+      game_type: game.gameType || '',
+      win_score: game.winScore ?? 21,
+      scoring_rule: game.scoringRule || '',
+      duration: game.duration || null,
+      fouls_a: game.foulsA ?? null,
+      fouls_b: game.foulsB ?? null,
+      max_lead_a: game.maxLeadA ?? null,
+      max_lead_b: game.maxLeadB ?? null,
+      lead_changes: game.leadChanges ?? null,
+      biggest_run: game.biggestRun ?? null,
+      quarters_played: game.quartersPlayed ?? null,
+      tournament_id: game.tournamentId || null,
+      fixture_id: game.fixtureId || null,
+      players_a: game.teamA?.players?.length ? game.teamA.players : null,
+      players_b: game.teamB?.players?.length ? game.teamB.players : null,
+      created_at: game.date ? new Date(game.date).toISOString() : new Date().toISOString()
+    });
+  } catch(e) { console.warn('supaSaveGame:', e.message); }
 }
 
 async function supaFetchGames(limit = 10) {
@@ -4749,8 +4763,9 @@ function createTournament(){
   const format=cx['cr-tourn-format']||'roundrobin';
   const winScore=parseInt(cx['cr-tourn-win']||'21',10);
   const fixtures=format==='roundrobin'?genRoundRobin(teams):genKnockout(teams);
-  const t={id:'t_'+Date.now(),name,format,winScore,teams:teams.map(n=>({name:n})),fixtures,createdAt:new Date().toLocaleDateString(),completed:false};
+  const t={id:'t_'+Date.now(),name,format,winScore,teams:teams.map(n=>({name:n})),fixtures,createdAt:new Date().toISOString(),completed:false};
   const tours=getCol(K.tournaments);tours.push(t);setCol(K.tournaments,tours);
+  supaUpsertTournament(t);
   trackEvent('tournament_created');
   activeTournId=t.id;
   showActiveTournament(t);
@@ -4909,11 +4924,14 @@ function saveTournamentResult(entry){
   }
 
   setCol(K.tournaments,tours);
+  supaUpsertTournament(t);
 }
 async function deleteTournament(){
   if(!await uiConfirm('Delete this tournament?'))return;
-  const tours=getCol(K.tournaments).filter(t=>t.id!==activeTournId);
+  const tid=activeTournId;
+  const tours=getCol(K.tournaments).filter(t=>t.id!==tid);
   setCol(K.tournaments,tours);activeTournId=null;
+  supaDeleteTournament(tid);
   showTournEmpty();showToast('Tournament deleted');
 }
 /* ════════════════════════════════════════════════════════
@@ -5334,6 +5352,337 @@ async function supaCreateEvent(event) {
     });
     return true;
   } catch(e) { console.warn('supaCreateEvent:', e.message); return false; }
+}
+
+async function supaUpdatePost(postId, fields) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('community_posts').update(fields).eq('id', postId);
+    if (error) { console.warn('supaUpdatePost:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaUpdatePost:', e.message); return false; }
+}
+
+async function supaHardDeletePost(postId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_posts').delete().eq('id', postId);
+    return true;
+  } catch(e) { console.warn('supaHardDeletePost:', e.message); return false; }
+}
+
+async function supaUpdateEvent(eventId, fields) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('community_events').update(fields).eq('id', eventId);
+    if (error) { console.warn('supaUpdateEvent:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaUpdateEvent:', e.message); return false; }
+}
+
+async function supaUpsertCPlayer(player) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('community_players').upsert({
+      id: player.id, community_id: player.communityId,
+      name: player.name, nickname: player.nickname || null,
+      jersey_number: player.jerseyNumber || null, photo_url: player.photoUrl || null,
+      position: player.position || null, badges: player.badges || [],
+      games_played: player.gamesPlayed || 0, wins: player.wins || 0,
+      losses: player.losses || 0, points: player.points || 0,
+      mvp_count: player.mvpCount || 0, created_by: player.createdBy || supaUser.id,
+      created_at: player.createdAt || new Date().toISOString()
+    }, { onConflict: 'id' });
+    if (error) { console.warn('supaUpsertCPlayer:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaUpsertCPlayer:', e.message); return false; }
+}
+
+async function supaDeleteCPlayer(playerId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_ratings').delete().eq('player_id', playerId);
+    await supa.from('community_players').delete().eq('id', playerId);
+    return true;
+  } catch(e) { console.warn('supaDeleteCPlayer:', e.message); return false; }
+}
+
+async function supaUpsertCRating(rating) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('community_ratings').upsert({
+      id: rating.id, player_id: rating.playerId, community_id: rating.communityId,
+      rater_id: supaUser.id,
+      shooting: rating.shooting || 0, defense: rating.defense || 0,
+      passing: rating.passing || 0, speed: rating.speed || 0,
+      teamwork: rating.teamwork || 0, clutch: rating.clutch || 0,
+      sportsmanship: rating.sportsmanship || 0,
+      created_at: rating.createdAt || new Date().toISOString(),
+      updated_at: rating.updatedAt || new Date().toISOString()
+    }, { onConflict: 'player_id,rater_id' });
+    if (error) { console.warn('supaUpsertCRating:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaUpsertCRating:', e.message); return false; }
+}
+
+async function supaSubmitGalleryItem(item) {
+  if (!supa || !supaUser) return false;
+  // Skip base64 uploads — those are too large for DB; only sync URL-sourced images
+  if (item.imageSourceType === 'upload' || !item.imageUrl) return false;
+  try {
+    const { error } = await supa.from('community_gallery').insert({
+      id: item.id, community_id: item.communityId,
+      uploaded_by: supaUser.id, uploader_name: item.uploaderName || currentProfile?.name || '',
+      image_url: item.imageUrl || null, caption: item.caption || '',
+      album: item.album || null, tagged_players: item.taggedPlayers || [],
+      likes: item.likes || [], comments: item.comments || [],
+      created_at: item.createdAt || new Date().toISOString()
+    });
+    if (error) { console.warn('supaSubmitGalleryItem:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaSubmitGalleryItem:', e.message); return false; }
+}
+
+async function supaUpdateGalleryItem(itemId, fields) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_gallery').update(fields).eq('id', itemId);
+    return true;
+  } catch(e) { console.warn('supaUpdateGalleryItem:', e.message); return false; }
+}
+
+async function supaDeleteGalleryItem(itemId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_gallery').delete().eq('id', itemId);
+    return true;
+  } catch(e) { console.warn('supaDeleteGalleryItem:', e.message); return false; }
+}
+
+async function supaCreateJoinRequest(req) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('community_join_requests').insert({
+      id: req.id, community_id: req.communityId, user_id: supaUser.id,
+      profile_name: req.profileName || currentProfile?.name || '',
+      status: 'pending', requested_at: req.requestedAt || new Date().toISOString()
+    });
+    if (error) { console.warn('supaCreateJoinRequest:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaCreateJoinRequest:', e.message); return false; }
+}
+
+async function supaCancelJoinRequest(communityId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_join_requests')
+      .delete().eq('community_id', communityId).eq('user_id', supaUser.id).eq('status', 'pending');
+    return true;
+  } catch(e) { console.warn('supaCancelJoinRequest:', e.message); return false; }
+}
+
+async function supaUpdateJoinRequest(reqId, status) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_join_requests')
+      .update({ status, reviewed_at: new Date().toISOString() }).eq('id', reqId);
+    if (status === 'approved') {
+      const req = getAllJoinReqs().find(r => r.id === reqId);
+      if (req) {
+        await supa.from('community_members').upsert({
+          community_id: req.communityId, user_id: req.profileId,
+          role: 'member', profile_name: req.profileName || ''
+        }, { onConflict: 'community_id,user_id' });
+      }
+    }
+    return true;
+  } catch(e) { console.warn('supaUpdateJoinRequest:', e.message); return false; }
+}
+
+async function supaLeaveComm(communityId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('community_members').delete()
+      .eq('community_id', communityId).eq('user_id', supaUser.id);
+    return true;
+  } catch(e) { console.warn('supaLeaveComm:', e.message); return false; }
+}
+
+async function supaUpsertTournament(tournament) {
+  if (!supa || !supaUser) return false;
+  try {
+    const { error } = await supa.from('tournaments').upsert({
+      id: tournament.id, user_id: supaUser.id,
+      name: tournament.name || '', format: tournament.format || '',
+      status: tournament.completed ? 'completed' : 'active',
+      teams: tournament.teams || [], fixtures: tournament.fixtures || [],
+      winner: tournament.winner || null,
+      settings: { winScore: tournament.winScore },
+      created_at: tournament.createdAt ? new Date(tournament.createdAt).toISOString() : new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    if (error) { console.warn('supaUpsertTournament:', error.message); return false; }
+    return true;
+  } catch(e) { console.warn('supaUpsertTournament:', e.message); return false; }
+}
+
+async function supaDeleteTournament(tournamentId) {
+  if (!supa || !supaUser) return false;
+  try {
+    await supa.from('tournaments').delete().eq('id', tournamentId).eq('user_id', supaUser.id);
+    return true;
+  } catch(e) { console.warn('supaDeleteTournament:', e.message); return false; }
+}
+
+// ── On-login full sync ────────────────────────────────────────
+async function syncAllUserDataFromDB() {
+  if (!supa || !supaUser) return;
+  await Promise.all([
+    syncCommunitiesFromDB(),
+    _syncGamesFromDB(),
+    _syncTournamentsFromDB(),
+    _syncCPlayersFromDB(),
+    _syncCRatingsFromDB(),
+    _syncJoinRequestsFromDB(),
+  ]);
+}
+
+async function _syncGamesFromDB() {
+  if (!supa || !supaUser) return;
+  try {
+    const { data } = await supa.from('games').select('*')
+      .eq('user_id', supaUser.id).order('created_at', { ascending: false }).limit(200);
+    if (!data) return;
+    const local = getCol(K.matches);
+    const dbIds = new Set(data.map(g => g.id));
+    const merged = [
+      ...data.map(g => {
+        const lc = local.find(m => m.id === g.id) || {};
+        return {
+          ...lc, id: g.id,
+          teamA: { name: g.team_a_name, score: g.score_a, players: g.players_a || lc.teamA?.players || [] },
+          teamB: { name: g.team_b_name, score: g.score_b, players: g.players_b || lc.teamB?.players || [] },
+          winner: g.winner ? { name: g.winner } : lc.winner,
+          gameType: g.game_type, winScore: g.win_score, scoringRule: g.scoring_rule,
+          duration: g.duration || lc.duration,
+          foulsA: g.fouls_a ?? lc.foulsA, foulsB: g.fouls_b ?? lc.foulsB,
+          date: g.created_at
+        };
+      }),
+      ...local.filter(m => !dbIds.has(m.id))
+    ];
+    setCol(K.matches, merged.slice(0, 200));
+  } catch(e) { console.warn('_syncGamesFromDB:', e.message); }
+}
+
+async function _syncTournamentsFromDB() {
+  if (!supa || !supaUser) return;
+  try {
+    const { data } = await supa.from('tournaments').select('*')
+      .eq('user_id', supaUser.id).order('created_at', { ascending: false });
+    if (!data) return;
+    const local = getCol(K.tournaments);
+    const dbIds = new Set(data.map(t => t.id));
+    const merged = [
+      ...data.map(t => {
+        const lc = local.find(x => x.id === t.id) || {};
+        return {
+          ...lc, id: t.id, name: t.name, format: t.format,
+          completed: t.status === 'completed',
+          teams: t.teams || lc.teams || [],
+          fixtures: t.fixtures || lc.fixtures || [],
+          winner: t.winner || lc.winner,
+          winScore: t.settings?.winScore || lc.winScore || 21,
+          createdAt: t.created_at
+        };
+      }),
+      ...local.filter(t => !dbIds.has(t.id))
+    ];
+    setCol(K.tournaments, merged);
+  } catch(e) { console.warn('_syncTournamentsFromDB:', e.message); }
+}
+
+async function _syncCPlayersFromDB() {
+  if (!supa || !supaUser) return;
+  try {
+    const myCommIds = getCommMembers()
+      .filter(m => m.profileId === (currentProfile?.id || supaUser.id))
+      .map(m => m.communityId);
+    if (!myCommIds.length) return;
+    const { data } = await supa.from('community_players').select('*').in('community_id', myCommIds);
+    if (!data) return;
+    const local = getAllCPlayers();
+    const dbIds = new Set(data.map(p => p.id));
+    const merged = [
+      ...data.map(p => {
+        const lc = local.find(x => x.id === p.id) || {};
+        return {
+          ...lc, id: p.id, communityId: p.community_id, name: p.name,
+          nickname: p.nickname || '', jerseyNumber: p.jersey_number || '',
+          photoUrl: p.photo_url || '', position: p.position || 'PG',
+          badges: p.badges || [], gamesPlayed: p.games_played || 0,
+          wins: p.wins || 0, losses: p.losses || 0,
+          points: p.points || 0, mvpCount: p.mvp_count || 0,
+          createdBy: p.created_by, createdAt: p.created_at
+        };
+      }),
+      ...local.filter(p => !dbIds.has(p.id))
+    ];
+    saveAllCPlayers(merged);
+  } catch(e) { console.warn('_syncCPlayersFromDB:', e.message); }
+}
+
+async function _syncCRatingsFromDB() {
+  if (!supa || !supaUser) return;
+  try {
+    const { data } = await supa.from('community_ratings').select('*').eq('rater_id', supaUser.id);
+    if (!data) return;
+    const local = getAllCRatings();
+    const dbIds = new Set(data.map(r => r.id));
+    const merged = [
+      ...data.map(r => ({
+        id: r.id, playerId: r.player_id, communityId: r.community_id,
+        raterProfileId: r.rater_id,
+        shooting: r.shooting || 0, defense: r.defense || 0,
+        passing: r.passing || 0, speed: r.speed || 0,
+        teamwork: r.teamwork || 0, clutch: r.clutch || 0,
+        sportsmanship: r.sportsmanship || 0,
+        createdAt: r.created_at, updatedAt: r.updated_at
+      })),
+      ...local.filter(r => !dbIds.has(r.id))
+    ];
+    saveAllCRatings(merged);
+  } catch(e) { console.warn('_syncCRatingsFromDB:', e.message); }
+}
+
+async function _syncJoinRequestsFromDB() {
+  if (!supa || !supaUser) return;
+  try {
+    const adminCommIds = getCommMembers()
+      .filter(m => m.role === 'admin' && m.profileId === (currentProfile?.id || supaUser.id))
+      .map(m => m.communityId);
+    const queries = [
+      supa.from('community_join_requests').select('*').eq('user_id', supaUser.id),
+    ];
+    if (adminCommIds.length) {
+      queries.push(supa.from('community_join_requests').select('*')
+        .in('community_id', adminCommIds).eq('status', 'pending'));
+    }
+    const results = await Promise.all(queries);
+    const allRows = results.flatMap(r => r.data || []);
+    const unique = [...new Map(allRows.map(r => [r.id, r])).values()];
+    const local = getAllJoinReqs();
+    const dbIds = new Set(unique.map(r => r.id));
+    const merged = [
+      ...unique.map(r => ({
+        id: r.id, communityId: r.community_id, profileId: r.user_id,
+        profileName: r.profile_name || '', status: r.status,
+        requestedAt: r.requested_at
+      })),
+      ...local.filter(r => !dbIds.has(r.id))
+    ];
+    saveAllJoinReqs(merged);
+  } catch(e) { console.warn('_syncJoinRequestsFromDB:', e.message); }
 }
 
 // localStorage keys — community module
@@ -6003,12 +6352,14 @@ async function deletePost(postId){
   saveAllPosts(getAllPosts().filter(p=>p.id!==postId));
   expandedComments.delete(postId);
   if(editingPostId===postId)editingPostId=null;
+  supaHardDeletePost(postId);
   setCommTab('feed');showToast('Post deleted');
 }
 
 function pinPost(postId){
   const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
   p.pinned=!p.pinned;saveAllPosts(all);
+  supaUpdatePost(postId,{pinned:p.pinned});
   setCommTab('feed');showToast(p.pinned?'Post pinned 📌':'Post unpinned');
 }
 
@@ -6019,7 +6370,9 @@ function reactPost(postId,communityId,emoji){
   if(!p.reactions[emoji])p.reactions[emoji]=[];
   const idx=p.reactions[emoji].indexOf(myId);
   if(idx>-1)p.reactions[emoji].splice(idx,1);else p.reactions[emoji].push(myId);
-  saveAllPosts(all);setCommTab('feed');
+  saveAllPosts(all);
+  supaUpdatePost(postId,{reactions:p.reactions});
+  setCommTab('feed');
 }
 
 function toggleComments(postId){
@@ -6037,7 +6390,9 @@ function submitComment(postId){
   if(_commForLock&&_commForLock.commentsLocked&&_myMbrRole!=='admin'){showToast('Comments are locked by the admin');return}
   if(!post.comments)post.comments=[];
   post.comments.push({id:'cmt_'+Date.now(),authorId:prof.id,authorName:prof.name||'Unknown',body,createdAt:new Date().toISOString()});
-  saveAllPosts(all);setCommTab('feed');
+  saveAllPosts(all);
+  supaUpdatePost(postId,{comments:post.comments});
+  setCommTab('feed');
 }
 
 function deleteComment(postId,communityId,commentId){
@@ -6288,6 +6643,7 @@ function submitCPlayer(communityId){
     createdBy:prof.id,createdAt:new Date().toISOString(),
   };
   const all=getAllCPlayers();all.push(player);saveAllCPlayers(all);
+  supaUpsertCPlayer(player);
   trackEvent('player_added');
   showAddPlayerForm=false;selectedBadges=new Set();
   setCommTab('players');showToast(`${player.name} added!`);
@@ -6316,7 +6672,9 @@ function saveCPlayerEdit(playerId){
   p.points=parseInt(document.getElementById('ep-pts')?.value)||0;
   p.mvpCount=parseInt(document.getElementById('ep-mvp')?.value)||0;
   p.badges=[...selectedBadges];
-  saveAllCPlayers(all);editingPlayerId=null;
+  saveAllCPlayers(all);
+  supaUpsertCPlayer(p);
+  editingPlayerId=null;
   setCommTab('players');showToast('Player updated');
 }
 
@@ -6324,6 +6682,7 @@ async function deleteCPlayer(playerId){
   if(!await uiConfirm('Remove this player from the community?'))return;
   saveAllCPlayers(getAllCPlayers().filter(p=>p.id!==playerId));
   saveAllCRatings(getAllCRatings().filter(r=>r.playerId!==playerId));
+  supaDeleteCPlayer(playerId);
   setCommTab('players');showToast('Player removed');
 }
 
@@ -6359,6 +6718,7 @@ function submitCRating(playerId,communityId){
   RATE_ATTRS.forEach(({k})=>{rating[k]=pendingRating[k]||0});
   if(idx>-1)all[idx]=rating;else all.push(rating);
   saveAllCRatings(all);
+  supaUpsertCRating(rating);
   ratingPlayerId=null;pendingRating={};
   setCommTab('players');showToast('Rating submitted! ⭐');
 }
@@ -6434,8 +6794,10 @@ function joinCommunity(communityId){
     if(reqs.find(r=>r.communityId===communityId&&r.profileId===myId&&r.status==='pending')){
       showToast('Request already sent');return;
     }
-    reqs.push({id:'join_'+Date.now(),communityId,profileId:myId,profileName:myName,requestedAt:new Date().toISOString(),status:'pending'});
+    const newReq={id:'join_'+Date.now(),communityId,profileId:myId,profileName:myName,requestedAt:new Date().toISOString(),status:'pending'};
+    reqs.push(newReq);
     saveAllJoinReqs(reqs);
+    supaCreateJoinRequest(newReq);
     showToast('Join request sent! ⏳');
   }else{
     const newMember={id:'mem_'+Date.now(),communityId,profileId:myId,profileName:myName,role:'member',joinedAt:new Date().toISOString().split('T')[0]};
@@ -6453,6 +6815,7 @@ function joinCommunity(communityId){
 function cancelJoinReq(communityId){
   const myId=(currentProfile||{id:'guest'}).id;
   saveAllJoinReqs(getAllJoinReqs().filter(r=>!(r.communityId===communityId&&r.profileId===myId)));
+  supaCancelJoinRequest(communityId);
   showToast('Request cancelled');
   renderCommDetail();
 }
@@ -6470,6 +6833,7 @@ async function leaveComm(communityId){
   const comms=getComms();
   const ci=comms.findIndex(x=>x.id===communityId);
   if(ci!==-1){comms[ci].memberCount=Math.max(0,(comms[ci].memberCount||1)-1);setComms(comms)}
+  supaLeaveComm(communityId);
   showToast('You left '+c.name);
   showScreen('communities');
 }
@@ -6488,6 +6852,7 @@ function approveJoin(reqId,communityId){
     const ci=comms.findIndex(x=>x.id===communityId);
     if(ci!==-1){comms[ci].memberCount=(comms[ci].memberCount||0)+1;setComms(comms)}
   }
+  supaUpdateJoinRequest(reqId,'approved');
   showToast(escHtml(req.profileName)+' approved ✅');
   setCommTab('members');
 }
@@ -6498,6 +6863,7 @@ function rejectJoin(reqId,communityId){
   if(!req)return;
   req.status='rejected';
   saveAllJoinReqs(reqs);
+  supaUpdateJoinRequest(reqId,'rejected');
   showToast('Request rejected');
   setCommTab('members');
 }
@@ -6873,6 +7239,7 @@ function rsvpEvent(eventId,communityId,status){
   }
   all[idx].rsvps=rsvps;
   saveAllEvents(all);
+  supaUpdateEvent(eventId,{rsvps});
   const labels={going:'Going ✅',maybe:'Maybe 🤔',not_going:"Can't Go ❌",need_team:'Need Team 🏀',running_late:'Running Late ⏰'};
   showToast(existing!==-1&&rsvps.findIndex(r=>r.profileId===myId)===-1?'RSVP removed':`Marked as ${labels[status]||status}`);
   setCommTab('events');
@@ -7125,6 +7492,7 @@ function submitGalleryItem(communityId){
   const all=getAllGalItems();
   all.push(item);
   saveAllGalItems(all);
+  supaSubmitGalleryItem(item);
   galPendingFile='';galPendingFileName='';galPendingFileSize=0;
   showAddGalleryForm=false;
   selectedAlbum=GAL_ALBUMS[0];
@@ -7137,6 +7505,7 @@ async function deleteGalItem(itemId,communityId){
   if(!await uiConfirm('Delete this photo?'))return;
   saveAllGalItems(getAllGalItems().filter(g=>g.id!==itemId));
   expandedGalleryComments.delete(itemId);
+  supaDeleteGalleryItem(itemId);
   setCommTab('gallery');
   showToast('Photo deleted');
 }
@@ -7151,6 +7520,7 @@ function likeGalItem(itemId,communityId){
   if(pos===-1)likes.push(myId);else likes.splice(pos,1);
   all[idx].likes=likes;
   saveAllGalItems(all);
+  supaUpdateGalleryItem(itemId,{likes});
   setCommTab('gallery');
 }
 
@@ -7173,6 +7543,7 @@ function submitGalCmt(itemId,communityId){
   if(!all[idx].comments)all[idx].comments=[];
   all[idx].comments.push({id:'gcmt_'+Date.now(),authorId:myId,authorName:myName,text,createdAt:new Date().toISOString()});
   saveAllGalItems(all);
+  supaUpdateGalleryItem(itemId,{comments:all[idx].comments});
   setCommTab('gallery');
 }
 
