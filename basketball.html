@@ -8383,10 +8383,25 @@ async function clearDemoData(){
   let angle=0, speed=0.022;
   let drag=false, lastX=0, momentum=0;
   let canvas, ctx;
-  let ballImg=null;
+  let ballImg=null; // working canvas for efficient sampling
   const _ballTex=new Image();
-  _ballTex.onload=()=>{ballImg=_ballTex};
   _ballTex.src='icons/basketball-3d.png';
+
+  const TEX_SIZE=512; // working resolution for texture sampling
+  const BALL_MARG=0.045; // trim white border from photo (% each side)
+
+  function _prepareBallTex(src){
+    const oc=document.createElement('canvas');
+    oc.width=oc.height=TEX_SIZE;
+    const ox=oc.getContext('2d');
+    // Draw the source image cropped to remove the white background border
+    const m=BALL_MARG;
+    ox.drawImage(src,
+      src.naturalWidth*m, src.naturalHeight*m,
+      src.naturalWidth*(1-2*m), src.naturalHeight*(1-2*m),
+      0, 0, TEX_SIZE, TEX_SIZE);
+    ballImg=oc;
+  }
 
   function init(){
     canvas=document.getElementById('ball-canvas');
@@ -8398,6 +8413,13 @@ async function clearDemoData(){
     canvas.style.height=BALL_PX+'px';
     ctx=canvas.getContext('2d');
     ctx.scale(dpr,dpr);
+
+    // Pre-scale the ball photo to a working canvas for fast per-column sampling
+    if(_ballTex.complete && _ballTex.naturalWidth){
+      _prepareBallTex(_ballTex);
+    } else {
+      _ballTex.onload=()=>{ _prepareBallTex(_ballTex); };
+    }
 
     const sl=document.getElementById('ball-speed');
     if(sl) sl.addEventListener('input',()=>{ speed=(+sl.value/100)*0.08; });
@@ -8428,90 +8450,109 @@ async function clearDemoData(){
     const W=BALL_PX, cx=W/2, cy=W/2, r=W*0.43;
     ctx.clearRect(0,0,W,W);
 
-    // ── 1. Drop shadow ──
-    ctx.shadowColor='rgba(0,0,0,0.6)';
-    ctx.shadowBlur=30; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
-
-    // ── 2. Sphere base — photo texture or Phong gradient fallback ──
     if(ballImg){
-      // Draw shadow placeholder first (needs a fill to cast shadow)
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-      ctx.fillStyle='rgba(0,0,0,0)'; ctx.fill();
-      ctx.shadowColor='transparent';
-      // Clip to circle and draw photo
+      // ══ PHOTO PATH: scanline sphere projection ══════════════════════
+      // Drop shadow
       ctx.save();
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
-      const td=r*2.18; // scale up slightly to crop white border
-      ctx.drawImage(ballImg,cx-td/2,cy-td/2,td,td);
+      ctx.shadowColor='rgba(0,0,0,0.65)';
+      ctx.shadowBlur=28; ctx.shadowOffsetX=6; ctx.shadowOffsetY=14;
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle='#BF4200'; ctx.fill(); // opaque fill needed to cast shadow
+      ctx.shadowColor='transparent';
       ctx.restore();
+
+      // Scanline loop — one 1-px vertical strip per column
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx,cy,r-0.5,0,Math.PI*2); ctx.clip();
+
+      const HALF_PI=Math.PI*0.5;
+      const TWO_PI=Math.PI*2;
+      const iW=TEX_SIZE, iH=TEX_SIZE;
+      const x0=Math.ceil(cx-r), x1=Math.floor(cx+r);
+
+      for(let px=x0; px<=x1; px++){
+        const nx=(px-cx)/r;                          // normalised x: −1…1
+        if(nx<-1||nx>1) continue;
+        const theta=Math.asin(nx);                   // screen longitude: −π/2…π/2
+
+        // Source longitude after rotation
+        let st=theta-a;
+        // Normalise to [−π, π]
+        st=((st+Math.PI)%TWO_PI+TWO_PI)%TWO_PI-Math.PI;
+        // Fold back hemisphere → [−π/2, π/2]  (ball looks same from both sides)
+        if(st> HALF_PI) st= Math.PI-st;
+        else if(st<-HALF_PI) st=-Math.PI-st;
+
+        const u=(st+HALF_PI)/Math.PI;               // 0…1
+        const srcX=u*iW;
+        const halfH=Math.sqrt(Math.max(0,1-nx*nx))*r;
+        if(halfH<0.5) continue;
+
+        ctx.drawImage(ballImg, srcX,0,1,iH, px,cy-halfH,1,halfH*2);
+      }
+      ctx.restore();
+
+      // Specular highlight
+      const sh=ctx.createRadialGradient(cx-r*.28,cy-r*.31,.5, cx-r*.1,cy-r*.1,r*.55);
+      sh.addColorStop(0,'rgba(255,255,255,.50)');
+      sh.addColorStop(.38,'rgba(255,255,255,.12)');
+      sh.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle=sh; ctx.fill();
+
+      // Rim darkening
+      const rim=ctx.createRadialGradient(cx,cy,r*.62,cx,cy,r);
+      rim.addColorStop(0,'rgba(0,0,0,0)');
+      rim.addColorStop(1,'rgba(0,0,0,.30)');
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle=rim; ctx.fill();
+
     }else{
+      // ══ FALLBACK PATH: Phong gradient + 3D seam lines ═══════════════
+      ctx.shadowColor='rgba(0,0,0,0.6)';
+      ctx.shadowBlur=30; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
       const g=ctx.createRadialGradient(cx-r*.30,cy-r*.32,r*.04, cx+r*.18,cy+r*.18,r*1.1);
-      g.addColorStop(0,   '#FFAA5A');
-      g.addColorStop(.28, '#E55500');
-      g.addColorStop(.62, '#BF4200');
-      g.addColorStop(1,   '#591400');
+      g.addColorStop(0,'#FFAA5A'); g.addColorStop(.28,'#E55500');
+      g.addColorStop(.62,'#BF4200'); g.addColorStop(1,'#591400');
       ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
       ctx.fillStyle=g; ctx.fill();
       ctx.shadowColor='transparent';
-    }
 
-    // ── 3. Great-circle seam lines ──
-    ctx.save();
-    ctx.beginPath(); ctx.arc(cx,cy,r-.5,0,Math.PI*2); ctx.clip();
-
-    const cosA=Math.cos(a), sinA=Math.sin(a);
-    const seamW=Math.max(3, r*0.055);   // ~11 px at 200px
-
-    for(const seam of SEAMS){
-      const segs=[];
-      let seg=[];
-      for(const [px,py,pz] of seam){
-        const x2= px*cosA + pz*sinA;   // Y-axis rotation
-        const z2=-px*sinA + pz*cosA;
-        if(z2>=-0.06){                 // visible front hemisphere
-          seg.push([cx+r*x2, cy-r*py]);
-        } else {
-          if(seg.length>1) segs.push(seg);
-          seg=[];
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx,cy,r-.5,0,Math.PI*2); ctx.clip();
+      const cosA=Math.cos(a), sinA=Math.sin(a);
+      const seamW=Math.max(3,r*0.055);
+      for(const seam of SEAMS){
+        const segs=[];let seg=[];
+        for(const [px,py,pz] of seam){
+          const x2=px*cosA+pz*sinA, z2=-px*sinA+pz*cosA;
+          if(z2>=-0.06){seg.push([cx+r*x2,cy-r*py]);}
+          else{if(seg.length>1)segs.push(seg);seg=[];}
+        }
+        if(seg.length>1)segs.push(seg);
+        for(const s of segs){
+          ctx.beginPath();ctx.moveTo(s[0][0],s[0][1]);
+          for(let k=1;k<s.length;k++)ctx.lineTo(s[k][0],s[k][1]);
+          ctx.strokeStyle='rgba(18,4,0,0.88)';ctx.lineWidth=seamW;
+          ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+          ctx.beginPath();ctx.moveTo(s[0][0],s[0][1]);
+          for(let k=1;k<s.length;k++)ctx.lineTo(s[k][0],s[k][1]);
+          ctx.strokeStyle='rgba(110,35,0,0.32)';ctx.lineWidth=seamW*0.36;ctx.stroke();
         }
       }
-      if(seg.length>1) segs.push(seg);
+      ctx.restore();
 
-      for(const s of segs){
-        // When using photo texture, use lower opacity so photo seams show through
-        const outerAlpha=ballImg?0.55:0.88;
-        const innerAlpha=ballImg?0.18:0.32;
-        // Outer dark groove
-        ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
-        for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
-        ctx.strokeStyle=`rgba(18,4,0,${outerAlpha})`;
-        ctx.lineWidth=seamW;
-        ctx.lineCap='round'; ctx.lineJoin='round';
-        ctx.stroke();
-        // Inner groove highlight
-        ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
-        for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
-        ctx.strokeStyle=`rgba(110,35,0,${innerAlpha})`;
-        ctx.lineWidth=seamW*0.36;
-        ctx.stroke();
-      }
+      const sh=ctx.createRadialGradient(cx-r*.28,cy-r*.31,.5, cx-r*.1,cy-r*.1,r*.58);
+      sh.addColorStop(0,'rgba(255,255,255,.56)');
+      sh.addColorStop(.38,'rgba(255,255,255,.13)');
+      sh.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=sh; ctx.fill();
+
+      const rim=ctx.createRadialGradient(cx,cy,r*.6,cx,cy,r);
+      rim.addColorStop(0,'rgba(0,0,0,0)');
+      rim.addColorStop(1,'rgba(0,0,0,.28)');
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=rim; ctx.fill();
     }
-    ctx.restore();
-
-    // ── 4. Specular highlight ──
-    const sh=ctx.createRadialGradient(cx-r*.28,cy-r*.31,.5, cx-r*.1,cy-r*.1,r*.58);
-    sh.addColorStop(0,   'rgba(255,255,255,.56)');
-    sh.addColorStop(.38, 'rgba(255,255,255,.13)');
-    sh.addColorStop(1,   'rgba(255,255,255,0)');
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fillStyle=sh; ctx.fill();
-
-    // ── 5. Rim darkening (ambient occlusion) ──
-    const rim=ctx.createRadialGradient(cx,cy,r*.6,cx,cy,r);
-    rim.addColorStop(0,'rgba(0,0,0,0)');
-    rim.addColorStop(1,'rgba(0,0,0,.28)');
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fillStyle=rim; ctx.fill();
   }
 
   function loop(){
