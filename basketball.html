@@ -40,7 +40,7 @@ button{touch-action:manipulation}
 .btn-icon{background:transparent;border:none;font-size:18px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:var(--r1);color:var(--muted)}
 .btn-icon:active{background:var(--s2);color:var(--text)}
 /* PROFILE */
-#s-profile{background:radial-gradient(ellipse at 30% 20%,rgba(255,87,34,.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(41,121,255,.10) 0%,transparent 50%),var(--bg);align-items:center;justify-content:center;padding:24px 20px}
+#s-profile{background:radial-gradient(ellipse at 50% 0%,rgba(255,87,34,.42) 0%,rgba(255,87,34,.18) 28%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(41,121,255,.10) 0%,transparent 50%),var(--bg);align-items:center;justify-content:center;padding:24px 20px}
 .profile-hero{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center}
 .ph-ball{font-size:64px;animation:ballBounce 1.4s ease-in-out infinite}
 @keyframes ballBounce{0%,100%{transform:translateY(0) rotate(0deg)}45%{transform:translateY(-22px) rotate(12deg)}65%{transform:translateY(-8px) rotate(-5deg)}}
@@ -1591,7 +1591,7 @@ body.modal-open{overflow:hidden}
 <!-- ══ PROFILE ══ -->
 <div id="s-profile" class="screen">
   <div class="profile-hero">
-    <span class="ph-ball">🏀</span>
+    <div class="ob-logo"><img src="icons/basketball-3d.png" alt="CourtCall" draggable="false" onerror="this.parentElement.innerHTML='🏀';this.parentElement.style.cssText='font-size:64px;width:auto;height:auto;border-radius:0;overflow:visible;box-shadow:none;background:none'"></div>
     <div class="ph-title">CourtCall</div>
     <div class="ph-sub">Voice-first pickup basketball OS</div>
     <div class="auth-card">
@@ -2761,7 +2761,13 @@ if (supa) {
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
       syncAllUserDataFromDB().then(() => {
         const active = document.querySelector('.screen.active')?.id;
-        if (active === 's-communities') renderCommunities();
+        if (active === 's-profile' || active === 's-onboarding') {
+          // Auto-advance returning users with an active session past the sign-in screen.
+          if (currentProfile?.id && currentProfile.id !== 'guest') {
+            renderHub();
+            showScreen('hub');
+          }
+        } else if (active === 's-communities') renderCommunities();
         else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
           syncPostsFromDB(activeCommunityId).then(() => renderCommDetail());
           renderCommDetail();
@@ -3176,7 +3182,7 @@ async function submitNewPin(){
   try{
     const {error}=await supa.auth.updateUser({password:pin});
     if(error)_setAuthErr('auth-err-rs',error.message);
-    else{_clearPin('pin-rs');_clearPin('pin-rsc');showToast('PIN updated — you\'re signed in');renderHub();showScreen(localStorage.getItem(OB_KEY)?'hub':'onboarding');}
+    else{_clearPin('pin-rs');_clearPin('pin-rsc');showToast('PIN updated — you\'re signed in');renderHub();showScreen('hub');}
   }catch{_setAuthErr('auth-err-rs','Could not update PIN — try again');}
   if(btn){btn.disabled=false;btn.textContent='Update PIN';}
 }
@@ -3257,7 +3263,7 @@ async function signIn(){
   };
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('signed_in');renderHub();
-  if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
+  showScreen('hub');
 }
 
 function _localSignIn(email,pin){
@@ -3267,7 +3273,7 @@ function _localSignIn(email,pin){
   if(p.pinHash!==_hashPin(pin,email)){_recordAuthFail(email);const left=_lockRemaining(email);_setAuthErr('auth-err-si',left?`Incorrect PIN. Locked for ${_fmtLockMsg(left)}.`:'Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
   _clearAuthFail(email);_clearAllPins();setObj(K.profile,p);currentProfile=p;
   trackEvent('signed_in');renderHub();
-  if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
+  showScreen('hub');
 }
 async function createAccount(){
   const name=(document.getElementById('inp-cr-name')?.value||'').trim();
@@ -3301,7 +3307,7 @@ async function createAccount(){
   const p={id:data.user.id,name,email,nickname:name,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
-  if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
+  showScreen('hub');
 }
 
 function _localCreateAccount(name,email,pin){
@@ -3311,7 +3317,7 @@ function _localCreateAccount(name,email,pin){
   const p={id:'p_'+Date.now(),name,email,nickname:name,pinHash:_hashPin(pin,email),createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
   setCol(K.profiles,[p]);setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
-  if(!localStorage.getItem(OB_KEY))showScreen('onboarding');else showScreen('hub');
+  showScreen('hub');
 }
 function guestLogin(){
   // Clear any lingering Supabase session so tokens don't persist in localStorage.
@@ -3324,7 +3330,7 @@ function guestLogin(){
   currentProfile=p;
   trackEvent('guest_started');
   renderHub();
-  if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}else{showScreen('hub');}
+  showScreen('hub');
 }
 // ── Hub ──────────────────────────────────────────────────
 function renderHub(){
@@ -7705,6 +7711,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   initAttrGrid();
   // Load saved profile
   const p=getObj(K.profile,null);
+  // Always init pin rows — both returning users and first-timers land on profile screen.
+  ['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
   if(p&&p.id){
     currentProfile=p;
     const saved=load();
@@ -7715,18 +7723,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     applySetupColors();
     renderHub();
     syncCommunitiesFromDB();
-    // Returning user: honor a deep-link / restore the screen from the URL hash.
+    // Pre-fill email for returning users.
+    if(p.email){const ef=document.getElementById('inp-si-email');if(ef)ef.value=p.email;}
+    // Returning user: honor a deep-link, otherwise show sign-in screen.
     if(location.hash&&_routeFromHash()){
       /* routed from hash */
-    }else if(!localStorage.getItem(OB_KEY)){
-      showScreen('onboarding');
     }else{
-      showScreen('hub');
+      showScreen('profile');
     }
   }else{
     // First time — show profile screen (onboarding runs after profile is set).
     // Still honor public deep-links (privacy/terms/communities/world).
-    ['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
     const seg=location.hash.replace(/^#\/?/,'').split('/')[0];
     if(seg&&_PUBLIC_SCREENS.has(seg)&&_routeFromHash()){
       /* routed to a public screen */
