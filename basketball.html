@@ -982,7 +982,8 @@ table.standings tr:last-child td{border-bottom:none}
 .lp-topnav{position:sticky;top:0;z-index:100;background:rgba(10,10,26,.92);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .lp-topnav-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .lp-tnav-logo{display:flex;align-items:center;gap:9px}
-.lp-tnav-ball{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ca),#c84000);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,87,34,.3)}
+.lp-tnav-ball{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 10px rgba(255,87,34,.35);background:linear-gradient(135deg,var(--ca),#c84000)}
+.lp-tnav-ball img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .lp-tnav-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);line-height:1}
 .lp-tnav-links{display:flex;gap:28px;align-items:center}
 .lp-tnav-link{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color var(--t1);white-space:nowrap;background:none;border:none;padding:10px 4px;min-height:44px;display:inline-flex;align-items:center}
@@ -1143,7 +1144,8 @@ table.standings tr:last-child td{border-bottom:none}
 .lp-footer-bar{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.07);padding:22px 24px}
 .lp-footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .lp-foot-logo{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em;color:var(--muted)}
-.lp-foot-ball{width:24px;height:24px;border-radius:7px;background:var(--ca);display:flex;align-items:center;justify-content:center;font-size:12px}
+.lp-foot-ball{width:26px;height:26px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--ca)}
+.lp-foot-ball img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .lp-foot-copy{font-size:11px;color:rgba(255,255,255,.22)}
 .lp-foot-guest{background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.45);font-size:12px;font-weight:600;cursor:pointer;padding:7px 14px;transition:all var(--t1)}
 .lp-foot-guest:active{color:var(--text)}
@@ -1207,7 +1209,8 @@ body.modal-open{overflow:hidden}
 /* ─── Onboarding ─────────────────────────────────────── */
 #s-onboarding{background:radial-gradient(ellipse at 50% 0%,rgba(255,87,34,.18) 0%,transparent 60%),var(--bg);align-items:center;justify-content:center;padding:24px 20px}
 .ob-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:0}
-.ob-logo{font-size:52px;margin-bottom:12px;animation:ballBounce 1.4s ease-in-out infinite}
+.ob-logo{width:108px;height:108px;border-radius:50%;overflow:hidden;margin:0 auto 16px;animation:ballBounce 1.4s ease-in-out infinite;box-shadow:0 8px 36px rgba(255,87,34,.45),0 0 0 2px rgba(255,87,34,.15);flex-shrink:0}
+.ob-logo img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .ob-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,9vw,48px);letter-spacing:.04em;text-align:center;line-height:1.1;margin-bottom:6px}
 .ob-sub{font-size:14px;color:var(--muted);text-align:center;margin-bottom:20px}
 .ob-cards{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
@@ -1547,7 +1550,7 @@ body.modal-open{overflow:hidden}
 <!-- ══ ONBOARDING ══ -->
 <div id="s-onboarding" class="screen" tabindex="-1">
   <div class="ob-wrap">
-    <div class="ob-logo">🏀</div>
+    <div class="ob-logo"><img src="icons/basketball-3d.png" alt="Basketball" draggable="false" onerror="this.parentElement.innerHTML='🏀';this.parentElement.style.cssText='font-size:52px;margin-bottom:12px'"></div>
     <h1 class="ob-h1">Welcome to<br>CourtCall</h1>
     <p class="ob-sub">What do you want to do today?</p>
     <div class="ob-cards">
@@ -1660,7 +1663,7 @@ body.modal-open{overflow:hidden}
   <header class="lp-topnav">
     <div class="lp-topnav-inner">
       <div class="lp-tnav-logo">
-        <div class="lp-tnav-ball" id="hub-avatar">🏀</div>
+        <div class="lp-tnav-ball" id="hub-avatar"><img src="icons/basketball-3d.png" alt="" draggable="false" id="hub-ball-img" onerror="this.style.display='none';this.parentElement.textContent='🏀'"></div>
         <span class="lp-tnav-name" id="hub-name">CourtCall</span>
       </div>
       <nav class="lp-tnav-links">
@@ -1843,7 +1846,7 @@ body.modal-open{overflow:hidden}
   <!-- FOOTER -->
   <footer class="lp-footer-bar">
     <div class="lp-footer-inner">
-      <div class="lp-foot-logo"><div class="lp-foot-ball">🏀</div>CourtCall</div>
+      <div class="lp-foot-logo"><div class="lp-foot-ball"><img src="icons/basketball-3d.png" alt="" draggable="false" onerror="this.style.display='none';this.parentElement.textContent='🏀'"></div>CourtCall</div>
       <div class="lp-foot-copy">© 2025 CourtCall · No login required · Works offline</div>
       <button class="lp-foot-guest" onclick="guestLogin()">Continue as Guest →</button>
     </div>
@@ -3327,10 +3330,18 @@ function guestLogin(){
 function renderHub(){
   const p=currentProfile||getObj(K.profile,null);
   if(p){
-    const init=p.name&&p.name!=='Guest'?p.name[0].toUpperCase():'🏀';
+    const init=p.name&&p.name!=='Guest'?p.name[0].toUpperCase():null;
     const avatarEl=document.getElementById('hub-avatar');
     const nameEl=document.getElementById('hub-name');
-    if(avatarEl)avatarEl.textContent=init;
+    if(avatarEl){
+      if(init){
+        avatarEl.innerHTML=`<span style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif">${init}</span>`;
+        avatarEl.style.background='linear-gradient(135deg,var(--ca),#c84000)';
+      }else{
+        avatarEl.innerHTML='<img src="icons/basketball-3d.png" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block">';
+        avatarEl.style.background='transparent';
+      }
+    }
     if(nameEl)nameEl.textContent=p.name==='Guest'?'CourtCall':`Hey, ${p.name}!`;
   }
   // Header auth state: signed-in users get a profile chip; otherwise "Log In".
@@ -8372,6 +8383,10 @@ async function clearDemoData(){
   let angle=0, speed=0.022;
   let drag=false, lastX=0, momentum=0;
   let canvas, ctx;
+  let ballImg=null;
+  const _ballTex=new Image();
+  _ballTex.onload=()=>{ballImg=_ballTex};
+  _ballTex.src='icons/basketball-3d.png';
 
   function init(){
     canvas=document.getElementById('ball-canvas');
@@ -8417,15 +8432,28 @@ async function clearDemoData(){
     ctx.shadowColor='rgba(0,0,0,0.6)';
     ctx.shadowBlur=30; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
 
-    // ── 2. Sphere base — Phong-style radial gradient ──
-    const g=ctx.createRadialGradient(cx-r*.30,cy-r*.32,r*.04, cx+r*.18,cy+r*.18,r*1.1);
-    g.addColorStop(0,   '#FFAA5A');
-    g.addColorStop(.28, '#E55500');
-    g.addColorStop(.62, '#BF4200');
-    g.addColorStop(1,   '#591400');
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fillStyle=g; ctx.fill();
-    ctx.shadowColor='transparent';
+    // ── 2. Sphere base — photo texture or Phong gradient fallback ──
+    if(ballImg){
+      // Draw shadow placeholder first (needs a fill to cast shadow)
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,0)'; ctx.fill();
+      ctx.shadowColor='transparent';
+      // Clip to circle and draw photo
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+      const td=r*2.18; // scale up slightly to crop white border
+      ctx.drawImage(ballImg,cx-td/2,cy-td/2,td,td);
+      ctx.restore();
+    }else{
+      const g=ctx.createRadialGradient(cx-r*.30,cy-r*.32,r*.04, cx+r*.18,cy+r*.18,r*1.1);
+      g.addColorStop(0,   '#FFAA5A');
+      g.addColorStop(.28, '#E55500');
+      g.addColorStop(.62, '#BF4200');
+      g.addColorStop(1,   '#591400');
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.shadowColor='transparent';
+    }
 
     // ── 3. Great-circle seam lines ──
     ctx.save();
@@ -8450,17 +8478,20 @@ async function clearDemoData(){
       if(seg.length>1) segs.push(seg);
 
       for(const s of segs){
+        // When using photo texture, use lower opacity so photo seams show through
+        const outerAlpha=ballImg?0.55:0.88;
+        const innerAlpha=ballImg?0.18:0.32;
         // Outer dark groove
         ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
         for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
-        ctx.strokeStyle='rgba(18,4,0,0.88)';
+        ctx.strokeStyle=`rgba(18,4,0,${outerAlpha})`;
         ctx.lineWidth=seamW;
         ctx.lineCap='round'; ctx.lineJoin='round';
         ctx.stroke();
-        // Inner groove highlight (gives the seam a 3-D inset look)
+        // Inner groove highlight
         ctx.beginPath(); ctx.moveTo(s[0][0],s[0][1]);
         for(let k=1;k<s.length;k++) ctx.lineTo(s[k][0],s[k][1]);
-        ctx.strokeStyle='rgba(110,35,0,0.32)';
+        ctx.strokeStyle=`rgba(110,35,0,${innerAlpha})`;
         ctx.lineWidth=seamW*0.36;
         ctx.stroke();
       }
