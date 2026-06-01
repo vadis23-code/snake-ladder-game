@@ -5640,12 +5640,12 @@ function renderFeedTabHTML(c,myRole){
   <textarea id="pp-body" class="post-inp post-textarea" placeholder="What's on the court?…" maxlength="600" aria-label="Post body"></textarea>
   <div style="display:flex;flex-direction:column;gap:6px">
     <label style="font-size:12px;color:var(--muted)">Photo (optional)</label>
-    <input type="file" id="pp-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handlePostFileSelect(this)">
+    <input type="file" id="pp-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handlePostFileSelect(this,'${escHtml(c.id)}')">
     <div style="display:flex;gap:8px;align-items:center">
       <button type="button" class="btn-post-action" onclick="document.getElementById('pp-file').click()">📎 Upload Photo</button>
       <span id="pp-file-name" style="font-size:12px;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
     </div>
-    <input id="pp-img" class="post-inp" type="text" placeholder="Or paste an image URL" autocomplete="off" aria-label="Image URL">
+    <input id="pp-img" class="post-inp" type="url" placeholder="Or paste an image URL" autocomplete="off" aria-label="Image URL">
   </div>
   <div class="post-form-actions">
     <button class="btn-post-submit" onclick="submitPost('${escHtml(c.id)}')">Publish</button>
@@ -5779,7 +5779,7 @@ function submitPost(communityId){
   setCommTab('feed');showToast('Post published!');
 }
 
-function handlePostFileSelect(input){
+function handlePostFileSelect(input,communityId){
   const file=input.files[0];
   if(!file)return;
   if(file.size>2*1024*1024){showToast('Image must be under 2 MB');input.value='';return}
