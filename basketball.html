@@ -1340,6 +1340,204 @@ body.modal-open{overflow:hidden}
 .hc-card-steps li{margin-bottom:2px}
 .hc-ask-bar{text-align:center;margin-top:16px}
 .hc-ask-btn{display:inline-block;padding:12px 24px;background:var(--ca);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE SYSTEM
+   Base layer = 360 px (smallest phone). min-width queries add polish.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Spacing scale — reusable across components */
+:root{--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px}
+
+/* ── Skip-to-content link (keyboard / AT navigation) ─────────────── */
+.skip-link{position:absolute;top:-100%;left:16px;z-index:9999;background:var(--ca);color:#fff;padding:10px 18px;border-radius:0 0 var(--r2) var(--r2);font:700 14px 'Inter',sans-serif;text-decoration:none;transition:top .15s;white-space:nowrap}
+.skip-link:focus{top:0;outline:3px solid var(--gold);outline-offset:2px}
+
+/* ── Offline banner ─────────────────────────────────────────────────  */
+.offline-banner{display:none;position:fixed;top:0;left:0;right:0;background:var(--danger);color:#fff;text-align:center;padding:10px 16px;font:700 13px 'Inter',sans-serif;z-index:9999;letter-spacing:.02em;line-height:1.4;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.offline-banner.show,.offline-banner.visible{display:block}
+
+/* ── Toast — prevent text clipping on narrow phones ─────────────────  */
+.toast{white-space:normal;max-width:min(320px,calc(100vw - 32px));word-break:break-word}
+
+/* ── Hub stats — 2×2 grid below 400 px (4 cols = ~75 px each, too cramped) */
+.hub-stats-grid{grid-template-columns:repeat(2,1fr)}
+
+/* ── Post-game card — scale padding with phone size ────────────────── */
+.pg-card{padding:22px 14px 18px}
+
+/* ── Score buttons — tight variant for 360-419 px ──────────────────── */
+.btn-score{min-height:72px;font-size:clamp(22px,6vw,36px)}
+
+/* ── Controls bar — wrap on very narrow viewports ──────────────────── */
+.controls-bar{flex-wrap:wrap;gap:6px;padding:8px 10px}
+.ctrl{min-height:48px;font-size:11px;padding:4px 3px}
+.ctrl-icon{font-size:15px}
+.ctrl-lbl{font-size:10px}
+
+/* ── Setup screen — tighter edge padding on 360 ─────────────────────── */
+.setup-form{padding-left:12px;padding-right:12px}
+.setup-actions{padding-left:12px;padding-right:12px}
+.chip{padding:9px 12px;font-size:12px;min-height:40px}
+
+/* ── Team builder tabs — compact on narrow ──────────────────────────── */
+.tb-tab{font-size:12px;padding:11px 5px}
+
+/* ── Community screens ─────────────────────────────────────────────── */
+.comm-list{padding:0 12px}
+.comm-form{padding:12px 12px 40px}
+
+/* ── Analytics & settings body ─────────────────────────────────────── */
+.analytics-body{padding:12px 12px 48px}
+.settings-body{padding:12px;gap:8px}
+
+/* ── World / league grid ───────────────────────────────────────────── */
+.league-grid{padding:0 12px 12px;gap:8px}
+
+/* ── Community detail tabs ─────────────────────────────────────────── */
+.cd-tab{padding:10px 10px;font-size:12px}
+
+/* ── More sheet ────────────────────────────────────────────────────── */
+.more-grid{gap:6px;padding:0 12px 12px}
+
+/* ── Landing topnav inner padding ──────────────────────────────────── */
+.lp-topnav-inner{padding:0 14px}
+
+/* ── Feed entries — slightly compact on 360 ────────────────────────── */
+.feed-entry{font-size:13px;padding:6px 8px}
+.fe-pts{font-size:17px}
+
+/* ── Player stats row — readable on tiny screens ───────────────────── */
+.pstat-val{font-size:16px}
+.pstat-lbl{font-size:8px}
+
+/* ── History / career filter bar ───────────────────────────────────── */
+.career-sort-bar{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ── Tourn card ────────────────────────────────────────────────────── */
+.tourn-form{padding:12px;gap:10px}
+
+/* ── Pulse / news screen ───────────────────────────────────────────── */
+.pulse-hero{padding:16px 12px 10px}
+.pulse-loc-card{margin:0 12px 12px}
+.pulse-feed{padding:0 12px 40px}
+
+/* ── Onboarding screen ─────────────────────────────────────────────── */
+#s-onboarding{padding:20px 14px}
+
+/* ═══ 400 px + — hub stats restore 4-col ═══════════════════════════ */
+@media(min-width:400px){
+  .hub-stats-grid{grid-template-columns:repeat(4,1fr)}
+  .btn-score{min-height:76px}
+}
+
+/* ═══ 420 px + — post-game card more breathing room ════════════════ */
+@media(min-width:420px){
+  .pg-card{padding:26px 18px 22px}
+  .setup-form{padding-left:14px;padding-right:14px}
+  .setup-actions{padding-left:14px;padding-right:14px}
+}
+
+/* ═══ 480 px + ══════════════════════════════════════════════════════ */
+@media(min-width:480px){
+  /* Post-game */
+  .pg-card{padding:36px 26px 30px}
+
+  /* Score buttons */
+  .btn-score{min-height:80px;font-size:clamp(26px,7vw,36px)}
+
+  /* Controls bar — unwrap, restore sizes */
+  .controls-bar{flex-wrap:nowrap;gap:8px;padding:8px 12px}
+  .ctrl{min-height:54px;font-size:12px;padding:6px 4px}
+  .ctrl-icon{font-size:18px}
+  .ctrl-lbl{font-size:11px}
+
+  /* Setup */
+  .setup-form{padding-left:16px;padding-right:16px}
+  .setup-actions{padding-left:16px;padding-right:16px}
+  .chip{padding:10px 16px;font-size:13px;min-height:44px}
+
+  /* Team builder */
+  .tb-tab{font-size:13px;padding:12px 8px}
+
+  /* Community */
+  .comm-list{padding:0 16px}
+  .comm-form{padding:12px 16px 40px}
+  .cd-tab{padding:11px 14px;font-size:13px}
+
+  /* Analytics / Settings */
+  .analytics-body{padding:16px 16px 48px}
+  .settings-body{padding:16px;gap:10px}
+
+  /* World */
+  .league-grid{padding:0 16px 16px;gap:10px}
+
+  /* More sheet */
+  .more-grid{gap:8px;padding:0 16px 16px}
+
+  /* Feed */
+  .feed-entry{font-size:14px;padding:7px 10px}
+  .fe-pts{font-size:20px}
+
+  /* Player stats */
+  .pstat-val{font-size:18px}
+  .pstat-lbl{font-size:9px}
+
+  /* Landing topnav */
+  .lp-topnav-inner{padding:0 20px}
+
+  /* Tourn form */
+  .tourn-form{padding:16px;gap:12px}
+
+  /* Pulse */
+  .pulse-hero{padding:20px 16px 12px}
+  .pulse-loc-card{margin:0 16px 14px}
+  .pulse-feed{padding:0 16px 40px}
+
+  /* Onboarding */
+  #s-onboarding{padding:24px 20px}
+}
+
+/* ═══ 640 px + ══════════════════════════════════════════════════════ */
+@media(min-width:640px){
+  /* Hub: wider feature cards */
+  .hub-feat-cards{grid-template-columns:repeat(3,1fr)}
+  .hub-feat-card:last-child:nth-child(odd){grid-column:auto}
+}
+
+/* ═══ 768 px (tablet) ═══════════════════════════════════════════════ */
+@media(min-width:768px){
+  /* Post-game — full desktop padding restored */
+  .pg-card{padding:40px 28px 32px}
+
+  /* Analytics / settings wider max */
+  .analytics-body{padding:20px 20px 60px;max-width:560px;margin:0 auto}
+  .settings-body{padding:20px;gap:12px;max-width:560px;margin:0 auto}
+
+  /* Player stats restore full size */
+  .pstat-val{font-size:18px}
+  .pstat-lbl{font-size:9px}
+}
+
+/* ═══ 900 px + (desktop nav) ════════════════════════════════════════ */
+@media(min-width:900px){
+  /* Restore topnav full padding on desktop */
+  .lp-topnav-inner{padding:0 24px}
+}
+
+/* ═══ 1024 px + (desktop) ══════════════════════════════════════════ */
+@media(min-width:1024px){
+  .analytics-body{max-width:640px;padding:24px 24px 60px}
+  .settings-body{max-width:640px;padding:24px;gap:12px}
+  .hub-stats-grid{grid-template-columns:repeat(4,1fr)}
+}
+
+/* ═══ 1440 px + (wide desktop) ═════════════════════════════════════ */
+@media(min-width:1440px){
+  .lp-sec-inner{max-width:1200px}
+  .lp-s4-inner,.lp-s5-inner,.lp-s6-inner{max-width:1200px}
+  .lp-topnav-inner,.lp-footer-inner{max-width:1200px}
+}
 </style>
 </head>
 <body>
