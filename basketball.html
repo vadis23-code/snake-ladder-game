@@ -1077,6 +1077,36 @@ table.standings tr:last-child td{border-bottom:none}
 .ball-speed-sl{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:rgba(255,255,255,.12);outline:none;cursor:pointer}
 .ball-speed-sl::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ca);cursor:pointer;box-shadow:0 2px 8px rgba(255,87,34,.5)}
 .ball-speed-sl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ca);cursor:pointer;border:none}
+/* ── sr-only utility ── */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* ── Tip-Off Decider Premium Widget ── */
+.tipoff-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;background:radial-gradient(ellipse at 50% -10%,rgba(255,87,34,.24) 0%,rgba(0,0,0,0) 62%),linear-gradient(180deg,#0e0e1f 0%,#080816 100%);border-radius:24px;padding:18px 14px 20px;overflow:hidden;border:1px solid rgba(255,255,255,.07);box-shadow:0 32px 80px rgba(0,0,0,.65)}
+.tipoff-wrap::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:65%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,87,34,.7),transparent)}
+.tipoff-header{width:100%;display:flex;flex-direction:column;gap:3px}
+.tipoff-kicker{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ca)}
+.tipoff-kicker-dot{width:5px;height:5px;border-radius:50%;background:var(--ca);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0}
+.tipoff-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.04em;color:var(--text);line-height:1}
+.tipoff-sub{font-size:12px;color:var(--muted);line-height:1.4}
+.tipoff-arc-row{display:flex;align-items:center;width:100%;gap:2px;margin-top:2px}
+.tipoff-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.35);white-space:nowrap;flex-shrink:0;padding:0 4px}
+.tipoff-arc-svg{flex:1;height:auto;overflow:visible}
+.tipoff-arena{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible}
+.tipoff-ring{position:absolute;border-radius:50%;pointer-events:none;box-shadow:0 0 22px 4px rgba(255,87,34,.35),0 0 0 1.5px rgba(255,100,50,.35);transition:box-shadow .15s ease}
+.tipoff-shadow-disc{width:70%;height:12px;background:radial-gradient(ellipse at center,rgba(0,0,0,.85) 0%,transparent 72%);border-radius:50%;margin-top:-6px;flex-shrink:0}
+.tipoff-court{width:100%;height:44px;background:linear-gradient(180deg,rgba(90,50,10,.28) 0%,rgba(55,30,3,.55) 100%);border-top:1px solid rgba(170,100,15,.22);border-radius:0 0 16px 16px;position:relative;overflow:hidden;flex-shrink:0}
+.tipoff-court::after{content:'';position:absolute;left:50%;top:-18px;transform:translateX(-50%);width:130px;height:80px;border:1.5px solid rgba(200,150,40,.14);border-radius:50%}
+.tipoff-result{min-height:18px;font-size:13px;font-weight:700;color:var(--text);text-align:center;padding:2px 8px}
+.tipoff-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(12,12,28,.85);border:1.5px solid rgba(255,255,255,.18);border-radius:50px;padding:14px 32px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;min-height:54px;box-shadow:0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);width:90%;max-width:280px}
+.tipoff-btn:hover{border-color:rgba(255,87,34,.5);box-shadow:0 4px 24px rgba(255,87,34,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.tipoff-btn:active{transform:scale(.96)}
+.tipoff-btn.spinning{border-color:rgba(255,87,34,.6);box-shadow:0 4px 24px rgba(255,87,34,.28),inset 0 1px 0 rgba(255,255,255,.06)}
+.tipoff-btn:focus-visible{outline:2px solid var(--ca);outline-offset:3px}
+.tipoff-kbd{background:none;border:1px dashed rgba(255,255,255,.12);border-radius:8px;padding:5px 12px;color:rgba(255,255,255,.3);font-size:11px;cursor:pointer;transition:all .15s;margin-top:-2px}
+.tipoff-kbd:hover,.tipoff-kbd:focus-visible{color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.3)}
+.tipoff-kbd:focus-visible{outline:2px solid var(--ca);outline-offset:2px}
+.tipoff-sparks{position:absolute;inset:-20px;pointer-events:none;overflow:visible}
+@keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--stx),var(--sty)) scale(0)}}
+@media (prefers-reduced-motion:reduce){.tipoff-kicker-dot{animation:none}.tipoff-ring{transition:none}.tipoff-btn{transition:none}}
 /* Section base */
 .lp-sec{padding:72px 0}
 .lp-sec-inner{max-width:1100px;margin:0 auto;padding:0 24px}
@@ -1720,22 +1750,72 @@ body.modal-open{overflow:hidden}
       </div>
     </div>
 
-    <!-- Right: interactive 3D basketball -->
-    <div class="lp-ball-card">
-      <div class="lp-ball-badge"><div class="lp-ball-dot"></div>Interactive 3D</div>
-      <canvas id="ball-canvas" aria-label="Rotating 3D basketball — drag to spin"></canvas>
-      <div class="ball-ctrl">
-        <div class="ball-ctrl-top">
-          <span class="ball-ctrl-ttl">Spin Speed</span>
-          <span class="ball-ctrl-hint">Drag ball to spin</span>
-        </div>
-        <div class="ball-ctrl-row">
-          <span class="ball-ctrl-ico">🐢</span>
-          <input type="range" id="ball-speed" class="ball-speed-sl" min="0" max="100" value="40"
-            aria-label="Basketball rotation speed">
-          <span class="ball-ctrl-ico">⚡</span>
-        </div>
+    <!-- Right: Tip-Off Decider premium widget -->
+    <div class="tipoff-wrap" role="application" aria-label="Tip-Off Decider basketball spinner" id="tipoff-wrap">
+      <!-- Header -->
+      <div class="tipoff-header">
+        <span class="tipoff-kicker"><span class="tipoff-kicker-dot"></span>INTERACTIVE</span>
+        <div class="tipoff-title">Tip-Off Decider</div>
+        <div class="tipoff-sub">Spin the ball to decide who gets first possession.</div>
       </div>
+
+      <!-- Speed Arc -->
+      <div class="tipoff-arc-row" aria-hidden="true">
+        <span class="tipoff-lbl">SLOW</span>
+        <svg class="tipoff-arc-svg" viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3a1500"/>
+              <stop offset="55%" stop-color="#FF5722"/>
+              <stop offset="100%" stop-color="#FF8A50"/>
+            </linearGradient>
+          </defs>
+          <!-- Background track -->
+          <path d="M 36,85 A 120,120 0 0 1 244,85" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+          <!-- Active fill — stroke-dashoffset driven by JS -->
+          <path id="arc-active" d="M 36,85 A 120,120 0 0 1 244,85" fill="none" stroke="url(#arcGrad)" stroke-width="3" stroke-linecap="round" stroke-dasharray="252" stroke-dashoffset="126"/>
+          <!-- Main tick marks at -60°,-30°,0°,30°,60° from vertical -->
+          <line x1="38.7" y1="86.5" x2="30.0" y2="81.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="81.0" y1="42.8" x2="78.0" y2="37.6" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="140.0" y1="27.0" x2="140.0" y2="19.0" stroke="rgba(255,255,255,0.65)" stroke-width="2.0" stroke-linecap="round"/>
+          <line x1="199.0" y1="42.8" x2="202.0" y2="37.6" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="241.3" y1="86.5" x2="250.0" y2="81.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Sub ticks at -45°,-15°,15°,45° -->
+          <line x1="56.6" y1="61.6" x2="54.5" y2="59.5" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linecap="round"/>
+          <line x1="109.4" y1="31.0" x2="108.7" y2="28.1" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linecap="round"/>
+          <line x1="170.6" y1="31.0" x2="171.3" y2="28.1" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linecap="round"/>
+          <line x1="223.4" y1="61.6" x2="225.5" y2="59.5" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linecap="round"/>
+          <!-- Speed pointer triangle (JS moves this) -->
+          <polygon id="arc-ptr" points="140,15 135.5,24 144.5,24" fill="white" opacity="0.9"/>
+        </svg>
+        <span class="tipoff-lbl">FAST</span>
+      </div>
+
+      <!-- Ball arena: ring + canvas + sparks -->
+      <div class="tipoff-arena" id="tipoff-arena">
+        <div class="tipoff-ring" id="tipoff-ring"></div>
+        <canvas id="ball-canvas" aria-label="Rotating 3D basketball — drag to spin"></canvas>
+        <div class="tipoff-sparks" id="tipoff-sparks"></div>
+      </div>
+
+      <!-- Court floor -->
+      <div class="tipoff-shadow-disc" aria-hidden="true"></div>
+      <div class="tipoff-court" aria-hidden="true"></div>
+
+      <!-- Result announcement -->
+      <div class="tipoff-result" id="tipoff-result" aria-live="polite"></div>
+
+      <!-- Drag & Spin CTA button -->
+      <button class="tipoff-btn" id="tipoff-btn" aria-label="Click to give the ball a random spin">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3c2.4 2.5 3.8 5.7 3.8 9s-1.4 6.5-3.8 9"/><path d="M12 3c-2.4 2.5-3.8 5.7-3.8 9s1.4 6.5 3.8 9"/><line x1="3.1" y1="9" x2="20.9" y2="9"/><line x1="3.1" y1="15" x2="20.9" y2="15"/></svg>
+        DRAG &amp; SPIN
+      </button>
+
+      <!-- Keyboard-accessible fallback -->
+      <button class="tipoff-kbd" onclick="tipoffRandomSpin()" aria-label="Random Pick — keyboard accessible alternative to dragging">⌨ Random Pick</button>
+
+      <!-- Hidden speed slider kept for JS backward-compat (auto-rotation speed) -->
+      <input type="range" id="ball-speed" class="sr-only" min="0" max="100" value="40" aria-label="Basketball rotation speed" tabindex="-1">
     </div>
   </div>
 
@@ -8362,7 +8442,7 @@ async function clearDemoData(){
    never appear perfectly edge-on while rotating.
 ═══════════════════════════════════════════════════════════ */
 ;(function(){
-  const BALL_PX=200;
+  const BALL_PX=260;
   const SEG=180;
 
   // Pre-tilt 24° around X-axis so seams look natural at all Y-rotation angles
@@ -8425,6 +8505,58 @@ async function clearDemoData(){
     ballImg=oc;
   }
 
+  // ── Visual effects state ──────────────────────────────────
+  let _prevAngle=0, _dispSpeed=0;
+  const ARC_LEN=252, ARC_CX=140, ARC_CY=145, ARC_R=112;
+
+  function _updateEffects(){
+    const delta=Math.abs(angle-_prevAngle);
+    _prevAngle=angle;
+    const rawNorm=Math.min(1,delta/0.14);
+    _dispSpeed+=( rawNorm-_dispSpeed)*0.09;
+    const s=_dispSpeed;
+
+    // Glow ring
+    const ring=document.getElementById('tipoff-ring');
+    if(ring){
+      const g1=18+s*70, g2=2+s*22, op=0.18+s*0.65;
+      ring.style.boxShadow=`0 0 ${g1}px ${g2}px rgba(255,87,34,${op.toFixed(2)}),0 0 0 1.5px rgba(255,100,50,${(0.28+s*0.55).toFixed(2)})`;
+    }
+
+    // Arc active fill
+    const arcEl=document.getElementById('arc-active');
+    if(arcEl) arcEl.style.strokeDashoffset=(ARC_LEN*(1-s*0.9)).toFixed(1);
+
+    // Arc pointer triangle (moves from left to right as speed increases)
+    const ptr=document.getElementById('arc-ptr');
+    if(ptr){
+      const aRad=(-60+s*120)*Math.PI/180;
+      const px=ARC_CX+ARC_R*Math.sin(aRad), py=ARC_CY-ARC_R*Math.cos(aRad);
+      ptr.setAttribute('points',`${px.toFixed(1)},${(py-9).toFixed(1)} ${(px-4.5).toFixed(1)},${(py+1).toFixed(1)} ${(px+4.5).toFixed(1)},${(py+1).toFixed(1)}`);
+    }
+
+    // Sparks when fast
+    const sparks=document.getElementById('tipoff-sparks');
+    if(sparks&&s>0.55&&Math.random()<(s-0.55)*0.35){
+      const a2=Math.random()*Math.PI*2;
+      const dist=BALL_PX/2+4+Math.random()*10;
+      const ox=sparks.offsetWidth/2||BALL_PX/2+20;
+      const oy=sparks.offsetHeight/2||BALL_PX/2+20;
+      const sx=(Math.cos(a2)*dist+ox).toFixed(1);
+      const sy=(Math.sin(a2)*dist+oy).toFixed(1);
+      const tx=(Math.cos(a2)*(18+Math.random()*28)).toFixed(1);
+      const ty=(Math.sin(a2)*(18+Math.random()*28)).toFixed(1);
+      const sp=document.createElement('div');
+      sp.style.cssText=`position:absolute;width:${(2+Math.random()*2).toFixed(1)}px;height:${(2+Math.random()*2).toFixed(1)}px;border-radius:50%;background:hsl(${(20+Math.random()*15).toFixed(0)},100%,65%);left:${sx}px;top:${sy}px;--stx:${tx}px;--sty:${ty}px;animation:sparkFly ${(0.35+Math.random()*0.35).toFixed(2)}s ease-out forwards;pointer-events:none`;
+      sparks.appendChild(sp);
+      setTimeout(()=>sp.remove(),750);
+    }
+
+    // Button spinning class
+    const btn=document.getElementById('tipoff-btn');
+    if(btn) btn.classList.toggle('spinning',s>0.18);
+  }
+
   function init(){
     canvas=document.getElementById('ball-canvas');
     if(!canvas)return;
@@ -8436,16 +8568,27 @@ async function clearDemoData(){
     ctx=canvas.getContext('2d');
     ctx.scale(dpr,dpr);
 
+    // Size the glow ring to wrap the ball canvas
+    const ring=document.getElementById('tipoff-ring');
+    if(ring){
+      const pad=20;
+      ring.style.width=(BALL_PX+pad*2)+'px';
+      ring.style.height=(BALL_PX+pad*2)+'px';
+      ring.style.inset=(-pad)+'px';
+    }
+
     // Pre-scale the ball photo to a working canvas for fast per-column sampling
-    if(_ballTex.complete && _ballTex.naturalWidth){
+    if(_ballTex.complete&&_ballTex.naturalWidth){
       _prepareBallTex(_ballTex);
-    } else {
+    }else{
       _ballTex.onload=()=>{ _prepareBallTex(_ballTex); };
     }
 
+    // Auto-rotation speed from hidden slider
     const sl=document.getElementById('ball-speed');
     if(sl) sl.addEventListener('input',()=>{ speed=(+sl.value/100)*0.08; });
 
+    // Drag to spin
     canvas.addEventListener('pointerdown',e=>{
       drag=true; lastX=e.offsetX; momentum=0;
       canvas.setPointerCapture(e.pointerId);
@@ -8464,6 +8607,17 @@ async function clearDemoData(){
         coast();
       }
     });
+
+    // Drag & Spin button → random kick
+    const btn=document.getElementById('tipoff-btn');
+    if(btn){
+      btn.addEventListener('click',()=>{
+        const dir=Math.random()>0.5?1:-1;
+        let v=dir*(0.12+Math.random()*0.16);
+        const coast=()=>{ v*=0.93; angle+=v; if(Math.abs(v)>5e-4) requestAnimationFrame(coast); };
+        coast();
+      });
+    }
 
     loop();
   }
@@ -8574,6 +8728,7 @@ async function clearDemoData(){
   function loop(){
     if(!drag) angle+=speed;
     drawBall(angle);
+    _updateEffects();
     requestAnimationFrame(loop);
   }
 
