@@ -8732,6 +8732,14 @@ async function clearDemoData(){
     requestAnimationFrame(loop);
   }
 
+  // Expose random spin for keyboard button
+  window.tipoffRandomSpin=function(){
+    const dir=Math.random()>0.5?1:-1;
+    let v=dir*(0.12+Math.random()*0.18);
+    const coast=()=>{ v*=0.93; angle+=v; if(Math.abs(v)>5e-4) requestAnimationFrame(coast); };
+    coast();
+  };
+
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',init);
   } else {
