@@ -8398,15 +8398,30 @@ async function clearDemoData(){
   const BALL_MARG=0.045; // trim white border from photo (% each side)
 
   function _prepareBallTex(src){
-    const oc=document.createElement('canvas');
-    oc.width=oc.height=TEX_SIZE;
-    const ox=oc.getContext('2d');
-    // Draw the source image cropped to remove the white background border
+    // Step 1: draw cropped photo to temp canvas then punch out white background
+    const tc=document.createElement('canvas');
+    tc.width=tc.height=TEX_SIZE;
+    const tx=tc.getContext('2d');
     const m=BALL_MARG;
-    ox.drawImage(src,
+    tx.drawImage(src,
       src.naturalWidth*m, src.naturalHeight*m,
       src.naturalWidth*(1-2*m), src.naturalHeight*(1-2*m),
       0, 0, TEX_SIZE, TEX_SIZE);
+    const id=tx.getImageData(0,0,TEX_SIZE,TEX_SIZE);
+    const d=id.data;
+    for(let i=0;i<d.length;i+=4){
+      // Any near-white pixel is the background — make transparent
+      if(d[i]>220 && d[i+1]>200 && d[i+2]>185) d[i+3]=0;
+    }
+    tx.putImageData(id,0,0);
+
+    // Step 2: composite: solid ball-color base so no gaps ever show white
+    const oc=document.createElement('canvas');
+    oc.width=oc.height=TEX_SIZE;
+    const ox=oc.getContext('2d');
+    ox.fillStyle='#C84B00';
+    ox.fillRect(0,0,TEX_SIZE,TEX_SIZE);
+    ox.drawImage(tc,0,0); // photo with holes → orange shows through
     ballImg=oc;
   }
 
@@ -8472,7 +8487,6 @@ async function clearDemoData(){
       ctx.save();
       ctx.beginPath(); ctx.arc(cx,cy,r-0.5,0,Math.PI*2); ctx.clip();
 
-      const HALF_PI=Math.PI*0.5;
       const TWO_PI=Math.PI*2;
       const iW=TEX_SIZE, iH=TEX_SIZE;
       const x0=Math.ceil(cx-r), x1=Math.floor(cx+r);
@@ -8482,15 +8496,10 @@ async function clearDemoData(){
         if(nx<-1||nx>1) continue;
         const theta=Math.asin(nx);                   // screen longitude: −π/2…π/2
 
-        // Source longitude after rotation
-        let st=theta-a;
-        // Normalise to [−π, π]
-        st=((st+Math.PI)%TWO_PI+TWO_PI)%TWO_PI-Math.PI;
-        // Fold back hemisphere → [−π/2, π/2]  (ball looks same from both sides)
-        if(st> HALF_PI) st= Math.PI-st;
-        else if(st<-HALF_PI) st=-Math.PI-st;
-
-        const u=(st+HALF_PI)/Math.PI;               // 0…1
+        // Source longitude after rotation — modulo wrap so texture tiles
+        // continuously around the full sphere (no fold = ball actually rotates)
+        const st=theta-a;
+        const u=(((st+Math.PI)/TWO_PI)%1+1)%1;      // 0…1, wrapping
         const srcX=u*iW;
         const halfH=Math.sqrt(Math.max(0,1-nx*nx))*r;
         if(halfH<0.5) continue;
