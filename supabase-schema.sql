@@ -63,7 +63,7 @@ create index if not exists idx_games_created_at on public.games(created_at desc)
 -- ── Migration: extended game stats columns (run once if upgrading) ───────
 -- These were missing from the original schema, causing supaSaveGame to fail.
 -- Safe to run multiple times (IF NOT EXISTS / IF column not already present).
-alter table public.games add column if not exists duration        int;
+alter table public.games add column if not exists duration        text; -- stores "0m 35s" formatted string
 alter table public.games add column if not exists fouls_a         int;
 alter table public.games add column if not exists fouls_b         int;
 alter table public.games add column if not exists max_lead_a      int;
