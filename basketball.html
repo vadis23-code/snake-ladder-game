@@ -5507,14 +5507,21 @@ async function supaUpsertCPlayer(player) {
   if (!supa || !supaUser) return false;
   try {
     const { error } = await supa.from('community_players').upsert({
-      id: player.id, community_id: player.communityId,
-      name: player.name, nickname: player.nickname || null,
-      jersey_number: player.jerseyNumber || null, photo_url: player.photoUrl || null,
-      position: player.position || null, badges: player.badges || [],
-      games_played: player.gamesPlayed || 0, wins: player.wins || 0,
-      losses: player.losses || 0, points: player.points || 0,
-      mvp_count: player.mvpCount || 0, created_by: player.createdBy || supaUser.id,
-      created_at: player.createdAt || new Date().toISOString()
+      id:           player.id,
+      community_id: player.communityId,
+      creator_id:   player.createdBy   || supaUser.id,
+      name:         player.name,
+      nickname:     player.nickname    || null,
+      jersey_num:   player.jerseyNumber || null,
+      photo_url:    player.photoUrl    || null,
+      position:     player.position    || null,
+      badges:       player.badges      || [],
+      games_played: player.gamesPlayed || 0,
+      wins:         player.wins        || 0,
+      losses:       player.losses      || 0,
+      points:       player.points      || 0,
+      mvp_count:    player.mvpCount    || 0,
+      created_at:   player.createdAt   || new Date().toISOString()
     }, { onConflict: 'id' });
     if (error) { console.warn('supaUpsertCPlayer:', error.message); return false; }
     return true;
@@ -5554,12 +5561,17 @@ async function supaSubmitGalleryItem(item) {
   if (item.imageSourceType === 'upload' || !item.imageUrl) return false;
   try {
     const { error } = await supa.from('community_gallery').insert({
-      id: item.id, community_id: item.communityId,
-      uploaded_by: supaUser.id, uploader_name: item.uploaderName || currentProfile?.name || '',
-      image_url: item.imageUrl || null, caption: item.caption || '',
-      album: item.album || null, tagged_players: item.taggedPlayers || [],
-      likes: item.likes || [], comments: item.comments || [],
-      created_at: item.createdAt || new Date().toISOString()
+      id:             item.id,
+      community_id:   item.communityId,
+      uploader_id:    supaUser.id,
+      uploader_name:  item.uploaderName || currentProfile?.name || '',
+      image_url:      item.imageUrl     || null,
+      caption:        item.caption      || '',
+      album:          item.album        || null,
+      tagged_players: item.taggedPlayers || [],
+      likes:          item.likes        || [],
+      comments:       item.comments     || [],
+      created_at:     item.createdAt    || new Date().toISOString()
     });
     if (error) { console.warn('supaSubmitGalleryItem:', error.message); return false; }
     return true;
@@ -5635,12 +5647,17 @@ async function supaUpsertTournament(tournament) {
   if (!supa || !supaUser) return false;
   try {
     const { error } = await supa.from('tournaments').upsert({
-      id: tournament.id, user_id: supaUser.id,
-      name: tournament.name || '', format: tournament.format || '',
-      status: tournament.completed ? 'completed' : 'active',
-      teams: tournament.teams || [], fixtures: tournament.fixtures || [],
-      winner: tournament.winner || null,
-      settings: { winScore: tournament.winScore },
+      id:         tournament.id,
+      user_id:    supaUser.id,
+      name:       tournament.name    || '',
+      format:     tournament.format  || '',
+      win_score:  tournament.winScore ?? 21,
+      teams:      tournament.teams    || [],
+      fixtures:   tournament.fixtures || [],
+      standings:  tournament.standings || {},
+      completed:  tournament.completed ? true : false,
+      winner:     tournament.winner   || null,
+      settings:   { winScore: tournament.winScore },
       created_at: tournament.createdAt ? new Date(tournament.createdAt).toISOString() : new Date().toISOString(),
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
