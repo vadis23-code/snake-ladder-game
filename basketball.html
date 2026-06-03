@@ -2957,32 +2957,24 @@ async function logOut() {
 async function supaSaveGame(game) {
   if (!supa || !supaUser) return;
   try {
-    await supa.from('games').insert({
-      id: game.id || ('g_' + Date.now()),
-      user_id: supaUser.id,
-      team_a_name: game.teamA?.name || '',
-      team_b_name: game.teamB?.name || '',
-      score_a: game.teamA?.score ?? 0,
-      score_b: game.teamB?.score ?? 0,
-      winner: game.winner?.name || game.winner || '',
-      game_type: game.gameType || '',
-      win_score: game.winScore ?? 21,
-      scoring_rule: game.scoringRule || '',
-      duration: game.duration || null,
-      fouls_a: game.foulsA ?? null,
-      fouls_b: game.foulsB ?? null,
-      max_lead_a: game.maxLeadA ?? null,
-      max_lead_b: game.maxLeadB ?? null,
-      lead_changes: game.leadChanges ?? null,
-      biggest_run: game.biggestRun ?? null,
-      quarters_played: game.quartersPlayed ?? null,
-      tournament_id: game.tournamentId || null,
-      fixture_id: game.fixtureId || null,
-      players_a: game.teamA?.players?.length ? game.teamA.players : null,
-      players_b: game.teamB?.players?.length ? game.teamB.players : null,
-      created_at: game.date ? new Date(game.date).toISOString() : new Date().toISOString()
+    const { error } = await supa.from('games').insert({
+      id:           game.id || ('g_' + Date.now()),
+      user_id:      supaUser.id,
+      team_a_name:  game.teamA?.name  || '',
+      team_b_name:  game.teamB?.name  || '',
+      score_a:      game.teamA?.score ?? 0,
+      score_b:      game.teamB?.score ?? 0,
+      winner:       game.winner?.name || game.winner || '',
+      game_type:    game.gameType     || '',
+      win_score:    game.winScore     ?? 21,
+      scoring_rule: game.scoringRule  || '',
+      created_at:   game.date ? new Date(game.date).toISOString() : new Date().toISOString()
     });
-  } catch(e) { console.warn('supaSaveGame:', e.message); }
+    if (error) throw error;
+  } catch(e) {
+    console.warn('supaSaveGame failed:', e.message);
+    if (typeof showToast === 'function') showToast('Game saved locally (cloud sync failed)', 3500);
+  }
 }
 
 async function supaFetchGames(limit = 10) {

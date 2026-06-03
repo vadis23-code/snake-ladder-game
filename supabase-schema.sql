@@ -59,3 +59,19 @@ create or replace trigger on_auth_user_created
 -- Performance indexes
 create index if not exists idx_games_user_id    on public.games(user_id);
 create index if not exists idx_games_created_at on public.games(created_at desc);
+
+-- ── Migration: extended game stats columns (run once if upgrading) ───────
+-- These were missing from the original schema, causing supaSaveGame to fail.
+-- Safe to run multiple times (IF NOT EXISTS / IF column not already present).
+alter table public.games add column if not exists duration        int;
+alter table public.games add column if not exists fouls_a         int;
+alter table public.games add column if not exists fouls_b         int;
+alter table public.games add column if not exists max_lead_a      int;
+alter table public.games add column if not exists max_lead_b      int;
+alter table public.games add column if not exists lead_changes    int;
+alter table public.games add column if not exists biggest_run     int;
+alter table public.games add column if not exists quarters_played int;
+alter table public.games add column if not exists tournament_id   text;
+alter table public.games add column if not exists fixture_id      text;
+alter table public.games add column if not exists players_a       jsonb;
+alter table public.games add column if not exists players_b       jsonb;
