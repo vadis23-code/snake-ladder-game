@@ -5882,6 +5882,7 @@ function createCommunity(){
     createdAt:new Date().toLocaleDateString(),
     memberCount:1,
   };
+  community.location=[community.city,community.state,community.country].filter(Boolean).join(', ');
   const communities=getComms();
   communities.push(community);
   setComms(communities);
