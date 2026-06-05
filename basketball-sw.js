@@ -1,4 +1,4 @@
-const CACHE = 'courtcall-v7';
+const CACHE = 'courtcall-v8';
 const SHELL = [
   './basketball.html',
   './basketball.manifest.json',

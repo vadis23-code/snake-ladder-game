@@ -976,6 +976,9 @@ table.standings tr:last-child td{border-bottom:none}
 .player-roster-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:var(--r1);background:rgba(255,255,255,.04);margin:2px 0;font-size:12px}
 .pr-name{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
 .pr-stats{color:var(--muted);font-size:11px;white-space:nowrap}.pr-fouls{color:var(--danger);font-weight:700}
+.player-roster-row.foul-limit{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.30)}
+.foul-out-tag{font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--danger);background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle}
+.pp-player-btn.foul-limit{border-color:rgba(239,68,68,.40);background:rgba(239,68,68,.06)}
 /* RESPONSIVE */
 @media(max-width:360px){
   .t-score{font-size:68px}.btn-score{min-height:68px}.vs-col{display:none}.scoreboard{grid-template-columns:1fr 1fr}
@@ -3788,7 +3791,8 @@ function renderFeed(){
     const col=e.team==='a'?'var(--ca)':'var(--cb)';
     if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
     if(e.type==='foul'){
-      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
+      const fouler=e.playerName?escHtml(e.playerName):escHtml(name);
+      items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${fouler}</span><span class="fe-pts" style="color:var(--muted)">Foul</span></li>`);
     } else if(e.type==='timeout'){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">⏱ Timeout</span></li>`);
     } else {
@@ -4231,7 +4235,7 @@ function openPlayerPicker(team,pts,type){
   const listEl=document.getElementById('pp-players-list');
   titleEl.textContent=type==='foul'?`Foul — ${state[T].name}`:`+${pts} — Who scored?`;
   titleEl.style.color=color;
-  listEl.innerHTML=players.map(p=>`<button class="pp-player-btn" onclick="_pickerSelect('${p.id}')"><span>${escHtml(p.name)}</span><span class="pp-player-stat">${p.score}pts${p.fouls?' &middot; <span class=\'pr-fouls\'>'+p.fouls+'F</span>':''}</span></button>`).join('');
+  listEl.innerHTML=players.map(p=>`<button class="pp-player-btn${p.fouls>=5?' foul-limit':''}" onclick="_pickerSelect('${p.id}')"><span>${escHtml(p.name)}${p.fouls>=5?'<span class="foul-out-tag">LIMIT</span>':''}</span><span class="pp-player-stat">${p.score}pts${p.fouls?' &middot; <span class=\'pr-fouls\'>'+p.fouls+'F</span>':''}</span></button>`).join('');
   _pickerCtx={team,pts,type};
   document.getElementById('player-picker').classList.remove('hidden');
   // Focus first player button for keyboard
@@ -4300,7 +4304,7 @@ function renderPlayerRosters(){
     if(!pad||!players.length)return;
     let roster=pad.querySelector('.player-roster');
     if(!roster){roster=document.createElement('div');roster.className='player-roster';pad.appendChild(roster);}
-    roster.innerHTML=players.map(p=>`<div class="player-roster-row"><span class="pr-name">${escHtml(p.name)}</span><span class="pr-stats">${p.score}pts${p.fouls?' &middot; <span class="pr-fouls">'+p.fouls+'F</span>':''}</span></div>`).join('');
+    roster.innerHTML=players.map(p=>`<div class="player-roster-row${p.fouls>=5?' foul-limit':''}"><span class="pr-name">${escHtml(p.name)}${p.fouls>=5?'<span class="foul-out-tag">LIMIT</span>':''}</span><span class="pr-stats">${p.score}pts${p.fouls?' &middot; <span class="pr-fouls">'+p.fouls+'F</span>':''}</span></div>`).join('');
   });
 }
 
