@@ -7341,6 +7341,7 @@ function submitEvent(communityId){
   const all=getAllEvents();
   all.push(evt);
   saveAllEvents(all);
+  supaCreateEvent(evt);
   showAddEventForm=false;
   eventsFilter='upcoming';
   setCommTab('events');
