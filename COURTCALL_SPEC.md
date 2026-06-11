@@ -1,5 +1,108 @@
 # CourtCall — Complete Recreation Specification
 
+---
+
+## ⚡ CREATIVE DIRECTIVE — Read This First
+
+You are not being asked to copy this app. You are being asked to **reimagine** it.
+
+Use the technical spec below as a **feature contract** — every screen, every data model, every Supabase table must be preserved exactly. But the visual layer, the motion design, the emotional tone, the micro-interactions, and the user experience are yours to own completely. Treat this as a flagship product launch, not a port.
+
+### Design Philosophy
+
+**Aesthetic target:** NBA Courtside Energy × Apple Sports × Nike SNKRS App × Dribbble "Shot of the Year." Dark, premium, kinetic. Every pixel should feel like it was designed by someone who loves basketball and loves great software in equal measure.
+
+**Emotional goal:** The moment someone opens this app, they should feel the court. The crowd hum. The squeak of sneakers. The orange glow of stadium lights. Make the digital feel physical.
+
+**User type:** Pickup ballers who check their phones between runs. They are distracted, sweaty, one-handed. Every interaction must be instant, effortless, and satisfying. No friction. No confusion. Pure feel.
+
+---
+
+### Visual Language — Go All-In
+
+**Color:** The palette below is the baseline. Expand it. Add atmospheric gradients, layered glows, micro-shimmer effects. Team A (orange) should pulse like stadium lighting. Team B (blue) should feel like the away team floodlights. The background should feel like standing inside an arena at midnight.
+
+**Typography:** Mix Bebas Neue for ALL power moments (scores, wins, team names, CTAs) with a premium grotesque (Inter or SF Pro) for everything else. Scale dramatically — a game score should feel like a billboard. A player name in a foul limit warning should feel urgent.
+
+**Depth & Glass:** Apply glassmorphism liberally on overlapping surfaces — modals, nav bars, floating cards. Use `backdrop-filter: blur()`. Stack `box-shadow` in 3 layers (ambient / key / color glow) on interactive elements. Cards should feel lifted off the screen.
+
+**Space:** Breathe. Use generous padding. A crowded UI feels like a bad locker room. Each element should have room to live.
+
+---
+
+### Animation — Make It Feel Alive
+
+Every state change is an opportunity. Go beyond the baseline:
+
+- **Score tap:** The number doesn't just scale — it explodes outward with a ripple ring, a particle burst in the team color, and a satisfying haptic pattern. Then settles with overshoot spring physics.
+- **Win moment:** Full-screen confetti storm, the winning score slams into view with a cinematic entrance (scale from 300%, motion blur trail), champion crown drops from above, score badge glows gold. The whole overlay should feel like the buzzer just went off.
+- **Foul:** A red flash pulse across the foul badge, a shake animation on the count, the feed entry slides in with urgency.
+- **5-foul LIMIT:** The player card border pulses red continuously. The LIMIT badge breathes (scale oscillation). A subtle warning sound cue (Web Audio API, 200ms).
+- **Navigation:** Tab switches use a horizontal slide with a trailing glow. The active tab indicator slides smoothly between tabs (like the iOS tabbar animation).
+- **Cards & lists:** Staggered entry animations — each card appears 40ms after the previous, sliding up from 12px below with a fade.
+- **Button press:** 6px translateY drop on `:active` with a shadow crush, spring back on release.
+- **Feed entries:** Slide in from top with a brief color flash in the team color, then settle.
+- **Loading states:** Skeleton screens pulsing in brand color, not generic grey spinners.
+- **Quarter change chip:** Morph animation between Q1/Q2/Q3/Q4/OT.
+- **Momentum bar:** Liquid fill animation — the bar breathes and oscillates slightly when tied, sloshes dramatically on run.
+- **Tip-off decider:** The coin/ball spins in 3D (CSS `rotateY`), blurs during the spin, lands with a bounce and a burst.
+- **Community post reactions:** Emoji floats up from the reaction button, scales up and fades out like a Like animation on Instagram.
+- **Tournament bracket:** Lines draw themselves progressively. Winners advance with a slide + glow.
+
+Use `cubic-bezier(.34,1.56,.64,1)` for bouncy/spring, `cubic-bezier(.4,0,.2,1)` for material-style, `cubic-bezier(.16,1,.3,1)` for expo-out on large entrances.
+
+---
+
+### Creative Feature Additions
+
+You have latitude to add features that serve the core user. These are encouraged:
+
+1. **Streak counter on the Hub** — "You've scored X games this week 🔥" — dynamic motivational copy that changes based on activity
+2. **Team color aura on scoreboard** — the leading team's side of the screen has a soft ambient glow in their color that intensifies as the lead grows
+3. **Hot hand indicator** — if a player scores 3+ points in a row without a stop, their name in the feed glows gold and shows "🔥 Hot Hand"
+4. **Game pace indicator** — a subtle "⚡ Fast" / "🐢 Slow" tag based on points-per-minute so far
+5. **Comeback alert** — if a team was down by 5+ and ties or takes the lead, flash a "COMEBACK!" banner
+6. **Ambient sound pack** — optional: buzzer, crowd roar, sneaker squeak on score (Web Audio API, short samples, toggle in Settings)
+7. **Player card flip** — in Team Builder, player cards flip (CSS 3D) to reveal their stats on the back
+8. **Score prediction chip** — after 10 points, show a small "on pace for X–Y" projection
+9. **Community feed real-time glow** — new posts appear with a brief green-glow pulse
+10. **Win probability bar** — a thin live bar showing probabilistic win % based on current score and game type (simple formula: score / winScore, normalized)
+
+All additions must gracefully degrade — if the feature can't compute (no data, guest mode), simply hide it silently.
+
+---
+
+### Human-Centric Principles
+
+- **Every tap must feel instant.** If something takes >100ms to respond visually, add an optimistic UI update first.
+- **One-handed use is the primary mode.** All critical actions must be reachable with a thumb from the bottom of a 390px screen.
+- **Forgiveness over gates.** If the user makes a mistake (wrong score, wrong foul), undo is always one tap away and always visible. Never dead-end the user.
+- **Context-aware empty states.** Empty history, empty community, empty bracket — each gets a beautiful illustration-style empty state with a clear, warm CTA. No grey placeholder text. No "No data found."
+- **Delight in the details.** Long press on a score shows a tooltip. Swipe left on a history card reveals a quick delete. Shake the device to undo the last score. These interactions don't need to be discovered — they're gifts.
+- **Accessibility is non-negotiable.** WCAG AA minimum everywhere. Every interactive element keyboard-navigable. Every modal focus-trapped. Every live region announced. `prefers-reduced-motion` respected — all animations disabled, not just slowed.
+
+---
+
+### Technical Constraints (Non-Negotiable)
+
+- **Single HTML file.** All CSS and JS inline. No external JS (except Supabase CDN script tag and the external SW file).
+- **No framework.** Vanilla JS only. No React, Vue, Svelte, Alpine, etc.
+- **Supabase schema unchanged.** Do not alter table names, column names, or RLS policies. All write functions must map exactly to the columns documented in Section 10.
+- **localStorage keys unchanged.** All `K.*` constants must use the same key strings.
+- **PWA.** Manifest, service worker, offline banner — all must be present.
+- **Web Speech API** for voice scoring — preserve the exact voice command grammar.
+- **Canvas** for the 3D basketball widget — preserve the render loop and drag/spin behavior.
+
+---
+
+> **Final instruction to the model:** The spec below is the skeleton. You are the muscle, the skin, the soul. Read every section, understand every interaction, then build something that makes a pickup baller stop mid-game to show their teammate. Make it the best sports PWA ever built in a single HTML file. Go.
+
+---
+
+# Technical Specification
+
+---
+
 **Version:** Single HTML file PWA (no build system)  
 **Contact / feedback email:** vadi.s23@gmail.com  
 **App version constant:** `APP_VERSION` (read from JS, shown in Settings and "What's New" toast)
