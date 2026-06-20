@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://courtcall13.win/sitemap.xml
