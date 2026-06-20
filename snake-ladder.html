@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake & Ladders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Auth Screen -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-title">🐍 Snake &amp; Ladders 🪜</div>
+      <div class="auth-subtitle">Sign in to play!</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <div id="form-login">
+        <input type="text" id="login-username" class="auth-input" placeholder="Username"
+               autocomplete="username" onkeydown="if(event.key==='Enter')authLogin()">
+        <input type="password" id="login-password" class="auth-input" placeholder="Password"
+               autocomplete="current-password" onkeydown="if(event.key==='Enter')authLogin()">
+        <div id="login-error" class="auth-error"></div>
+        <button class="auth-btn btn-primary" onclick="authLogin()">Sign In</button>
+      </div>
+
+      <div id="form-register" class="hidden">
+        <input type="text" id="reg-username" class="auth-input" placeholder="Username (3–20 chars)"
+               autocomplete="username" onkeydown="if(event.key==='Enter')authRegister()">
+        <input type="password" id="reg-password" class="auth-input" placeholder="Password (min 6 chars)"
+               autocomplete="new-password" onkeydown="if(event.key==='Enter')authRegister()">
+        <input type="password" id="reg-confirm" class="auth-input" placeholder="Confirm Password"
+               autocomplete="new-password" onkeydown="if(event.key==='Enter')authRegister()">
+        <div id="reg-error" class="auth-error"></div>
+        <button class="auth-btn btn-primary" onclick="authRegister()">Create Account</button>
+      </div>
+
+      <div class="auth-divider">── or ──</div>
+      <button class="auth-btn btn-guest" onclick="authGuest()">👤 Play as Guest</button>
+    </div>
+  </div>
+
+  <!-- Start Screen -->
+  <div id="start-screen" class="hidden">
+    <div class="start-card">
+      <div class="start-title">🐍 Snake &amp; Ladders 🪜</div>
+      <div class="start-subtitle">Choose how to play!</div>
+      <button class="mode-btn btn-2p" onclick="startGame('2p')">👫 2 Players</button>
+      <button class="mode-btn btn-cpu" onclick="startGame('cpu')">🤖 vs Computer</button>
+    </div>
+  </div>
+
+  <!-- User Bar (shown after auth) -->
+  <div id="user-bar" class="hidden">
+    <span id="user-name-display">👤 Guest</span>
+    <button id="stats-btn" class="stats-btn" onclick="showStats()">📊 Stats</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Stats Overlay -->
+  <div id="stats-overlay" class="hidden">
+    <div id="stats-card">
+      <button class="stats-close-btn" onclick="hideStats()">✕</button>
+      <div id="stats-title">📊 Stats</div>
+      <div id="stats-summary">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-wins">0</div>
+          <div class="stat-lbl">Wins</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-losses">0</div>
+          <div class="stat-lbl">Losses</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-rate">—</div>
+          <div class="stat-lbl">Win Rate</div>
+        </div>
+      </div>
+      <div class="history-title">Recent Games</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- Confetti container -->
+  <div id="confetti-container"></div>
+
+  <!-- Win overlay -->
+  <div id="win-overlay" class="hidden">
+    <div id="win-card">
+      <div id="win-emoji">🎉</div>
+      <div id="win-text"></div>
+      <div id="win-stats" class="win-stats"></div>
+      <button class="action-btn" onclick="newGame()">🔄 Play Again!</button>
+    </div>
+  </div>
+
+  <!-- Main Game -->
+  <div id="game" class="hidden">
+    <h1 class="game-title">🐍 Snake &amp; Ladders 🪜</h1>
+
+    <!-- Player turn banner -->
+    <div id="turn-banner">
+      <span id="turn-text">Player 1's Turn 🔴</span>
+    </div>
+
+    <!-- Score display -->
+    <div id="scores">
+      <div class="score-box p1-box">
+        <span class="score-label" id="p1-label">🔴 Player 1</span>
+        <span class="score-pos" id="p1-pos">Start</span>
+      </div>
+      <div class="score-box p2-box">
+        <span class="score-label" id="p2-label">🔵 Player 2</span>
+        <span class="score-pos" id="p2-pos">Start</span>
+      </div>
+    </div>
+
+    <!-- Board area -->
+    <div id="board-wrapper">
+      <div id="board-grid"></div>
+      <svg id="overlay-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="tokens-layer"></div>
+    </div>
+
+    <!-- Dice -->
+    <div id="dice-area">
+      <div id="dice" class="dice">
+        <div class="dot-grid" id="dot-grid"></div>
+      </div>
+      <div id="dice-result"></div>
+    </div>
+
+    <!-- Message box -->
+    <div id="message-box">Roll the dice to start!</div>
+
+    <!-- Buttons -->
+    <div id="btn-row">
+      <button id="roll-btn" class="action-btn roll-btn" onclick="rollDice()">🎲 Roll Dice!</button>
+      <button class="action-btn new-btn" onclick="newGame()">🔄 New Game</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

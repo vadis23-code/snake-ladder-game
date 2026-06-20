@@ -1,6 +1,6 @@
-const CACHE = 'courtcall-v1';
+const CACHE = 'courtcall-v2';
 const SHELL = [
-  './basketball.html',
+  './',
   './basketball.manifest.json',
   './icons/icon.svg',
 ];

@@ -2,7 +2,7 @@
   "name": "CourtCall",
   "short_name": "CourtCall",
   "description": "Basketball pickup game scorer — score, build teams, run tournaments",
-  "start_url": "./basketball.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0F0F23",
@@ -29,7 +29,7 @@
       "name": "Quick Game",
       "short_name": "Play",
       "description": "Jump straight into a new game",
-      "url": "./basketball.html#setup",
+      "url": "./#setup",
       "icons": [{ "src": "icons/icon.svg", "sizes": "any" }]
     }
   ]
