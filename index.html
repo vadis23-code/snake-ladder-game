@@ -2858,42 +2858,66 @@ body.modal-open{overflow:hidden}
 const SUPA_URL = 'https://jfeegcocynozbjpzbjae.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZWVnY29jeW5vemJqcHpiamFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjM5ODksImV4cCI6MjA5NzUzOTk4OX0.qYv3JttEH8RSBwhxXQijow0VNw8uC88cv6BSK0ijBGg';
 const supa = (typeof supabase !== 'undefined') ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
-let supaUser = null; // tracks the logged-in Supabase auth user
-let supaSession = null; // tracks the active session (has the JWT)
+let supaUser = null; // set ONLY when a valid session with access_token exists
+let supaSession = null; // the active Supabase session object
+
+// Validates that a session is real: has access_token and user.id.
+function _isValidSession(s) {
+  return !!(s && s.access_token && s.user && s.user.id);
+}
+
+// Sets supaUser/supaSession only from a validated session. Never from data.user alone.
+function _setAuthFromSession(session) {
+  if (_isValidSession(session)) {
+    supaSession = session;
+    supaUser = session.user;
+    return true;
+  }
+  supaSession = null;
+  supaUser = null;
+  return false;
+}
 
 async function ensureSupaUser() {
-  if (supaUser && supaSession) return supaUser;
+  if (supaUser && _isValidSession(supaSession)) return supaUser;
   if (!supa) return null;
   try {
     const { data: { session } } = await supa.auth.getSession();
-    supaSession = session;
-    supaUser = session?.user ?? null;
-    if (!session) console.log('[Supa] No active session');
+    if (_setAuthFromSession(session)) {
+      console.log('[Supa] ensureSupaUser: session valid, user=' + supaUser.id);
+    } else {
+      console.log('[Supa] ensureSupaUser: no valid session');
+    }
   } catch(e) { console.warn('[Supa] ensureSupaUser error:', e.message); }
   return supaUser;
 }
 
 function isSupaAuthenticated() {
-  return !!(supa && supaUser && supaSession);
+  return !!(supa && supaUser && _isValidSession(supaSession));
 }
 
 
 // Listen for auth state changes
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
-    supaSession = session;
-    supaUser = session?.user ?? null;
-    console.log('[Supa] Auth event:', event, supaUser ? 'user=' + supaUser.id : 'no user', session ? 'session=valid' : 'session=null');
-    // User arrived via a password-recovery email link → let them set a new PIN.
+    const wasAuthenticated = isSupaAuthenticated();
+    _setAuthFromSession(session);
+    console.log('[Supa] Auth event:', event, supaUser ? 'user=' + supaUser.id : 'no user', _isValidSession(session) ? 'session=valid (has access_token)' : 'session=INVALID/null');
     if (event === 'PASSWORD_RECOVERY') {
       if (typeof showScreen === 'function') showScreen('reset-pin');
       return;
     }
-    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && supaUser) {
+    if (!_isValidSession(session)) return;
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      // First confirmed sign-in: push any local-only data up to Supabase.
+      if (!wasAuthenticated && event === 'SIGNED_IN') {
+        _pushLocalDataToCloud().then(() => {
+          if (typeof showToast === 'function') showToast('Cloud sync active ☁️');
+        });
+      }
       syncAllUserDataFromDB().then(() => {
         const active = document.querySelector('.screen.active')?.id;
         if (active === 's-profile' || active === 's-onboarding') {
-          // Auto-advance returning users with an active session past the sign-in screen.
           if (currentProfile?.id && currentProfile.id !== 'guest') {
             renderHub();
             showScreen('hub');
@@ -2920,24 +2944,17 @@ async function supaSignUp(email, pin, name) {
     console.warn('[Supa] signUp error:', error.message);
     return { data, error };
   }
-  // Profile row is created by the handle_new_user trigger (SECURITY DEFINER).
-  // After signup, session may be null if email confirmation is enabled.
-  supaSession = data.session;
-  supaUser = data.session?.user ?? data.user ?? null;
-  if (!data.session) {
-    console.warn('[Supa] signUp: no session returned — email confirmation may be required. Attempting auto sign-in...');
-    // Auto sign-in: works when "Confirm email" is OFF in Supabase Auth settings.
-    const si = await supa.auth.signInWithPassword({ email, password: pin });
-    if (!si.error && si.data.session) {
-      supaSession = si.data.session;
-      supaUser = si.data.session.user;
-      console.log('[Supa] signUp: auto sign-in succeeded, session active');
-    } else {
-      console.warn('[Supa] signUp: auto sign-in failed:', si.error?.message || 'no session');
-    }
+  // Profile row is created server-side by the handle_new_user trigger.
+  // Only set supaUser if signup returned a real session (email confirm OFF).
+  if (_setAuthFromSession(data.session)) {
+    console.log('[Supa] signUp: session active, user=' + supaUser.id);
   } else {
-    console.log('[Supa] signUp: session active, user:', supaUser?.id);
+    // Email confirmation is enabled — no session until user confirms.
+    console.log('[Supa] signUp: no session (email confirmation required). Cloud writes disabled until confirmed sign-in.');
   }
+  // data.user is always returned (the auth record), but we expose
+  // needsEmailConfirmation so the UI can show the right toast.
+  data._needsEmailConfirmation = !_isValidSession(data.session);
   return { data, error };
 }
 
@@ -2946,15 +2963,16 @@ async function supaSignIn(email, pin) {
   const { data, error } = await supa.auth.signInWithPassword({ email, password: pin });
   if (error) {
     console.warn('[Supa] signIn error:', error.message);
-    // If email not confirmed, give a clear message
     if (error.message?.includes('Email not confirmed')) {
-      return { data, error: { message: 'Email not confirmed. Go to Supabase → Auth → Settings → disable "Confirm email".' } };
+      return { data, error: { message: 'Please check your email and click the confirmation link first, then sign in again.' } };
     }
     return { data, error };
   }
-  supaSession = data.session;
-  supaUser = data.session?.user ?? data.user ?? null;
-  console.log('[Supa] signIn: session active, user:', supaUser?.id);
+  if (_setAuthFromSession(data.session)) {
+    console.log('[Supa] signIn: session active, user=' + supaUser.id + ', access_token present');
+  } else {
+    console.warn('[Supa] signIn: succeeded but no valid session returned');
+  }
   return { data, error };
 }
 
@@ -3468,13 +3486,18 @@ async function createAccount(){
     _setAuthErr('auth-err-cr',error.message||'Could not create account — try again');return;
   }
 
-  // Save profile locally too
+  // Save profile locally (always — works offline and while awaiting email confirmation).
   const p={id:data.user.id,name,email,nickname:name,createdAt:new Date().toLocaleDateString(),gamesPlayed:0};
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   showScreen('hub');
-  if(isSupaAuthenticated()){showToast('Account created — cloud sync active ☁️');}
-  else{showToast('Account created — local only (sign in again if cloud sync needed)',4000);}
+  if(isSupaAuthenticated()){
+    showToast('Account created — cloud sync active ☁️');
+  }else if(data._needsEmailConfirmation){
+    showToast('Check your email to activate cloud sync. Until then, data is saved locally.',5000);
+  }else{
+    showToast('Account created — local only',4000);
+  }
 }
 
 function _localCreateAccount(name,email,pin){
@@ -5798,6 +5821,31 @@ async function syncAllUserDataFromDB() {
     _syncCRatingsFromDB(),
     _syncJoinRequestsFromDB(),
   ]);
+}
+
+// Push local-only data to Supabase on first confirmed sign-in.
+// Called once when a user who created data while unconfirmed finally gets a session.
+async function _pushLocalDataToCloud() {
+  if (!isSupaAuthenticated()) return;
+  console.log('[Supa] _pushLocalDataToCloud: syncing local data to cloud...');
+  try {
+    // Push local games
+    const localGames = getCol(K.matches);
+    for (const g of localGames) { await supaSaveGame(g); }
+    // Push local communities the user created
+    const localComms = getComms().filter(c => c.createdBy === currentProfile?.id || c.createdBy === supaUser?.id);
+    for (const c of localComms) {
+      const member = getCommMembers().find(m => m.communityId === c.id && (m.profileId === currentProfile?.id || m.profileId === supaUser?.id));
+      await supaCreateCommunity(c, member || { role: 'admin', profileName: currentProfile?.name });
+    }
+    // Push local gallery items
+    const localGallery = getAllGalItems();
+    for (const item of localGallery) { await supaSubmitGalleryItem(item); }
+    // Push local posts
+    const localPosts = getAllPosts();
+    for (const p of localPosts) { if (p.communityId) await supaSubmitPost(p); }
+    console.log('[Supa] _pushLocalDataToCloud: done (%d games, %d communities, %d gallery, %d posts)', localGames.length, localComms.length, localGallery.length, localPosts.length);
+  } catch(e) { console.warn('[Supa] _pushLocalDataToCloud error:', e.message); }
 }
 
 async function _syncGamesFromDB() {
