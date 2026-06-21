@@ -7199,9 +7199,9 @@ function renderEventsTabHTML(c,myRole){
     <input class="add-gal-url" id="evt-loc-input" type="text" placeholder="Court name or address">
     <div class="form-label">Max Players <span style="color:var(--muted);font-weight:400">(0 = no limit)</span></div>
     <input class="add-gal-url" id="evt-max-input" type="number" min="0" placeholder="0" style="margin-bottom:8px">
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-primary" style="flex:1" onclick="submitEvent('${escHtml(c.id)}')">📅 Create Event</button>
-      <button class="btn-secondary" onclick="cancelAddEvent()">Cancel</button>
+    <div class="post-form-actions" style="margin-top:4px">
+      <button class="btn-post-submit" onclick="submitEvent('${escHtml(c.id)}')">📅 Create Event</button>
+      <button class="btn-post-cancel" onclick="cancelAddEvent()">Cancel</button>
     </div>
   </div>`:'';
 
@@ -7477,9 +7477,9 @@ function renderGalleryTabHTML(c,myRole){
     <div class="gal-album-chips">${albumChips}</div>
     <div class="form-label">Tag Players</div>
     <div class="gal-tag-chips">${tagChips}</div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn-primary" style="flex:1" onclick="submitGalleryItem('${escHtml(c.id)}')">📸 Save Photo</button>
-      <button class="btn-secondary" onclick="cancelAddGallery()">Cancel</button>
+    <div class="post-form-actions" style="margin-top:10px">
+      <button class="btn-post-submit" onclick="submitGalleryItem('${escHtml(c.id)}')">📸 Save Photo</button>
+      <button class="btn-post-cancel" onclick="cancelAddGallery()">Cancel</button>
     </div>
   </div>`:'';
 
@@ -7548,7 +7548,7 @@ function toggleAddGallery(){
   if(showAddGalleryForm){selectedAlbum=GAL_ALBUMS[0];selectedTaggedPlayers=new Set();galImageMode='upload';galPendingFile='';galPendingFileName='';galPendingFileSize=0;}
   setCommTab('gallery');
 }
-function cancelAddGallery(){showAddGalleryForm=false;galPendingFile='';galPendingFileName='';galPendingFileSize=0;setCommTab('gallery')}
+function cancelAddGallery(){showAddGalleryForm=false;galPendingFile='';galPendingFileName='';galPendingFileSize=0;selectedTaggedPlayers=new Set();selectedAlbum=GAL_ALBUMS[0];galImageMode='upload';setCommTab('gallery')}
 
 function pickAlbumChip(btn,album){
   document.querySelectorAll('.gal-album-chip').forEach(b=>b.classList.remove('on'));
