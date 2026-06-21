@@ -5924,11 +5924,10 @@ function createCommunity(){
 // ── Render Communities Screen ────────────────────────────
 function _renderCommunitiesDOM(){
   const p=currentProfile||{id:'guest'};
-  const isGuest=!p.id||p.id==='guest';
   const communities=getComms();
   const members=getCommMembers();
-  const memberIds=isGuest?[]:members.filter(m=>m.profileId===p.id).map(m=>m.communityId);
-  const createdIds=isGuest?[]:communities.filter(c=>c.createdBy===p.id).map(c=>c.id);
+  const memberIds=members.filter(m=>m.profileId===p.id).map(m=>m.communityId);
+  const createdIds=communities.filter(c=>c.createdBy===p.id).map(c=>c.id);
   const myIds=new Set([...memberIds,...createdIds]);
   const myComms=communities.filter(c=>myIds.has(c.id));
   const discoverComms=communities.filter(c=>c.visibility==='public'&&!myIds.has(c.id));
