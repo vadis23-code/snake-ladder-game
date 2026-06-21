@@ -2425,7 +2425,8 @@ if (supa) {
         const active = document.querySelector('.screen.active')?.id;
         if (active === 's-communities') renderCommunities();
         else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
-          syncPostsFromDB(activeCommunityId).then(() => renderCommDetail());
+          const _cid=activeCommunityId;
+          syncPostsFromDB(_cid).then(() => { if(activeCommunityId===_cid&&document.getElementById('s-comm-detail')?.classList.contains('active')) renderCommDetail(); });
           renderCommDetail();
         }
       });
@@ -4758,12 +4759,11 @@ function openCommunity(id){
   lbCategory='rating';
   if(typeof expandedComments!=='undefined')expandedComments.clear();
   if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
-  renderCommDetail();
   showScreen('comm-detail');
   // Sync member data from DB then re-render — fixes stale role on reload
   if(supa&&supaUser){
     Promise.all([syncCommunitiesFromDB(), syncPostsFromDB(id)])
-      .then(()=>{ if(activeCommunityId===id) renderCommDetail(); });
+      .then(()=>{ if(activeCommunityId===id&&document.getElementById('s-comm-detail')?.classList.contains('active')) renderCommDetail(); });
   }
 }
 
@@ -4825,10 +4825,12 @@ function setCommTab(tab){
   if(tab==='leaderboard')lbCategory='rating';
   activeCommTab=tab;
   const cdTabsCont=document.getElementById('cd-tabs');
+  const activeTabBtn=cdTabsCont&&cdTabsCont.querySelector(`[data-tab="${tab}"]`);
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
-  _setTabSelected(cdTabsCont,cdTabsCont&&cdTabsCont.querySelector(`[data-tab="${tab}"]`));
+  _setTabSelected(cdTabsCont,activeTabBtn);
+  if(activeTabBtn)activeTabBtn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
   const c=getComms().find(x=>x.id===activeCommunityId);
-  if(!c)return;
+  if(!c){renderCommDetail();return}
   const members=getCommMembers().filter(m=>m.communityId===c.id);
   const myRole=members.find(m=>m.profileId===(currentProfile||{id:'guest'}).id)?.role||'guest';
   _renderCommTabContent(c,members,myRole);
@@ -4837,21 +4839,23 @@ function setCommTab(tab){
 function _renderCommTabContent(c,members,myRole){
   const el=document.getElementById('cd-tab-content');
   if(!el)return;
-  if(activeCommTab==='feed'){
-    el.innerHTML=renderFeedTabHTML(c,myRole);
-  }else if(activeCommTab==='members'){
-    el.innerHTML=_buildMembersHTML(c,members,myRole);
-  }else if(activeCommTab==='players'){
-    el.innerHTML=renderPlayersTabHTML(c,myRole);
-  }else if(activeCommTab==='gallery'){
-    el.innerHTML=renderGalleryTabHTML(c,myRole);
-  }else if(activeCommTab==='events'){
-    el.innerHTML=renderEventsTabHTML(c,myRole);
-  }else if(activeCommTab==='leaderboard'){
-    el.innerHTML=renderLeaderboardTabHTML(c,myRole);
-  }else if(activeCommTab==='settings'){
-    el.innerHTML=_buildSettingsHTML(c,myRole);
-  }
+  try{
+    if(activeCommTab==='feed'){
+      el.innerHTML=renderFeedTabHTML(c,myRole);
+    }else if(activeCommTab==='members'){
+      el.innerHTML=_buildMembersHTML(c,members,myRole);
+    }else if(activeCommTab==='players'){
+      el.innerHTML=renderPlayersTabHTML(c,myRole);
+    }else if(activeCommTab==='gallery'){
+      el.innerHTML=renderGalleryTabHTML(c,myRole);
+    }else if(activeCommTab==='events'){
+      el.innerHTML=renderEventsTabHTML(c,myRole);
+    }else if(activeCommTab==='leaderboard'){
+      el.innerHTML=renderLeaderboardTabHTML(c,myRole);
+    }else if(activeCommTab==='settings'){
+      el.innerHTML=_buildSettingsHTML(c,myRole);
+    }
+  }catch(err){console.warn('Tab render error:',err);el.innerHTML='<div class="cd-panel" style="text-align:center;padding:32px"><span style="font-size:24px">⚠️</span><div style="color:var(--muted);margin-top:8px">Something went wrong. Try again.</div></div>'}
 }
 
 function _buildMembersHTML(c,members,myRole){
