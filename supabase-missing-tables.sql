@@ -191,3 +191,11 @@ create policy "events: creator update" on public.community_events
     creator_id = auth.uid() or
     exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid())
   );
+
+-- ── 7. Grants for additional tables ────────────────────────
+
+grant select, insert, update, delete on public.tournaments              to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_players        to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_ratings        to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_gallery        to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_join_requests  to anon, authenticated, service_role;

@@ -5400,10 +5400,11 @@ async function supaCreateCommunity(community, creatorMember) {
       location: community.location || '', invite_code: community.inviteCode || null
     });
     if (ce) { console.warn('supaCreateCommunity:', ce.message); return false; }
-    await supa.from('community_members').insert({
+    const { error: me } = await supa.from('community_members').insert({
       community_id: community.id, user_id: supaUser.id,
       role: creatorMember.role || 'admin', profile_name: creatorMember.profileName || currentProfile?.name || ''
     });
+    if (me) { console.warn('supaCreateCommunity member:', me.message); }
     return true;
   } catch(e) { console.warn('supaCreateCommunity:', e.message); return false; }
 }
@@ -5411,10 +5412,11 @@ async function supaCreateCommunity(community, creatorMember) {
 async function supaJoinCommunity(communityId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_members').upsert({
+    const { error } = await supa.from('community_members').upsert({
       community_id: communityId, user_id: supaUser.id,
       role: 'member', profile_name: currentProfile?.name || ''
     }, { onConflict: 'community_id,user_id' });
+    if (error) { console.warn('supaJoinCommunity:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaJoinCommunity:', e.message); return false; }
 }
@@ -5484,11 +5486,12 @@ async function _doSyncPostsFromDB(communityId) {
 async function supaCreateEvent(event) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_events').insert({
+    const { error } = await supa.from('community_events').insert({
       id: event.id, community_id: event.communityId, creator_id: supaUser.id,
       title: event.title, description: event.description || '',
       event_date: event.date || '', location: event.location || ''
     });
+    if (error) { console.warn('supaCreateEvent:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaCreateEvent:', e.message); return false; }
 }
@@ -5505,7 +5508,8 @@ async function supaUpdatePost(postId, fields) {
 async function supaHardDeletePost(postId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_posts').delete().eq('id', postId);
+    const { error } = await supa.from('community_posts').delete().eq('id', postId);
+    if (error) { console.warn('supaHardDeletePost:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaHardDeletePost:', e.message); return false; }
 }
@@ -5547,8 +5551,10 @@ async function supaUpsertCPlayer(player) {
 async function supaDeleteCPlayer(playerId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_ratings').delete().eq('player_id', playerId);
-    await supa.from('community_players').delete().eq('id', playerId);
+    const { error: re } = await supa.from('community_ratings').delete().eq('player_id', playerId);
+    if (re) console.warn('supaDeleteCPlayer ratings:', re.message);
+    const { error: pe } = await supa.from('community_players').delete().eq('id', playerId);
+    if (pe) { console.warn('supaDeleteCPlayer:', pe.message); return false; }
     return true;
   } catch(e) { console.warn('supaDeleteCPlayer:', e.message); return false; }
 }
@@ -5597,7 +5603,8 @@ async function supaSubmitGalleryItem(item) {
 async function supaUpdateGalleryItem(itemId, fields) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_gallery').update(fields).eq('id', itemId);
+    const { error } = await supa.from('community_gallery').update(fields).eq('id', itemId);
+    if (error) { console.warn('supaUpdateGalleryItem:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaUpdateGalleryItem:', e.message); return false; }
 }
@@ -5605,7 +5612,8 @@ async function supaUpdateGalleryItem(itemId, fields) {
 async function supaDeleteGalleryItem(itemId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_gallery').delete().eq('id', itemId);
+    const { error } = await supa.from('community_gallery').delete().eq('id', itemId);
+    if (error) { console.warn('supaDeleteGalleryItem:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaDeleteGalleryItem:', e.message); return false; }
 }
@@ -5626,8 +5634,9 @@ async function supaCreateJoinRequest(req) {
 async function supaCancelJoinRequest(communityId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_join_requests')
+    const { error } = await supa.from('community_join_requests')
       .delete().eq('community_id', communityId).eq('user_id', supaUser.id).eq('status', 'pending');
+    if (error) { console.warn('supaCancelJoinRequest:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaCancelJoinRequest:', e.message); return false; }
 }
@@ -5635,15 +5644,17 @@ async function supaCancelJoinRequest(communityId) {
 async function supaUpdateJoinRequest(reqId, status) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_join_requests')
+    const { error } = await supa.from('community_join_requests')
       .update({ status, reviewed_at: new Date().toISOString() }).eq('id', reqId);
+    if (error) { console.warn('supaUpdateJoinRequest:', error.message); return false; }
     if (status === 'approved') {
       const req = getAllJoinReqs().find(r => r.id === reqId);
       if (req) {
-        await supa.from('community_members').upsert({
+        const { error: me } = await supa.from('community_members').upsert({
           community_id: req.communityId, user_id: req.profileId,
           role: 'member', profile_name: req.profileName || ''
         }, { onConflict: 'community_id,user_id' });
+        if (me) console.warn('supaUpdateJoinRequest member:', me.message);
       }
     }
     return true;
@@ -5653,8 +5664,9 @@ async function supaUpdateJoinRequest(reqId, status) {
 async function supaLeaveComm(communityId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('community_members').delete()
+    const { error } = await supa.from('community_members').delete()
       .eq('community_id', communityId).eq('user_id', supaUser.id);
+    if (error) { console.warn('supaLeaveComm:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaLeaveComm:', e.message); return false; }
 }
@@ -5685,7 +5697,8 @@ async function supaUpsertTournament(tournament) {
 async function supaDeleteTournament(tournamentId) {
   if (!supa || !supaUser) return false;
   try {
-    await supa.from('tournaments').delete().eq('id', tournamentId).eq('user_id', supaUser.id);
+    const { error } = await supa.from('tournaments').delete().eq('id', tournamentId).eq('user_id', supaUser.id);
+    if (error) { console.warn('supaDeleteTournament:', error.message); return false; }
     return true;
   } catch(e) { console.warn('supaDeleteTournament:', e.message); return false; }
 }

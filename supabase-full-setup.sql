@@ -111,6 +111,8 @@ create policy "profiles: own update" on public.profiles for update using (auth.u
 -- Games
 create policy "games: own read"   on public.games for select using (auth.uid() = user_id);
 create policy "games: own insert" on public.games for insert with check (auth.uid() = user_id);
+create policy "games: own update" on public.games for update using (auth.uid() = user_id);
+create policy "games: own delete" on public.games for delete using (auth.uid() = user_id);
 
 -- SECURITY DEFINER helper: checks membership WITHOUT triggering the
 -- community_members SELECT policy, avoiding infinite recursion.
@@ -141,6 +143,11 @@ create policy "members: community read" on public.community_members
   );
 create policy "members: self insert" on public.community_members
   for insert with check (auth.uid() = user_id);
+create policy "members: admin update" on public.community_members
+  for update using (
+    user_id = auth.uid() or
+    exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid())
+  );
 create policy "members: self delete" on public.community_members
   for delete using (auth.uid() = user_id or
     exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid()));
@@ -202,3 +209,24 @@ create index if not exists idx_communities_creator_id    on public.communities(c
 create index if not exists idx_comm_members_user_id      on public.community_members(user_id);
 create index if not exists idx_comm_posts_community_id   on public.community_posts(community_id, created_at desc);
 create index if not exists idx_comm_events_community_id  on public.community_events(community_id);
+
+-- ── 6. Grants ──────────────────────────────────────────────
+-- Ensure authenticated & anon roles can access all tables.
+-- Supabase sets default privileges, but explicit grants are
+-- needed if tables were created before defaults were in place.
+
+grant usage on schema public to anon, authenticated, service_role;
+
+grant select, insert, update, delete on public.profiles          to anon, authenticated, service_role;
+grant select, insert, update, delete on public.games             to anon, authenticated, service_role;
+grant select, insert, update, delete on public.communities       to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_members to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_posts   to anon, authenticated, service_role;
+grant select, insert, update, delete on public.community_events  to anon, authenticated, service_role;
+
+grant usage on all sequences in schema public to anon, authenticated, service_role;
+
+grant execute on function public.is_community_member(text, uuid) to anon, authenticated, service_role;
+
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to anon, authenticated, service_role;
