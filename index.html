@@ -7858,6 +7858,7 @@ function renderPulseFeed(){
      .then(r=>r.json()).then(data=>renderRealCards(data.articles))
 */
 function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function escAttr(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 /* ════════════════════════════════════════════════════════
    Init
 ════════════════════════════════════════════════════════ */
