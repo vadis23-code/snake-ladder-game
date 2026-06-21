@@ -148,6 +148,10 @@ create policy "members: admin update" on public.community_members
     user_id = auth.uid() or
     exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid())
   );
+create policy "members: admin insert" on public.community_members
+  for insert with check (
+    exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid())
+  );
 create policy "members: self delete" on public.community_members
   for delete using (auth.uid() = user_id or
     exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid()));

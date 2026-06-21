@@ -92,7 +92,29 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- ── 4. Grant EXECUTE on helper function ────────────────────
+-- ── 4. Missing policy: community_members admin INSERT ──────
+-- When an admin approves a join request, they insert a row for
+-- ANOTHER user. The existing "self insert" policy only allows
+-- auth.uid() = user_id. This additional policy lets community
+-- creators insert members on behalf of approved users.
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'community_members' AND policyname = 'members: admin insert'
+  ) THEN
+    CREATE POLICY "members: admin insert"
+      ON public.community_members FOR INSERT
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM public.communities c
+          WHERE c.id = community_id AND c.creator_id = auth.uid()
+        )
+      );
+  END IF;
+END $$;
+
+-- ── 5. Grant EXECUTE on helper function ────────────────────
 -- The is_community_member function is used in many policies.
 -- Make sure all roles can execute it.
 

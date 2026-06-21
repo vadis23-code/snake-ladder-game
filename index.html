@@ -504,6 +504,7 @@ table.standings tr:last-child td{border-bottom:none}
 .fx-badge.played{background:rgba(0,230,118,.12);color:var(--success)}
 .btn-score-match{background:var(--ca);color:#fff;border:none;border-radius:var(--r1);font:700 13px 'Inter',sans-serif;padding:10px 16px;cursor:pointer;min-height:40px;transition:all var(--t1)}
 .btn-score-match:active{opacity:.85}
+.btn-score-match.done{background:var(--success);opacity:.7;cursor:default}
 .btn-del-tourn{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);color:var(--danger);border-radius:var(--r1);font:600 13px 'Inter',sans-serif;padding:10px;cursor:pointer;min-height:44px;transition:all var(--t1)}
 .btn-del-tourn:active{background:rgba(255,23,68,.15)}
 /* WORLD */
@@ -793,6 +794,11 @@ table.standings tr:last-child td{border-bottom:none}
 .gal-preview-name{font-size:12px;font-weight:700;color:var(--text);word-break:break-all;line-height:1.3}
 .gal-preview-size{font-size:11px;color:var(--success);margin-top:3px;font-weight:600}
 .gal-preview-remove{margin-top:8px;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+.form-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.post-body-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;box-sizing:border-box}
+.cmt-body{flex:1;min-width:0}
+.btn-del-cmt{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px;border-radius:4px;flex-shrink:0;opacity:.6;transition:opacity var(--t1)}
+.btn-del-cmt:hover,.btn-del-cmt:active{opacity:1;color:var(--danger)}
 /* EVENTS */
 .evt-list{display:flex;flex-direction:column;gap:10px;padding:14px}
 .evt-card{background:var(--s1);border-radius:12px;border:1px solid var(--border);overflow:hidden}
@@ -2902,12 +2908,13 @@ async function supaSignUp(email, pin, name) {
     options: { data: { name } }
   });
   if (!error && data.user) {
-    await supa.from('profiles').insert({
+    const { error: pe } = await supa.from('profiles').insert({
       id: data.user.id,
       name,
       nickname: name,
       games_played: 0
     });
+    if (pe) console.warn('supaSignUp profile insert:', pe.message);
     supaUser = data.user;
   }
   return { data, error };
@@ -5426,7 +5433,7 @@ async function supaSubmitPost(post) {
   try {
     const { error } = await supa.from('community_posts').insert({
       id: post.id, community_id: post.communityId, user_id: supaUser.id,
-      author_name: post.authorName || post.authorName || currentProfile?.name || '',
+      author_name: post.authorName || currentProfile?.name || '',
       title: post.title || null, content: post.body || post.text || post.content || '',
       image_url: post.imageUrl || null, type: post.type || 'text',
       reactions: post.reactions || {}, comments: post.comments || []
@@ -5589,7 +5596,7 @@ async function supaSubmitGalleryItem(item) {
       uploader_name:  item.uploaderName || currentProfile?.name || '',
       image_url:      item.imageUrl     || null,
       caption:        item.caption      || '',
-      album:          item.album        || null,
+      album:          item.album        || 'General',
       tagged_players: item.taggedPlayers || [],
       likes:          item.likes        || [],
       comments:       item.comments     || [],
