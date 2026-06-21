@@ -36,6 +36,8 @@ create policy "profiles: own update" on public.profiles for update using (auth.u
 
 create policy "games: own read"   on public.games for select using (auth.uid() = user_id);
 create policy "games: own insert" on public.games for insert with check (auth.uid() = user_id);
+create policy "games: own update" on public.games for update using (auth.uid() = user_id);
+create policy "games: own delete" on public.games for delete using (auth.uid() = user_id);
 
 -- Auto-create profile on signup
 create or replace function public.handle_new_user()

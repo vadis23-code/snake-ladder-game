@@ -96,6 +96,11 @@ create policy "members: community read" on public.community_members
 create policy "members: self insert" on public.community_members
   for insert with check (auth.uid() = user_id);
 
+create policy "members: admin update" on public.community_members
+  for update using (
+    user_id = auth.uid() or
+    exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid())
+  );
 create policy "members: self delete" on public.community_members
   for delete using (auth.uid() = user_id or
     exists (select 1 from public.communities c where c.id = community_id and c.creator_id = auth.uid()));
