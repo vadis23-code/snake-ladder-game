@@ -2859,22 +2859,31 @@ const SUPA_URL = 'https://jfeegcocynozbjpzbjae.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZWVnY29jeW5vemJqcHpiamFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjM5ODksImV4cCI6MjA5NzUzOTk4OX0.qYv3JttEH8RSBwhxXQijow0VNw8uC88cv6BSK0ijBGg';
 const supa = (typeof supabase !== 'undefined') ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
 let supaUser = null; // tracks the logged-in Supabase auth user
+let supaSession = null; // tracks the active session (has the JWT)
 
 async function ensureSupaUser() {
-  if (supaUser) return supaUser;
+  if (supaUser && supaSession) return supaUser;
   if (!supa) return null;
   try {
     const { data: { session } } = await supa.auth.getSession();
+    supaSession = session;
     supaUser = session?.user ?? null;
-  } catch {}
+    if (!session) console.log('[Supa] No active session');
+  } catch(e) { console.warn('[Supa] ensureSupaUser error:', e.message); }
   return supaUser;
+}
+
+function isSupaAuthenticated() {
+  return !!(supa && supaUser && supaSession);
 }
 
 
 // Listen for auth state changes
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
+    supaSession = session;
     supaUser = session?.user ?? null;
+    console.log('[Supa] Auth event:', event, supaUser ? 'user=' + supaUser.id : 'no user', session ? 'session=valid' : 'session=null');
     // User arrived via a password-recovery email link → let them set a new PIN.
     if (event === 'PASSWORD_RECOVERY') {
       if (typeof showScreen === 'function') showScreen('reset-pin');
@@ -2907,15 +2916,27 @@ async function supaSignUp(email, pin, name) {
     password: pin,
     options: { data: { name } }
   });
-  if (!error && data.user) {
-    const { error: pe } = await supa.from('profiles').insert({
-      id: data.user.id,
-      name,
-      nickname: name,
-      games_played: 0
-    });
-    if (pe) console.warn('supaSignUp profile insert:', pe.message);
-    supaUser = data.user;
+  if (error) {
+    console.warn('[Supa] signUp error:', error.message);
+    return { data, error };
+  }
+  // Profile row is created by the handle_new_user trigger (SECURITY DEFINER).
+  // After signup, session may be null if email confirmation is enabled.
+  supaSession = data.session;
+  supaUser = data.session?.user ?? data.user ?? null;
+  if (!data.session) {
+    console.warn('[Supa] signUp: no session returned — email confirmation may be required. Attempting auto sign-in...');
+    // Auto sign-in: works when "Confirm email" is OFF in Supabase Auth settings.
+    const si = await supa.auth.signInWithPassword({ email, password: pin });
+    if (!si.error && si.data.session) {
+      supaSession = si.data.session;
+      supaUser = si.data.session.user;
+      console.log('[Supa] signUp: auto sign-in succeeded, session active');
+    } else {
+      console.warn('[Supa] signUp: auto sign-in failed:', si.error?.message || 'no session');
+    }
+  } else {
+    console.log('[Supa] signUp: session active, user:', supaUser?.id);
   }
   return { data, error };
 }
@@ -2923,13 +2944,25 @@ async function supaSignUp(email, pin, name) {
 async function supaSignIn(email, pin) {
   if (!supa) return { error: { message: 'Supabase not configured' } };
   const { data, error } = await supa.auth.signInWithPassword({ email, password: pin });
-  if (!error) supaUser = data.user;
+  if (error) {
+    console.warn('[Supa] signIn error:', error.message);
+    // If email not confirmed, give a clear message
+    if (error.message?.includes('Email not confirmed')) {
+      return { data, error: { message: 'Email not confirmed. Go to Supabase → Auth → Settings → disable "Confirm email".' } };
+    }
+    return { data, error };
+  }
+  supaSession = data.session;
+  supaUser = data.session?.user ?? data.user ?? null;
+  console.log('[Supa] signIn: session active, user:', supaUser?.id);
   return { data, error };
 }
 
 async function supaSignOut() {
   if (supa) await supa.auth.signOut();
   supaUser = null;
+  supaSession = null;
+  console.log('[Supa] Signed out');
 }
 
 // Clears every CourtCall + Supabase key from localStorage.
@@ -2977,7 +3010,8 @@ async function logOut() {
 }
 
 async function supaSaveGame(game) {
-  if (!supa || !supaUser) return;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaSaveGame skipped — not authenticated (local only)'); return; }
   try {
     const { error } = await supa.from('games').insert({
       id:              game.id || ('g_' + Date.now()),
@@ -2990,7 +3024,7 @@ async function supaSaveGame(game) {
       game_type:       game.gameType     || '',
       win_score:       game.winScore     ?? 21,
       scoring_rule:    game.scoringRule  || '',
-      duration:        game.duration     || null,  // text e.g. "12m 30s"
+      duration:        game.duration     || null,
       fouls_a:         game.foulsA       ?? null,
       fouls_b:         game.foulsB       ?? null,
       max_lead_a:      game.maxLead?.a   ?? null,
@@ -3005,8 +3039,9 @@ async function supaSaveGame(game) {
       created_at:      game.date ? new Date(game.date).toISOString() : new Date().toISOString()
     });
     if (error) throw error;
+    console.log('[Supa] supaSaveGame: success');
   } catch(e) {
-    console.warn('supaSaveGame failed:', e.message);
+    console.error('[Supa] supaSaveGame FAILED:', e.message, e);
     if (typeof showToast === 'function') showToast('Game saved locally (cloud sync failed)', 3500);
   }
 }
@@ -3392,6 +3427,8 @@ async function signIn(){
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('signed_in');renderHub();
   showScreen('hub');
+  if(isSupaAuthenticated()){showToast('Signed in — cloud sync active ☁️');}
+  else{showToast('Signed in — local only (cloud sync unavailable)',4000);}
 }
 
 function _localSignIn(email,pin){
@@ -3436,6 +3473,8 @@ async function createAccount(){
   setObj(K.profile,p);currentProfile=p;
   _clearAllPins();trackEvent('account_created');renderHub();
   showScreen('hub');
+  if(isSupaAuthenticated()){showToast('Account created — cloud sync active ☁️');}
+  else{showToast('Account created — local only (sign in again if cloud sync needed)',4000);}
 }
 
 function _localCreateAccount(name,email,pin){
@@ -5394,11 +5433,12 @@ async function _doSyncCommunitiesFromDB() {
     const dbMemberKeys = new Set(normMembers.map(m => m.communityId + '_' + m.profileId));
     const localMembers = getCommMembers();
     setCommMembers([...normMembers, ...localMembers.filter(m => !dbMemberKeys.has((m.communityId||'') + '_' + (m.profileId||'')))]);
-  } catch(e) { console.warn('syncCommunitiesFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _doSyncCommunitiesFromDB EXCEPTION:', e.message, e); }
 }
 
 async function supaCreateCommunity(community, creatorMember) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaCreateCommunity skipped — not authenticated'); return false; }
   try {
     const { error: ce } = await supa.from('communities').insert({
       id: community.id, creator_id: supaUser.id, name: community.name,
@@ -5406,30 +5446,34 @@ async function supaCreateCommunity(community, creatorMember) {
       visibility: community.visibility || 'public', logo: community.logo || '🏀',
       location: community.location || '', invite_code: community.inviteCode || null
     });
-    if (ce) { console.warn('supaCreateCommunity:', ce.message); return false; }
+    if (ce) { console.error('[Supa] supaCreateCommunity INSERT failed:', ce.message, ce); return false; }
     const { error: me } = await supa.from('community_members').insert({
       community_id: community.id, user_id: supaUser.id,
       role: creatorMember.role || 'admin', profile_name: creatorMember.profileName || currentProfile?.name || ''
     });
-    if (me) { console.warn('supaCreateCommunity member:', me.message); }
+    if (me) { console.error('[Supa] supaCreateCommunity member INSERT failed:', me.message, me); }
+    console.log('[Supa] supaCreateCommunity: success, id=' + community.id);
     return true;
-  } catch(e) { console.warn('supaCreateCommunity:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaCreateCommunity EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaJoinCommunity(communityId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaJoinCommunity skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_members').upsert({
       community_id: communityId, user_id: supaUser.id,
       role: 'member', profile_name: currentProfile?.name || ''
     }, { onConflict: 'community_id,user_id' });
-    if (error) { console.warn('supaJoinCommunity:', error.message); return false; }
+    if (error) { console.error('[Supa] supaJoinCommunity FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaJoinCommunity: success');
     return true;
-  } catch(e) { console.warn('supaJoinCommunity:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaJoinCommunity EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaSubmitPost(post) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaSubmitPost skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_posts').insert({
       id: post.id, community_id: post.communityId, user_id: supaUser.id,
@@ -5438,9 +5482,10 @@ async function supaSubmitPost(post) {
       image_url: post.imageUrl || null, type: post.type || 'text',
       reactions: post.reactions || {}, comments: post.comments || []
     });
-    if (error) { console.warn('supaSubmitPost:', error.message); return false; }
+    if (error) { console.error('[Supa] supaSubmitPost FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaSubmitPost: success');
     return true;
-  } catch(e) { console.warn('supaSubmitPost:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaSubmitPost EXCEPTION:', e.message, e); return false; }
 }
 
 async function syncPostsFromDB(communityId) {
@@ -5487,51 +5532,60 @@ async function _doSyncPostsFromDB(communityId) {
       };
     }), ...all];
     saveAllPosts(merged);
-  } catch(e) { console.warn('syncPostsFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _doSyncPostsFromDB EXCEPTION:', e.message, e); }
 }
 
 async function supaCreateEvent(event) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaCreateEvent skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_events').insert({
       id: event.id, community_id: event.communityId, creator_id: supaUser.id,
       title: event.title, description: event.description || '',
       event_date: event.date || '', location: event.location || ''
     });
-    if (error) { console.warn('supaCreateEvent:', error.message); return false; }
+    if (error) { console.error('[Supa] supaCreateEvent FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaCreateEvent: success');
     return true;
-  } catch(e) { console.warn('supaCreateEvent:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaCreateEvent EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpdatePost(postId, fields) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpdatePost skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_posts').update(fields).eq('id', postId);
-    if (error) { console.warn('supaUpdatePost:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpdatePost FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpdatePost: success');
     return true;
-  } catch(e) { console.warn('supaUpdatePost:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpdatePost EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaHardDeletePost(postId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaHardDeletePost skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_posts').delete().eq('id', postId);
-    if (error) { console.warn('supaHardDeletePost:', error.message); return false; }
+    if (error) { console.error('[Supa] supaHardDeletePost FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaHardDeletePost: success');
     return true;
-  } catch(e) { console.warn('supaHardDeletePost:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaHardDeletePost EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpdateEvent(eventId, fields) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpdateEvent skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_events').update(fields).eq('id', eventId);
-    if (error) { console.warn('supaUpdateEvent:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpdateEvent FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpdateEvent: success');
     return true;
-  } catch(e) { console.warn('supaUpdateEvent:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpdateEvent EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpsertCPlayer(player) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpsertCPlayer skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_players').upsert({
       id:           player.id,
@@ -5550,24 +5604,28 @@ async function supaUpsertCPlayer(player) {
       mvp_count:    player.mvpCount    || 0,
       created_at:   player.createdAt   || new Date().toISOString()
     }, { onConflict: 'id' });
-    if (error) { console.warn('supaUpsertCPlayer:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpsertCPlayer FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpsertCPlayer: success');
     return true;
-  } catch(e) { console.warn('supaUpsertCPlayer:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpsertCPlayer EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaDeleteCPlayer(playerId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaDeleteCPlayer skipped — not authenticated'); return false; }
   try {
     const { error: re } = await supa.from('community_ratings').delete().eq('player_id', playerId);
-    if (re) console.warn('supaDeleteCPlayer ratings:', re.message);
+    if (re) console.error('[Supa] supaDeleteCPlayer ratings FAILED:', re.message, re);
     const { error: pe } = await supa.from('community_players').delete().eq('id', playerId);
-    if (pe) { console.warn('supaDeleteCPlayer:', pe.message); return false; }
+    if (pe) { console.error('[Supa] supaDeleteCPlayer FAILED:', pe.message, pe); return false; }
+    console.log('[Supa] supaDeleteCPlayer: success');
     return true;
-  } catch(e) { console.warn('supaDeleteCPlayer:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaDeleteCPlayer EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpsertCRating(rating) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpsertCRating skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_ratings').upsert({
       id: rating.id, player_id: rating.playerId, community_id: rating.communityId,
@@ -5579,13 +5637,15 @@ async function supaUpsertCRating(rating) {
       created_at: rating.createdAt || new Date().toISOString(),
       updated_at: rating.updatedAt || new Date().toISOString()
     }, { onConflict: 'player_id,rater_id' });
-    if (error) { console.warn('supaUpsertCRating:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpsertCRating FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpsertCRating: success');
     return true;
-  } catch(e) { console.warn('supaUpsertCRating:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpsertCRating EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaSubmitGalleryItem(item) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaSubmitGalleryItem skipped — not authenticated'); return false; }
   // Skip base64 uploads — those are too large for DB; only sync URL-sourced images
   if (item.imageSourceType === 'upload' || !item.imageUrl) return false;
   try {
@@ -5602,58 +5662,68 @@ async function supaSubmitGalleryItem(item) {
       comments:       item.comments     || [],
       created_at:     item.createdAt    || new Date().toISOString()
     });
-    if (error) { console.warn('supaSubmitGalleryItem:', error.message); return false; }
+    if (error) { console.error('[Supa] supaSubmitGalleryItem FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaSubmitGalleryItem: success');
     return true;
-  } catch(e) { console.warn('supaSubmitGalleryItem:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaSubmitGalleryItem EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpdateGalleryItem(itemId, fields) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpdateGalleryItem skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_gallery').update(fields).eq('id', itemId);
-    if (error) { console.warn('supaUpdateGalleryItem:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpdateGalleryItem FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpdateGalleryItem: success');
     return true;
-  } catch(e) { console.warn('supaUpdateGalleryItem:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpdateGalleryItem EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaDeleteGalleryItem(itemId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaDeleteGalleryItem skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_gallery').delete().eq('id', itemId);
-    if (error) { console.warn('supaDeleteGalleryItem:', error.message); return false; }
+    if (error) { console.error('[Supa] supaDeleteGalleryItem FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaDeleteGalleryItem: success');
     return true;
-  } catch(e) { console.warn('supaDeleteGalleryItem:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaDeleteGalleryItem EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaCreateJoinRequest(req) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaCreateJoinRequest skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_join_requests').insert({
       id: req.id, community_id: req.communityId, user_id: supaUser.id,
       profile_name: req.profileName || currentProfile?.name || '',
       status: 'pending', requested_at: req.requestedAt || new Date().toISOString()
     });
-    if (error) { console.warn('supaCreateJoinRequest:', error.message); return false; }
+    if (error) { console.error('[Supa] supaCreateJoinRequest FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaCreateJoinRequest: success');
     return true;
-  } catch(e) { console.warn('supaCreateJoinRequest:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaCreateJoinRequest EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaCancelJoinRequest(communityId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaCancelJoinRequest skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_join_requests')
       .delete().eq('community_id', communityId).eq('user_id', supaUser.id).eq('status', 'pending');
-    if (error) { console.warn('supaCancelJoinRequest:', error.message); return false; }
+    if (error) { console.error('[Supa] supaCancelJoinRequest FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaCancelJoinRequest: success');
     return true;
-  } catch(e) { console.warn('supaCancelJoinRequest:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaCancelJoinRequest EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpdateJoinRequest(reqId, status) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpdateJoinRequest skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_join_requests')
       .update({ status, reviewed_at: new Date().toISOString() }).eq('id', reqId);
-    if (error) { console.warn('supaUpdateJoinRequest:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpdateJoinRequest FAILED:', error.message, error); return false; }
     if (status === 'approved') {
       const req = getAllJoinReqs().find(r => r.id === reqId);
       if (req) {
@@ -5661,25 +5731,29 @@ async function supaUpdateJoinRequest(reqId, status) {
           community_id: req.communityId, user_id: req.profileId,
           role: 'member', profile_name: req.profileName || ''
         }, { onConflict: 'community_id,user_id' });
-        if (me) console.warn('supaUpdateJoinRequest member:', me.message);
+        if (me) console.error('[Supa] supaUpdateJoinRequest member FAILED:', me.message, me);
       }
     }
+    console.log('[Supa] supaUpdateJoinRequest: success');
     return true;
-  } catch(e) { console.warn('supaUpdateJoinRequest:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpdateJoinRequest EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaLeaveComm(communityId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaLeaveComm skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('community_members').delete()
       .eq('community_id', communityId).eq('user_id', supaUser.id);
-    if (error) { console.warn('supaLeaveComm:', error.message); return false; }
+    if (error) { console.error('[Supa] supaLeaveComm FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaLeaveComm: success');
     return true;
-  } catch(e) { console.warn('supaLeaveComm:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaLeaveComm EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaUpsertTournament(tournament) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaUpsertTournament skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('tournaments').upsert({
       id:         tournament.id,
@@ -5696,18 +5770,21 @@ async function supaUpsertTournament(tournament) {
       created_at: tournament.createdAt ? new Date(tournament.createdAt).toISOString() : new Date().toISOString(),
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
-    if (error) { console.warn('supaUpsertTournament:', error.message); return false; }
+    if (error) { console.error('[Supa] supaUpsertTournament FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaUpsertTournament: success');
     return true;
-  } catch(e) { console.warn('supaUpsertTournament:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaUpsertTournament EXCEPTION:', e.message, e); return false; }
 }
 
 async function supaDeleteTournament(tournamentId) {
-  if (!supa || !supaUser) return false;
+  await ensureSupaUser();
+  if (!supa || !supaUser) { console.log('[Supa] supaDeleteTournament skipped — not authenticated'); return false; }
   try {
     const { error } = await supa.from('tournaments').delete().eq('id', tournamentId).eq('user_id', supaUser.id);
-    if (error) { console.warn('supaDeleteTournament:', error.message); return false; }
+    if (error) { console.error('[Supa] supaDeleteTournament FAILED:', error.message, error); return false; }
+    console.log('[Supa] supaDeleteTournament: success');
     return true;
-  } catch(e) { console.warn('supaDeleteTournament:', e.message); return false; }
+  } catch(e) { console.error('[Supa] supaDeleteTournament EXCEPTION:', e.message, e); return false; }
 }
 
 // ── On-login full sync ────────────────────────────────────────
@@ -5748,7 +5825,7 @@ async function _syncGamesFromDB() {
       ...local.filter(m => !dbIds.has(m.id))
     ];
     setCol(K.matches, merged.slice(0, 200));
-  } catch(e) { console.warn('_syncGamesFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _syncGamesFromDB EXCEPTION:', e.message, e); }
 }
 
 async function _syncTournamentsFromDB() {
@@ -5775,7 +5852,7 @@ async function _syncTournamentsFromDB() {
       ...local.filter(t => !dbIds.has(t.id))
     ];
     setCol(K.tournaments, merged);
-  } catch(e) { console.warn('_syncTournamentsFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _syncTournamentsFromDB EXCEPTION:', e.message, e); }
 }
 
 async function _syncCPlayersFromDB() {
@@ -5805,7 +5882,7 @@ async function _syncCPlayersFromDB() {
       ...local.filter(p => !dbIds.has(p.id))
     ];
     saveAllCPlayers(merged);
-  } catch(e) { console.warn('_syncCPlayersFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _syncCPlayersFromDB EXCEPTION:', e.message, e); }
 }
 
 async function _syncCRatingsFromDB() {
@@ -5828,7 +5905,7 @@ async function _syncCRatingsFromDB() {
       ...local.filter(r => !dbIds.has(r.id))
     ];
     saveAllCRatings(merged);
-  } catch(e) { console.warn('_syncCRatingsFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _syncCRatingsFromDB EXCEPTION:', e.message, e); }
 }
 
 async function _syncJoinRequestsFromDB() {
@@ -5858,7 +5935,7 @@ async function _syncJoinRequestsFromDB() {
       ...local.filter(r => !dbIds.has(r.id))
     ];
     saveAllJoinReqs(merged);
-  } catch(e) { console.warn('_syncJoinRequestsFromDB:', e.message); }
+  } catch(e) { console.error('[Supa] _syncJoinRequestsFromDB EXCEPTION:', e.message, e); }
 }
 
 // localStorage keys — community module
