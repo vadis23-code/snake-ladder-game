@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ============================================================
+       VELORA ONE — Premium Event Planning & Décor, Bengaluru
+       Single-page landing site · HTML + CSS + JS (static)
+       ============================================================ -->
+
+  <!-- Primary SEO -->
+  <title>Velora One | Premium Event Planner in Bengaluru</title>
+  <meta name="description" content="Velora One is a premium event planning and décor brand in Bengaluru, offering end-to-end execution for birthdays, housewarmings, engagements, baby showers, weddings, corporate events, inaugurations, and custom celebrations.">
+  <meta name="keywords" content="event planner in Bengaluru, event management company Bangalore, birthday decoration Bangalore, housewarming decoration Bangalore, corporate event planner Bengaluru, baby shower decoration Bangalore, engagement decoration Bangalore, inauguration event planner Bangalore, wedding decoration Bangalore, end-to-end event planner Bangalore, premium event planner Bengaluru, event décor Bangalore">
+  <meta name="author" content="Velora One">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://veloraone.in/"> <!-- TODO: replace with your final domain -->
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Velora One | Premium Event Planner in Bengaluru">
+  <meta property="og:description" content="Beautifully Planned. Perfectly Celebrated. End-to-end event planning and elegant décor in Bengaluru — birthdays, housewarmings, engagements, weddings, corporate events and more.">
+  <meta property="og:url" content="https://veloraone.in/"> <!-- TODO: replace with your final domain -->
+  <meta property="og:site_name" content="Velora One">
+  <meta property="og:locale" content="en_IN">
+  <!-- TODO: Add a 1200×630px branded image at /og-image.jpg and uncomment: -->
+  <!-- <meta property="og:image" content="https://veloraone.in/og-image.jpg"> -->
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Velora One | Premium Event Planner in Bengaluru">
+  <meta name="twitter:description" content="Beautifully Planned. Perfectly Celebrated. Your end-to-end event partner in Bengaluru.">
+  <!-- <meta name="twitter:image" content="https://veloraone.in/og-image.jpg"> -->
+
+  <!-- Fonts: Playfair Display (headings) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- ============================================================
+       STRUCTURED DATA (Schema.org)
+       LocalBusiness + Organization + Services + FAQPage
+       ============================================================ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["LocalBusiness", "Organization"],
+        "@id": "https://veloraone.in/#business",
+        "name": "Velora One",
+        "slogan": "Your End-to-End Event Partner",
+        "description": "Premium event planning and décor brand in Bengaluru offering end-to-end execution for birthdays, housewarmings, engagements, baby showers, weddings, corporate events, inaugurations, and custom celebrations.",
+        "url": "https://veloraone.in/",
+        "telephone": "+916366463924",
+        "email": "veloraoneevents@gmail.com",
+        "foundingDate": "2026",
+        "founder": { "@type": "Person", "name": "Rani" },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressRegion": "Karnataka",
+          "addressCountry": "IN"
+        },
+        "areaServed": { "@type": "City", "name": "Bengaluru" },
+        "sameAs": ["https://www.instagram.com/veloraoneevents"],
+        "priceRange": "₹₹",
+        "makesOffer": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Birthday Decoration & Planning", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Housewarming Decoration", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Engagement Décor", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Baby Shower Decoration", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wedding Styling & Décor", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Corporate Event Planning", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Inauguration Event Management", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Naming Ceremony Décor", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Anniversary Celebration Planning", "areaServed": "Bengaluru" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom Celebration Design", "areaServed": "Bengaluru" } }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://veloraone.in/#faq",
+        "mainEntity": [
+          { "@type": "Question", "name": "Do you handle small home events?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We plan and style intimate home celebrations with the same attention to detail as larger events. No occasion is too small to be beautiful." } },
+          { "@type": "Question", "name": "Do you manage corporate events?", "acceptedAnswer": { "@type": "Answer", "text": "Absolutely. We handle office inaugurations, product launches, team celebrations, and professional gatherings with polished planning and refined décor." } },
+          { "@type": "Question", "name": "How early should we book Velora One?", "acceptedAnswer": { "@type": "Answer", "text": "We recommend reaching out 2–4 weeks in advance for most celebrations, and earlier for weddings or large corporate events. For urgent timelines, message us on WhatsApp — we will always try to help." } },
+          { "@type": "Question", "name": "Can you work within a specific budget?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every celebration is custom quoted. Share your budget range with us and we will design the most beautiful experience possible within it." } },
+          { "@type": "Question", "name": "Do you provide only décor or full event planning?", "acceptedAnswer": { "@type": "Answer", "text": "Both. You can choose décor only, planning plus décor, or complete end-to-end event execution where we manage every detail from concept to wrap-up." } },
+          { "@type": "Question", "name": "Do you handle apartment clubhouse events?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Apartment clubhouse celebrations are one of our favourite settings. We coordinate with your community, manage setup timings, and transform the space beautifully." } },
+          { "@type": "Question", "name": "Do you provide fresh flower decoration?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We work with fresh florals, artificial arrangements, or a thoughtful blend of both, depending on your style, season, and budget." } },
+          { "@type": "Question", "name": "Can we share reference photos or themes?", "acceptedAnswer": { "@type": "Answer", "text": "Please do. Reference photos, Pinterest boards, and Instagram saves help us understand your taste, and we build a concept around what you love." } },
+          { "@type": "Question", "name": "Do you visit the venue before the event?", "acceptedAnswer": { "@type": "Answer", "text": "For most events, yes. A venue visit helps us plan the layout, lighting, and décor placement so everything fits your space perfectly on the day." } },
+          { "@type": "Question", "name": "How do we start the inquiry process?", "acceptedAnswer": { "@type": "Answer", "text": "Simply message us on WhatsApp at +91 63664 63924, call us, or fill in the inquiry form on this page. We will respond with ideas and next steps." } }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+
+<!-- ================================================================
+     1. STICKY HEADER / NAVIGATION
+     ================================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="container header-inner">
+    <a href="#home" class="brand" aria-label="Velora One — Home">
+      <span class="brand-word">Velora <em>One</em></span>
+      <span class="brand-tag">Your End-to-End Event Partner</span>
+    </a>
+
+    <nav class="site-nav" id="siteNav" aria-label="Primary navigation">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#gallery" class="nav-link">Gallery</a>
+      <a href="#reviews" class="nav-link">Reviews</a>
+      <a href="#inquiry" class="nav-link">Inquiry</a>
+      <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="nav-link">Instagram</a>
+      <!-- WhatsApp CTA shown inside menu on mobile -->
+      <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
+         target="_blank" rel="noopener" class="btn btn-gold btn-nav">Call / WhatsApp</a>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="home">
+
+  <!-- ================================================================
+       2. HERO SECTION
+       ================================================================ -->
+  <section class="hero" aria-label="Introduction">
+    <div class="container hero-grid">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Serving Bengaluru Since 2026</p>
+        <h1>Beautifully Planned.<br><span class="accent-italic">Perfectly Celebrated.</span></h1>
+        <p class="hero-sub">
+          Premium event planning and décor in Bengaluru for birthdays, housewarmings,
+          engagements, baby showers, weddings, corporate events, inaugurations,
+          and custom celebrations.
+        </p>
+        <p class="hero-emotion">You focus on your guests. We take care of the rest.</p>
+
+        <div class="hero-actions">
+          <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
+             target="_blank" rel="noopener" class="btn btn-gold">Call / WhatsApp Us</a>
+          <a href="#inquiry" class="btn btn-outline">Send Inquiry</a>
+          <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-ghost">View Our Instagram</a>
+        </div>
+
+        <ul class="hero-contact" aria-label="Contact details">
+          <li><a href="tel:+916366463924">+91 63664 63924</a></li>
+          <li><a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener">@veloraoneevents</a></li>
+          <li>Bengaluru, India</li>
+        </ul>
+      </div>
+
+      <!-- HERO VISUAL
+           REPLACE-IMAGE: Swap the .ph-hero div below with a real <img>.
+           Recommended: a wide/tall décor hero shot, ~1200×1400px, WebP, under 250KB.
+           Example:
+           <img src="images/hero-decor.webp" alt="Elegant floral event décor by Velora One in Bengaluru" loading="eager" class="hero-img">
+      -->
+      <div class="hero-visual reveal reveal-delay-1">
+        <div class="ph ph-hero" role="img" aria-label="Elegant event décor placeholder — replace with a signature Velora One setup photo">
+          <span class="ph-label">Signature Décor Visual</span>
+        </div>
+        <!-- Floating credibility cards -->
+        <div class="float-card float-card-1">✦ End-to-End Planning</div>
+        <div class="float-card float-card-2">✦ Elegant Décor</div>
+        <div class="float-card float-card-3">✦ Stress-Free Execution</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       3. TRUST BADGES
+       ================================================================ -->
+  <section class="trust-strip" aria-label="Why trust Velora One">
+    <div class="container">
+      <ul class="trust-list reveal">
+        <li>Bengaluru Based</li>
+        <li>End-to-End Execution</li>
+        <li>Family &amp; Corporate Events</li>
+        <li>Custom Themes</li>
+        <li>WhatsApp Support</li>
+        <li>Since 2026</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       4. ABOUT VELORA ONE
+       ================================================================ -->
+  <section class="section about" id="about">
+    <div class="container split">
+      <div class="split-copy reveal">
+        <p class="eyebrow">Who We Are</p>
+        <h2>About Velora One</h2>
+        <p>
+          Velora One was created with a simple belief — every celebration deserves
+          thoughtful planning, elegant décor, and flawless execution. Based in Bengaluru,
+          we bring together creativity, coordination, and care to make every event feel
+          effortless for our clients.
+        </p>
+        <ul class="check-list">
+          <li>End-to-end event planning &amp; execution</li>
+          <li>Family and corporate celebrations</li>
+          <li>Elegant, custom décor concepts</li>
+          <li>Complete vendor coordination</li>
+          <li>On-ground event-day execution</li>
+          <li>A genuinely stress-free client experience</li>
+        </ul>
+        <p class="signature-line">Designed with elegance. Managed with care. Delivered with perfection.</p>
+      </div>
+
+      <!-- REPLACE-IMAGE: Swap .ph-about with a real brand or décor photo.
+           Recommended: 900×1100px portrait, WebP, under 200KB. -->
+      <div class="split-visual reveal reveal-delay-1">
+        <div class="ph ph-about" role="img" aria-label="Velora One elegant celebration setup placeholder">
+          <span class="ph-label">Brand Visual</span>
+        </div>
+        <div class="visual-caption-card">
+          <p class="vc-title">Velora One</p>
+          <p class="vc-sub">Premium Events · Bengaluru</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       5. FOUNDER / PERSONAL TOUCH
+       ================================================================ -->
+  <section class="section founder">
+    <div class="container founder-inner reveal">
+      <p class="eyebrow">A Personal Promise</p>
+      <h2>Curated With Care by Rani</h2>
+      <p class="founder-copy">
+        Velora One brings a personal touch to every celebration. Led with warmth, care,
+        and attention to detail, every event is planned as if it were our own family
+        occasion — with elegance, responsibility, and complete ownership.
+      </p>
+      <p class="founder-note">Personal attention. Professional execution. Beautiful memories.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       6. BRAND STORY / SERVING BENGALURU SINCE 2026
+       ================================================================ -->
+  <section class="section story">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Our Story</p>
+        <h2>Serving Bengaluru Since 2026</h2>
+        <p class="section-sub">
+          From our first event to every celebration ahead, Velora One is built on trust,
+          attention to detail, and the joy of creating memorable experiences.
+        </p>
+      </div>
+      <div class="stat-grid reveal reveal-delay-1">
+        <div class="stat-card"><span class="stat-big">2026</span><span class="stat-label">Serving Since</span></div>
+        <div class="stat-card"><span class="stat-big">Bengaluru</span><span class="stat-label">Proudly Based</span></div>
+        <div class="stat-card"><span class="stat-big">End-to-End</span><span class="stat-label">Event Ownership</span></div>
+        <div class="stat-card"><span class="stat-big">Family + Corporate</span><span class="stat-label">Celebrations</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       7. SERVICES — CELEBRATIONS WE CURATE
+       ================================================================ -->
+  <section class="section services" id="services">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">What We Do</p>
+        <h2>Celebrations We Curate</h2>
+        <p class="section-sub">
+          From intimate home functions to polished corporate gatherings, we bring every
+          occasion to life with thoughtful planning and elegant execution.
+        </p>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🕯️</span>
+          <h3>Birthdays</h3>
+          <p>Graceful themes and warm styling for milestone birthdays and intimate family celebrations alike.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🏠</span>
+          <h3>Housewarming</h3>
+          <p>Warm, graceful setups that make your new beginning feel welcoming, elegant, and memorable.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">💍</span>
+          <h3>Engagements</h3>
+          <p>Romantic backdrops, refined florals, and couple styling that make the moment feel timeless.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🕊️</span>
+          <h3>Baby Showers</h3>
+          <p>Soft, tender themes designed with love — gentle colours, delicate details, family warmth.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🌸</span>
+          <h3>Weddings</h3>
+          <p>Elegant wedding styling and coordination that lets your family be guests at your own celebration.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🏛️</span>
+          <h3>Corporate Events</h3>
+          <p>Polished planning and refined décor for office inaugurations, launches, team celebrations, and professional gatherings.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🎀</span>
+          <h3>Inaugurations</h3>
+          <p>Ribbon-cutting ceremonies, entrance styling, and launch-day experiences handled with precision.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🌿</span>
+          <h3>Naming Ceremonies</h3>
+          <p>Traditional elegance and gentle styling for one of your family's most cherished first moments.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">🥂</span>
+          <h3>Anniversaries</h3>
+          <p>Understated luxury for the milestones that matter — intimate dinners to grand celebrations.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+        <article class="service-card reveal">
+          <span class="service-icon" aria-hidden="true">✨</span>
+          <h3>Custom Celebrations</h3>
+          <p>An idea of your own? We design fully personalised concepts around your occasion and story.</p>
+          <a href="#inquiry" class="card-link">Enquire Now →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       8. SIGNATURE PACKAGES
+       ================================================================ -->
+  <section class="section packages">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Curated Experiences</p>
+        <h2>Velora One Signature Packages</h2>
+        <p class="section-sub">
+          Curated event experiences designed around your occasion, space, guest count,
+          and preferred style.
+        </p>
+      </div>
+
+      <div class="package-grid">
+        <article class="package-card reveal">
+          <h3>Intimate Home Celebration</h3>
+          <p>For birthdays, anniversaries, naming ceremonies, and small family events styled beautifully at home.</p>
+        </article>
+        <article class="package-card reveal">
+          <h3>Premium Housewarming Setup</h3>
+          <p>Elegant entrance décor, traditional touches, florals, lamps, kolam, and guest welcome styling.</p>
+        </article>
+        <article class="package-card reveal">
+          <h3>Corporate Inauguration Package</h3>
+          <p>Professional décor for office launches — ribbon cutting, entrance branding, florals, lighting, and guest experience.</p>
+        </article>
+        <article class="package-card reveal">
+          <h3>Baby Shower Elegance Package</h3>
+          <p>Soft, warm, and beautiful themes designed for family celebrations full of tenderness.</p>
+        </article>
+        <article class="package-card reveal">
+          <h3>Engagement Décor Experience</h3>
+          <p>Elegant backdrops, florals, couple seating, lighting, and complete setup coordination.</p>
+        </article>
+        <article class="package-card featured reveal">
+          <h3>Custom Luxury Celebration</h3>
+          <p>Fully personalised concepts for special occasions — designed from scratch, just for you.</p>
+        </article>
+      </div>
+
+      <p class="pricing-note reveal">
+        Every package is <strong>custom quoted</strong> based on event type, venue, theme,
+        guest count, and décor requirements.
+      </p>
+      <div class="center reveal">
+        <a href="#inquiry" class="btn btn-gold">Plan My Celebration</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       9. THE VELORA ONE EXPERIENCE — PROCESS TIMELINE
+       ================================================================ -->
+  <section class="section experience">
+    <div class="container">
+      <div class="section-head light reveal">
+        <p class="eyebrow">The Velora One Experience</p>
+        <h2>From First Idea to Final Applause,<br>We Manage Every Detail</h2>
+        <p class="section-sub">
+          Our role is not just to decorate a venue. We help shape the experience —
+          from the first conversation to the final celebration moment.
+        </p>
+      </div>
+
+      <ol class="timeline">
+        <li class="timeline-step reveal"><span class="step-num">01</span><h3>Consultation</h3><p>We listen to your occasion, wishes, and budget.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">02</span><h3>Concept &amp; Theme Design</h3><p>A tailored theme shaped around your story and taste.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">03</span><h3>Décor Planning</h3><p>Florals, lighting, backdrops, and styling mapped in detail.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">04</span><h3>Vendor Coordination</h3><p>Trusted partners aligned and managed on your behalf.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">05</span><h3>Setup &amp; Styling</h3><p>Your venue transformed, styled, and finished with care.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">06</span><h3>Event-Day Execution</h3><p>We stay on ground so everything runs on time, beautifully.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">07</span><h3>Guest Experience Support</h3><p>Warm, attentive support so your guests feel looked after.</p></li>
+        <li class="timeline-step reveal"><span class="step-num">08</span><h3>Wrap-Up</h3><p>Graceful teardown and handover — you simply carry the memories.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       10. PERFECT FOR SECTION
+       ================================================================ -->
+  <section class="section settings">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Where We Work</p>
+        <h2>Perfect For Every Beautiful Setting</h2>
+        <p class="section-sub">
+          Whether it is a home function, apartment clubhouse celebration, office
+          inauguration, or elegant banquet gathering, we design the experience
+          around your space.
+        </p>
+      </div>
+      <div class="setting-grid reveal reveal-delay-1">
+        <div class="setting-card">Apartment Clubhouses</div>
+        <div class="setting-card">Home Celebrations</div>
+        <div class="setting-card">Villa Events</div>
+        <div class="setting-card">Banquet Halls</div>
+        <div class="setting-card">Corporate Offices</div>
+        <div class="setting-card">Cafés &amp; Retail Launches</div>
+        <div class="setting-card">Community Halls</div>
+        <div class="setting-card">Outdoor Lawns</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       11. GALLERY — MOMENTS WE CREATE
+       Masonry-style grid: one large tile + smaller stacked tiles.
+
+       REPLACE-IMAGE (each tile):
+       Replace each .ph-tile placeholder div with a real <img>, e.g.:
+         <img src="images/gallery/birthday-decor.webp"
+              alt="Elegant birthday décor setup by Velora One in Bengaluru"
+              loading="lazy">
+       Recommended: 800×1000px (large tile 1000×1250px), WebP, under 180KB each.
+       Keep the .tile-overlay element so hover labels continue to work.
+       ================================================================ -->
+  <section class="section gallery" id="gallery">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Our Work</p>
+        <h2>Moments We Create</h2>
+        <p class="section-sub">
+          A glimpse of the celebration styles, décor moods, and event experiences
+          Velora One can bring to life.
+        </p>
+      </div>
+
+      <div class="gallery-grid reveal reveal-delay-1">
+        <figure class="tile tile-large">
+          <div class="ph ph-tile ph-g1" role="img" aria-label="Elegant birthday décor setup — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Birthday Décor</span><span class="tile-cap">Graceful themes, warm light</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g2" role="img" aria-label="Traditional housewarming décor — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Housewarming Setup</span><span class="tile-cap">Traditional warmth, elegant welcome</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g3" role="img" aria-label="Corporate inauguration setup — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Corporate Inauguration</span><span class="tile-cap">Polished, professional, refined</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g4" role="img" aria-label="Soft baby shower theme décor — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Baby Shower Theme</span><span class="tile-cap">Soft colours, tender details</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g5" role="img" aria-label="Romantic engagement décor backdrop — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Engagement Décor</span><span class="tile-cap">Romantic backdrops, fine florals</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g6" role="img" aria-label="Elegant wedding styling — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Wedding Styling</span><span class="tile-cap">Timeless, editorial elegance</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g7" role="img" aria-label="Traditional naming ceremony décor — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Naming Ceremony</span><span class="tile-cap">Tradition, styled gently</span></figcaption>
+        </figure>
+        <figure class="tile">
+          <div class="ph ph-tile ph-g8" role="img" aria-label="Custom themed celebration décor — placeholder, replace with real event photo"></div>
+          <figcaption class="tile-overlay"><span class="tile-name">Custom Celebration</span><span class="tile-cap">Your idea, beautifully realised</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="center reveal">
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-outline">View More on Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       12. BEFORE & AFTER
+       REPLACE-IMAGE: For each card, replace .ph-before and .ph-after with
+       real photos of the same venue before and after your setup.
+       Recommended: matching angles, 800×600px, WebP.
+       ================================================================ -->
+  <section class="section beforeafter">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">The Transformation</p>
+        <h2>From Simple Spaces to Beautiful Celebrations</h2>
+      </div>
+
+      <div class="ba-grid">
+        <article class="ba-card reveal">
+          <div class="ba-pair">
+            <div class="ba-half"><div class="ph ph-before" role="img" aria-label="Apartment clubhouse before decoration — placeholder"></div><span class="ba-tag">Before</span></div>
+            <div class="ba-half"><div class="ph ph-after" role="img" aria-label="Apartment clubhouse after Velora One décor — placeholder"></div><span class="ba-tag gold">After</span></div>
+          </div>
+          <h3>Apartment Clubhouse Transformation</h3>
+          <p>Before: a simple community space. After: a warm, elegant celebration setup.</p>
+        </article>
+
+        <article class="ba-card reveal">
+          <div class="ba-pair">
+            <div class="ba-half"><div class="ph ph-before" role="img" aria-label="Home entrance before decoration — placeholder"></div><span class="ba-tag">Before</span></div>
+            <div class="ba-half"><div class="ph ph-after" role="img" aria-label="Home entrance after Velora One styling — placeholder"></div><span class="ba-tag gold">After</span></div>
+          </div>
+          <h3>Home Entrance Transformation</h3>
+          <p>Before: an everyday doorway. After: a graceful, welcoming first impression.</p>
+        </article>
+
+        <article class="ba-card reveal">
+          <div class="ba-pair">
+            <div class="ba-half"><div class="ph ph-before" role="img" aria-label="Office space before inauguration setup — placeholder"></div><span class="ba-tag">Before</span></div>
+            <div class="ba-half"><div class="ph ph-after" role="img" aria-label="Office after corporate inauguration décor — placeholder"></div><span class="ba-tag gold">After</span></div>
+          </div>
+          <h3>Corporate Inauguration Setup</h3>
+          <p>Before: an empty office floor. After: a polished, launch-ready experience.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       13. CLIENT LOVE / TESTIMONIALS
+       ⚠️ PLACEHOLDER REVIEWS — replace with real customer reviews as
+       they come in. Keep name + event type + short quote format.
+       ================================================================ -->
+  <section class="section reviews" id="reviews">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Kind Words</p>
+        <h2>Client Love</h2>
+      </div>
+
+      <div class="review-grid">
+        <article class="review-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>“Velora One made our housewarming feel elegant and effortless. Every detail was handled beautifully.”</p>
+          <footer><strong>Priya S.</strong><span>Housewarming Event</span></footer>
+        </article>
+        <article class="review-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>“The décor felt warm, premium, and perfectly suited to our family celebration.”</p>
+          <footer><strong>Ananya R.</strong><span>Baby Shower</span></footer>
+        </article>
+        <article class="review-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>“The setup was professional, refined, and completed with excellent coordination.”</p>
+          <footer><strong>Rajesh M.</strong><span>Corporate Inauguration</span></footer>
+        </article>
+        <article class="review-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>“From planning to execution, everything was smooth. We could simply enjoy the celebration.”</p>
+          <footer><strong>Sneha K.</strong><span>Birthday Celebration</span></footer>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       14. EVENT MOODBOARDS
+       REPLACE-IMAGE: swap each .ph-mood with a real moodboard/style photo.
+       ================================================================ -->
+  <section class="section moods">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Style Direction</p>
+        <h2>Choose the Mood of Your Celebration</h2>
+      </div>
+
+      <div class="mood-grid">
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m1" role="img" aria-label="Traditional elegance moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#7A2E2E"></span><span style="background:#C9A24D"></span><span style="background:#F3E4C8"></span><span style="background:#1F3D33"></span></div>
+            <h3>Traditional Elegance</h3>
+            <p>Marigolds, lamps, silk tones, and heritage details styled with restraint.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Traditional%20Elegance%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m2" role="img" aria-label="Modern minimal moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#FFFDF8"></span><span style="background:#EFE3D0"></span><span style="background:#6F5F4E"></span><span style="background:#1F1F1B"></span></div>
+            <h3>Modern Minimal</h3>
+            <p>Clean lines, neutral palettes, and quiet luxury for contemporary tastes.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Modern%20Minimal%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m3" role="img" aria-label="Floral luxury moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#E8B4B8"></span><span style="background:#F8F3EA"></span><span style="background:#9CAF88"></span><span style="background:#C9A24D"></span></div>
+            <h3>Floral Luxury</h3>
+            <p>Lush fresh florals, soft pastels, and romantic abundance in every corner.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Floral%20Luxury%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m4" role="img" aria-label="Corporate premium moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#1F3D33"></span><span style="background:#C9A24D"></span><span style="background:#FFFDF8"></span><span style="background:#1F1F1B"></span></div>
+            <h3>Corporate Premium</h3>
+            <p>Sharp, branded, and professional — designed to impress clients and teams.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Corporate%20Premium%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m5" role="img" aria-label="Kids celebration moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#F5C6AA"></span><span style="background:#A8D8EA"></span><span style="background:#FFF3D6"></span><span style="background:#C9A24D"></span></div>
+            <h3>Kids Celebration</h3>
+            <p>Playful yet tasteful themes children adore — without the visual clutter.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Kids%20Celebration%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+        <article class="mood-card reveal">
+          <div class="ph ph-mood ph-m6" role="img" aria-label="Festive Indian moodboard placeholder"></div>
+          <div class="mood-body">
+            <div class="swatches"><span style="background:#B33A3A"></span><span style="background:#E5A33D"></span><span style="background:#2E5339"></span><span style="background:#F8F3EA"></span></div>
+            <h3>Festive Indian</h3>
+            <p>Rich colours, diyas, drapes, and celebration energy rooted in tradition.</p>
+            <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Festive%20Indian%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       15. PREMIUM INQUIRY FORM
+       On submit: validates, builds a WhatsApp message, opens wa.me chat.
+       See script.js for logic + comments on connecting Supabase /
+       Formspree / Netlify Forms / Google Forms / email backends later.
+       ================================================================ -->
+  <section class="section inquiry" id="inquiry">
+    <div class="container inquiry-inner">
+      <div class="section-head light reveal">
+        <p class="eyebrow">Let's Begin</p>
+        <h2>Plan Your Celebration With Velora One</h2>
+        <p class="section-sub">Tell us about your occasion, and we'll help you bring it beautifully to life.</p>
+      </div>
+
+      <form class="inquiry-form reveal reveal-delay-1" id="inquiryForm" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="fName">Full Name <span class="req">*</span></label>
+            <input type="text" id="fName" name="name" autocomplete="name" required placeholder="Your name">
+          </div>
+          <div class="field">
+            <label for="fMobile">Mobile Number <span class="req">*</span></label>
+            <input type="tel" id="fMobile" name="mobile" autocomplete="tel" required inputmode="tel" placeholder="+91 XXXXX XXXXX">
+          </div>
+          <div class="field">
+            <label for="fEmail">Email Address</label>
+            <input type="email" id="fEmail" name="email" autocomplete="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="fType">Event Type <span class="req">*</span></label>
+            <select id="fType" name="eventType" required>
+              <option value="">Select event type…</option>
+              <option>Birthday</option>
+              <option>Housewarming</option>
+              <option>Engagement</option>
+              <option>Baby Shower</option>
+              <option>Wedding</option>
+              <option>Corporate Event</option>
+              <option>Inauguration</option>
+              <option>Naming Ceremony</option>
+              <option>Anniversary</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fDate">Event Date</label>
+            <input type="date" id="fDate" name="eventDate">
+          </div>
+          <div class="field">
+            <label for="fLocation">Event Location</label>
+            <input type="text" id="fLocation" name="location" placeholder="Area / venue in Bengaluru">
+          </div>
+          <div class="field">
+            <label for="fGuests">Estimated Guest Count</label>
+            <input type="number" id="fGuests" name="guests" min="1" placeholder="e.g. 50">
+          </div>
+          <div class="field">
+            <label for="fBudget">Budget Range</label>
+            <select id="fBudget" name="budget">
+              <option value="">Select budget range…</option>
+              <option>Below ₹25,000</option>
+              <option>₹25,000 – ₹50,000</option>
+              <option>₹50,000 – ₹1,00,000</option>
+              <option>₹1,00,000 – ₹2,50,000</option>
+              <option>Above ₹2,50,000</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fStyle">Preferred Style</label>
+            <select id="fStyle" name="style">
+              <option value="">Select preferred style…</option>
+              <option>Traditional</option>
+              <option>Floral</option>
+              <option>Minimal</option>
+              <option>Luxury</option>
+              <option>Corporate</option>
+              <option>Kids Theme</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fReq">Requirement Type</label>
+            <select id="fReq" name="requirement">
+              <option value="">Select requirement…</option>
+              <option>Décor only</option>
+              <option>Planning + Décor</option>
+              <option>Full end-to-end event execution</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field field-full">
+            <label for="fMsg">Message / Requirements</label>
+            <textarea id="fMsg" name="message" rows="4" placeholder="Tell us anything that will help us plan your celebration…"></textarea>
+          </div>
+        </div>
+
+        <p class="form-error" id="formError" role="alert" hidden></p>
+
+        <button type="submit" class="btn btn-gold btn-large">Send My Event Inquiry</button>
+        <p class="form-hint">Submitting opens WhatsApp with your details pre-filled — nothing is sent until you press send in WhatsApp.</p>
+      </form>
+
+      <div class="center reveal">
+        <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
+           target="_blank" rel="noopener" class="btn btn-ghost-light">Prefer WhatsApp? Message Us Directly</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       16. VISITOR COUNTER (placeholder)
+       The "1,000+" figure is a static placeholder.
+       See script.js comments for wiring a real counter via
+       Google Analytics / Firebase / Supabase / Plausible / CountAPI.
+       ================================================================ -->
+  <section class="section growing">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Thank You</p>
+        <h2>Growing With Every Celebration</h2>
+        <p class="section-sub">Thank you for discovering Velora One — Bengaluru's premium event planning partner.</p>
+      </div>
+      <div class="stat-grid reveal reveal-delay-1">
+        <div class="stat-card"><span class="stat-big" id="visitorCount">1,000+</span><span class="stat-label">Page Visitors</span></div>
+        <div class="stat-card"><span class="stat-big">2026</span><span class="stat-label">Serving Since</span></div>
+        <div class="stat-card"><span class="stat-big">Bengaluru</span><span class="stat-label">Based &amp; Proud</span></div>
+        <div class="stat-card"><span class="stat-big">Family + Corporate</span><span class="stat-label">Events Curated</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       17. INSTAGRAM SECTION
+       REPLACE-IMAGE: swap each .ph-insta with real Instagram post images,
+       each linking to the actual post. To embed a live feed later, use
+       Instagram's official embed, Behold.so, Elfsight, or SnapWidget —
+       paste their embed snippet in place of .insta-grid below.
+       ================================================================ -->
+  <section class="section instagram">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">@veloraoneevents</p>
+        <h2>Follow Our Celebrations on Instagram</h2>
+        <p class="section-sub">See our latest décor ideas, event setups, behind-the-scenes moments, and celebration stories.</p>
+      </div>
+
+      <div class="insta-grid reveal reveal-delay-1">
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i1" role="img" aria-label="Instagram post preview placeholder — décor idea"></div><span class="insta-tag">▶ Reel</span></a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i2" role="img" aria-label="Instagram post preview placeholder — event setup"></div></a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i3" role="img" aria-label="Instagram post preview placeholder — behind the scenes"></div><span class="insta-tag">▶ Reel</span></a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i4" role="img" aria-label="Instagram post preview placeholder — celebration story"></div></a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i5" role="img" aria-label="Instagram post preview placeholder — floral styling"></div></a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="insta-card"><div class="ph ph-insta ph-i6" role="img" aria-label="Instagram post preview placeholder — corporate setup"></div><span class="insta-tag">▶ Reel</span></a>
+      </div>
+
+      <div class="center reveal">
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-gold">Follow on Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       18. FAQ SECTION (accordion — see script.js)
+       ================================================================ -->
+  <section class="section faq" id="faqs">
+    <div class="container faq-inner">
+      <div class="section-head reveal">
+        <p class="eyebrow">Good to Know</p>
+        <h2>Questions Before We Plan Your Celebration?</h2>
+      </div>
+
+      <div class="faq-list reveal reveal-delay-1">
+        <details class="faq-item">
+          <summary>Do you handle small home events?</summary>
+          <p>Yes. We plan and style intimate home celebrations with the same attention to detail as larger events. No occasion is too small to be beautiful.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you manage corporate events?</summary>
+          <p>Absolutely. We handle office inaugurations, product launches, team celebrations, and professional gatherings with polished planning and refined décor.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How early should we book Velora One?</summary>
+          <p>We recommend reaching out 2–4 weeks in advance for most celebrations, and earlier for weddings or large corporate events. For urgent timelines, message us on WhatsApp — we will always try to help.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can you work within a specific budget?</summary>
+          <p>Yes. Every celebration is custom quoted. Share your budget range with us and we will design the most beautiful experience possible within it.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you provide only décor or full event planning?</summary>
+          <p>Both. You can choose décor only, planning plus décor, or complete end-to-end event execution where we manage every detail from concept to wrap-up.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you handle apartment clubhouse events?</summary>
+          <p>Yes. Apartment clubhouse celebrations are one of our favourite settings. We coordinate with your community, manage setup timings, and transform the space beautifully.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you provide fresh flower decoration?</summary>
+          <p>Yes. We work with fresh florals, artificial arrangements, or a thoughtful blend of both, depending on your style, season, and budget.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can we share reference photos or themes?</summary>
+          <p>Please do. Reference photos, Pinterest boards, and Instagram saves help us understand your taste, and we build a concept around what you love.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you visit the venue before the event?</summary>
+          <p>For most events, yes. A venue visit helps us plan the layout, lighting, and décor placement so everything fits your space perfectly on the day.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do we start the inquiry process?</summary>
+          <p>Simply message us on WhatsApp at <a href="https://wa.me/916366463924" target="_blank" rel="noopener">+91 63664 63924</a>, call us, or fill in the inquiry form above. We will respond with ideas and next steps.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       19. FINAL CALL-TO-ACTION
+       ================================================================ -->
+  <section class="section final-cta">
+    <div class="container center reveal">
+      <h2>Planning a Celebration in Bengaluru?</h2>
+      <p class="section-sub">Let Velora One handle it from start to finish.</p>
+      <div class="hero-actions center-actions">
+        <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
+           target="_blank" rel="noopener" class="btn btn-gold">Call / WhatsApp: +91 63664 63924</a>
+        <a href="#inquiry" class="btn btn-outline-light">Send Inquiry</a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-ghost-light">Follow on Instagram</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================================================================
+     20. FOOTER
+     ================================================================ -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <p class="brand-word">Velora <em>One</em></p>
+      <p>Your End-to-End Event Partner</p>
+      <p>Serving Bengaluru since 2026<br>Bengaluru, India</p>
+    </div>
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <ul>
+        <li><a href="https://wa.me/916366463924" target="_blank" rel="noopener">Call / WhatsApp: +91 63664 63924</a></li>
+        <li><a href="mailto:veloraoneevents@gmail.com">veloraoneevents@gmail.com</a></li>
+        <li><a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener">@veloraoneevents</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#reviews">Client Love</a></li>
+        <li><a href="#inquiry">Inquiry</a></li>
+        <li><a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="#faqs">FAQs</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p class="signature-line">Designed with elegance. Managed with care. Delivered with perfection.</p>
+    <p class="copyright">© <span id="year">2026</span> Velora One · Bengaluru, India</p>
+  </div>
+</footer>
+
+<!-- ================================================================
+     21. FLOATING BUTTONS
+     ================================================================ -->
+<a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
+   target="_blank" rel="noopener" class="float-wa" aria-label="Talk to our event concierge on WhatsApp">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.83 14.16c-.25.7-1.44 1.33-2 1.41-.51.08-1.16.11-1.87-.12-.43-.14-.98-.32-1.69-.62-2.98-1.29-4.92-4.29-5.07-4.49-.15-.2-1.21-1.61-1.21-3.07 0-1.46.77-2.18 1.04-2.48.27-.3.6-.37.8-.37h.57c.18 0 .43-.07.67.51.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.61.17.3.76 1.26 1.63 2.04 1.12 1 2.07 1.31 2.36 1.46.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.4-.25.67-.15.27.1 1.72.81 2.02.96.3.15.5.22.57.35.07.13.07.72-.17 1.42z"/></svg>
+  <span>Talk to Our Event Concierge</span>
+</a>
+
+<button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+<script src="script.js" defer></script>
+</body>
+</html>
