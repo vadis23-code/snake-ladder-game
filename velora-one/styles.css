@@ -230,14 +230,54 @@ h3 { font-size: 1.18rem; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ============================================================
-   2. HERO
+   FULL-PAGE CELEBRATION BACKDROP
+   A fixed photo layer behind the whole page, revealed through
+   the hero, the mid-page quote band, and the final CTA.
+   REPLACE-IMAGE: swap images/celebration-bg.jpg with a real
+   Velora One event photo — a defocused/wide evening shot works
+   best (1920×1280, JPEG/WebP, under 400KB). Nothing else needs
+   to change.
+   ============================================================ */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--wine-dark) url('images/celebration-bg.jpg') center / cover no-repeat;
+}
+
+/* ============================================================
+   2. HERO — a window onto the celebration backdrop
    ============================================================ */
 .hero {
   padding: calc(var(--header-h) + clamp(2.5rem, 7vw, 5rem)) 0 clamp(3rem, 7vw, 5rem);
-  background:
-    radial-gradient(ellipse 80% 60% at 85% 10%, rgba(240, 185, 200, 0.25), transparent 60%),
-    linear-gradient(180deg, var(--blush), var(--warm-white));
+  background: linear-gradient(180deg,
+    rgba(35, 5, 16, 0.60),
+    rgba(62, 11, 30, 0.38) 45%,
+    rgba(88, 16, 43, 0.60) 100%);
 }
+.hero-copy { text-shadow: 0 1px 20px rgba(20, 3, 9, 0.5); }
+.hero h1 { color: var(--warm-white); }
+.hero .accent-italic,
+.hero .eyebrow,
+.hero-emotion { color: var(--rose-light); }
+.hero-sub { color: rgba(255, 250, 249, 0.88); }
+.hero-contact { color: rgba(255, 250, 249, 0.82); }
+.hero-contact li::before { color: var(--rose-light); }
+.hero-contact a:hover { color: var(--rose-light); }
+.hero .btn-outline { border-color: rgba(255, 250, 249, 0.75); color: var(--warm-white); }
+.hero .btn-outline:hover { background: var(--warm-white); color: var(--wine); }
+.hero .btn-ghost { color: rgba(255, 250, 249, 0.88); }
+.hero .btn-ghost:hover { color: var(--rose-light); }
+
+/* Hero visual becomes a frosted glass panel over the photo */
+.hero .ph-hero {
+  background: rgba(255, 250, 249, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 10px 40px rgba(20, 3, 9, 0.35);
+}
+.hero .ph-hero::after { border-color: rgba(255, 250, 249, 0.35); }
+.hero .ph-label { color: rgba(255, 250, 249, 0.8); }
 
 .hero-grid {
   display: grid;
@@ -371,6 +411,8 @@ h3 { font-size: 1.18rem; }
   gap: 3rem;
   align-items: center;
 }
+.about, .packages, .settings, .beforeafter { background: var(--warm-white); }
+
 .split-copy p { color: var(--muted-plum); }
 .split-copy h2 { margin-bottom: 1.2rem; }
 
@@ -573,6 +615,29 @@ h3 { font-size: 1.18rem; }
   transform: translateY(-4px);
   background: var(--rose-soft);
   border-color: rgba(176, 30, 82, 0.5);
+}
+
+/* ============================================================
+   PHOTO BAND — quote window onto the celebration backdrop
+   ============================================================ */
+.photo-band {
+  padding: clamp(4.5rem, 11vw, 8rem) 0;
+  background: linear-gradient(180deg, rgba(35, 5, 16, 0.55), rgba(88, 16, 43, 0.55));
+  text-align: center;
+}
+.photo-band .container { text-shadow: 0 1px 20px rgba(20, 3, 9, 0.5); }
+.photo-band .eyebrow { color: var(--rose-light); }
+.photo-band h2 {
+  color: var(--warm-white);
+  font-style: italic;
+  font-weight: 500;
+  max-width: 720px;
+  margin-inline: auto;
+}
+.photo-band p {
+  margin-top: 1rem;
+  color: rgba(255, 250, 249, 0.82);
+  font-size: 0.95rem;
 }
 
 /* ============================================================
@@ -869,9 +934,7 @@ h3 { font-size: 1.18rem; }
    19. FINAL CTA
    ============================================================ */
 .final-cta {
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(176, 30, 82, 0.18), transparent 65%),
-    var(--wine);
+  background: linear-gradient(180deg, rgba(35, 5, 16, 0.74), rgba(70, 13, 34, 0.80));
 }
 .final-cta h2, .final-cta .section-sub { color: var(--warm-white); }
 .final-cta .section-sub { opacity: 0.85; }

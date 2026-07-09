@@ -34,6 +34,7 @@ Every placeholder is a `div` with class `ph` and a code comment starting with `R
 
 | Location | Size | Notes |
 |---|---|---|
+| Full-page backdrop | 1920 × 1280 | Replace `images/celebration-bg.jpg` — a defocused/wide evening celebration shot works best; it shows through the hero, quote band, and final CTA |
 | Hero visual | 1200 × 1440 | Your single best décor shot |
 | About visual | 900 × 1100 | Brand/venue mood shot |
 | Gallery tiles | 800 × 1000 | Large tile: 1000 × 1250 |
