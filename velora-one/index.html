@@ -38,6 +38,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+  <meta name="theme-color" content="#B01E52">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23B01E52' d='M20 4C10 4 4 10 4 20c10 0 16-6 16-16z'/%3E%3C/svg%3E">
+
   <link rel="stylesheet" href="styles.css">
 
   <!-- ============================================================
@@ -110,7 +113,11 @@
 <header class="site-header" id="siteHeader">
   <div class="container header-inner">
     <a href="#home" class="brand" aria-label="Velora One — Home">
-      <span class="brand-word">Velora <em>One</em></span>
+      <!-- REPLACE-IMAGE (optional): to use the full logo file instead of the
+           styled wordmark, save it as images/logo.png (transparent PNG,
+           ~480px wide) and swap the span below for:
+           <img src="images/logo.png" alt="Velora One — Your End-to-End Event Partner" height="44"> -->
+      <span class="brand-word">Velora <em>One</em><svg class="brand-leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16z"/></svg></span>
       <span class="brand-tag">Your End-to-End Event Partner</span>
     </a>
 
@@ -124,7 +131,7 @@
       <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="nav-link">Instagram</a>
       <!-- WhatsApp CTA shown inside menu on mobile -->
       <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
-         target="_blank" rel="noopener" class="btn btn-gold btn-nav">Call / WhatsApp</a>
+         target="_blank" rel="noopener" class="btn btn-primary btn-nav">Call / WhatsApp</a>
     </nav>
 
     <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
@@ -152,7 +159,7 @@
 
         <div class="hero-actions">
           <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
-             target="_blank" rel="noopener" class="btn btn-gold">Call / WhatsApp Us</a>
+             target="_blank" rel="noopener" class="btn btn-primary">Call / WhatsApp Us</a>
           <a href="#inquiry" class="btn btn-outline">Send Inquiry</a>
           <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-ghost">View Our Instagram</a>
         </div>
@@ -400,7 +407,7 @@
         guest count, and décor requirements.
       </p>
       <div class="center reveal">
-        <a href="#inquiry" class="btn btn-gold">Plan My Celebration</a>
+        <a href="#inquiry" class="btn btn-primary">Plan My Celebration</a>
       </div>
     </div>
   </section>
@@ -628,7 +635,7 @@
         <article class="mood-card reveal">
           <div class="ph ph-mood ph-m2" role="img" aria-label="Modern minimal moodboard placeholder"></div>
           <div class="mood-body">
-            <div class="swatches"><span style="background:#FFFDF8"></span><span style="background:#EFE3D0"></span><span style="background:#6F5F4E"></span><span style="background:#1F1F1B"></span></div>
+            <div class="swatches"><span style="background:#FFFAF9"></span><span style="background:#F4DCDA"></span><span style="background:#8A6470"></span><span style="background:#33222A"></span></div>
             <h3>Modern Minimal</h3>
             <p>Clean lines, neutral palettes, and quiet luxury for contemporary tastes.</p>
             <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Modern%20Minimal%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
@@ -637,7 +644,7 @@
         <article class="mood-card reveal">
           <div class="ph ph-mood ph-m3" role="img" aria-label="Floral luxury moodboard placeholder"></div>
           <div class="mood-body">
-            <div class="swatches"><span style="background:#E8B4B8"></span><span style="background:#F8F3EA"></span><span style="background:#9CAF88"></span><span style="background:#C9A24D"></span></div>
+            <div class="swatches"><span style="background:#E8B4B8"></span><span style="background:#FBEFEE"></span><span style="background:#9CAF88"></span><span style="background:#B01E52"></span></div>
             <h3>Floral Luxury</h3>
             <p>Lush fresh florals, soft pastels, and romantic abundance in every corner.</p>
             <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Floral%20Luxury%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
@@ -646,7 +653,7 @@
         <article class="mood-card reveal">
           <div class="ph ph-mood ph-m4" role="img" aria-label="Corporate premium moodboard placeholder"></div>
           <div class="mood-body">
-            <div class="swatches"><span style="background:#1F3D33"></span><span style="background:#C9A24D"></span><span style="background:#FFFDF8"></span><span style="background:#1F1F1B"></span></div>
+            <div class="swatches"><span style="background:#701537"></span><span style="background:#B01E52"></span><span style="background:#FFFAF9"></span><span style="background:#33222A"></span></div>
             <h3>Corporate Premium</h3>
             <p>Sharp, branded, and professional — designed to impress clients and teams.</p>
             <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Corporate%20Premium%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
@@ -655,7 +662,7 @@
         <article class="mood-card reveal">
           <div class="ph ph-mood ph-m5" role="img" aria-label="Kids celebration moodboard placeholder"></div>
           <div class="mood-body">
-            <div class="swatches"><span style="background:#F5C6AA"></span><span style="background:#A8D8EA"></span><span style="background:#FFF3D6"></span><span style="background:#C9A24D"></span></div>
+            <div class="swatches"><span style="background:#F5C6AA"></span><span style="background:#A8D8EA"></span><span style="background:#FFF3D6"></span><span style="background:#B01E52"></span></div>
             <h3>Kids Celebration</h3>
             <p>Playful yet tasteful themes children adore — without the visual clutter.</p>
             <a class="card-link" href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20love%20the%20Kids%20Celebration%20style.%20Can%20we%20discuss%20it%20for%20my%20event%3F" target="_blank" rel="noopener">Discuss This Style →</a>
@@ -773,7 +780,7 @@
 
         <p class="form-error" id="formError" role="alert" hidden></p>
 
-        <button type="submit" class="btn btn-gold btn-large">Send My Event Inquiry</button>
+        <button type="submit" class="btn btn-primary btn-large">Send My Event Inquiry</button>
         <p class="form-hint">Submitting opens WhatsApp with your details pre-filled — nothing is sent until you press send in WhatsApp.</p>
       </form>
 
@@ -831,7 +838,7 @@
       </div>
 
       <div class="center reveal">
-        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-gold">Follow on Instagram</a>
+        <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-primary">Follow on Instagram</a>
       </div>
     </div>
   </section>
@@ -900,7 +907,7 @@
       <p class="section-sub">Let Velora One handle it from start to finish.</p>
       <div class="hero-actions center-actions">
         <a href="https://wa.me/916366463924?text=Hi%20Velora%20One%2C%20I%20would%20like%20to%20enquire%20about%20an%20event.%20Please%20contact%20me."
-           target="_blank" rel="noopener" class="btn btn-gold">Call / WhatsApp: +91 63664 63924</a>
+           target="_blank" rel="noopener" class="btn btn-primary">Call / WhatsApp: +91 63664 63924</a>
         <a href="#inquiry" class="btn btn-outline-light">Send Inquiry</a>
         <a href="https://www.instagram.com/veloraoneevents" target="_blank" rel="noopener" class="btn btn-ghost-light">Follow on Instagram</a>
       </div>
@@ -915,7 +922,7 @@
 <footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-brand">
-      <p class="brand-word">Velora <em>One</em></p>
+      <p class="brand-word">Velora <em>One</em><svg class="brand-leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16z"/></svg></p>
       <p>Your End-to-End Event Partner</p>
       <p>Serving Bengaluru since 2026<br>Bengaluru, India</p>
     </div>
