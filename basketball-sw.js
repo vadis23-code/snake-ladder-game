@@ -1,60 +1,131 @@
-const CACHE = 'courtcall-v9';
+const CACHE_PREFIX = 'courtcall-';
+const CACHE_VERSION = 'v15';
+const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
+const NAVIGATION_TIMEOUT_MS = 4000;
+const RUNTIME_MAX_ENTRIES = 48;
 const SHELL = [
   './',
+  './basketball-supa.js',
+  './courtcall-core.js',
+  './courtcall-notifications.js',
+  './courtcall-cloud-state.js',
   './basketball.manifest.json',
-  './icons/icon.svg',
+  './icons/basketball-3d.webp',
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(SHELL))
-      .then(() => self.skipWaiting())
-  );
+function isHtmlResponse(response) {
+  return (response.headers.get('content-type') || '').toLowerCase().includes('text/html');
+}
+
+async function precacheShell() {
+  const cache = await caches.open(CACHE);
+  try {
+    await Promise.all(SHELL.map(async asset => {
+      const response = await fetch(asset, { cache: 'reload' });
+      if (!response.ok || (asset !== './' && isHtmlResponse(response))) {
+        throw new Error(`Invalid app-shell response for ${asset}`);
+      }
+      await cache.put(asset, response);
+    }));
+  } catch (error) {
+    await caches.delete(CACHE);
+    throw error;
+  }
+}
+
+self.addEventListener('install', event => {
+  event.waitUntil(precacheShell());
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+        keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE && key !== RUNTIME_CACHE).map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  const url = new URL(e.request.url);
-
-  // For same-origin requests: cache-first, update in background (stale-while-revalidate)
-  if (url.origin === self.location.origin) {
-    e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match(e.request).then(cached => {
-          const fresh = fetch(e.request).then(res => {
-            if (res.ok) cache.put(e.request, res.clone());
-            return res;
-          }).catch(() => null);
-          return cached || fresh;
-        })
-      )
-    );
-    return;
+async function fetchWithTimeout(request, timeoutMs) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(request, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
   }
+}
 
-  // Google Fonts: cache-first (they're versioned, safe to cache)
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-    e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match(e.request).then(cached => {
-          if (cached) return cached;
-          return fetch(e.request).then(res => {
-            if (res.ok) cache.put(e.request, res.clone());
-            return res;
-          }).catch(() => new Response('', { status: 503 }));
-        })
-      )
-    );
+async function navigationResponse(request) {
+  const cache = await caches.open(CACHE);
+  try {
+    return await fetchWithTimeout(request, NAVIGATION_TIMEOUT_MS);
+  } catch {
+    return (await cache.match('./'))
+      || new Response('CourtCall is unavailable offline until its first successful load.', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      });
+  }
+}
+
+function isUsefulRuntimeAsset(request) {
+  return ['script', 'style', 'image', 'font', 'manifest'].includes(request.destination);
+}
+
+function isCacheableRuntimeResponse(response) {
+  return response.ok && response.type === 'basic' && !isHtmlResponse(response);
+}
+
+async function putRuntimeResponse(request, response) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  // Refresh insertion order so trimming approximates least-recently-updated eviction.
+  await cache.delete(request);
+  await cache.put(request, response);
+  const keys = await cache.keys();
+  const overflow = keys.length - RUNTIME_MAX_ENTRIES;
+  if (overflow > 0) {
+    await Promise.all(keys.slice(0, overflow).map(key => cache.delete(key)));
+  }
+}
+
+async function staleWhileRevalidate(request, event) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
+  const network = fetch(request).then(async response => {
+    if (isCacheableRuntimeResponse(response)) {
+      try {
+        await putRuntimeResponse(request, response.clone());
+      } catch {
+        // A cache write failure must never prevent the live response from loading.
+      }
+    }
+    return response;
+  }).catch(() => null);
+  if (cached) {
+    event.waitUntil(network);
+    return cached;
+  }
+  return (await network) || new Response('', { status: 504, statusText: 'Offline' });
+}
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET' || request.headers.has('range')) return;
+  const url = new URL(request.url);
+
+  if (url.origin === self.location.origin) {
+    if (request.mode === 'navigate') {
+      event.respondWith(navigationResponse(request));
+    } else if (isUsefulRuntimeAsset(request)) {
+      event.respondWith(staleWhileRevalidate(request, event));
+    }
+    return;
   }
 });
