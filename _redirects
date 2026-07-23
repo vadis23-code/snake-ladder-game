@@ -1,0 +1,23 @@
+# courtcall13.win is also deployed by Cloudflare Pages from the repository
+# root. Redirect every repository-internal path before static asset lookup so
+# only the production application surface is reachable on the custom domain.
+/.github/* / 308
+/supabase/* / 308
+/tests/* / 308
+/tools/* / 308
+/COURTCALL_SPEC.md / 308
+/TESTING-INSTRUCTIONS.md / 308
+/game.js / 308
+/style.css / 308
+/snake-ladder / 308
+/snake-ladder.html / 308
+/icons/basketball-3d.png / 308
+/icons/icon.svg / 308
+/supabase-communities.sql / 308
+/supabase-enhancements.sql / 308
+/supabase-fix-permissions.sql / 308
+/supabase-full-setup.sql / 308
+/supabase-missing-tables.sql / 308
+/supabase-rls-audit.sql / 308
+/supabase-schema.sql / 308
+/backup-* / 308

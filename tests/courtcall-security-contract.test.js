@@ -10,6 +10,7 @@ const root = path.resolve(__dirname, '..');
 const accessSql = fs.readFileSync(path.join(root, 'supabase', 'migrations', '20260713162416_community_access_hardening.sql'), 'utf8');
 const alignmentSql = fs.readFileSync(path.join(root, 'supabase', 'migrations', '20260713170000_client_schema_alignment.sql'), 'utf8');
 const definerLockdownSql = fs.readFileSync(path.join(root, 'supabase', 'migrations', '20260723143500_legacy_definer_execution_lockdown.sql'), 'utf8');
+const cloudflareRedirects = fs.readFileSync(path.join(root, '_redirects'), 'utf8');
 const clientHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 
 test('public community directory cannot expose invite codes', () => {
@@ -31,6 +32,24 @@ test('trigger-only and compatibility definers are not exposed as browser RPCs', 
   assert.match(definerLockdownSql, /revoke all on function public\.handle_new_user\(\)[\s\S]*?from public, anon, authenticated/i);
   assert.match(definerLockdownSql, /revoke all on function public\.is_community_member\(text, uuid\)[\s\S]*?from public, anon, authenticated/i);
   assert.doesNotMatch(definerLockdownSql, /to anon|to authenticated/i);
+});
+
+test('Cloudflare production blocks repository-internal files before static lookup', () => {
+  const requiredPaths = [
+    '/.github/*', '/supabase/*', '/tests/*', '/tools/*',
+    '/COURTCALL_SPEC.md', '/TESTING-INSTRUCTIONS.md', '/game.js', '/style.css',
+    '/snake-ladder', '/snake-ladder.html', '/icons/basketball-3d.png', '/icons/icon.svg',
+    '/supabase-communities.sql', '/supabase-enhancements.sql', '/supabase-fix-permissions.sql',
+    '/supabase-full-setup.sql', '/supabase-missing-tables.sql', '/supabase-rls-audit.sql',
+    '/supabase-schema.sql', '/backup-*'
+  ];
+  const rules = cloudflareRedirects.split(/\r?\n/)
+    .map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+
+  for (const privatePath of requiredPaths) {
+    assert.ok(rules.includes(`${privatePath} / 308`), `${privatePath} must redirect before asset lookup`);
+  }
+  assert.ok(rules.every(rule => rule.endsWith(' / 308')), 'every protection rule must use a permanent redirect');
 });
 
 test('RSVP updates use the atomic member-scoped RPC and restore rejected changes', () => {
