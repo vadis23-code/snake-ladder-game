@@ -886,6 +886,9 @@
     if (fixture.isBye || fixture.teamA === 'BYE' || fixture.teamB === 'BYE') {
       return { status: 'bye', fixtures: source, fixture, outcome: null };
     }
+    if (fixture.played) {
+      return { status: 'already_played', fixtures: source, fixture, outcome: fixture.outcome || null };
+    }
 
     const scoreA = parseFixtureScore(rawScoreA);
     const scoreB = parseFixtureScore(rawScoreB);
@@ -1009,6 +1012,303 @@
           || right.pf - left.pf
           || left.name.localeCompare(right.name);
       });
+  }
+
+  function normalizeTournamentFormat(value) {
+    const compact = String(value || '').trim().toLowerCase().replace(/[\s_-]+/g, '');
+    return compact === 'knockout' || compact === 'singleelimination' || compact === 'singleelim'
+      ? 'knockout'
+      : 'roundrobin';
+  }
+
+  function validateTournamentTeams(teamNames, options) {
+    const config = asObject(options);
+    const minTeams = boundedInteger(firstDefined(config.minTeams, 2), 2, 64, 2);
+    const maxTeams = boundedInteger(firstDefined(config.maxTeams, 16), minTeams, 64, 16);
+    const names = Array.isArray(teamNames) ? teamNames.map(readName).filter(Boolean) : [];
+    const seen = new Set();
+    const duplicateNames = [];
+    names.forEach(function (name) {
+      const key = name.toLocaleLowerCase();
+      if (seen.has(key) && !duplicateNames.some(function (duplicate) { return duplicate.toLocaleLowerCase() === key; })) {
+        duplicateNames.push(name);
+      }
+      seen.add(key);
+    });
+    const errors = [];
+    if (names.length < minTeams) errors.push(`Add at least ${minTeams} named teams.`);
+    if (names.length > maxTeams) errors.push(`A tournament can have up to ${maxTeams} teams.`);
+    if (duplicateNames.length) errors.push('Team names must be unique.');
+    return { valid: errors.length === 0, names, duplicateNames, errors, minTeams, maxTeams };
+  }
+
+  function validateTournamentName(value, tournaments) {
+    const name = readName(value);
+    const key = name.toLocaleLowerCase();
+    const duplicate = Boolean(name) && (Array.isArray(tournaments) ? tournaments : []).some(function (tournament) {
+      const source = asObject(tournament);
+      return readName(firstDefined(source.name, source.title)).toLocaleLowerCase() === key;
+    });
+    const errors = [];
+    if (!name) errors.push('Enter a tournament name.');
+    if (duplicate) errors.push('A tournament with this name already exists.');
+    return { valid: errors.length === 0, name, duplicate, errors };
+  }
+
+  function normalizeTournamentTeam(team, index) {
+    const source = asObject(team);
+    const name = readName(typeof team === 'string'
+      ? team
+      : firstDefined(source.name, source.teamName, source.team_name, source.label));
+    if (!name) return null;
+    return Object.assign({}, source, { name });
+  }
+
+  function normalizeTournamentFixture(fixture, index, tournamentId) {
+    const source = asObject(fixture);
+    const teamA = readName(firstDefined(source.teamA, source.team_a, source.homeTeam, source.home_team, source.home)) || 'TBD';
+    const teamB = readName(firstDefined(source.teamB, source.team_b, source.awayTeam, source.away_team, source.away)) || 'TBD';
+    const scoreA = parseFixtureScore(firstDefined(source.scoreA, source.score_a, source.homeScore, source.home_score));
+    const scoreB = parseFixtureScore(firstDefined(source.scoreB, source.score_b, source.awayScore, source.away_score));
+    const status = String(source.status || '').trim().toLowerCase();
+    const isBye = source.isBye === true || teamA === 'BYE' || teamB === 'BYE';
+    const played = isBye
+      ? source.played !== false
+      : source.played === true || source.completed === true || ['played', 'complete', 'completed', 'final'].includes(status)
+        || (scoreA !== null && scoreB !== null);
+    let outcome = source.outcome || null;
+    if (!outcome && played && scoreA !== null && scoreB !== null) {
+      outcome = scoreA === scoreB
+        ? OUTCOMES.TIE
+        : scoreA > scoreB ? OUTCOMES.TEAM_A_WIN : OUTCOMES.TEAM_B_WIN;
+    }
+    let winner = readName(source.winner && typeof source.winner === 'object' ? source.winner.name : source.winner) || null;
+    if (!winner && isBye) winner = teamA === 'BYE' ? teamB : teamA;
+    if (!winner && outcome === OUTCOMES.TEAM_A_WIN) winner = teamA;
+    if (!winner && outcome === OUTCOMES.TEAM_B_WIN) winner = teamB;
+    const rawRound = Number(firstDefined(source.round, source.roundNumber, source.round_number, 1));
+    const round = Number.isInteger(rawRound) && rawRound > 0 ? rawRound : 1;
+    const rawSlot = String(firstDefined(source.nextSlot, source.next_slot, '') || '').trim().toLowerCase();
+    const nextSlot = ['home', 'a', 'teama'].includes(rawSlot)
+      ? 'home'
+      : ['away', 'b', 'teamb'].includes(rawSlot) ? 'away' : null;
+    return Object.assign({}, source, {
+      id: String(firstDefined(source.id, source.fixtureId, source.fixture_id, `legacy_fx_${tournamentId || 'tournament'}_${index}`)),
+      teamA,
+      teamB,
+      scoreA,
+      scoreB,
+      winner,
+      outcome,
+      played,
+      isBye,
+      round,
+      nextMatchId: firstDefined(source.nextMatchId, source.next_match_id, null),
+      nextSlot,
+      resultMatchId: firstDefined(source.resultMatchId, source.result_match_id, source.matchId, source.match_id, null)
+    });
+  }
+
+  /** Read current and legacy tournament JSON without rewriting local storage. */
+  function normalizeTournament(tournament, options) {
+    const source = asObject(tournament);
+    const config = asObject(options);
+    const id = String(firstDefined(source.id, source.tournamentId, source.tournament_id, `legacy_tournament_${firstDefined(config.index, 0)}`));
+    const fixtures = (Array.isArray(source.fixtures) ? source.fixtures : [])
+      .map(function (fixture, index) { return normalizeTournamentFixture(fixture, index, id); });
+    let teams = (Array.isArray(source.teams) ? source.teams : [])
+      .map(normalizeTournamentTeam)
+      .filter(Boolean);
+    if (!teams.length) {
+      const seen = new Set();
+      teams = fixtures.flatMap(function (fixture) { return [fixture.teamA, fixture.teamB]; })
+        .filter(function (name) {
+          const key = readName(name).toLocaleLowerCase();
+          if (!key || key === 'bye' || key === 'tbd' || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .map(function (name, index) { return normalizeTournamentTeam(name, index); });
+    }
+    const rawWinScore = Number(firstDefined(source.winScore, source.win_score, asObject(source.settings).winScore, 21));
+    const winScore = Number.isInteger(rawWinScore) && rawWinScore >= 2 && rawWinScore <= 999 ? rawWinScore : 21;
+    const sourceWinner = source.winner && typeof source.winner === 'object' ? source.winner.name : source.winner;
+    const standings = Array.isArray(source.standings) ? source.standings.map(function (row) { return Object.assign({}, row); }) : [];
+    return Object.assign({}, source, {
+      id,
+      name: readName(firstDefined(source.name, source.title)) || 'Untitled Tournament',
+      format: normalizeTournamentFormat(firstDefined(source.format, source.type)),
+      winScore,
+      teams,
+      fixtures,
+      standings,
+      completed: source.completed === true || String(source.status || '').toLowerCase() === 'completed',
+      winner: readName(sourceWinner) || null,
+      createdAt: firstDefined(source.createdAt, source.created_at, null),
+      updatedAt: firstDefined(source.updatedAt, source.updated_at, null)
+    });
+  }
+
+  function resolveStandingsChampion(standings) {
+    const rows = Array.isArray(standings) ? standings : [];
+    if (!rows.length) return { winner: null, tied: false };
+    if (rows.length === 1) return { winner: rows[0].name, tied: false };
+    const first = rows[0];
+    const second = rows[1];
+    const tied = first.pts === second.pts
+      && first.difference === second.difference
+      && first.pf === second.pf;
+    return { winner: tied ? null : first.name, tied };
+  }
+
+  /** Derive status, standings, next match and champion without mutating the input. */
+  function deriveTournamentState(tournament) {
+    const normalized = normalizeTournament(tournament);
+    const playable = normalized.fixtures.filter(function (fixture) { return !fixture.isBye; });
+    const completedFixtures = playable.filter(function (fixture) { return fixture.played; });
+    const ready = playable
+      .filter(function (fixture) {
+        return !fixture.played && fixture.teamA !== 'TBD' && fixture.teamB !== 'TBD';
+      })
+      .sort(function (left, right) { return left.round - right.round || String(left.id).localeCompare(String(right.id)); });
+    let standings = normalized.standings;
+    let completed = normalized.completed;
+    let winner = normalized.winner;
+    let tieBreakPending = false;
+
+    if (normalized.format === 'roundrobin') {
+      standings = calculateStandings(normalized.fixtures, normalized.teams.map(function (team) { return team.name; }), {
+        winPoints: 2,
+        tiePoints: 1,
+        lossPoints: 0
+      });
+      completed = playable.length > 0 && completedFixtures.length === playable.length;
+      if (completed) {
+        const champion = resolveStandingsChampion(standings);
+        winner = champion.winner;
+        tieBreakPending = champion.tied;
+      } else {
+        winner = null;
+      }
+    } else {
+      const highestRound = normalized.fixtures.reduce(function (max, fixture) { return Math.max(max, fixture.round || 1); }, 1);
+      const finals = normalized.fixtures.filter(function (fixture) { return fixture.round === highestRound; });
+      const final = finals.length === 1 ? finals[0] : null;
+      completed = Boolean(final && final.played && final.winner);
+      winner = completed ? final.winner : null;
+    }
+
+    const status = completed
+      ? tieBreakPending ? 'tiebreak_required' : 'completed'
+      : completedFixtures.length ? 'in_progress' : 'scheduled';
+    return Object.assign({}, normalized, {
+      standings,
+      completed,
+      winner,
+      tieBreakPending,
+      status,
+      completedFixtures: completedFixtures.length,
+      pendingFixtures: Math.max(0, playable.length - completedFixtures.length),
+      totalFixtures: playable.length,
+      nextFixture: ready[0] || null
+    });
+  }
+
+  /** Apply one real-game result once, then derive standings or bracket state. */
+  function applyTournamentResult(tournament, result, options) {
+    const normalized = normalizeTournament(tournament);
+    const source = asObject(result);
+    const config = asObject(options);
+    const fixtureId = firstDefined(source.fixtureId, source.fixture_id, source.id);
+    const fixture = normalized.fixtures.find(function (candidate) { return String(candidate.id) === String(fixtureId); });
+    if (!fixture) return { status: 'not_found', tournament: deriveTournamentState(normalized), fixture: null };
+    const matchId = firstDefined(source.matchId, source.match_id, null);
+    if (matchId && normalized.fixtures.some(function (candidate) {
+      return String(candidate.id) !== String(fixture.id) && String(candidate.resultMatchId || '') === String(matchId);
+    })) {
+      return { status: 'duplicate_match', tournament: deriveTournamentState(normalized), fixture };
+    }
+    if (fixture.played) return { status: 'duplicate', tournament: deriveTournamentState(normalized), fixture };
+    if (fixture.teamA === 'TBD' || fixture.teamB === 'TBD' || fixture.isBye) {
+      return { status: 'not_ready', tournament: deriveTournamentState(normalized), fixture };
+    }
+    const teamAName = readName(firstDefined(source.teamAName, asObject(source.teamA).name));
+    const teamBName = readName(firstDefined(source.teamBName, asObject(source.teamB).name));
+    if ((teamAName && teamAName !== fixture.teamA) || (teamBName && teamBName !== fixture.teamB)) {
+      return { status: 'team_mismatch', tournament: deriveTournamentState(normalized), fixture };
+    }
+    const recorded = recordFixtureResult(
+      normalized.fixtures,
+      fixture.id,
+      firstDefined(source.scoreA, asObject(source.teamA).score),
+      firstDefined(source.scoreB, asObject(source.teamB).score),
+      { allowTies: normalized.format === 'roundrobin' && config.allowTies === true }
+    );
+    if (recorded.status !== 'applied') {
+      return Object.assign({}, recorded, { tournament: deriveTournamentState(normalized) });
+    }
+    if (matchId) {
+      const appliedFixture = recorded.fixtures.find(function (candidate) { return String(candidate.id) === String(fixture.id); });
+      if (appliedFixture) appliedFixture.resultMatchId = matchId;
+    }
+    const updated = deriveTournamentState(Object.assign({}, normalized, {
+      fixtures: recorded.fixtures,
+      updatedAt: firstDefined(source.recordedAt, source.date, new Date().toISOString())
+    }));
+    return {
+      status: 'applied',
+      tournament: updated,
+      fixture: updated.fixtures.find(function (candidate) { return String(candidate.id) === String(fixture.id); }),
+      advancedTo: recorded.advancedTo
+        ? updated.fixtures.find(function (candidate) { return String(candidate.id) === String(recorded.advancedTo.id); })
+        : null
+    };
+  }
+
+  function undoTournamentResult(tournament, fixtureId, options) {
+    const normalized = normalizeTournament(tournament);
+    const config = asObject(options);
+    const index = normalized.fixtures.findIndex(function (fixture) { return String(fixture.id) === String(fixtureId); });
+    if (index < 0) return { status: 'not_found', tournament: deriveTournamentState(normalized), fixture: null };
+    const fixture = normalized.fixtures[index];
+    if (!fixture.played || fixture.isBye) return { status: 'noop', tournament: deriveTournamentState(normalized), fixture };
+    if (config.matchId && fixture.resultMatchId && String(config.matchId) !== String(fixture.resultMatchId)) {
+      return { status: 'match_mismatch', tournament: deriveTournamentState(normalized), fixture };
+    }
+    const fixtures = normalized.fixtures.map(function (candidate) { return Object.assign({}, candidate); });
+    if (fixture.nextMatchId) {
+      const next = fixtures.find(function (candidate) { return String(candidate.id) === String(fixture.nextMatchId); });
+      if (next && next.played) return { status: 'downstream_played', tournament: deriveTournamentState(normalized), fixture };
+      if (next) {
+        if (fixture.nextSlot === 'home' && next.teamA === fixture.winner) next.teamA = 'TBD';
+        if (fixture.nextSlot === 'away' && next.teamB === fixture.winner) next.teamB = 'TBD';
+      }
+    }
+    fixtures[index] = Object.assign({}, fixtures[index], {
+      scoreA: null,
+      scoreB: null,
+      winner: null,
+      outcome: null,
+      played: false,
+      resultMatchId: null
+    });
+    const updated = deriveTournamentState(Object.assign({}, normalized, {
+      fixtures,
+      completed: false,
+      winner: null,
+      updatedAt: new Date().toISOString()
+    }));
+    return { status: 'applied', tournament: updated, fixture: updated.fixtures[index] };
+  }
+
+  function tournamentRoundLabel(round, totalRounds) {
+    const current = Math.max(1, Number.parseInt(round, 10) || 1);
+    const total = Math.max(current, Number.parseInt(totalRounds, 10) || current);
+    const remaining = total - current;
+    if (remaining === 0) return 'Final';
+    if (remaining === 1) return 'Semifinal';
+    if (remaining === 2) return 'Quarterfinal';
+    return `Round of ${2 ** (remaining + 1)}`;
   }
 
   function normalizeBuilderAttributes(value, ratingFallback) {
@@ -1338,6 +1638,7 @@
     'teams',
     'terms',
     'tournament',
+    'tourn-detail',
     'world'
   ]);
   const DEFAULT_PUBLIC_ROUTE_SCREENS = Object.freeze([
@@ -1434,6 +1735,24 @@
 
     if (!hasProfile && !publicScreens.has(route)) {
       return routeDecision('navigate', 'profile', route, 'auth_required');
+    }
+
+    if (route === 'tournament' || route === 'tourn-detail') {
+      const encodedTournamentId = encodedParts.length > 1 ? encodedParts[1] : '';
+      const decodedTournamentId = encodedTournamentId ? safeDecodeRoutePart(encodedTournamentId) : '';
+      const tournamentId = decodedTournamentId === null ? '' : decodedTournamentId.trim();
+      if (route === 'tourn-detail' && !tournamentId) {
+        return routeDecision('navigate', 'tournament', route, decodedTournamentId === null
+          ? 'invalid_tournament_id'
+          : 'missing_tournament_id');
+      }
+      if (tournamentId) {
+        const knownIds = communityIdSet(config.tournamentIds);
+        if (knownIds && !knownIds.has(tournamentId)) {
+          return routeDecision('navigate', 'tournament', route, 'unknown_tournament', { tournamentId });
+        }
+        return routeDecision('open_tournament', 'tourn-detail', route, 'tournament_deep_link', { tournamentId });
+      }
     }
 
     if (route === 'reset-pin' && !asBoolean(config.hasRecoverySession)) {
@@ -1549,6 +1868,13 @@
     generateRoundRobinFixtures,
     recordFixtureResult,
     calculateStandings,
+    validateTournamentTeams,
+    validateTournamentName,
+    normalizeTournament,
+    deriveTournamentState,
+    applyTournamentResult,
+    undoTournamentResult,
+    tournamentRoundLabel,
     calculatePlayerRating,
     normalizeBuilderPlayer,
     snakeDraftTeamIndex,

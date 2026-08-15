@@ -290,14 +290,16 @@ html[data-cc-save-data] .screen.cc-visual-route::before { background-image: line
 /* Tournament: restrained gold championship coverage. */
 #s-tournament .tourn-empty,
 #s-tournament .tourn-form,
-#s-tournament .tourn-card { width: min(70rem, calc(100% - 2rem)); margin-inline: auto; }
+#s-tournament .tourn-card,
+#s-tourn-detail .tourn-empty,
+#s-tourn-detail .tourn-card { width: min(70rem, calc(100% - 2rem)); margin-inline: auto; }
 #s-tournament .tourn-empty { margin-top: 1rem; border: 1px dashed rgba(244,183,64,.4); border-radius: var(--r3); background: linear-gradient(145deg, rgba(40,29,12,.32), rgba(8,12,20,.88)); }
-#s-tournament .tourn-card { border-color: rgba(244,183,64,.34); background: linear-gradient(145deg, rgba(22,20,16,.96), rgba(8,11,18,.96)); box-shadow: 0 1.5rem 4rem rgba(0,0,0,.28), 0 0 3rem rgba(244,183,64,.06); }
-#s-tournament .tc-header { position: relative; background: linear-gradient(100deg, rgba(244,183,64,.16), transparent 45%), var(--cc-atmosphere-image) center 44% / cover; }
-#s-tournament .tc-header::after { content: 'CHAMPIONSHIP COVERAGE'; position: absolute; right: 1rem; bottom: .65rem; color: rgba(255,255,255,.45); font-size: .55rem; font-weight: 900; letter-spacing: .14em; }
-#s-tournament .fixture-card { position: relative; overflow: hidden; border-color: rgba(244,183,64,.2); background: linear-gradient(90deg, rgba(244,183,64,.055), rgba(255,255,255,.018)); }
-#s-tournament .fixture-card::before { content: ''; position: absolute; left: 0; top: 50%; width: .22rem; height: 58%; transform: translateY(-50%); border-radius: 0 1rem 1rem 0; background: var(--cc-arena-gold); opacity: .6; }
-#s-tournament table.standings tr:first-child td { color: var(--cc-arena-gold); background: rgba(244,183,64,.055); }
+:is(#s-tournament, #s-tourn-detail) .tourn-card { border-color: rgba(244,183,64,.34); background: linear-gradient(145deg, rgba(22,20,16,.96), rgba(8,11,18,.96)); box-shadow: 0 1.5rem 4rem rgba(0,0,0,.28), 0 0 3rem rgba(244,183,64,.06); }
+:is(#s-tournament, #s-tourn-detail) .tc-header { position: relative; background: linear-gradient(100deg, rgba(244,183,64,.16), transparent 45%), var(--cc-atmosphere-image) center 44% / cover; }
+:is(#s-tournament, #s-tourn-detail) .tc-header::after { content: 'CHAMPIONSHIP COVERAGE'; position: absolute; right: 1rem; bottom: .65rem; color: rgba(255,255,255,.45); font-size: .55rem; font-weight: 900; letter-spacing: .14em; }
+:is(#s-tournament, #s-tourn-detail) .fixture-card { position: relative; overflow: hidden; border-color: rgba(244,183,64,.2); background: linear-gradient(90deg, rgba(244,183,64,.055), rgba(255,255,255,.018)); }
+:is(#s-tournament, #s-tourn-detail) .fixture-card::before { content: ''; position: absolute; left: 0; top: 50%; width: .22rem; height: 58%; transform: translateY(-50%); border-radius: 0 1rem 1rem 0; background: var(--cc-arena-gold); opacity: .6; }
+:is(#s-tournament, #s-tourn-detail) table.standings tr:first-child td { color: var(--cc-arena-gold); background: rgba(244,183,64,.055); }
 
 /* Basketball World and Pulse: editorial sideline desk. */
 :is(.world-hero, .pulse-hero).cc-native-hero { text-align: left; }

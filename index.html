@@ -1677,6 +1677,7 @@ body.modal-open{overflow:hidden}
 <link rel="stylesheet" href="./courtcall-motion-foundation.css">
 <link rel="stylesheet" href="./courtcall-cinematic.css?v=20260814b">
 <link rel="stylesheet" href="./courtcall-global-visual-system.css?v=20260814b">
+<link rel="stylesheet" href="./courtcall-tournaments.css">
 </head>
 <body>
 <a class="skip-link" id="skip-link" href="#s-landing">Skip to content</a>
@@ -2546,15 +2547,52 @@ body.modal-open{overflow:hidden}
       </div>
     </form>
   </div>
+  <div id="tourn-list-wrap" class="hidden">
+    <section class="tourn-section" aria-labelledby="tourn-current-heading">
+      <div class="tourn-section-head">
+        <div>
+          <p class="tourn-section-kicker">On the court</p>
+          <h2 id="tourn-current-heading">Current tournaments</h2>
+        </div>
+        <button class="tourn-new-inline" type="button" onclick="showTournForm()">＋ Create Tournament</button>
+      </div>
+      <div class="tourn-list" id="tourn-current-list"></div>
+    </section>
+    <section class="tourn-section hidden" id="tourn-history-section" aria-labelledby="tourn-history-heading">
+      <div class="tourn-section-head">
+        <div>
+          <p class="tourn-section-kicker">Final archive</p>
+          <h2 id="tourn-history-heading">Tournament history</h2>
+        </div>
+      </div>
+      <div class="tourn-list" id="tourn-history-list"></div>
+    </section>
+  </div>
+</div>
+
+<!-- TOURNAMENT DETAIL -->
+<div id="s-tourn-detail" class="screen">
+  <div class="page-nav">
+    <button class="btn-back" onclick="showScreen('tournament')">← Tournaments</button>
+    <div class="page-title">Tournament Detail</div>
+    <span class="page-nav-spacer" aria-hidden="true"></span>
+  </div>
+  <div id="tourn-detail-missing" class="tourn-empty hidden" role="status">
+    <div class="tourn-empty-icon">🏆</div>
+    <div class="tourn-empty-title">Tournament unavailable</div>
+    <div class="tourn-empty-sub">This tournament may have been removed on another device.</div>
+    <button class="btn-create-t" onclick="showScreen('tournament')">View Tournaments</button>
+  </div>
   <div id="tourn-active" class="hidden">
     <div class="tourn-card" id="tourn-card">
       <div class="tc-header">
         <div class="tc-name" id="tc-name">Tournament</div>
         <div class="tc-meta" id="tc-meta">—</div>
       </div>
+      <div class="tc-overview" id="tc-overview" aria-live="polite"></div>
       <div class="tc-tabs" id="tc-tabs" role="tablist" aria-label="Tournament view">
         <button class="tc-tab on" role="tab" aria-selected="true" aria-controls="tourn-tab-body" onclick="switchTournTab('standings',this)">Standings</button>
-        <button class="tc-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tourn-tab-body" onclick="switchTournTab('fixtures',this)">Fixtures</button>
+        <button class="tc-tab" role="tab" aria-selected="false" tabindex="-1" aria-controls="tourn-tab-body" onclick="switchTournTab('fixtures',this)">Matches</button>
       </div>
       <div class="tc-body" id="tourn-tab-body" role="tabpanel"></div>
     </div>
@@ -3538,6 +3576,7 @@ const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms
 function _validScreen(name){return !!document.getElementById('s-'+name);}
 function _screenToHash(name){
   if(name==='comm-detail'&&activeCommunityId)return `#/community/${activeCommunityId}`;
+  if(name==='tourn-detail'&&activeTournId)return `#/tournament/${encodeURIComponent(activeTournId)}`;
   return `#/${name}`;
 }
 function _syncHash(name){
@@ -3551,11 +3590,13 @@ function _routeFromHash(){
     hasProfile:Boolean(currentProfile),isGuest:currentProfile?.id==='guest',
     validScreens:[...document.querySelectorAll('.screen[id^="s-"]')].map(screen=>screen.id.replace(/^s-/,'')),
     publicScreens:[..._PUBLIC_SCREENS],communityIds:getComms().map(community=>community.id),
+    tournamentIds:getCol(K.tournaments).map(tournament=>tournament.id),
     hasActiveGame:Boolean(saved&&!saved.gameOver&&saved.teamA&&saved.teamB),
     hasRecoverySession:_hasRecoverySession
   });
   if(!decision.handled)return false;
   if(decision.action==='open_community'){openCommunity(decision.communityId);return true}
+  if(decision.action==='open_tournament'){activeTournId=decision.tournamentId;showScreen('tourn-detail');return true}
   if(decision.action==='open_changelog'){openChangelog();return true}
   if(decision.action==='resume_game'){handleResume();return true}
   showScreen(decision.screen||'profile');return true;
@@ -3581,9 +3622,9 @@ document.addEventListener('keydown',e=>{
   const clMod=document.getElementById('changelog-modal');
   if(clMod&&!clMod.classList.contains('hidden')){closeChangelog();return;}
 });
-const BTM_NAV_SCREENS=['hub','teams','history','tournament','communities','world','pulse','analytics'];
-const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
-const ROUTE_LABELS={landing:'CourtCall',profile:'Profile',onboarding:'Welcome',hub:'Home',setup:'New Game',game:'Live Game',teams:'Teams',history:'Match History',tournament:'Tournaments',communities:'Communities','comm-create':'Create Community','comm-detail':'Community',pulse:'Basketball Pulse',world:'Basketball World',settings:'Settings',analytics:'Analytics','help-center':'Help Center',privacy:'Privacy Policy',terms:'Terms of Service','reset-pin':'Reset PIN'};
+const BTM_NAV_SCREENS=['hub','teams','history','tournament','tourn-detail','communities','world','pulse','analytics'];
+const BTM_NAV_MAP={hub:'hub',teams:'teams',history:'history',tournament:'more','tourn-detail':'more',communities:'more','comm-detail':'more','comm-create':'more',world:'more',pulse:'more',settings:'more',analytics:'more',profile:'more'};
+const ROUTE_LABELS={landing:'CourtCall',profile:'Profile',onboarding:'Welcome',hub:'Home',setup:'New Game',game:'Live Game',teams:'Teams',history:'Match History',tournament:'Tournaments','tourn-detail':'Tournament Detail',communities:'Communities','comm-create':'Create Community','comm-detail':'Community',pulse:'Basketball Pulse',world:'Basketball World',settings:'Settings',analytics:'Analytics','help-center':'Help Center',privacy:'Privacy Policy',terms:'Terms of Service','reset-pin':'Reset PIN'};
 function _syncActiveScreenA11y(name){
   const activeId=`s-${name}`;
   let activeScreen=null;
@@ -3663,6 +3704,7 @@ function showScreen(name){
     renderHistory();renderCareerStats();
   }
   if(name==='tournament')renderTournament();
+  if(name==='tourn-detail')renderTournamentDetail();
   if(name==='teams')renderTeamBuilder();
   if(name==='settings')renderSettings();
   if(name==='analytics')renderAnalytics();
@@ -4822,8 +4864,11 @@ function handleStartGame(){
 }
 async function handleBackFromGame(){
   if(state.history.length>0&&!state.gameOver){if(!await uiConfirm('Go back? Progress is saved.'))return}
-  pauseGameRuntime();showScreen('hub');
-  document.getElementById('resume-card').classList.toggle('hidden',!(state.history.length>0&&!state.gameOver));
+  const returnToTournament=gameContext.type==='tournament'&&gameContext.tournamentId;
+  if(returnToTournament)activeTournId=gameContext.tournamentId;
+  pauseGameRuntime();showScreen(returnToTournament?'tourn-detail':'hub');
+  const resumeCard=document.getElementById('resume-card');
+  if(resumeCard)resumeCard.classList.toggle('hidden',!(state.history.length>0&&!state.gameOver));
 }
 function pauseGameRuntime(){
   SC.pause({pauseGameClock:false});GC.pause();stopVoice();
@@ -5168,12 +5213,23 @@ function finalizeGameOutcome(outcome,{allowUndo=false}={}){
   state.maxLead={...timelineStats.maxLead};
   state.gameOver=true;SC.stop();GC.stop();stopVoice();save();
   const entry=buildMatchEntry(outcome);
-  saveToMatches(entry);
-  applyQueueOutcome(entry);
-  lastCompletedEntry={...entry,canUndoLastScore:allowUndo};
-  if(outcome!==CourtCallCore.OUTCOMES.NO_CONTEST)trackEvent('game_completed');
-  else trackEvent('game_no_contest');
-  if(gameContext.type==='tournament'&&gameContext.fixtureId&&isWinningOutcome(outcome))saveTournamentResult(entry);
+  let tournamentResult=null,duplicateTournamentResult=false;
+  if(gameContext.type==='tournament'&&gameContext.fixtureId&&isWinningOutcome(outcome)){
+    tournamentResult=saveTournamentResult(entry);
+    duplicateTournamentResult=['duplicate','duplicate_match'].includes(tournamentResult?.status);
+  }
+  if(!duplicateTournamentResult){
+    saveToMatches(entry);
+    applyQueueOutcome(entry);
+    if(outcome!==CourtCallCore.OUTCOMES.NO_CONTEST)trackEvent('game_completed');
+    else trackEvent('game_no_contest');
+  }else{
+    showToast('This tournament fixture already has a result. The duplicate game was not saved again.',{type:'error',duration:6000});
+  }
+  if(tournamentResult&&tournamentResult.status!=='applied'&&!duplicateTournamentResult){
+    showToast('The game was saved, but the tournament could not be updated. Reopen the tournament to review it.',{type:'error',duration:6000});
+  }
+  lastCompletedEntry={...entry,canUndoLastScore:allowUndo&&!duplicateTournamentResult,duplicateTournamentResult};
   showPostGame(entry);
 }
 function checkWin(){
@@ -5208,11 +5264,16 @@ async function handleEndGame(){
   finalizeGameOutcome(decision.outcome);
 }
 function cancelActiveGame(){
-  SC.stop();GC.stop();stopVoice();clearSave();lastCompletedEntry=null;
+  SC.stop();GC.stop();stopVoice();lastCompletedEntry=null;
   const wasTournament=gameContext.type==='tournament';
+  const tournamentId=gameContext.tournamentId;
   state=freshState();gameContext={type:'pickup',tournamentId:null,fixtureId:null};
   trackEvent('game_cancelled');showToast('Game cancelled before scoring began.',4000);
-  showScreen(wasTournament?'tournament':'hub');
+  if(wasTournament&&tournamentId)activeTournId=tournamentId;
+  showScreen(wasTournament&&tournamentId?'tourn-detail':'hub');
+  // showScreen pauses a departing live game and persists it. Clear after that
+  // lifecycle step so a cancelled 0-0 game cannot block another fixture.
+  clearSave();
 }
 // Post-game
 let _postGameReturnFocus=null;
@@ -5315,9 +5376,12 @@ async function undoCompletedGame(){
 // Back from the victory screen: the game is finished, so clear it and
 // return to the Hub rather than dropping the user back into a dead game.
 function saveAndExitGame(){
+  const tournamentId=gameContext.type==='tournament'?gameContext.tournamentId:null;
   clearSave();stopVoice();SC.stop();GC.stop();
   lastCompletedEntry=null;
-  showScreen('hub');renderHub();
+  if(tournamentId)activeTournId=tournamentId;
+  showScreen(tournamentId?'tourn-detail':'hub');
+  if(!tournamentId)renderHub();
 }
 function closePG(){saveAndExitGame()}
 function playAgain(){
@@ -6421,16 +6485,53 @@ function shareMdMatch(){
 ════════════════════════════════════════════════════════ */
 let activeTournId=null;
 let tournTab='standings';
-function renderTournament(){
-  const tours=getCol(K.tournaments);
-  const last=tours.find(t=>!t.completed)||tours[tours.length-1];
-  if(last){activeTournId=last.id;showActiveTournament(last)}
-  else{activeTournId=null;showTournEmpty()}
+function readTournamentList(){
+  return getCol(K.tournaments).map((tournament,index)=>CourtCallCore.deriveTournamentState(CourtCallCore.normalizeTournament(tournament,{index})));
 }
-function showTournEmpty(){document.getElementById('tourn-empty').classList.remove('hidden');document.getElementById('tourn-form-wrap').classList.add('hidden');document.getElementById('tourn-active').classList.add('hidden')}
+function tournamentRecord(tournament){
+  const record={...tournament};
+  ['status','tieBreakPending','completedFixtures','pendingFixtures','totalFixtures','nextFixture'].forEach(key=>delete record[key]);
+  return record;
+}
+function tournamentDateLabel(value){
+  if(!value)return'Date unavailable';
+  const date=new Date(value);return Number.isNaN(date.getTime())?String(value):date.toLocaleDateString();
+}
+function tournamentStatusLabel(tournament){
+  if(tournament.status==='completed')return`Champion · ${tournament.winner||'Pending'}`;
+  if(tournament.status==='tiebreak_required')return'Final standings tied';
+  if(tournament.status==='in_progress')return'In progress';
+  return'Scheduled';
+}
+function tournamentCardMarkup(tournament){
+  const next=tournament.nextFixture;
+  const nextText=next?`${next.teamA} vs ${next.teamB}`:tournament.completed?(tournament.winner?`Champion: ${tournament.winner}`:'Tie-break required'):'Waiting for the next round';
+  return`<article class="tourn-list-card cc-tournament-card${tournament.completed&&tournament.winner?' cc-championship-glow':''}">
+    <div class="tourn-list-card-main">
+      <div class="tourn-list-card-head"><h3>${escHtml(tournament.name)}</h3><span class="tourn-status" data-status="${escAttr(tournament.status)}">${escHtml(tournamentStatusLabel(tournament))}</span></div>
+      <p>${tournament.format==='roundrobin'?'Round Robin':'Knockout'} · ${tournament.teams.length} teams · First to ${tournament.winScore}</p>
+      <div class="tourn-progress" role="status"><strong>${tournament.completedFixtures}/${tournament.totalFixtures}</strong> matches complete <span>Next: ${escHtml(nextText)}</span></div>
+    </div>
+    <button class="btn-score-match" type="button" aria-label="Open ${escAttr(tournament.name)}" onclick="openTournament(${jsArg(tournament.id)})">Open Tournament</button>
+  </article>`;
+}
+function renderTournament(){
+  const tours=readTournamentList().sort((a,b)=>(new Date(b.updatedAt||b.createdAt||0).getTime()||0)-(new Date(a.updatedAt||a.createdAt||0).getTime()||0));
+  document.getElementById('tourn-form-wrap').classList.add('hidden');
+  if(!tours.length){activeTournId=null;showTournEmpty();return}
+  document.getElementById('tourn-empty').classList.add('hidden');
+  document.getElementById('tourn-list-wrap').classList.remove('hidden');
+  const current=tours.filter(tournament=>!tournament.completed),history=tours.filter(tournament=>tournament.completed);
+  const currentList=document.getElementById('tourn-current-list');
+  currentList.innerHTML=current.length?current.map(tournamentCardMarkup).join(''):'<div class="tourn-list-empty">No active tournaments. Start a new bracket when the court is ready.</div>';
+  const historySection=document.getElementById('tourn-history-section');
+  historySection.classList.toggle('hidden',!history.length);
+  document.getElementById('tourn-history-list').innerHTML=history.map(tournamentCardMarkup).join('');
+}
+function showTournEmpty(){document.getElementById('tourn-empty').classList.remove('hidden');document.getElementById('tourn-form-wrap').classList.add('hidden');document.getElementById('tourn-list-wrap').classList.add('hidden')}
 function showTournForm(){
   document.getElementById('tourn-empty').classList.add('hidden');
-  document.getElementById('tourn-active').classList.add('hidden');
+  document.getElementById('tourn-list-wrap').classList.add('hidden');
   document.getElementById('tourn-form-wrap').classList.remove('hidden');
   document.getElementById('tourn-name').value='';
   document.getElementById('tourn-teams-list').innerHTML='';
@@ -6458,11 +6559,11 @@ function updateTournamentFormState(){
   const customScore=cx['cr-tourn-win']==='custom';custom.classList.toggle('show',customScore);
   const name=document.getElementById('tourn-name')?.value.trim()||'';
   const teams=[...document.querySelectorAll('.tourn-team-input')].map(input=>input.value.trim()).filter(Boolean);
-  const unique=new Set(teams.map(team=>team.toLocaleLowerCase()));
+  const teamValidation=CourtCallCore.validateTournamentTeams(teams,{minTeams:2,maxTeams:16});
   const score=customScore?Number(custom.value):Number(cx['cr-tourn-win']||21);
   const format=cx['cr-tourn-format']||'roundrobin';
   let matches=0;if(teams.length>=2){if(format==='roundrobin')matches=teams.length*(teams.length-1)/2;else{let size=1;while(size<teams.length)size*=2;matches=size-1}}
-  const valid=!!name&&teams.length>=2&&teams.length<=16&&unique.size===teams.length&&Number.isFinite(score)&&score>=2;
+  const valid=!!name&&teamValidation.valid&&Number.isInteger(score)&&score>=2&&score<=999;
   button.disabled=!valid;
   summary.innerHTML=`<span><strong>${format==='roundrobin'?'Round Robin':'Knockout'}</strong></span><span><strong>${teams.length}</strong> team${teams.length===1?'':'s'}</span><span><strong>${matches}</strong> match${matches===1?'':'es'}</span><span>First to <strong>${Number.isFinite(score)&&score>=2?score:'—'}</strong></span><span>Estimated play: <strong>${matches?`${matches*12}–${matches*18} min`:'—'}</strong></span><span>${valid?'Ready to create':'Add a name and at least 2 unique teams'}</span>`;
   if(valid)setTournError('');
@@ -6480,12 +6581,14 @@ function removeTournTeam(button){button.closest('.team-input-row')?.remove();ren
 function createTournament(){
   const name=document.getElementById('tourn-name').value.trim();
   if(!name){setTournError('Enter a tournament name');document.getElementById('tourn-name').focus();return}
-  if(getCol(K.tournaments).some(tournament=>tournament.name?.trim().toLocaleLowerCase()===name.toLocaleLowerCase())){setTournError('A tournament with this name already exists');document.getElementById('tourn-name').focus();return}
+  const nameValidation=CourtCallCore.validateTournamentName(name,getCol(K.tournaments));
+  if(!nameValidation.valid){setTournError(nameValidation.errors[0]);document.getElementById('tourn-name').focus();return}
   const teamInputs=[...document.querySelectorAll('.tourn-team-input')];
   const teams=teamInputs.map(i=>i.value.trim()).filter(Boolean);
+  const teamValidation=CourtCallCore.validateTournamentTeams(teams,{minTeams:2,maxTeams:16});
   if(teams.length<2){setTournError('Add at least 2 named teams');(teamInputs.find(input=>!input.value.trim())||teamInputs[0])?.focus();return}
-  const folded=teams.map(team=>team.toLocaleLowerCase());
-  const duplicate=teams.find((team,index)=>folded.indexOf(folded[index])!==index);
+  if(teams.length>16){setTournError('A tournament can have up to 16 teams');teamInputs[16]?.focus();return}
+  const duplicate=teamValidation.duplicateNames[0];
   if(duplicate){
     setTournError(`Team names must be unique. “${duplicate}” appears more than once.`);
     let foundFirst=false;
@@ -6495,13 +6598,14 @@ function createTournament(){
   setTournError('');
   const format=cx['cr-tourn-format']||'roundrobin';
   const winScore=cx['cr-tourn-win']==='custom'?parseInt(document.getElementById('tourn-win-custom').value,10):parseInt(cx['cr-tourn-win']||'21',10);
+  if(!Number.isInteger(winScore)||winScore<2||winScore>999){setTournError('Win score must be a whole number from 2 to 999');document.getElementById('tourn-win-custom')?.focus();return}
   const fixtures=format==='roundrobin'?genRoundRobin(teams):genKnockout(teams);
-  const t={id:'t_'+Date.now(),name,format,winScore,teams:teams.map(n=>({name:n})),fixtures,createdAt:new Date().toISOString(),completed:false,ownerId:currentProfile?.id||'guest'};
-  const tours=getCol(K.tournaments);tours.push(t);setCol(K.tournaments,tours);
+  const now=new Date().toISOString();
+  const t=CourtCallCore.deriveTournamentState({id:'tourn_'+Date.now(),name,format,winScore,teams:teams.map(n=>({name:n})),fixtures,createdAt:now,updatedAt:now,completed:false,ownerId:currentProfile?.id||'guest'});
+  const tours=getCol(K.tournaments);tours.push(tournamentRecord(t));setCol(K.tournaments,tours);
   supaUpsertTournament(t);
   trackEvent('tournament_created');
-  activeTournId=t.id;
-  showActiveTournament(t);
+  openTournament(t.id);
   showToast(`${name} created`,{type:'success'});
 }
 function genRoundRobin(teams){
@@ -6509,20 +6613,37 @@ function genRoundRobin(teams){
 }
 function genKnockout(teams){
   if(teams.length<2)return[];
-  const shuffled=[...teams].sort(()=>Math.random()-.5);
-  return CourtCallCore.generateKnockoutFixtures(shuffled,{base:Date.now()});
+  return CourtCallCore.generateKnockoutFixtures(teams,{base:Date.now()});
 }
-function showActiveTournament(t){
-  document.getElementById('tourn-empty').classList.add('hidden');
-  document.getElementById('tourn-form-wrap').classList.add('hidden');
+function openTournament(tournamentId){
+  const tournament=readTournamentList().find(candidate=>String(candidate.id)===String(tournamentId));
+  if(!tournament){activeTournId=null;showToast('Tournament not found',{type:'error'});showScreen('tournament');return}
+  activeTournId=tournament.id;tournTab='standings';showScreen('tourn-detail');
+}
+function renderTournamentDetail(){
+  const t=readTournamentList().find(candidate=>String(candidate.id)===String(activeTournId));
+  const missing=document.getElementById('tourn-detail-missing');
+  if(!t){missing.classList.remove('hidden');document.getElementById('tourn-active').classList.add('hidden');return}
+  missing.classList.add('hidden');
   document.getElementById('tourn-active').classList.remove('hidden');
   document.getElementById('tc-name').textContent=t.name;
-  document.getElementById('tc-meta').textContent=`${t.format==='roundrobin'?'Round Robin':'Knockout'} · First to ${t.winScore} · ${t.createdAt||''}`;
-  const activeTab=[...document.querySelectorAll('.tc-tab')].find(tb=>tb.textContent.trim().toLowerCase()===tournTab);
+  document.getElementById('tc-meta').textContent=`${t.format==='roundrobin'?'Round Robin':'Knockout'} · First to ${t.winScore} · Created ${tournamentDateLabel(t.createdAt)}`;
+  const status=tournamentStatusLabel(t),next=t.nextFixture;
+  const champion=t.winner?`<div class="tc-champion"><span>Champion</span><strong>🏆 ${escHtml(t.winner)}</strong></div>`:t.tieBreakPending?'<div class="tc-tiebreak" role="status"><strong>Champion unresolved</strong><span>The specified points, differential and points-for tie-breakers are level. CourtCall will not invent another rule.</span></div>':'';
+  document.getElementById('tc-overview').innerHTML=`<div class="tc-stat-grid">
+      <div><span>Status</span><strong>${escHtml(status)}</strong></div>
+      <div><span>Teams</span><strong>${t.teams.length}</strong></div>
+      <div><span>Completed</span><strong>${t.completedFixtures}/${t.totalFixtures}</strong></div>
+      <div><span>Next match</span><strong>${next?`${escHtml(next.teamA)} vs ${escHtml(next.teamB)}`:(t.completed?'Tournament complete':'Waiting for bracket progression')}</strong></div>
+    </div>${champion}<div class="tc-team-roster" aria-label="Participating teams">${t.teams.map(team=>`<span>${escHtml(team.name)}</span>`).join('')}</div>`;
+  const tabs=[...document.querySelectorAll('#tc-tabs .tc-tab')];
+  tabs[0].textContent=t.format==='roundrobin'?'Standings':'Bracket';tabs[1].textContent='Matches';
+  const activeTab=tabs[tournTab==='fixtures'?1:0];
   document.querySelectorAll('.tc-tab').forEach(tb=>tb.classList.toggle('on',tb===activeTab));
   _setTabSelected(document.getElementById('tc-tabs'),activeTab);
   renderTournTab(tournTab);
 }
+function showActiveTournament(t){activeTournId=t?.id||null;if(activeTournId)showScreen('tourn-detail');else showScreen('tournament')}
 function switchTournTab(name,btn){
   tournTab=name;
   document.querySelectorAll('.tc-tab').forEach(t=>t.classList.toggle('on',t===btn));
@@ -6530,42 +6651,54 @@ function switchTournTab(name,btn){
   renderTournTab(name);
 }
 function renderTournTab(name){
-  const tours=getCol(K.tournaments);
-  const t=tours.find(x=>x.id===activeTournId);
+  const t=readTournamentList().find(candidate=>String(candidate.id)===String(activeTournId));
   if(!t)return;
   const body=document.getElementById('tourn-tab-body');
   if(name==='standings'){
-    if(t.format==='knockout'){body.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Knockout format — view Fixtures for bracket</div>';return}
-    const teams=t.teams.map(x=>x.name);
-    const std=calcStandings(t.fixtures,teams);
-    body.innerHTML=`<table class="standings"><thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>PF</th><th>PA</th><th>Pts</th></tr></thead><tbody>`+
-      std.map((s,i)=>`<tr><td class="s-rank">${i+1}</td><td style="font-weight:700">${escHtml(s.name)}</td><td>${s.won}</td><td>${s.lost}</td><td>${s.pf}</td><td>${s.pa}</td><td class="s-pts">${s.pts}</td></tr>`).join('')+
-      '</tbody></table>';
+    if(t.format==='knockout'){body.innerHTML=renderKnockoutBracket(t);return}
+    const std=t.standings;
+    body.innerHTML=`<div class="standings-scroll" role="region" aria-label="Round Robin standings" tabindex="0"><table class="standings"><caption class="cc-sr-only">${escHtml(t.name)} standings, ranked by points, point differential, then points scored</caption><thead><tr><th scope="col">#</th><th scope="col">Team</th><th scope="col">P</th><th scope="col">W</th><th scope="col">L</th><th scope="col">D</th><th scope="col">PF</th><th scope="col">PA</th><th scope="col">Diff</th><th scope="col">Pts</th></tr></thead><tbody>`+
+      std.map((s,i)=>`<tr><td class="s-rank">${i+1}</td><th scope="row">${escHtml(s.name)}</th><td>${s.played}</td><td>${s.won}</td><td>${s.lost}</td><td>${s.tied}</td><td>${s.pf}</td><td>${s.pa}</td><td>${s.difference>0?'+':''}${s.difference}</td><td class="s-pts">${s.pts}</td></tr>`).join('')+
+      '</tbody></table></div>';
   }else{
-    // Show champion banner for completed knockouts
-    const championBanner=t.format==='knockout'&&t.completed
-      ?`<div style="text-align:center;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:.08em">🏆 Champion: ${escHtml(t.fixtures.find(f=>!f.nextMatchId)?.winner||'')}</div>`:'';
-    // Skip BYE auto-advance matches from display (they are internal bracket scaffolding)
-    const visible=t.fixtures.filter(fx=>!(fx.played&&(fx.teamA==='BYE'||fx.teamB==='BYE')&&fx.scoreA===null));
-    body.innerHTML=championBanner+visible.map(fx=>{
-      // Guard for legacy tournaments without nextMatchId field
-      const canScore=!fx.played&&fx.teamA!=='TBD'&&fx.teamB!=='TBD'&&fx.teamA!=='BYE'&&fx.teamB!=='BYE';
-      return`<div class="fixture-card">
-      <div class="fx-row"><span class="fx-badge${fx.played?' played':''}">${fx.played?'Played':'Pending'}</span>${fx.round?`<span class="fx-badge">R${fx.round}</span>`:''}</div>
-      <div class="fx-row"><span class="fx-teams">${escHtml(fx.teamA)}<span class="fx-vs">vs</span>${escHtml(fx.teamB)}</span>${fx.played?`<span class="fx-score">${fx.scoreA}–${fx.scoreB}</span>`:''}</div>
-      ${canScore?`<button class="btn-score-match" onclick="startTournMatch(${jsArg(activeTournId)},${jsArg(fx.id)})">▶ Score This Match</button>`:fx.played?`<button class="btn-score-match done" disabled>✓ ${escHtml(fx.winner||'Done')}</button>`:`<button class="btn-score-match" disabled style="opacity:.4">Waiting…</button>`}
-    </div>`;}).join('');
+    const totalRounds=Math.max(1,...t.fixtures.map(fixture=>fixture.round||1));
+    body.innerHTML=t.fixtures.slice().sort((a,b)=>(a.round||1)-(b.round||1)||String(a.id).localeCompare(String(b.id))).map(fx=>renderTournamentMatchCard(t,fx,totalRounds)).join('');
   }
+}
+function renderKnockoutBracket(tournament){
+  const totalRounds=Math.max(1,...tournament.fixtures.map(fixture=>fixture.round||1));
+  const rounds=Array.from({length:totalRounds},(_,index)=>index+1);
+  return`<div class="tournament-bracket-scroll" role="region" aria-label="${escAttr(tournament.name)} knockout bracket. Scroll horizontally to review all rounds." tabindex="0"><div class="tournament-bracket">${rounds.map(round=>`<section class="bracket-round" aria-labelledby="bracket-round-${round}"><h3 id="bracket-round-${round}">${CourtCallCore.tournamentRoundLabel(round,totalRounds)}</h3>${tournament.fixtures.filter(fixture=>fixture.round===round).map(fixture=>`<article class="fixture-card bracket-fixture${fixture.played?' cc-bracket-winner':''}"><span class="fx-badge${fixture.played?' played':''}">${fixture.isBye?'Bye':fixture.played?'Final':'Pending'}</span><div class="bracket-team${fixture.winner===fixture.teamA?' winner':''}"><span>${escHtml(fixture.teamA)}</span><strong>${fixture.scoreA??'—'}</strong></div><div class="bracket-team${fixture.winner===fixture.teamB?' winner':''}"><span>${escHtml(fixture.teamB)}</span><strong>${fixture.scoreB??'—'}</strong></div>${fixture.isBye?`<p>${escHtml(fixture.winner)} advances automatically</p>`:''}</article>`).join('')}</section>`).join('')}</div></div>`;
+}
+function renderTournamentMatchCard(tournament,fixture,totalRounds){
+  const saved=load(),savedContext=saved?._gc||{};
+  const sameActive=Boolean(saved&&!saved.gameOver&&savedContext.type==='tournament'&&String(savedContext.tournamentId)===String(tournament.id)&&String(savedContext.fixtureId)===String(fixture.id));
+  const otherActive=Boolean(saved&&!saved.gameOver&&!sameActive);
+  const isBye=fixture.isBye||fixture.teamA==='BYE'||fixture.teamB==='BYE';
+  const ready=!fixture.played&&!isBye&&fixture.teamA!=='TBD'&&fixture.teamB!=='TBD'&&!tournament.completed;
+  const label=tournament.format==='knockout'?CourtCallCore.tournamentRoundLabel(fixture.round,totalRounds):`Round ${fixture.round||1}`;
+  let action='';
+  if(sameActive)action=`<button class="btn-score-match" onclick="startTournMatch(${jsArg(tournament.id)},${jsArg(fixture.id)})">▶ Resume Match</button>`;
+  else if(ready&&!otherActive)action=`<button class="btn-score-match" onclick="startTournMatch(${jsArg(tournament.id)},${jsArg(fixture.id)})">▶ Score This Match</button>`;
+  else if(fixture.played&&!isBye)action=`<button class="btn-score-match done" disabled>✓ ${escHtml(fixture.winner||'Recorded')}</button>`;
+  else if(isBye)action=`<div class="fx-bye-note">${escHtml(fixture.winner||fixture.teamA)} advances automatically</div>`;
+  else action=`<button class="btn-score-match" disabled>${otherActive?'Another game is active':'Waiting for previous round'}</button>`;
+  return`<article class="fixture-card${fixture.played?' cc-bracket-winner':''}"><div class="fx-row"><span class="fx-badge${fixture.played?' played':''}">${isBye?'Bye':fixture.played?'Completed':'Pending'}</span><span class="fx-badge">${label}</span></div><div class="fx-row"><span class="fx-teams">${escHtml(fixture.teamA)}<span class="fx-vs">vs</span>${escHtml(fixture.teamB)}</span>${fixture.played&&!isBye?`<span class="fx-score">${fixture.scoreA}–${fixture.scoreB}</span>`:''}</div>${action}</article>`;
 }
 function calcStandings(fixtures,teamNames){
   return CourtCallCore.calculateStandings(fixtures,teamNames,{winPoints:2,tiePoints:1,lossPoints:0});
 }
-function startTournMatch(tournId,fixtureId){
-  const tours=getCol(K.tournaments);
-  const t=tours.find(x=>x.id===tournId);
+async function startTournMatch(tournId,fixtureId){
+  const t=readTournamentList().find(candidate=>String(candidate.id)===String(tournId));
   if(!t)return;
   const fx=t.fixtures.find(f=>f.id===fixtureId);
-  if(!fx||fx.teamA==='TBD'||fx.teamB==='TBD'||fx.teamA==='BYE'||fx.teamB==='BYE')return;
+  if(!fx||fx.played||t.completed||fx.teamA==='TBD'||fx.teamB==='TBD'||fx.teamA==='BYE'||fx.teamB==='BYE')return;
+  const saved=load(),savedContext=saved?._gc||{};
+  if(saved&&!saved.gameOver){
+    const same=String(savedContext.tournamentId||'')===String(tournId)&&String(savedContext.fixtureId||'')===String(fixtureId);
+    if(same){activeTournId=tournId;handleResume();return}
+    showToast('Finish or cancel the active game before starting another tournament match.',{type:'error',duration:5000});return;
+  }
   // Pre-fill setup
   document.getElementById('inp-a').value=fx.teamA;
   document.getElementById('inp-b').value=fx.teamB;
@@ -6574,58 +6707,26 @@ function startTournMatch(tournId,fixtureId){
   if(winScore===11)pickChipByVal('cr-win','11');
   else if(winScore===15)pickChipByVal('cr-win','15');
   else{pickChipByVal('cr-win','21')}
-  state={...freshState(),gameType:cx['cr-type'],winScore,ptsSmall:1,ptsLarge:2,teamA:{name:fx.teamA,score:0,fouls:0,colorKey:'orange'},teamB:{name:fx.teamB,score:0,fouls:0,colorKey:'blue'},startTime:Date.now()};
+  state=Phase4GameCore.createState({gameType:cx['cr-type']||'3v3',winScore,ptsSmall:1,ptsLarge:2,teamA:{name:fx.teamA,score:0,fouls:0,colorKey:'orange'},teamB:{name:fx.teamB,score:0,fouls:0,colorKey:'blue'},startTime:null});
   applyTeamColors();save();renderGame();SC.init();GC.init();showScreen('game');
 }
 function pickChipByVal(rowId,val){const btn=document.querySelector(`#${rowId} [data-v="${val}"]`);if(btn)pickChip(rowId,btn)}
 function saveTournamentResult(entry){
   const tours=getCol(K.tournaments);
-  const t=tours.find(x=>x.id===entry.tournamentId);
-  if(!t)return;
-  const fx=t.fixtures.find(f=>f.id===entry.fixtureId);
-  if(!fx)return;
-  fx.scoreA=entry.teamA.score;fx.scoreB=entry.teamB.score;
-  fx.winner=entry.winner.name;fx.played=true;
-
-  // Knockout: advance winner into next round slot
-  if(t.format==='knockout'&&fx.nextMatchId){
-    const next=t.fixtures.find(f=>f.id===fx.nextMatchId);
-    if(next&&!next.played){
-      if(fx.nextSlot==='home')next.teamA=fx.winner;
-      else next.teamB=fx.winner;
-      // If both slots are now real teams, mark as ready (remove TBD)
-    }
-  }
-
-  // Mark tournament complete when final match (no nextMatchId) is played
-  if(t.format==='knockout'){
-    const final=t.fixtures.find(f=>!f.nextMatchId);
-    if(final&&final.played)t.completed=true;
-  }
-  // Round-robin: standings are computed live from fixtures in calcStandings()
-  if(t.format==='roundrobin'){
-    const allPlayed=t.fixtures.every(f=>f.played);
-    if(allPlayed)t.completed=true;
-  }
-
-  setCol(K.tournaments,tours);
-  supaUpsertTournament(t);
+  const index=tours.findIndex(tournament=>String(tournament.id)===String(entry.tournamentId));
+  if(index<0)return{status:'not_found'};
+  const result=CourtCallCore.applyTournamentResult(tours[index],{fixtureId:entry.fixtureId,matchId:entry.id,teamA:entry.teamA,teamB:entry.teamB,scoreA:entry.teamA.score,scoreB:entry.teamB.score,date:entry.date});
+  if(result.status!=='applied')return result;
+  tours[index]=tournamentRecord(result.tournament);setCol(K.tournaments,tours);activeTournId=result.tournament.id;
+  supaUpsertTournament(result.tournament);return result;
 }
 function undoTournamentResult(entry){
   const tours=getCol(K.tournaments);
-  const t=tours.find(x=>x.id===entry.tournamentId);
-  const fx=t?.fixtures?.find(f=>f.id===entry.fixtureId);
-  if(!t||!fx)return;
-  const priorWinner=fx.winner;
-  fx.scoreA=null;fx.scoreB=null;fx.winner=null;fx.played=false;
-  if(t.format==='knockout'&&fx.nextMatchId){
-    const next=t.fixtures.find(f=>f.id===fx.nextMatchId);
-    if(next&&!next.played){
-      if(fx.nextSlot==='home'&&next.teamA===priorWinner)next.teamA='TBD';
-      if(fx.nextSlot==='away'&&next.teamB===priorWinner)next.teamB='TBD';
-    }
-  }
-  t.completed=false;setCol(K.tournaments,tours);supaUpsertTournament(t);
+  const index=tours.findIndex(tournament=>String(tournament.id)===String(entry.tournamentId));
+  if(index<0)return{status:'not_found'};
+  const result=CourtCallCore.undoTournamentResult(tours[index],entry.fixtureId,{matchId:entry.id});
+  if(result.status!=='applied')return result;
+  tours[index]=tournamentRecord(result.tournament);setCol(K.tournaments,tours);supaUpsertTournament(result.tournament);return result;
 }
 async function deleteTournament(){
   if(!await uiConfirm('Delete this tournament?'))return;
@@ -6633,7 +6734,7 @@ async function deleteTournament(){
   const tours=getCol(K.tournaments).filter(t=>t.id!==tid);
   setCol(K.tournaments,tours);activeTournId=null;
   supaDeleteTournament(tid);
-  showTournEmpty();showToast('Tournament deleted');
+  showScreen('tournament');showToast('Tournament deleted');
 }
 /* ════════════════════════════════════════════════════════
    Settings
@@ -7486,10 +7587,10 @@ async function supaUpsertTournament(tournament) {
       win_score:  tournament.winScore ?? 21,
       teams:      tournament.teams    || [],
       fixtures:   tournament.fixtures || [],
-      standings:  tournament.standings || {},
+      standings:  Array.isArray(tournament.standings) ? tournament.standings : [],
       completed:  tournament.completed ? true : false,
       winner:     tournament.winner   || null,
-      settings:   { winScore: tournament.winScore },
+      settings:   { ...(tournament.settings || {}), winScore: tournament.winScore },
       created_at: tournament.createdAt ? new Date(tournament.createdAt).toISOString() : new Date().toISOString(),
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
@@ -7685,15 +7786,18 @@ async function _syncTournamentsFromDB() {
     const merged = [
       ...data.map(t => {
         const lc = local.find(x => x.id === t.id) || {};
-        return {
+        return CourtCallCore.normalizeTournament({
           ...lc, id: t.id, name: t.name, format: t.format,
           completed: t.completed ?? (t.status === 'completed'),
           teams: t.teams || lc.teams || [],
           fixtures: t.fixtures || lc.fixtures || [],
+          standings: t.standings ?? lc.standings ?? [],
           winner: t.winner || lc.winner,
           winScore: t.win_score ?? t.settings?.winScore ?? lc.winScore ?? 21,
-          createdAt: t.created_at
-        };
+          settings: t.settings || lc.settings || {},
+          createdAt: t.created_at,
+          updatedAt: t.updated_at || lc.updatedAt
+        });
       }),
       ...local.filter(t => !dbIds.has(t.id))
     ];

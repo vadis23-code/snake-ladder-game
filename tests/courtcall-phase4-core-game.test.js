@@ -133,7 +133,8 @@ test('Phase 4 runtime wires state, clocks, voice, persistence and victory safely
   assert.match(html, /_setModalBackground\(overlay,true\)/);
   assert.match(html, /document\.getElementById\('pg-save-exit'\)\?\.focus\(\)/);
   assert.match(html, /if\(gameReducedMotion\(\)\)return/);
-  assert.match(html, /function saveAndExitGame\(\)\{[\s\S]*?showScreen\('hub'\);renderHub\(\);/);
+  assert.match(html, /function saveAndExitGame\(\)\{[\s\S]*?clearSave\(\);stopVoice\(\);SC\.stop\(\);GC\.stop\(\)/);
+  assert.match(html, /showScreen\(tournamentId\?'tourn-detail':'hub'\)/);
   assert.match(html, /function newGame\(\)\{[\s\S]*?showScreen\('setup'\);goSetup\(\)\}/);
   assert.match(html, /const returnFocus=_renameReturnFocus;_renameReturnFocus=null;\s*if\(returnFocus\?\.isConnected\)/);
 });
@@ -146,7 +147,7 @@ test('Phase 4 remains functional while an older cached core module is being repl
 });
 
 test('Phase 4 stylesheet is cached and defines every required game surface', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v38'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v44'/);
   assert.match(serviceWorker, /'\.\/courtcall-core-game\.css'/);
   [
     '.setup-hero', '.setup-advanced', '#s-game.active', '.team-leader-label',

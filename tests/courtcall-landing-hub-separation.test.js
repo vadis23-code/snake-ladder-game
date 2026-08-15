@@ -93,7 +93,7 @@ test('Midnight Arena presentation explicitly yields the landing layer', () => {
 });
 
 test('PWA shell versions every changed landing asset without touching navigation strategy', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v38'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v44'/);
   for (const asset of [
     'courtcall-cinematic.css?v=20260814b',
     'courtcall-cinematic.js?v=20260814b',

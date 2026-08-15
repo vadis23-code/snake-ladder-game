@@ -17,6 +17,7 @@
       atmosphere: 'championship', kicker: 'CHAMPIONSHIP CONTROL', title: 'ONE BRACKET. ONE WINNER.',
       copy: 'Run the fixtures, call every result and light the final court.'
     },
+    'tourn-detail': { atmosphere: 'championship', native: '.tc-header' },
     world: { atmosphere: 'sideline', native: '.world-hero' },
     communities: { atmosphere: 'community', native: '.comm-hero' },
     'comm-create': {

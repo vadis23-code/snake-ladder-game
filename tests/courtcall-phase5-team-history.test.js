@@ -174,7 +174,7 @@ test('Phase 5 remains functional while an older cached core module is replaced',
   assert.match(html, /const method=mode==='balanced'\?'generateBalancedTeams':'generateRandomTeams';if\(typeof CourtCallCore\[method\]==='function'\)/);
   assert.match(html, /if\(typeof CourtCallCore\.filterMatchHistory==='function'\)/);
   assert.match(html, /Phase5Core\.normalizePlayer\(player,index\)/);
-  assert.match(serviceWorker, /CACHE_VERSION = 'v38'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v44'/);
   assert.match(serviceWorker, /'\.\/courtcall-team-history\.css'/);
 });
 

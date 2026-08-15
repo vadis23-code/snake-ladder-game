@@ -1,0 +1,396 @@
+/* CourtCall Phase 6 — tournament-only layout and responsive hardening. */
+#s-tournament,
+#s-tourn-detail {
+  overflow-x: clip;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+#s-tournament .page-nav-spacer,
+#s-tourn-detail .page-nav-spacer {
+  width: 3.75rem;
+  min-height: 2.75rem;
+}
+
+#s-tournament .tourn-section,
+#s-tourn-detail .tourn-card,
+#s-tourn-detail > #tourn-active > div:last-child {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+#s-tournament #tourn-list-wrap {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem 0 calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+.tourn-section {
+  display: grid;
+  gap: .75rem;
+}
+
+.tourn-section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-inline: .15rem;
+}
+
+.tourn-section-head h2 {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.55rem, 4vw, 2.2rem);
+  letter-spacing: .055em;
+}
+
+.tourn-new-inline {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: .7rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--ca) 55%, var(--border));
+  border-radius: var(--r1);
+  color: #fff;
+  background: linear-gradient(135deg, var(--ca), var(--ca2));
+  box-shadow: 0 .45rem 1.2rem color-mix(in srgb, var(--ca) 20%, transparent);
+  font: 800 .78rem 'Inter', sans-serif;
+  cursor: pointer;
+}
+
+.tourn-section-kicker {
+  margin: 0 0 .1rem;
+  color: var(--gold);
+  font-size: .64rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.tourn-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: .75rem;
+}
+
+.tourn-list-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-color: rgba(244, 183, 64, .28);
+  background: linear-gradient(145deg, rgba(22, 20, 16, .96), rgba(8, 11, 18, .96));
+}
+
+.tourn-list-card-main {
+  display: grid;
+  min-width: 0;
+  gap: .55rem;
+}
+
+.tourn-list-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.tourn-list-card h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.55rem;
+  letter-spacing: .045em;
+  line-height: 1;
+}
+
+.tourn-list-card p,
+.tourn-progress {
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.55;
+}
+
+.tourn-progress {
+  display: grid;
+  gap: .15rem;
+}
+
+.tourn-progress strong { color: var(--text); }
+
+.tourn-status {
+  flex: 0 0 auto;
+  max-width: 9.5rem;
+  padding: .28rem .55rem;
+  border: 1px solid rgba(244, 183, 64, .34);
+  border-radius: 999px;
+  color: var(--gold);
+  background: rgba(244, 183, 64, .08);
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tourn-status[data-status='in_progress'] {
+  border-color: color-mix(in srgb, var(--ca) 48%, var(--border));
+  color: var(--ca);
+}
+
+.tourn-status[data-status='tiebreak_required'] {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+  color: var(--danger);
+}
+
+.tourn-list-card .btn-score-match {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+.tourn-list-empty {
+  grid-column: 1 / -1;
+  padding: 1.2rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r2);
+  color: var(--muted);
+  background: rgba(255, 255, 255, .025);
+  font-size: .82rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+#s-tourn-detail .tourn-card {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+#s-tourn-detail .tc-overview {
+  display: grid;
+  gap: .85rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(145deg, rgba(244, 183, 64, .055), transparent);
+}
+
+.tc-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .55rem;
+}
+
+.tc-stat-grid > div {
+  display: grid;
+  min-width: 0;
+  gap: .2rem;
+  padding: .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: rgba(5, 7, 13, .48);
+}
+
+.tc-stat-grid span,
+.tc-champion span,
+.tc-tiebreak span {
+  color: var(--muted);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tc-stat-grid strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: .82rem;
+  line-height: 1.35;
+}
+
+.tc-team-roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.tc-team-roster span {
+  padding: .32rem .6rem;
+  border: 1px solid rgba(244, 183, 64, .25);
+  border-radius: 999px;
+  color: var(--text-dim);
+  background: rgba(244, 183, 64, .055);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.tc-champion,
+.tc-tiebreak {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem 1rem;
+  border: 1px solid rgba(244, 183, 64, .38);
+  border-radius: var(--r1);
+  background: linear-gradient(100deg, rgba(244, 183, 64, .14), rgba(244, 183, 64, .035));
+}
+
+.tc-champion strong {
+  color: var(--gold);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.45rem;
+  letter-spacing: .06em;
+}
+
+.tc-tiebreak {
+  align-items: flex-start;
+  flex-direction: column;
+  border-color: color-mix(in srgb, var(--danger) 38%, var(--border));
+}
+
+.tc-tiebreak strong { color: var(--danger); }
+.tc-tiebreak span { line-height: 1.55; text-transform: none; }
+
+.standings-scroll,
+.tournament-bracket-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x pan-y;
+  scrollbar-color: rgba(244, 183, 64, .52) rgba(255, 255, 255, .04);
+}
+
+.standings-scroll table.standings {
+  min-width: 42rem;
+}
+
+table.standings th[scope='row'] {
+  padding: .65rem .4rem;
+  color: var(--text);
+  font-size: .82rem;
+  text-align: left;
+}
+
+.tournament-bracket {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 18rem);
+  grid-auto-flow: column;
+  align-items: stretch;
+  width: max-content;
+  min-width: 100%;
+  gap: 1.25rem;
+  padding: .25rem .25rem .9rem;
+}
+
+.bracket-round {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: .7rem;
+  padding-right: .55rem;
+}
+
+.bracket-round:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2.15rem;
+  right: -.65rem;
+  bottom: .35rem;
+  width: 1px;
+  transform: scaleY(1);
+  transform-origin: top;
+  background: linear-gradient(transparent, rgba(244, 183, 64, .48), transparent);
+}
+
+.bracket-round h3 {
+  position: sticky;
+  left: 0;
+  margin: 0 0 .15rem;
+  color: var(--gold);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.bracket-fixture {
+  display: grid;
+  gap: .4rem;
+  min-height: 7.5rem;
+}
+
+.bracket-team {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .55rem;
+  align-items: center;
+  min-width: 0;
+  padding: .52rem .6rem;
+  border-radius: .55rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, .035);
+}
+
+.bracket-team span { overflow-wrap: anywhere; }
+.bracket-team strong { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; }
+.bracket-team.winner { color: var(--gold); background: rgba(244, 183, 64, .1); }
+.bracket-fixture p,
+.fx-bye-note { color: var(--muted); font-size: .7rem; line-height: 1.45; }
+
+#s-tourn-detail .tc-body > .fixture-card {
+  min-width: 0;
+}
+
+#s-tourn-detail .btn-score-match:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+
+@media (max-width: 43.75rem) {
+  #s-tournament .tourn-section,
+  #s-tourn-detail .tourn-card,
+  #s-tourn-detail > #tourn-active > div:last-child {
+    width: calc(100% - 1rem);
+  }
+
+  #s-tournament #tourn-list-wrap { padding-top: .6rem; }
+  .tc-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tourn-list-card-head { flex-direction: column; }
+  .tourn-section-head { align-items: stretch; flex-direction: column; }
+  .tourn-new-inline { width: 100%; }
+  .tourn-status { max-width: 100%; }
+  .tc-champion { align-items: flex-start; flex-direction: column; }
+  .tournament-bracket { grid-auto-columns: minmax(13.75rem, 78vw); }
+}
+
+@media (max-width: 22.5rem) {
+  .tc-stat-grid { grid-template-columns: 1fr; }
+  #s-tourn-detail .tc-body { padding-inline: .65rem; }
+  .team-input-row { align-items: stretch; }
+  .btn-remove-team { min-width: 2.75rem; min-height: 2.75rem; }
+}
+
+@media (max-height: 31rem) and (orientation: landscape) {
+  #s-tourn-detail .tourn-card { margin-top: .55rem; }
+  #s-tourn-detail .tc-header { padding-block: .8rem; }
+  #s-tourn-detail .tc-overview { padding: .7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bracket-round:not(:last-child)::after { transform: none; }
+}
+
+html[data-reduced-motion='true'] .bracket-round:not(:last-child)::after { transform: none; }
+
+@media (forced-colors: active) {
+  .tourn-list-card,
+  .tc-stat-grid > div,
+  .tc-champion,
+  .tc-tiebreak,
+  .bracket-fixture { border: 1px solid CanvasText; }
+  .bracket-round:not(:last-child)::after { background: CanvasText; }
+}
