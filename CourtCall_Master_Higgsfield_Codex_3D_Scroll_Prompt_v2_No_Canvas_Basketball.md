@@ -194,10 +194,9 @@ Preserve the architecture specified in `COURTCALL_SPEC.md`.
 
 ## Main application
 
-- Main file: `basketball.html`
-- One HTML file containing all application markup, CSS and JavaScript
-- CSS inline
-- JavaScript inline
+- Canonical production file: `index.html`
+- `basketball.html` is a redirect-only compatibility shim; do not duplicate the application into it
+- Preserve the current static root shell plus local additive CSS/JavaScript files
 - Plain ES2020 JavaScript
 - No React
 - No Vue
@@ -2017,7 +2016,7 @@ Confirm:
 
 Deliver:
 
-1. Updated `basketball.html`
+1. Updated canonical `index.html`
 2. Updated `basketball-sw.js`
 3. Updated `basketball.manifest.json`
 4. `icons/icon.svg`
@@ -2027,6 +2026,8 @@ Deliver:
 8. Feature-compliance matrix
 9. Supabase mapping matrix
 10. localStorage compatibility confirmation
+
+Legacy links to `basketball.html` must continue to redirect to the canonical root without creating a second application version.
 11. Testing report
 12. Accessibility report
 13. Performance notes

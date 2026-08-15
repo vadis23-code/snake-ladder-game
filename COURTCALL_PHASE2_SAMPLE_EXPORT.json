@@ -1,0 +1,203 @@
+{
+  "metadata": {
+    "appName": "CourtCall",
+    "appVersion": "v0.12 Beta",
+    "exportedAt": "2026-08-04T17:27:34.780Z",
+    "schemaVersion": 3,
+    "credentialsExcluded": true
+  },
+  "profile": {
+    "id": "guest",
+    "name": "Guest",
+    "nickname": "Guest",
+    "localOnly": true,
+    "createdAt": "",
+    "gamesPlayed": 0
+  },
+  "profiles": [],
+  "players": [],
+  "builder": {},
+  "matches": [
+    {
+      "id": "m_1785864431667",
+      "outcome": "team_b_win",
+      "teamA": {
+        "name": "Baseline Orange",
+        "score": 1,
+        "players": []
+      },
+      "teamB": {
+        "name": "Baseline Blue",
+        "score": 2,
+        "players": []
+      },
+      "gameType": "3v3",
+      "winScore": 11,
+      "winBy2": false,
+      "scoringRule": "1s2s",
+      "date": "2026-08-04T17:27:11.667Z",
+      "duration": "0m 47s",
+      "history": [
+        {
+          "type": "score",
+          "team": "b",
+          "pts": 2,
+          "quarter": 1
+        },
+        {
+          "type": "score",
+          "team": "a",
+          "pts": 1,
+          "quarter": 1
+        }
+      ],
+      "foulsA": 0,
+      "foulsB": 0,
+      "maxLead": {
+        "a": 1,
+        "b": 1
+      },
+      "leadChanges": 1,
+      "biggestRun": 2,
+      "tournamentId": null,
+      "fixtureId": null,
+      "ownerId": "guest",
+      "winner": {
+        "name": "Baseline Blue",
+        "score": 2,
+        "players": []
+      },
+      "loser": {
+        "name": "Baseline Orange",
+        "score": 1,
+        "players": []
+      },
+      "winnerTeam": "b",
+      "timeline": [
+        {
+          "type": "score",
+          "team": "b",
+          "pts": 2,
+          "quarter": 1
+        },
+        {
+          "type": "score",
+          "team": "a",
+          "pts": 1,
+          "quarter": 1
+        }
+      ],
+      "biggestLead": {
+        "team": null,
+        "points": 1
+      },
+      "isCompetitiveResult": true,
+      "countsAsWinLoss": true,
+      "playersA": [],
+      "playersB": []
+    }
+  ],
+  "legacyGames": [
+    {
+      "winner": "Baseline Blue",
+      "loser": "Baseline Orange",
+      "nameA": "Baseline Orange",
+      "nameB": "Baseline Blue",
+      "scoreW": 2,
+      "scoreL": 1,
+      "gameType": "3v3",
+      "winScore": 11,
+      "date": "2026-08-04T17:27:11.667Z",
+      "id": "m_1785864431667"
+    }
+  ],
+  "tournaments": [],
+  "settings": {},
+  "activeGame": {
+    "gameType": "3v3",
+    "winScore": 11,
+    "ptsSmall": 1,
+    "ptsLarge": 2,
+    "allowFreeThrow": true,
+    "shotClockDuration": 0,
+    "shotClockAutoReset": true,
+    "gameClockMode": "off",
+    "periodsEnabled": false,
+    "winBy2": false,
+    "withPlayers": false,
+    "timeoutsPerTeam": 0,
+    "timeoutsUsedA": 0,
+    "timeoutsUsedB": 0,
+    "teamA": {
+      "name": "Baseline Orange",
+      "score": 1,
+      "fouls": 0,
+      "colorKey": "orange",
+      "players": []
+    },
+    "teamB": {
+      "name": "Baseline Blue",
+      "score": 2,
+      "fouls": 0,
+      "colorKey": "blue",
+      "players": []
+    },
+    "quarter": 1,
+    "possession": "a",
+    "history": [
+      {
+        "type": "score",
+        "team": "b",
+        "pts": 2,
+        "quarter": 1
+      },
+      {
+        "type": "score",
+        "team": "a",
+        "pts": 1,
+        "quarter": 1
+      }
+    ],
+    "maxLead": {
+      "a": 1,
+      "b": 1
+    },
+    "voiceActive": false,
+    "gameOver": true,
+    "startTime": 1785864384609,
+    "_gc": {
+      "type": "pickup",
+      "tournamentId": null,
+      "fixtureId": null
+    },
+    "_gce": 0
+  },
+  "analytics": {
+    "appLaunchDate": "2026-08-04T17:24:49.693Z",
+    "lastVisitAt": "2026-08-04T17:27:25.658Z",
+    "totalVisits": 5,
+    "guestSessions": 1,
+    "gamesStarted": 1,
+    "gamesCompleted": 1,
+    "matchesSaved": 1
+  },
+  "pulseLocation": {
+    "country": "India",
+    "state": "",
+    "city": "",
+    "area": "",
+    "court": ""
+  },
+  "onboardingSeen": false,
+  "communities": [],
+  "communityMembers": [],
+  "communityJoinRequests": [],
+  "communityPlayers": [],
+  "communityPosts": [],
+  "communityGallery": [],
+  "communityEvents": [],
+  "communityRatings": [],
+  "communityDraft": null,
+  "helpChatHistory": [],
+  "helpFeedback": []
+}

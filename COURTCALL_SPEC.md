@@ -111,12 +111,12 @@ All additions must gracefully degrade — if the feature can't compute (no data,
 
 ## 1. Overview & Tech Stack
 
-**What it is:** CourtCall ("CourtCall") is a pickup-basketball scoring and community app. It runs as a single HTML file (basketball.html) deployed to static hosting (GitHub Pages). No build step, no framework, no bundler.
+**What it is:** CourtCall ("CourtCall") is a pickup-basketball scoring and community app. Its canonical production shell is `index.html`, deployed from the repository root to static hosting. The app uses local CSS/JavaScript support files but still has no build step, framework, or bundler. `basketball.html` is a redirect-only compatibility shim and must never contain a second application copy.
 
 **Tagline:** "Basketball pickup game scorer — score, build teams, run tournaments."
 
 ### Tech stack
-- Single-file HTML with inline CSS and inline JavaScript — no external JS files except the service worker
+- Canonical `index.html` application shell with inline legacy code plus local additive CSS/JavaScript modules
 - **Supabase** for cloud auth and data sync (CDN-loaded client SDK via script tag)
 - **Web Speech API** for voice scoring
 - **Canvas 2D API** for the 3D basketball renderer
@@ -129,7 +129,8 @@ All additions must gracefully degrade — if the feature can't compute (no data,
 
 ### Hosting
 - Static file hosting (GitHub Pages)
-- URL: `./basketball.html` with hash routing (`#/screenname`)
+- Canonical URL: `./` (`index.html`) with hash routing (`#/screenname`)
+- Legacy compatibility URL: `./basketball.html` redirects to `./` while preserving query and hash state
 - Manifest: `basketball.manifest.json`
 - Service worker: `basketball-sw.js`
 
@@ -1751,14 +1752,11 @@ await supa.from('community_join_requests').upsert({
 ## 11. PWA & Offline
 
 ### Service Worker (`basketball-sw.js`)
-- Cache name: `courtcall-v8`
-- Shell files cached on install: `['./basketball.html', './basketball.manifest.json', './icons/icon.svg']`
-- **Install:** `caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())`
-- **Activate:** delete all caches where key ≠ CACHE; `self.clients.claim()`
-- **Fetch:** GET only; two strategies:
-  - Same-origin: stale-while-revalidate — return cached immediately, fetch+update in background; fall back to cache if fetch fails
-  - `fonts.googleapis.com` and `fonts.gstatic.com`: cache-first — return cached if exists, otherwise fetch+cache; 503 response on network failure
-  - All other origins: pass through (no interception)
+- Cache prefix: `courtcall-`; the current version is defined by `CACHE_VERSION` in `basketball-sw.js`.
+- The canonical shell caches `./` (the root `index.html` response), local application styles/scripts, the manifest, and required local imagery.
+- **Install:** pre-cache every declared shell asset and reject unexpected HTML responses for non-navigation assets.
+- **Activate:** remove older CourtCall shell/runtime caches and claim clients.
+- **Fetch:** network-first navigation with cached `./` fallback; stale-while-revalidate for useful same-origin runtime assets.
 
 ### Registration
 ```javascript
@@ -1773,15 +1771,15 @@ if ('serviceWorker' in navigator) {
 - name: "CourtCall"
 - short_name: "CourtCall"
 - description: "Basketball pickup game scorer — score, build teams, run tournaments"
-- start_url: "./basketball.html"
-- scope: "./"
+- id: "/"
+- start_url: "/"
+- scope: "/"
 - display: "standalone"
 - background_color: "#0F0F23"
 - theme_color: "#FF5722"
-- orientation: "portrait"
 - categories: ["sports", "utilities"]
-- icons: `icons/icon.svg` (any size, SVG, purpose: "any" and "maskable")
-- shortcuts: `[{ name: "Quick Game", short_name: "Play", url: "./basketball.html#setup" }]`
+- icons: PNG `192`, `512`, and maskable `512` variants under `icons/`
+- shortcuts: `[{ name: "Quick Game", short_name: "Play", url: "/#/setup" }]`
 
 ### PWA install prompt
 - `_deferredInstall` captures `beforeinstallprompt` event

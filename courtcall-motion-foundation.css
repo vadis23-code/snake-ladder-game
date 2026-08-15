@@ -1,0 +1,532 @@
+/*
+ * CourtCall Visual Motion Foundation
+ *
+ * Presentation-only motion for the canonical root application. The live-game
+ * state machine, persistence, cloud mappings and permissions remain owned by
+ * the existing application code.
+ */
+
+:root {
+  --cc-motion-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --cc-motion-standard: cubic-bezier(.4, 0, .2, 1);
+  --cc-motion-entrance: cubic-bezier(.16, 1, .3, 1);
+  --cc-motion-press: 100ms;
+  --cc-motion-micro: 180ms;
+  --cc-motion-nav: 240ms;
+  --cc-motion-card: 320ms;
+  --cc-motion-celebration: 900ms;
+}
+
+/* Live score: input stays immediate; every decorative layer ignores input. */
+#s-game .score-fx,
+#s-game .score-fx::before,
+#s-game .score-fx i {
+  pointer-events: none;
+}
+
+#s-game .score-fx::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 2px solid color-mix(in srgb, var(--tc) 74%, white 8%);
+  border-radius: 50%;
+  opacity: 0;
+  content: '';
+  transform: translate(-50%, -50%) scale(.36);
+}
+
+#s-game .team-panel.score-call .score-fx::before {
+  animation: ccMotionScoreRipple 360ms var(--cc-motion-entrance) both;
+}
+
+#s-game .team-panel.score-call .t-score {
+  animation: ccMotionScoreSpring 220ms var(--cc-motion-spring) both;
+}
+
+#s-game .score-fx i {
+  animation: ccMotionScoreParticle 420ms var(--cc-motion-entrance) var(--fx-delay) both;
+}
+
+@keyframes ccMotionScoreSpring {
+  0% { text-shadow: 0 0 0 transparent; transform: scale(1); }
+  48% { text-shadow: 0 0 2rem color-mix(in srgb, var(--tc) 82%, transparent); transform: scale(1.17); }
+  74% { transform: scale(.97); }
+  100% { text-shadow: 0 0 .55rem color-mix(in srgb, var(--tc) 18%, transparent); transform: scale(1); }
+}
+
+@keyframes ccMotionScoreRipple {
+  0% { opacity: .72; transform: translate(-50%, -50%) scale(.36); }
+  72% { opacity: .2; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+}
+
+@keyframes ccMotionScoreParticle {
+  0% { opacity: .95; transform: translate(0, 0) scale(.9); }
+  60% { opacity: .7; }
+  100% { opacity: 0; transform: translate(var(--fx-x), -3rem) scale(.18); }
+}
+
+/* Lead aura uses the existing numeric --lead-strength and text status. */
+#s-game .team-panel::before {
+  transition: opacity 220ms var(--cc-motion-standard);
+}
+
+#s-game .team-panel .t-score,
+#s-game .team-leader-label {
+  transition: color var(--cc-motion-micro) var(--cc-motion-standard),
+    text-shadow 220ms var(--cc-motion-standard),
+    opacity var(--cc-motion-micro) var(--cc-motion-standard);
+}
+
+#s-game .team-panel.leading .team-leader-label::before {
+  margin-right: .28rem;
+  content: '\25B2';
+  font-size: .54rem;
+}
+
+/* Fouls remain legible without colour through count text and the live status. */
+#s-game .team-panel.foul-call {
+  animation: ccMotionFoulPulse 320ms var(--cc-motion-standard) both;
+}
+
+#s-game .foul-badge.foul-shake {
+  animation: ccMotionFoulShake 240ms var(--cc-motion-standard) both;
+}
+
+@keyframes ccMotionFoulPulse {
+  0%, 100% { box-shadow: inset 0 0 0 0 transparent; }
+  45% { box-shadow: inset 0 0 0 .32rem color-mix(in srgb, var(--cc-color-danger) 48%, transparent); }
+}
+
+@keyframes ccMotionFoulShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-.22rem); }
+  55% { transform: translateX(.18rem); }
+  78% { transform: translateX(-.08rem); }
+}
+
+/* Possession and period changes are short and do not move surrounding layout. */
+#s-game .poss-btn.cc-motion-possession-swap {
+  animation: ccMotionPossession 180ms var(--cc-motion-spring) both;
+}
+
+#s-game .poss-btn.cc-motion-possession-swap[data-side='a'] {
+  --cc-possession-shift: -.42rem;
+}
+
+#s-game .poss-btn.cc-motion-possession-swap[data-side='b'] {
+  --cc-possession-shift: .42rem;
+}
+
+#s-game .poss-label.cc-motion-possession-label {
+  animation: ccMotionPossessionLabel 180ms var(--cc-motion-standard) both;
+}
+
+#s-game .q-chip.cc-motion-period-change #q-label {
+  animation: ccMotionPeriod 220ms var(--cc-motion-standard) both;
+}
+
+@keyframes ccMotionPossession {
+  0% { opacity: .55; transform: translateX(calc(var(--cc-possession-shift) * -1)); }
+  66% { opacity: 1; transform: translateX(var(--cc-possession-shift)); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes ccMotionPossessionLabel {
+  from { opacity: .35; transform: translateY(-.25rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ccMotionPeriod {
+  0% { opacity: .25; transform: translateY(-.25rem) scale(.92); }
+  55% { opacity: 1; transform: translateY(.05rem) scale(1.04); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Only newly inserted feed rows receive this class from the motion controller. */
+#s-game .feed-entry {
+  animation: none;
+}
+
+#s-game .feed-entry.cc-motion-feed-in {
+  animation: ccMotionFeedIn 180ms var(--cc-motion-entrance) var(--cc-feed-delay, 0ms) both;
+}
+
+#s-game .feed-entry.cc-motion-team-a { --cc-feed-flash: var(--ca); }
+#s-game .feed-entry.cc-motion-team-b { --cc-feed-flash: var(--cb); }
+#s-game .feed-entry--urgent.cc-motion-feed-in { --cc-feed-flash: var(--cc-color-danger); }
+
+@keyframes ccMotionFeedIn {
+  0% {
+    opacity: .18;
+    box-shadow: inset .24rem 0 0 var(--cc-feed-flash, var(--cc-color-border-strong));
+    transform: translateY(-.625rem);
+  }
+  58% {
+    opacity: 1;
+    box-shadow: inset .24rem 0 0 color-mix(in srgb, var(--cc-feed-flash, white) 50%, transparent);
+  }
+  100% { box-shadow: inset 0 0 0 transparent; transform: translateY(0); }
+}
+
+/* Press response: compression and shadow crush happen after the native action. */
+:is(
+  #s-game .btn-score,
+  #s-game .ctrl,
+  #s-game .poss-btn,
+  #s-game .q-chip,
+  .cc-button,
+  .btn-start,
+  .btn-pg-share,
+  .btn-pg-2,
+  .bn-btn,
+  .react-btn
+) {
+  transition: transform var(--cc-motion-press) var(--cc-motion-spring),
+    box-shadow var(--cc-motion-press) var(--cc-motion-standard),
+    border-color var(--cc-motion-micro) var(--cc-motion-standard),
+    background-color var(--cc-motion-micro) var(--cc-motion-standard);
+  touch-action: manipulation;
+}
+
+:is(
+  #s-game .btn-score,
+  #s-game .ctrl,
+  #s-game .poss-btn,
+  #s-game .q-chip,
+  .cc-button,
+  .btn-start,
+  .btn-pg-share,
+  .btn-pg-2,
+  .bn-btn,
+  .react-btn
+):active:not(:disabled) {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(.16rem) scale(.965);
+}
+
+/* A run is the supported team-level hot-hand signal; no run means no badge. */
+#s-game .run-banner.active {
+  animation: ccMotionRunEnter 280ms var(--cc-motion-entrance) both;
+}
+
+#s-game .run-banner[data-motion-label]::before {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.35rem;
+  margin-right: .65rem;
+  padding: .12rem .45rem;
+  border: 1px solid color-mix(in srgb, #fbbf24 68%, transparent);
+  border-radius: 999px;
+  color: #fde68a;
+  background: color-mix(in srgb, #f59e0b 16%, transparent);
+  box-shadow: 0 0 1rem color-mix(in srgb, #f59e0b 28%, transparent);
+  content: attr(data-motion-label);
+  font: 850 .56rem/1 var(--cc-font-ui);
+  letter-spacing: .1em;
+  vertical-align: middle;
+}
+
+@keyframes ccMotionRunEnter {
+  from { opacity: 0; transform: translateY(-.55rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cc-comeback-alert {
+  position: absolute;
+  z-index: 8;
+  top: max(3rem, env(safe-area-inset-top));
+  left: 50%;
+  width: min(calc(100% - 2rem), 26rem);
+  padding: .65rem .85rem;
+  border: 1px solid color-mix(in srgb, var(--cc-comeback-color, var(--cc-color-warning)) 52%, var(--cc-color-border));
+  border-radius: var(--cc-radius-pill);
+  color: var(--cc-color-text);
+  background: color-mix(in srgb, var(--cc-color-canvas) 88%, transparent);
+  box-shadow: 0 .8rem 2.2rem rgba(0, 0, 0, .34), 0 0 1.5rem color-mix(in srgb, var(--cc-comeback-color, var(--cc-color-warning)) 20%, transparent);
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-align: center;
+  text-transform: uppercase;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.cc-comeback-alert.cc-motion-comeback-in {
+  animation: ccMotionComeback 1200ms var(--cc-motion-entrance) both;
+}
+
+@keyframes ccMotionComeback {
+  0% { opacity: 0; transform: translate(-50%, -.7rem) scale(.96); }
+  14%, 78% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -.2rem) scale(.99); }
+}
+
+/* Victory: dim, winner entrance, score settle, restrained short confetti. */
+#pg-overlay:not(.hidden) {
+  animation: ccMotionVictoryDim 280ms var(--cc-motion-standard) both;
+}
+
+#pg-overlay:not(.hidden) .pg-card {
+  animation: ccMotionVictoryCard var(--cc-motion-celebration) var(--cc-motion-entrance) both;
+}
+
+#pg-overlay:not(.hidden) .pg-winner {
+  animation: ccMotionWinnerName 720ms var(--cc-motion-entrance) 60ms both;
+}
+
+#pg-overlay:not(.hidden) .pg-score {
+  animation: ccMotionFinalScore 820ms var(--cc-motion-spring) 80ms both;
+}
+
+.pg-primary-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: .55rem;
+  margin: .9rem 0 1rem;
+}
+
+.pg-primary-actions :is(.btn-pg-share, .btn-pg-2) {
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: .7rem .55rem;
+  font-size: clamp(.78rem, 3.4vw, 1rem);
+}
+
+#pg-overlay .cp {
+  will-change: transform, opacity;
+}
+
+@keyframes ccMotionVictoryDim {
+  from { background-color: rgba(2, 4, 9, .35); }
+  to { background-color: rgba(2, 4, 9, .94); }
+}
+
+@keyframes ccMotionVictoryCard {
+  0% { opacity: 0; transform: translateY(1.35rem) scale(.96); }
+  42% { opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes ccMotionWinnerName {
+  from { opacity: 0; transform: translateY(.85rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ccMotionFinalScore {
+  0% { opacity: .28; transform: scale(1.65); }
+  58% { opacity: 1; transform: scale(.96); }
+  100% { transform: scale(1); }
+}
+
+/* Hash navigation remains authoritative; motion only decorates active state. */
+.screen.cc-motion-route-in {
+  animation: ccMotionRouteIn var(--cc-motion-nav) var(--cc-motion-entrance) both;
+}
+
+.btm-nav .bn-btn {
+  position: relative;
+}
+
+.btm-nav .bn-btn::after {
+  position: absolute;
+  right: 22%;
+  bottom: calc(.2rem + env(safe-area-inset-bottom, 0px));
+  left: 22%;
+  height: .16rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 .8rem currentColor;
+  content: '';
+  opacity: 0;
+  transform: scaleX(.18);
+  transition: opacity var(--cc-motion-micro) var(--cc-motion-standard),
+    transform var(--cc-motion-nav) var(--cc-motion-spring);
+}
+
+.btm-nav .bn-btn.active::after {
+  opacity: .9;
+  transform: scaleX(1);
+}
+
+@keyframes ccMotionRouteIn {
+  from { opacity: .35; transform: translateY(.45rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* In a short landscape viewport, keep the live action bar above the fold. */
+@media (orientation: landscape) and (min-width: 37.5rem) and (max-height: 31.25rem) {
+  #s-game .last-action { display: none !important; }
+  #s-game .run-banner.active {
+    max-height: 2.25rem;
+    padding-block: .32rem;
+    font-size: .9rem;
+  }
+}
+
+/* Premium cards lift on real hover/focus hardware; touch cards stay stable. */
+@media (hover: hover) and (pointer: fine) {
+  :is(.premium-player-card, .player-card, .gen-team-card, .fixture-card) {
+    transform: translateZ(0);
+    transition: transform var(--cc-motion-card) var(--cc-motion-entrance),
+      border-color var(--cc-motion-micro) var(--cc-motion-standard),
+      box-shadow var(--cc-motion-card) var(--cc-motion-standard);
+  }
+
+  :is(.premium-player-card, .player-card, .gen-team-card, .fixture-card):is(:hover, :focus-within) {
+    border-color: color-mix(in srgb, var(--cc-color-action-bright) 36%, var(--cc-color-border));
+    box-shadow: 0 1.15rem 2.4rem rgba(0, 0, 0, .28), 0 0 1.2rem color-mix(in srgb, var(--cc-color-action-bright) 9%, transparent);
+    transform: translateY(-.25rem) scale(1.008);
+  }
+}
+
+/* Existing vertical knockout fixtures get an honest, progressive winner cue. */
+#tourn-tab-body .fixture-card {
+  position: relative;
+  overflow: hidden;
+}
+
+#tourn-tab-body .fixture-card.cc-bracket-winner::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: .2rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold), var(--cc-color-action-bright));
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--gold) 48%, transparent);
+  content: '';
+  transform: scaleY(1);
+  transform-origin: top;
+}
+
+#tourn-tab-body .fixture-card.cc-motion-bracket-advance {
+  animation: ccMotionBracketAdvance 360ms var(--cc-motion-entrance) var(--cc-bracket-delay, 0ms) both;
+}
+
+#tourn-tab-body .fixture-card.cc-motion-bracket-advance::before {
+  animation: ccMotionBracketLine 360ms var(--cc-motion-entrance) var(--cc-bracket-delay, 0ms) both;
+}
+
+@keyframes ccMotionBracketAdvance {
+  from { opacity: .45; box-shadow: 0 0 0 transparent; transform: translateX(-.65rem); }
+  72% { box-shadow: 0 0 1.4rem color-mix(in srgb, var(--gold) 24%, transparent); }
+  to { opacity: 1; box-shadow: 0 0 0 transparent; transform: translateX(0); }
+}
+
+@keyframes ccMotionBracketLine {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+/* Reaction counts remain owned by reactPost; this is only the transient float. */
+.cc-reaction-float {
+  position: fixed;
+  z-index: 260;
+  left: var(--cc-reaction-x);
+  top: var(--cc-reaction-y);
+  color: var(--cc-color-text);
+  filter: drop-shadow(0 .35rem .5rem rgba(0, 0, 0, .45));
+  font-size: 1.35rem;
+  line-height: 1;
+  pointer-events: none;
+  animation: ccMotionReactionFloat 720ms var(--cc-motion-entrance) both;
+}
+
+@keyframes ccMotionReactionFloat {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(.72); }
+  22% { opacity: 1; transform: translate(-50%, -.4rem) scale(1.06); }
+  100% { opacity: 0; transform: translate(-50%, -2.8rem) scale(.92); }
+}
+
+/* Focus stays explicit even where motion and glow share the same component. */
+:is(.btn-score, .ctrl, .poss-btn, .q-chip, .bn-btn, .react-btn, .premium-player-card) :focus-visible,
+:is(.btn-score, .ctrl, .poss-btn, .q-chip, .bn-btn, .react-btn, .premium-player-card):focus-visible {
+  outline: 3px solid var(--cc-color-focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .score-fx,
+    .score-fx i,
+    .team-panel.score-call .t-score,
+    .team-panel.foul-call,
+    .foul-badge.foul-shake,
+    .cc-motion-possession-swap,
+    .cc-motion-possession-label,
+    .cc-motion-period-change #q-label,
+    .cc-motion-feed-in,
+    .run-banner.active,
+    .cc-comeback-alert,
+    #pg-overlay,
+    #pg-overlay .pg-card,
+    #pg-overlay .pg-winner,
+    #pg-overlay .pg-score,
+    .screen.cc-motion-route-in,
+    .fixture-card.cc-motion-bracket-advance,
+    .cc-reaction-float
+  ) {
+    animation: none !important;
+    transition-duration: .001ms !important;
+  }
+
+  .score-fx::before,
+  .fixture-card.cc-motion-bracket-advance::before { animation: none !important; }
+
+  .score-fx,
+  .cc-comeback-alert,
+  .cc-reaction-float,
+  #pg-overlay .cp { display: none !important; }
+
+  :is(.premium-player-card, .player-card, .gen-team-card, .fixture-card):is(:hover, :focus-within) {
+    transform: none !important;
+  }
+}
+
+html[data-reduced-motion='true'] :is(
+  .score-fx,
+  .score-fx i,
+  .team-panel.score-call .t-score,
+  .team-panel.foul-call,
+  .foul-badge.foul-shake,
+  .cc-motion-possession-swap,
+  .cc-motion-possession-label,
+  .cc-motion-period-change #q-label,
+  .cc-motion-feed-in,
+  .run-banner.active,
+  .cc-comeback-alert,
+  #pg-overlay,
+  #pg-overlay .pg-card,
+  #pg-overlay .pg-winner,
+  #pg-overlay .pg-score,
+  .screen.cc-motion-route-in,
+  .fixture-card.cc-motion-bracket-advance,
+  .cc-reaction-float
+) {
+  animation: none !important;
+  transition-duration: .001ms !important;
+}
+
+html[data-reduced-motion='true'] .score-fx::before,
+html[data-reduced-motion='true'] .fixture-card.cc-motion-bracket-advance::before { animation: none !important; }
+
+html[data-reduced-motion='true'] :is(.score-fx, .cc-comeback-alert, .cc-reaction-float, #pg-overlay .cp) {
+  display: none !important;
+}
+
+html[data-reduced-motion='true'] :is(.premium-player-card, .player-card, .gen-team-card, .fixture-card):is(:hover, :focus-within) {
+  transform: none !important;
+}
+
+@media (forced-colors: active) {
+  .team-panel.leading .team-leader-label,
+  .run-banner[data-motion-label]::before,
+  .cc-comeback-alert,
+  .fixture-card.cc-bracket-winner { outline: 2px solid CanvasText; }
+
+  .btm-nav .bn-btn.active::after { background: Highlight; }
+}
