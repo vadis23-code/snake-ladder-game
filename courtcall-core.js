@@ -1648,7 +1648,8 @@
     'privacy',
     'terms',
     'communities',
-    'world'
+    'world',
+    'help-center'
   ]);
 
   function routeNameSet(value, fallback) {

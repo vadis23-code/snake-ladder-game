@@ -18,7 +18,7 @@ test('motion foundation loads last and is available offline', () => {
 
   assert.ok(design < game && game < teamHistory && teamHistory < motionCss);
   assert.ok(motionJs > html.lastIndexOf('</script>', motionJs - 1));
-  assert.match(serviceWorker, /CACHE_VERSION = 'v48'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v51'/);
   assert.match(serviceWorker, /'\.\/courtcall-motion-foundation\.css'/);
   assert.match(serviceWorker, /'\.\/courtcall-motion-foundation\.js'/);
 });

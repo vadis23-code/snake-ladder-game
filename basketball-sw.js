@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'courtcall-';
-const CACHE_VERSION = 'v48';
+const CACHE_VERSION = 'v51';
 const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
 const NAVIGATION_TIMEOUT_MS = 4000;
@@ -13,11 +13,13 @@ const SHELL = [
   './courtcall-cinematic.css?v=20260814b',
   './courtcall-global-visual-system.css?v=20260814b',
   './courtcall-tournaments.css',
+  './courtcall-supporting-product.css?v=20260822',
   './basketball-supa.js',
   './courtcall-core.js',
   './courtcall-communities.js?v=20260821',
   './courtcall-notifications.js',
   './courtcall-cloud-state.js',
+  './courtcall-supporting-product.js?v=20260822',
   './courtcall-motion-foundation.js',
   './courtcall-cinematic.js?v=20260814b',
   './courtcall-global-visual-system.js?v=20260814b',

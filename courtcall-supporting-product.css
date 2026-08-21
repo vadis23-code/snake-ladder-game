@@ -1,0 +1,65 @@
+/* Phase 8 supporting-product surfaces: data-first, responsive, and route-safe. */
+.analytics-body{max-width:920px;gap:24px}
+.an-section{display:flex;flex-direction:column;gap:10px;min-width:0}
+.an-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.an-section-title{font:700 12px 'Inter',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--text)}
+.an-section-copy{font-size:11px;line-height:1.5;color:var(--muted);max-width:560px}
+.an-cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+.an-card{min-width:0;min-height:116px;justify-content:center}
+.an-card-full{min-height:auto}
+.an-card-val,.an-card-small-val{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;word-break:normal}
+.an-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--s1)}
+.an-table{width:100%;min-width:620px;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.an-table th,.an-table td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+.an-table th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--s2)}
+.an-table th:first-child,.an-table td:first-child{text-align:left;white-space:normal;min-width:140px}
+.an-table tbody tr:last-child td{border-bottom:0}
+.an-rank{display:inline-flex;align-items:center;justify-content:center;min-width:23px;margin-right:7px;color:var(--muted);font-weight:800}
+.an-empty{padding:22px;border:1px dashed var(--border-strong);border-radius:14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;background:var(--s1)}
+.an-note{opacity:1;text-wrap:balance}
+.an-actions{justify-content:flex-start;flex-wrap:wrap}
+.btn-an-export,.btn-an-reset{flex:0 1 220px;min-height:44px}
+
+.pulse-state{margin:0 16px 12px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--s1);color:var(--muted);font-size:12px;line-height:1.5}
+.pulse-state[data-offline="true"]{border-color:rgba(245,158,11,.4);color:var(--gold)}
+.pulse-feed-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 0;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pulse-feed-title span{font-size:10px;letter-spacing:.04em;text-transform:none;font-weight:600;color:var(--muted2)}
+.pulse-card.local-activity{border-left:3px solid var(--ca)}
+.pulse-card.local-activity .pulse-link-btn{align-self:flex-start;border:0;background:var(--s2);color:var(--text)}
+.pulse-card.local-activity .pc-demo{color:var(--success);border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+.pulse-search-note{font-size:11px;color:var(--muted);line-height:1.45}
+
+.world-directory-note{margin:0 16px 18px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--s1);font-size:12px;line-height:1.6;color:var(--muted)}
+.world-directory-note strong{display:block;color:var(--text);margin-bottom:3px}
+.world-offline-note{margin:0 16px 40px;color:var(--muted2);font-size:11px;line-height:1.55;text-align:center}
+.league-card{min-width:0}
+.league-link{min-height:40px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+
+.hc-body{max-width:760px;width:100%;margin:0 auto}
+.hc-results-status{min-height:18px;margin:-4px 0 10px;color:var(--muted);font-size:11px}
+.legal-body{max-width:760px;width:100%;margin:0 auto;padding:24px 22px 100px;line-height:1.75}
+.legal-body h2{font-size:17px;font-weight:800;margin:24px 0 7px;color:var(--text)}
+.legal-body a{text-decoration:underline;text-underline-offset:3px}
+
+@media(max-width:700px){
+  .an-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .an-section-head{align-items:flex-start;flex-direction:column;gap:3px}
+}
+@media(max-width:520px){
+  .league-grid{grid-template-columns:1fr}
+  .pulse-loc-grid{grid-template-columns:1fr}
+  .pulse-search-links,.pulse-state{margin-inline:12px}
+  .pulse-filter-bar{padding-inline:12px}
+  .world-directory-note,.world-offline-note{margin-inline:12px}
+  .legal-body{padding-inline:16px}
+}
+@media(max-width:340px){
+  .an-cards{grid-template-columns:1fr}
+  .an-card-full{grid-column:auto}
+  .an-actions{flex-direction:column}
+  .btn-an-export,.btn-an-reset{flex-basis:auto;width:100%}
+  .pulse-card{padding-inline:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .league-link,.pulse-card,.psl-link,.hc-card-arr{transition:none!important}
+}

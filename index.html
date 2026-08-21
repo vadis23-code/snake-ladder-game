@@ -1698,6 +1698,7 @@ body.modal-open{overflow:hidden}
 <link rel="stylesheet" href="./courtcall-cinematic.css?v=20260814b">
 <link rel="stylesheet" href="./courtcall-global-visual-system.css?v=20260814b">
 <link rel="stylesheet" href="./courtcall-tournaments.css">
+<link rel="stylesheet" href="./courtcall-supporting-product.css?v=20260822">
 </head>
 <body>
 <a class="skip-link" id="skip-link" href="#s-landing">Skip to content</a>
@@ -2626,56 +2627,58 @@ body.modal-open{overflow:hidden}
 <div id="s-world" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
-    <div class="page-title">Basketball World</div>
+    <h1 class="page-title">Basketball World</h1>
     <div style="width:60px"></div>
   </div>
   <div class="world-hero">
     <div class="world-emoji">🌍</div>
     <div class="world-title">Basketball World</div>
-    <div class="world-sub">Major leagues and basketball ecosystems</div>
+    <div class="world-sub">A curated directory of official basketball destinations</div>
   </div>
-  <div class="section-label">Major Leagues</div>
+  <div class="world-directory-note" role="note">
+    <strong>Official resources, not a live feed</strong>
+    CourtCall lists established basketball organisations here. Scores, schedules, news, and availability come from the linked third-party sites and require an internet connection.
+  </div>
+  <div class="section-label">Official destinations</div>
   <div class="league-grid">
     <div class="league-card">
       <div class="lc-logo">🏀</div>
       <div class="lc-name">NBA</div>
       <div class="lc-desc">National Basketball Association — the world's premier league</div>
-      <a class="league-link" href="https://www.nba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://www.nba.com" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
     <div class="league-card">
       <div class="lc-logo">⭐</div>
       <div class="lc-name">WNBA</div>
       <div class="lc-desc">Women's National Basketball Association</div>
-      <a class="league-link" href="https://www.wnba.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://www.wnba.com" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
     <div class="league-card">
       <div class="lc-logo">🌐</div>
       <div class="lc-name">FIBA</div>
       <div class="lc-desc">International Basketball Federation — global governing body</div>
-      <a class="league-link" href="https://www.fiba.basketball" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://www.fiba.basketball" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
     <div class="league-card">
       <div class="lc-logo">🏅</div>
       <div class="lc-name">EuroLeague</div>
       <div class="lc-desc">Europe's top club basketball competition</div>
-      <a class="league-link" href="https://www.euroleaguebasketball.net" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://www.euroleaguebasketball.net/euroleague" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
     <div class="league-card">
       <div class="lc-logo">🎓</div>
       <div class="lc-name">NCAA</div>
       <div class="lc-desc">College basketball — March Madness and more</div>
-      <a class="league-link" href="https://www.ncaa.com/sports/basketball-men/d1" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://www.ncaa.com/sports/basketball-men/d1" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
     <div class="league-card">
       <div class="lc-logo">3️⃣</div>
       <div class="lc-name">BIG3</div>
       <div class="lc-desc">Professional 3-on-3 basketball league</div>
-      <a class="league-link" href="https://big3.com" target="_blank" rel="noopener noreferrer">Visit Website ↗</a>
+      <a class="league-link" href="https://big3.com" target="_blank" rel="noopener noreferrer">Visit Official Site ↗</a>
     </div>
   </div>
-  <div class="section-label" style="margin-top:8px">Coming Soon</div>
-  <div class="world-placeholder"><div class="wp-text">📰 Today in Basketball — news feed coming soon</div></div>
-  <div class="world-placeholder" style="margin-bottom:40px"><div class="wp-text">📍 Local Pickup Runs near you — coming soon</div></div>
+  <p class="world-offline-note">The directory remains readable offline after CourtCall is installed; external destinations open only when a network connection is available.</p>
 </div>
 
 <!-- ══ COMMUNITIES ══ -->
@@ -2822,13 +2825,13 @@ body.modal-open{overflow:hidden}
 <div id="s-pulse" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
-    <div class="page-title">CourtCall Pulse</div>
+    <h1 class="page-title">CourtCall Pulse</h1>
     <div style="width:60px"></div>
   </div>
   <div class="pulse-hero">
     <div class="pulse-hero-icon">📡</div>
     <div class="pulse-hero-title">CourtCall Pulse</div>
-    <div class="pulse-hero-sub">Trusted basketball search shortcuts tailored to your location.</div>
+    <div class="pulse-hero-sub">Your saved CourtCall activity plus clearly labeled external search shortcuts.</div>
   </div>
   <!-- Location form -->
   <div class="pulse-loc-card">
@@ -2842,27 +2845,29 @@ body.modal-open{overflow:hidden}
     <div class="pulse-loc-grid full">
       <input id="pulse-court" class="pulse-inp" type="text" placeholder="Court name (optional)" aria-label="Court name, optional" maxlength="60" autocomplete="off">
     </div>
-    <button class="btn-pulse-save" onclick="savePulseLocation()">Save &amp; Refresh Feed</button>
+    <button class="btn-pulse-save" type="button" onclick="savePulseLocation()">Save Location &amp; Refresh</button>
   </div>
+  <div class="pulse-state" id="pulse-connection-state" role="status" aria-live="polite"></div>
   <!-- Category filters -->
-  <div class="pulse-filter-bar" id="pulse-filter-bar">
-    <button class="pf-chip on" data-cat="all" onclick="setPulseFilter('all')">All</button>
-    <button class="pf-chip" data-cat="basketball" onclick="setPulseFilter('basketball')">🏀 Basketball</button>
-    <button class="pf-chip" data-cat="local" onclick="setPulseFilter('local')">📍 Local Sports</button>
-    <button class="pf-chip" data-cat="tournament" onclick="setPulseFilter('tournament')">🏆 Tournaments</button>
-    <button class="pf-chip" data-cat="community" onclick="setPulseFilter('community')">🤝 Community</button>
-    <button class="pf-chip" data-cat="weather" onclick="setPulseFilter('weather')">⛅ Weather</button>
-    <button class="pf-chip" data-cat="national" onclick="setPulseFilter('national')">🌐 National Bball</button>
+  <div class="pulse-filter-bar" id="pulse-filter-bar" role="group" aria-label="Pulse categories">
+    <button class="pf-chip on" type="button" aria-pressed="true" data-cat="all" onclick="setPulseFilter('all')">All</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="basketball" onclick="setPulseFilter('basketball')">🏀 Basketball</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="local" onclick="setPulseFilter('local')">📍 Local Sports</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="tournament" onclick="setPulseFilter('tournament')">🏆 Tournaments</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="community" onclick="setPulseFilter('community')">🤝 Community</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="weather" onclick="setPulseFilter('weather')">⛅ Weather</button>
+    <button class="pf-chip" type="button" aria-pressed="false" data-cat="national" onclick="setPulseFilter('national')">🌐 National Bball</button>
   </div>
   <!-- Live search links (location-aware) -->
   <div class="pulse-search-links" id="pulse-search-links">
-    <div class="psl-title">🔍 Search Live News</div>
+    <div class="psl-title">🔍 External live-search shortcuts</div>
+    <p class="pulse-search-note">These links open Google or Google News in a new tab. Results are third-party content, not a CourtCall news feed.</p>
     <div id="pulse-link-list"></div>
   </div>
   <!-- News feed -->
   <div class="pulse-feed" id="pulse-feed"></div>
   <!-- Disclaimer -->
-  <div class="pulse-disclaimer">Live news links open external search results. CourtCall does not verify third-party news.</div>
+  <div class="pulse-disclaimer">Local activity comes only from records already saved in CourtCall. CourtCall does not fetch, rank, or verify live news.</div>
 </div>
 
 <!-- ══ SETTINGS ══ -->
@@ -2960,6 +2965,10 @@ body.modal-open{overflow:hidden}
     <div class="hub-section-title" style="padding:8px 0">Data</div>
     <div class="settings-sec">
       <div class="setting-row no-click">
+        <div class="sr-icon">📶</div>
+        <div class="sr-info"><div class="sr-label">Network</div><div class="sr-sub" id="settings-network-status" aria-live="polite">Checking connection…</div></div>
+      </div>
+      <div class="setting-row no-click">
         <div class="sr-icon">☁️</div>
         <div class="sr-info"><div class="sr-label">Sync Status</div><div class="sr-sub" id="settings-sync-status" aria-live="polite">Saved on this device</div></div>
       </div>
@@ -2990,7 +2999,7 @@ body.modal-open{overflow:hidden}
     </div>
     <div class="hub-section-title" style="padding:8px 0">Help</div>
     <div class="settings-sec">
-      <button class="setting-row" type="button" onclick="showScreen('help-center')">
+      <button class="setting-row" type="button" onclick="openHelpCenter()">
         <div class="sr-icon">📖</div>
         <div class="sr-info"><div class="sr-label">Help Center</div><div class="sr-sub">Browse how-to guides and FAQs</div></div>
         <div style="color:var(--muted2)">›</div>
@@ -3005,7 +3014,7 @@ body.modal-open{overflow:hidden}
     <div class="settings-sec">
       <button class="setting-row" type="button" onclick="showScreen('analytics')" style="border-bottom:none">
         <div class="sr-icon">📊</div>
-        <div class="sr-info"><div class="sr-label">Analytics Dashboard</div><div class="sr-sub">App usage stats &amp; insights</div></div>
+        <div class="sr-info"><div class="sr-label">Analytics Dashboard</div><div class="sr-sub">Insights from saved CourtCall records</div></div>
         <div style="color:var(--muted2)">›</div>
       </button>
     </div>
@@ -3079,10 +3088,10 @@ body.modal-open{overflow:hidden}
 <div id="s-analytics" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('settings')">← Settings</button>
-    <div class="page-title">Analytics</div>
+    <h1 class="page-title">Analytics</h1>
     <div style="width:60px"></div>
   </div>
-  <div class="analytics-body" id="analytics-body"></div>
+  <div class="analytics-body" id="analytics-body" aria-live="polite"></div>
 </div>
 
 <!-- ══ POST-GAME OVERLAY ══ -->
@@ -3141,6 +3150,7 @@ body.modal-open{overflow:hidden}
 <script src="./courtcall-communities.js?v=20260821"></script>
 <script src="./courtcall-notifications.js"></script>
 <script src="./courtcall-cloud-state.js"></script>
+<script src="./courtcall-supporting-product.js?v=20260822"></script>
 <script>
 // ── Supabase ─────────────────────────────────────────────
 const SUPA_URL = 'https://jfeegcocynozbjpzbjae.supabase.co';
@@ -3586,6 +3596,16 @@ function openLegal(which){
   showScreen(which);
 }
 function closeLegal(){showScreen(_legalReturnScreen||'profile');}
+let _helpCenterReturnScreen='settings';
+function openHelpCenter(){
+  const active=document.querySelector('.screen.active');
+  if(active&&active.id&&active.id!=='s-help-center')_helpCenterReturnScreen=active.id.replace(/^s-/,'');
+  showScreen('help-center');
+}
+function closeHelpCenter(){
+  const target=_helpCenterReturnScreen||(currentProfile?'settings':'landing');
+  showScreen(!currentProfile&&!_PUBLIC_SCREENS.has(target)?'landing':target);
+}
 
 // ── Hash routing ─────────────────────────────────────────
 // Maps each screen to a URL hash so browser back/forward, refresh, and
@@ -3593,7 +3613,7 @@ function closeLegal(){showScreen(_legalReturnScreen||'profile');}
 let _settingHash=false;
 // Screens that should NOT be deep-linked/restored from a cold URL because
 // they need live state or an auth identity we can't assume on first load.
-const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms','communities','world']);
+const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms','communities','world','help-center']);
 function _validScreen(name){return !!document.getElementById('s-'+name);}
 function _screenToHash(name){
   if(name==='comm-detail'&&activeCommunityId)return `#/community/${encodeURIComponent(activeCommunityId)}`;
@@ -3692,6 +3712,7 @@ function _syncActiveScreenA11y(name){
   focusTarget.setAttribute('data-cc-route-focus','');
   const routeName=ROUTE_LABELS[name]||(focusTarget.textContent||name).replace(/\s+/g,' ').trim();
   requestAnimationFrame(()=>{
+    window.scrollTo(0,0);
     activeScreen.scrollTop=0;
     try{focusTarget.focus({preventScroll:true})}catch{focusTarget.focus()}
     announcer.textContent='';
@@ -6807,6 +6828,8 @@ function renderSettings(){
   volume.value=String(Math.max(0,Math.min(100,Number(s.soundVolume)||0)));
   updateVolumePreview(volume.value);updateSoundVolumeAvailability(s);
   document.getElementById('settings-sync-status').textContent=CourtCallCloudState.syncCopy(currentSyncState);
+  const networkStatus=document.getElementById('settings-network-status');
+  if(networkStatus)networkStatus.textContent=navigator.onLine?'Online · external links and cloud sync are available':'Offline · local scoring, history, Help, and saved directories remain available';
   document.getElementById('settings-last-sync').textContent=formatSettingTime(localStorage.getItem(K.lastSync),'No successful cloud sync yet');
   document.getElementById('settings-last-backup').textContent=formatSettingTime(localStorage.getItem(K.lastBackup),'No backup exported yet');
   applyUserPreferences(s);
@@ -6998,66 +7021,44 @@ async function clearAllData(){
 function renderAnalytics(){
   const body=document.getElementById('analytics-body');
   if(!body)return;
-  const s=getAppStats();
-  const games=getCol(K.matches).length;
-  const tourneys=getCol(K.tournaments).length;
-  const comms=getComms().length;
-  const players=getAllCPlayers().length;
-  const dur=fmtLiveDur(s.appLaunchDate);
-  const lastVisit=s.lastVisitAt?new Date(s.lastVisitAt).toLocaleString():'—';
-
-  function card(icon,val,lbl,sub='',extra=''){
-    return`<div class="an-card${extra}"><div class="an-card-icon">${icon}</div><div class="an-card-val">${val}</div><div class="an-card-lbl">${lbl}</div>${sub?`<div class="an-card-sub">${sub}</div>`:''}</div>`;
-  }
-  function group(title,inner){
-    return`<div><div class="an-group-title">${title}</div><div class="an-cards">${inner}</div></div>`;
-  }
-
-  const appBlock=group('App',[
-    `<div class="an-card an-card-full"><div class="an-card-icon" style="font-size:28px">⏱</div><div class="an-card-main"><div class="an-card-val hi">${dur||'—'}</div><div class="an-card-lbl">Live Duration</div><div class="an-card-sub">Since first launch</div></div></div>`,
-    card('👁',s.totalVisits||0,'Total Visits','App opens'),
-    `<div class="an-card"><div class="an-card-icon">🕐</div><div class="an-card-lbl">Last Visit</div><div class="an-card-small-val">${lastVisit}</div></div>`,
-  ].join(''));
-
-  const gameBlock=group('Gameplay',[
-    card('🏀',s.gamesStarted||0,'Games Scored',(s.gamesCompleted||0)+' completed'),
-    card('💾',s.matchesSaved||0,'Matches Saved'),
-    card('🎤',s.voiceCommandsUsed||0,'Voice Commands'),
-    card('🏆',s.tournamentsCreated||0,'Tournaments'),
-  ].join(''));
-
-  const usersBlock=group('Users & Growth',[
-    card('👤',s.profilesCreated||0,'Profiles Created'),
-    card('👻',s.guestSessions||0,'Guest Sessions'),
-    card('🧍',players,'Players Added'),
-    card('🌍',comms,'Communities'),
-  ].join(''));
-
-  body.innerHTML=`
-    ${appBlock}
-    ${gameBlock}
-    ${usersBlock}
-    <div class="an-actions">
-      <button class="btn-an-export" onclick="exportAnalytics()">⬇ Export JSON</button>
-      <button class="btn-an-reset" onclick="resetAnalytics()">🗑 Reset Stats</button>
-    </div>
-    <div class="an-note">Local stats are stored on this device only.<br>For real global analytics, connect a backend service.</div>
-  `;
+  const analytics=buildSupportingAnalytics();
+  const g=analytics.games,t=analytics.tournaments,c=analytics.communities,u=analytics.usage;
+  const metric=(icon,value,label,sub='')=>`<div class="an-card"><div class="an-card-icon" aria-hidden="true">${icon}</div><div class="an-card-val">${escHtml(value)}</div><div class="an-card-lbl">${escHtml(label)}</div>${sub?`<div class="an-card-sub">${escHtml(sub)}</div>`:''}</div>`;
+  const section=(title,copy,content)=>`<section class="an-section"><div class="an-section-head"><h2 class="an-section-title">${escHtml(title)}</h2>${copy?`<p class="an-section-copy">${escHtml(copy)}</p>`:''}</div>${content}</section>`;
+  const signed=value=>`${value>0?'+':''}${value}`;
+  const teamTable=analytics.teams.length?`<div class="an-table-wrap" tabindex="0" aria-label="Team performance table, horizontally scrollable"><table class="an-table"><thead><tr><th scope="col">Team</th><th scope="col">GP</th><th scope="col">W</th><th scope="col">L</th><th scope="col">D</th><th scope="col">PF</th><th scope="col">PA</th><th scope="col">Diff</th><th scope="col">Win%</th></tr></thead><tbody>${analytics.teams.map((team,index)=>`<tr><td><span class="an-rank">${index+1}</span>${escHtml(team.name)}</td><td>${team.played}</td><td>${team.wins}</td><td>${team.losses}</td><td>${team.draws}</td><td>${team.pointsFor}</td><td>${team.pointsAgainst}</td><td>${signed(team.differential)}</td><td>${team.winRate}%</td></tr>`).join('')}</tbody></table></div>`:'<div class="an-empty">No team record yet. Completed or tied games will appear here.</div>';
+  const playerTable=analytics.players.length?`<div class="an-table-wrap" tabindex="0" aria-label="Player performance table, horizontally scrollable"><table class="an-table"><thead><tr><th scope="col">Player</th><th scope="col">GP</th><th scope="col">PTS</th><th scope="col">AVG</th><th scope="col">W</th><th scope="col">L</th><th scope="col">D</th><th scope="col">Win%</th></tr></thead><tbody>${analytics.players.map((player,index)=>`<tr><td><span class="an-rank">${index+1}</span>${escHtml(player.name)}</td><td>${player.games}</td><td>${player.points}</td><td>${Number(player.averagePoints||0).toFixed(1)}</td><td>${player.wins}</td><td>${player.losses}</td><td>${player.draws}</td><td>${player.winRate}%</td></tr>`).join('')}</tbody></table></div>`:'<div class="an-empty">No player box scores yet. Start a game with player lineups to build this table.</div>';
+  const formatSummary=g.formats.length?g.formats.map(item=>`${item.label}: ${item.count}`).join(' · '):'No saved formats yet';
+  body.innerHTML=[
+    section('Saved game record','Derived from Match History; cancelled and no-contest games never count as wins or losses.',`<div class="an-cards">${metric('🏀',g.saved,'Saved games',`${g.competitive} competitive`)}${metric('📈',g.averageCombinedPoints.toFixed(1),'Avg combined points',formatSummary)}${metric('🤏',g.closeGames,'Close games','Final margin of 2 or less')}${metric('↔️',g.averageMargin.toFixed(1),'Average margin',`${g.ties} ties · ${g.cancelled+g.noContests} non-results`)}</div>`),
+    section('Team performance','Teams are grouped by case-insensitive saved team name. This is separate from the Home-side career summary in History.',teamTable),
+    section('Player performance','Only saved competitive games that contain player lineups contribute to these numbers.',playerTable),
+    section('Tournaments & communities','Read-only totals from existing local records; this screen does not change brackets, memberships, or permissions.',`<div class="an-cards">${metric('🏆',t.total,'Tournaments',`${t.active} active · ${t.completed} complete`)}${metric('✅',`${t.playedFixtures}/${t.totalFixtures}`,'Fixtures recorded')}${metric('🏘️',c.total,'Communities',`${c.players} roster players`)}${metric('📣',c.posts+c.events,'Community activity',`${c.posts} posts · ${c.events} events`)}</div>`),
+    section('Device usage','Optional counters for this browser only. Resetting these does not delete matches or product data.',`<div class="an-cards">${metric('👁',u.totalVisits||0,'App opens')}${metric('🎮',u.gamesStarted||0,'Games started')}${metric('🎤',u.voiceCommandsUsed||0,'Voice commands')}${metric('⏱️',fmtLiveDur(u.appLaunchDate)||'—','Time since first use')}</div>`),
+    `<div class="an-actions"><button class="btn-an-export" type="button" onclick="exportAnalytics()">⬇ Export analytics JSON</button><button class="btn-an-reset" type="button" onclick="resetAnalytics()">Reset usage counters</button></div>`,
+    '<p class="an-note">All insights on this screen are calculated locally from records already available to CourtCall. Missing data stays empty; CourtCall does not estimate or invent performance.</p>'
+  ].join('');
+}
+function buildSupportingAnalytics(){
+  return CourtCallSupportingProduct.buildAnalytics({
+    matches:getCol(K.matches),tournaments:getCol(K.tournaments),communities:getComms(),
+    communityPlayers:getAllCPlayers(),communityPosts:getAllPosts(),communityEvents:getAllEvents(),usage:getAppStats()
+  },{core:CourtCallCore});
 }
 function exportAnalytics(){
-  const s=getAppStats();
-  const blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  const payload={metadata:{appName:'CourtCall',type:'supporting-product-analytics',generatedAt:new Date().toISOString()},analytics:buildSupportingAnalytics()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='courtcall_analytics.json';
+  a.download=`courtcall-analytics-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(()=>URL.revokeObjectURL(a.href),0);
 }
 async function resetAnalytics(){
-  if(!await uiConfirm('Reset all analytics stats? This cannot be undone.'))return;
+  if(!await uiConfirm('Reset device-only usage counters? Saved games, player records, tournaments, and communities will not be changed.'))return;
   localStorage.removeItem(STATS_KEY);
   trackEvent('app_opened');
-  showToast('Analytics reset');
+  showToast('Usage counters reset');
   renderAnalytics();
 }
 /* ════════════════════════════════════════════════════════
@@ -10311,29 +10312,7 @@ const CAT_CLASS={basketball:'',local:'local',tournament:'tournament',community:'
 const CAT_LABEL={basketball:'Basketball',local:'Local Sports',tournament:'Tournaments',community:'Community',weather:'Weather',national:'National Bball'};
 
 function buildNewsQueries(loc){
-  const country=loc.country||'India';
-  const state=loc.state||'';
-  const city=loc.city||state||country;
-  const court=loc.court||'';
-  const queries=[];
-  // Basketball-specific
-  queries.push({label:`🏀 ${city} basketball news`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' basketball')}&hl=en`,cat:'basketball'});
-  if(state)queries.push({label:`🏀 ${state} basketball`,url:`https://news.google.com/search?q=${encodeURIComponent(state+' basketball news')}&hl=en`,cat:'basketball'});
-  // Local sports
-  queries.push({label:`📍 ${city} local sports`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' sports news')}&hl=en`,cat:'local'});
-  // Tournament
-  queries.push({label:`🏆 ${city} basketball tournament`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' basketball tournament')}&hl=en`,cat:'tournament'});
-  if(state)queries.push({label:`🏆 ${state} sports tournament`,url:`https://news.google.com/search?q=${encodeURIComponent(state+' sports tournament')}&hl=en`,cat:'tournament'});
-  // Community
-  queries.push({label:`🤝 ${city} community sports events`,url:`https://news.google.com/search?q=${encodeURIComponent(city+' community sports event')}&hl=en`,cat:'community'});
-  // Weather
-  queries.push({label:`⛅ ${city} weekend weather`,url:`https://www.google.com/search?q=${encodeURIComponent('weather '+city+' weekend')}&hl=en`,cat:'weather'});
-  // National
-  queries.push({label:`🌐 ${country} basketball news`,url:`https://news.google.com/search?q=${encodeURIComponent(country+' basketball news')}&hl=en`,cat:'national'});
-  queries.push({label:`🌐 India basketball federation`,url:`https://news.google.com/search?q=${encodeURIComponent('Basketball Federation India news')}&hl=en`,cat:'national'});
-  // Court-specific
-  if(court)queries.push({label:`📍 "${court}" court updates`,url:`https://www.google.com/search?q=${encodeURIComponent(court+' basketball court '+city)}&hl=en`,cat:'local'});
-  return queries;
+  return CourtCallSupportingProduct.buildSearchQueries(loc);
 }
 
 function loadPulseLocation(){
@@ -10371,6 +10350,11 @@ function renderPulse(){
   document.getElementById('pulse-city').value=loc.city||'';
   document.getElementById('pulse-area').value=loc.area||'';
   document.getElementById('pulse-court').value=loc.court||'';
+  const status=document.getElementById('pulse-connection-state');
+  if(status){
+    status.dataset.offline=String(!navigator.onLine);
+    status.textContent=navigator.onLine?'Online · external search shortcuts can open in a new tab. Local activity below is read from this device.':'Offline · saved CourtCall activity remains available. External search shortcuts need a connection.';
+  }
   // Render search links
   renderPulseLinks(loc);
   // Render feed
@@ -10382,25 +10366,27 @@ function renderPulseLinks(loc){
   const filtered=pulseFilter==='all'?queries:queries.filter(q=>q.cat===pulseFilter);
   const list=document.getElementById('pulse-link-list');
   if(!filtered.length){list.innerHTML='<div style="font-size:12px;color:var(--muted2);padding:4px 0">No search links for this filter.</div>';return}
-  list.innerHTML=filtered.map(q=>`<a class="psl-link" href="${escHtml(q.url)}" target="_blank" rel="noopener noreferrer">${escHtml(q.label)}<span class="psl-arrow">↗</span></a>`).join('');
+  list.innerHTML=filtered.map(q=>`<a class="psl-link" href="${escAttr(q.url)}" target="_blank" rel="noopener noreferrer">${escHtml(q.label)}<span class="psl-arrow" aria-hidden="true">↗</span><span class="cc-sr-only"> opens external search in a new tab</span></a>`).join('');
 }
 
 function renderPulseFeed(){
   const loc=loadPulseLocation();
   const feed=document.getElementById('pulse-feed');
-  if(!_isDevMode()){
-    feed.innerHTML='<div class="pulse-empty"><span style="font-size:36px">🔎</span><strong>Live search shortcuts</strong><span>CourtCall does not present unsourced stories as news. Use the trusted external links above to check current basketball, tournament, weather, and local-sports information.</span></div>';
-    renderPulseLinks(loc);return;
+  const activity=CourtCallSupportingProduct.buildLocalActivity({matches:getCol(K.matches),tournaments:getCol(K.tournaments),communityPosts:getAllPosts(),communityEvents:getAllEvents()},{core:CourtCallCore});
+  const local=pulseFilter==='all'?activity:activity.filter(item=>item.category===pulseFilter);
+  let html='<div class="pulse-feed-title">Local CourtCall activity <span>Saved records only</span></div>';
+  if(local.length){
+    html+=local.map(item=>`<article class="pulse-card local-activity"><div class="pulse-card-top"><span class="pc-cat${CAT_CLASS[item.category]?' '+CAT_CLASS[item.category]:''}">${escHtml(CAT_LABEL[item.category]||item.category)}</span><span class="pc-demo">Local record</span></div><h2 class="pulse-headline">${escHtml(item.title)}</h2><p class="pulse-summary">${escHtml(item.summary)}</p><div class="pulse-meta"><span class="pm-source">${escHtml(item.label)}</span><span class="pm-time">${escHtml(formatPulseActivityTime(item.occurredAt))}</span></div><button class="pulse-link-btn" type="button" onclick="openPulseActivity(${jsArg(item.route)})">Open in CourtCall →</button></article>`).join('');
+  }else{
+    html+='<div class="pulse-empty"><span style="font-size:32px" aria-hidden="true">📭</span><strong>No matching local activity</strong><span>Play a game or save a tournament, community post, or event to populate this category.</span></div>';
   }
-  const cards=pulseFilter==='all'?PULSE_DEMO_CARDS:PULSE_DEMO_CARDS.filter(c=>c.cat===pulseFilter);
-  if(!cards.length){feed.innerHTML='<div class="pulse-empty"><span style="font-size:36px">📭</span><span>No updates for this category yet.</span></div>';return}
-  const city=loc.city||'your city';
-  // Personalise summary hint for first basketball card with user's city
-  feed.innerHTML='<div class="pulse-demo-banner">Demo content — these are sample stories and not real events or news.</div>'+cards.map(card=>{
+  if(_isDevMode()){
+    const cards=pulseFilter==='all'?PULSE_DEMO_CARDS:PULSE_DEMO_CARDS.filter(c=>c.cat===pulseFilter);
+    const city=loc.city||'your city';
+    html+='<div class="pulse-feed-title">Sample layout <span>Developer mode</span></div><div class="pulse-demo-banner">Demo content — these are sample stories, not real events or news.</div>'+cards.map(card=>{
     const catCls=CAT_CLASS[card.cat]||'';
     const catLbl=CAT_LABEL[card.cat]||card.cat;
     const summary=card.cat==='basketball'&&card.id==='d1'?card.summary.replace('Courts across the city',`Courts across ${escHtml(city)}`):escHtml(card.summary);
-    // Search link for this card
     const searchUrl=`https://news.google.com/search?q=${encodeURIComponent(card.headline+' '+city)}&hl=en`;
     return`<div class="pulse-card">
   <div class="pulse-card-top"><span class="pc-cat${catCls?' '+catCls:''}">${escHtml(catLbl)}</span><span class="pc-demo">Demo</span></div>
@@ -10409,21 +10395,22 @@ function renderPulseFeed(){
   <div class="pulse-meta"><span class="pm-source">${escHtml(card.source)}</span><span class="pm-time">${escHtml(card.time)}</span></div>
   <a class="pulse-link-btn" href="${searchUrl}" target="_blank" rel="noopener noreferrer">Search this sample topic ↗</a>
 </div>`;
-  }).join('');
-  // Also refresh links
+    }).join('');
+  }
+  feed.innerHTML=html;
   renderPulseLinks(loc);
 }
-
-/* Production API integration points (replace demo cards with real data):
-   - NewsAPI: https://newsapi.org — requires API key in header
-   - GNews: https://gnews.io — free tier with key
-   - Bing News Search: Azure Cognitive Services — key required
-   - SerpAPI: https://serpapi.com — Google News results with key
-   - Google Custom Search JSON API: https://developers.google.com/custom-search
-   Example (NewsAPI):
-   fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(city+' basketball')}&apiKey=YOUR_KEY`)
-     .then(r=>r.json()).then(data=>renderRealCards(data.articles))
-*/
+function formatPulseActivityTime(value){
+  if(!value)return'Saved locally';
+  const date=new Date(value);if(Number.isNaN(date.getTime()))return String(value);
+  return date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+}
+function openPulseActivity(route){
+  const [name,id]=String(route||'').split('/');
+  if(name==='community'&&id){openCommunity(id);return}
+  if(name==='tournament'&&id){activeTournId=id;showScreen('tourn-detail');return}
+  showScreen(_validScreen(name)?name:'hub');
+}
 function escHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function escAttr(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function safeCssColor(value){const color=String(value||'');return /^#[0-9a-f]{3,8}$/i.test(color)?color:'var(--muted2)'}
@@ -10501,6 +10488,8 @@ function _updateOnlineStatus(){
   if(offline)setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);
   else retryCloudSync();
   if(document.getElementById('s-communities')?.classList.contains('active'))renderCommunities();
+  if(document.getElementById('s-pulse')?.classList.contains('active'))renderPulse();
+  if(document.getElementById('s-settings')?.classList.contains('active'))renderSettings();
 }
 window.addEventListener('online',_updateOnlineStatus);
 window.addEventListener('offline',_updateOnlineStatus);
@@ -10636,8 +10625,8 @@ const _HFMSG=`I'm not fully sure about that yet. Please email <a href="mailto:${
 const COURTCALL_HELP_KB=[
   {id:'getting-started',title:'Getting Started with CourtCall',category:'Getting Started',
     keywords:['start','begin','what is courtcall','courtcall','offline','login','account','new user','first time','how to use','intro','sign up','no account','no login'],
-    shortAnswer:'CourtCall lets you score pickup games, build balanced teams, manage tournaments, create communities, and save match history — no login needed, fully offline.',
-    steps:['Open CourtCall — no sign-up required.','Tap Start Quick Game to score immediately.','Use Team Builder to split players into fair teams.','Use Tournament for round-robin or knockout fixtures.','Use Communities for your crew: feed, players, gallery, and events.'],
+    shortAnswer:'CourtCall lets you score pickup games, build balanced teams, manage tournaments, create communities, and save match history. Guest mode works locally; signed-in accounts can also sync supported data.',
+    steps:['Open CourtCall and continue as a guest or sign in.','Tap Start Quick Game to score immediately.','Use Team Builder to split players into fair teams.','Use Tournament for round-robin or knockout fixtures.','Use Communities for your crew: feed, players, gallery, events, and leaderboards.'],
     relatedFeatures:['Quick Game','Team Builder','Tournament','Communities']},
   {id:'quick-game',title:'How to Start a Quick Game',category:'Quick Game',
     keywords:['quick game','start game','new game','score game','3v3','4v4','5v5','game type','win score','team name','begin game','play game','setup game'],
@@ -10689,6 +10678,11 @@ const COURTCALL_HELP_KB=[
     shortAnswer:'Match history is saved automatically when a game ends. Browse it in the History tab.',
     steps:['Tap 📋 History in the bottom navigation.','See all completed games in reverse order.','Tap a match to view the full score and event log.','If a game is paused mid-session, tap Resume on the Hub to continue.'],
     relatedFeatures:['Quick Game','Tournament']},
+  {id:'analytics',title:'Understanding Analytics',category:'Analytics',
+    keywords:['analytics','dashboard','insights','team record','player performance','average margin','close games','usage counters','statistics','stats dashboard'],
+    shortAnswer:'Analytics calculates team, player, tournament, and community summaries from records already saved in CourtCall.',
+    steps:['Open Settings → Analytics Dashboard.','Saved game metrics use Match History and exclude cancelled or no-contest games from win/loss records.','Team rows are grouped by saved team name.','Player rows appear only when saved games contain player lineups.','Reset usage counters clears browser usage counters only; it does not delete product data.'],
+    relatedFeatures:['Match History','Tournament','Communities']},
   {id:'tournament',title:'How to Create a Tournament',category:'Tournament',
     keywords:['tournament','bracket','fixture','round robin','knockout','standings','create tournament','single elimination','generate fixtures','schedule','tournament result'],
     shortAnswer:'Create a tournament from More → Tournament. Add teams and choose Round Robin or Knockout format.',
@@ -10697,7 +10691,7 @@ const COURTCALL_HELP_KB=[
   {id:'communities',title:'How to Create a Community',category:'Communities',
     keywords:['community','create community','join community','public','private','admin','contributor','member','role','community settings','my community'],
     shortAnswer:'Communities are spaces for your crew. Create one from More → Communities.',
-    steps:['Tap More → Communities.','Tap Create Community.','Enter name, city, court name, and description.','Choose Public or Private visibility.','Enable Join Approval to review new member requests.','Tap Create — you become the admin.','Share the community name so others can find and join.'],
+    steps:['Tap More → Communities.','Tap Create Community.','Enter a name and the available location, run, and description details.','Choose Public, Private, or Hidden visibility.','For a public community, choose open join or admin approval.','Tap Create — you become the owner/admin.','Use the generated invite code when the community is not publicly discoverable.'],
     relatedFeatures:['Community Feed','Community Players','Community Gallery','Community Events']},
   {id:'community-feed',title:'Community Feed and Posts',category:'Community Feed',
     keywords:['post','feed','announce','community post','comment','react','emoji','pin post','delete post','who can post','announcement','game recap'],
@@ -10722,12 +10716,12 @@ const COURTCALL_HELP_KB=[
   {id:'pulse',title:'CourtCall Pulse',category:'CourtCall Pulse',
     keywords:['pulse','courtcall pulse','news','local news','basketball news','sports news','location news','search links','pulse screen'],
     shortAnswer:'Pulse shows basketball and sports search links tailored to your location.',
-    steps:['Tap More → Pulse.','Allow location access for local news links.','Tap a category: Basketball, Local Sports, Tournament, Community, Weather, or National.','Tap a link to open live search results in your browser.','Pulse generates smart search links — it does not fetch live data directly.'],
+    steps:['Tap More → Pulse.','Enter and save the location fields you want used in search shortcuts. CourtCall does not request device location.','Tap a category: Basketball, Local Sports, Tournament, Community, Weather, or National.','Review local activity derived from saved CourtCall records.','Tap an external shortcut to open live search results in a new tab. Pulse does not fetch or present a live news feed.'],
     relatedFeatures:['Basketball World']},
   {id:'basketball-world',title:'Basketball World',category:'Basketball World',
     keywords:['basketball world','world','nba','global basketball','leagues','international basketball','world screen'],
-    shortAnswer:'Basketball World provides global basketball info and links. Tap More → Basketball World.',
-    steps:['Tap More → Basketball World.','Browse global basketball links and content.'],
+    shortAnswer:'Basketball World is a curated directory of official basketball destinations. It does not display live scores or a news feed.',
+    steps:['Tap More → Basketball World.','Browse the official league and governing-body directory.','External destinations require an internet connection and open in a new tab.'],
     relatedFeatures:['CourtCall Pulse']},
   {id:'settings',title:'App Settings',category:'Settings',
     keywords:['settings','preferences','defaults','sound','volume','vibration','theme','light mode','dark mode','reduced motion','preferred court','sync status','backup status','default win score','default game type','team colours','switch profile','app settings','where settings'],
@@ -10736,13 +10730,13 @@ const COURTCALL_HELP_KB=[
     relatedFeatures:['Backup / Export','Feedback']},
   {id:'backup-export',title:'Exporting and Backing Up Data',category:'Backup / Export',
     keywords:['backup','export','import','save data','restore','json','data file','download data','transfer data','data backup','export data','import data','data loss','local storage','cloud'],
-    shortAnswer:"Data is stored locally by default. When you sign in, it syncs to the cloud so you can access it across devices. Export regularly using Settings → Export Data.",
-    steps:['Go to Settings → Data → Export Data.','A JSON file is downloaded with all your data.','To restore: Settings → Data → Import Data → select the JSON file.','Data lives in your browser localStorage — not in the cloud.','Use Clear All Data only as a last resort (irreversible).'],
+    shortAnswer:"CourtCall keeps a local copy of app data. Signed-in users may also sync supported records after consent. Export regularly using Settings → Export Data.",
+    steps:['Go to Settings → Data → Export Data.','A credential-free JSON backup is downloaded.','To restore: Settings → Data → Import Data → select the JSON file.','Import replaces only the local sections included in that backup; it does not automatically overwrite cloud data.','Use Clear All Data only after exporting anything you may need.'],
     relatedFeatures:['Settings']},
   {id:'feedback',title:'Sending Feedback or Reporting a Bug',category:'Feedback',
     keywords:['feedback','bug','report bug','suggest','feature request','problem','issue','contact','email','send feedback','report problem','bug report'],
     shortAnswer:'Use Settings → Send Feedback, or email vadi.s23@gmail.com.',
-    steps:['Go to Settings → Send Feedback.','Choose type: Bug Report, Feature Request, or General Feedback.','Describe what happened and which screen you were on.','Tap Submit.','Or email vadi.s23@gmail.com directly for urgent issues.'],
+    steps:['Go to Settings → Send Feedback.','Choose a feedback type.','Describe what happened and which screen you were on.','Choose Send via Email, or Copy Feedback to paste it into another app.','You can also email vadi.s23@gmail.com directly.'],
     relatedFeatures:['Settings','Troubleshooting']},
   {id:'troubleshooting',title:'Troubleshooting Common Issues',category:'Troubleshooting',
     keywords:['problem','issue','not working','bug','broken','error','crash','freeze','voice not working','data missing','game lost','score wrong','fix','trouble'],
@@ -10753,20 +10747,7 @@ const COURTCALL_HELP_KB=[
 
 // ── Answer Engine ─────────────────────────────────────────────────────
 function answerCourtCallQuestion(query){
-  const q=query.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
-  const words=q.split(' ').filter(w=>w.length>2);
-  let best=null,bestScore=0;
-  for(const art of COURTCALL_HELP_KB){
-    let score=0;
-    for(const kw of art.keywords){
-      const nkw=kw.toLowerCase();
-      if(q.includes(nkw))score+=nkw.split(' ').length*3; // phrase match
-      else for(const w of words)if(nkw===w||nkw.startsWith(w)||w.startsWith(nkw))score+=1;
-    }
-    if(score>bestScore){bestScore=score;best=art;}
-  }
-  const confidence=bestScore>=6?'high':bestScore>=2?'medium':'low';
-  return{article:confidence!=='low'?best:null,score:bestScore,confidence};
+  return CourtCallSupportingProduct.matchHelpArticle(COURTCALL_HELP_KB,query);
 }
 
 // ── Chat State ────────────────────────────────────────────────────────
@@ -10906,6 +10887,8 @@ function renderHelpCenter(){
     a.category.toLowerCase().includes(q)||
     a.keywords.some(k=>k.includes(q)));
   const artEl=document.getElementById('hc-articles');
+  const statusEl=document.getElementById('hc-results-status');
+  if(statusEl)statusEl.textContent=`${arts.length} help ${arts.length===1?'article':'articles'}${q?` matching “${q}”`:hcActiveCat!=='All'?` in ${hcActiveCat}`:''}`;
   if(!artEl)return;
   if(!arts.length){artEl.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">No articles found.<br><small>Try different keywords.</small></div>';return;}
   artEl.innerHTML=arts.map(a=>`<div class="hc-card">
@@ -11188,8 +11171,8 @@ async function clearDemoData(){
 <!-- ══ HELP CENTER ══ -->
 <div id="s-help-center" class="screen">
   <div class="page-nav">
-    <button class="btn-back" onclick="showScreen('settings')">← Settings</button>
-    <div class="page-title">Help Center</div>
+    <button class="btn-back" onclick="closeHelpCenter()">← Back</button>
+    <h1 class="page-title">Help Center</h1>
     <div style="width:60px"></div>
   </div>
   <div class="hc-body">
@@ -11198,9 +11181,10 @@ async function clearDemoData(){
       <input class="hc-search" id="hc-search" type="text" placeholder="Search help articles…" aria-label="Search help articles" oninput="renderHelpCenter()" autocomplete="off">
     </div>
     <div class="hc-cats" id="hc-cats" role="group" aria-label="Help categories"></div>
+    <div class="hc-results-status" id="hc-results-status" role="status" aria-live="polite"></div>
     <div id="hc-articles"></div>
     <div class="hc-ask-bar">
-      <button class="hc-ask-btn" onclick="closeHelpChat();showScreen('settings');setTimeout(openHelpChat,120)">💬 Ask CourtCall Assistant</button>
+      <button class="hc-ask-btn" type="button" onclick="openHelpChat()">💬 Ask CourtCall Assistant</button>
     </div>
   </div>
 </div>
@@ -11209,64 +11193,64 @@ async function clearDemoData(){
 <div id="s-privacy" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="closeLegal()">← Back</button>
-    <div class="page-title">Privacy Policy</div>
+    <h1 class="page-title">Privacy Policy</h1>
     <div style="width:60px"></div>
   </div>
-  <div class="legal-body">
+  <main class="legal-body">
     <p class="legal-updated">Last updated: May 30, 2026</p>
     <p>CourtCall ("we", "the app") is a pickup-basketball scoring app. This policy explains what data we collect and how we use it. We aim to collect as little as possible.</p>
-    <h3>What we collect</h3>
+    <h2>What we collect</h2>
     <ul>
       <li><b>Account info:</b> the email address and display name you provide when you create an account. Your 6-digit PIN is never stored in plain text — it is used as your password and handled by our authentication provider.</li>
       <li><b>App data:</b> games, teams, players, tournaments, and communities you create. This is stored locally on your device and, if you sign in, synced to our backend so you can access it across devices.</li>
       <li><b>Guest mode:</b> if you continue as a guest, no email is collected and your data stays on your device only.</li>
     </ul>
-    <h3>How we use it</h3>
+    <h2>How we use it</h2>
     <ul>
       <li>To provide the app: saving your games, syncing your account, and showing communities you join.</li>
       <li>We do <b>not</b> sell your data or use it for advertising.</li>
     </ul>
-    <h3>Where it's stored</h3>
+    <h2>Where it's stored</h2>
     <p>Account and synced data are stored with our backend provider (Supabase). Local data lives in your browser's storage and is removed when you log out or clear data.</p>
-    <h3>Your choices</h3>
+    <h2>Your choices</h2>
     <ul>
       <li><b>Export:</b> download all your data as JSON from Settings → Export Data.</li>
       <li><b>Delete:</b> log out (clears this device) or use Clear All Data. To delete your account and server data, contact us at the email below.</li>
     </ul>
-    <h3>Contact</h3>
+    <h2>Contact</h2>
     <p>Questions about privacy or data deletion: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
     <p class="legal-note">CourtCall is an independent beta project and is not affiliated with the NBA or any league. This document is provided for transparency and may be updated as the app evolves.</p>
-  </div>
+  </main>
 </div>
 
 <!-- ══ TERMS OF SERVICE ══ -->
 <div id="s-terms" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="closeLegal()">← Back</button>
-    <div class="page-title">Terms of Service</div>
+    <h1 class="page-title">Terms of Service</h1>
     <div style="width:60px"></div>
   </div>
-  <div class="legal-body">
+  <main class="legal-body">
     <p class="legal-updated">Last updated: May 30, 2026</p>
     <p>By using CourtCall you agree to these terms. CourtCall is provided "as is" during its beta period.</p>
-    <h3>Using the app</h3>
+    <h2>Using the app</h2>
     <ul>
       <li>You're responsible for the activity on your account and for keeping your PIN private.</li>
       <li>Don't post unlawful, harassing, or infringing content in communities, and don't misuse or attempt to break the service.</li>
       <li>You must be old enough to consent to data processing in your region (generally 13+, or 16+ in parts of the EU).</li>
     </ul>
-    <h3>Your content</h3>
+    <h2>Your content</h2>
     <p>You keep ownership of the games, teams, and posts you create. By posting in a community you allow other members of that community to see your content.</p>
-    <h3>Beta &amp; availability</h3>
+    <h2>Beta &amp; availability</h2>
     <ul>
       <li>Features may change, break, or be removed. Back up important data with Export.</li>
       <li>We don't guarantee uninterrupted service or that data will never be lost.</li>
     </ul>
-    <h3>Liability</h3>
+    <h2>Liability</h2>
     <p>To the fullest extent permitted by law, CourtCall is not liable for any indirect or incidental damages arising from use of the app.</p>
-    <h3>Contact</h3>
+    <h2>Contact</h2>
     <p>Questions about these terms: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
-  </div>
+  </main>
 </div>
 
 <!-- ══ SET NEW PIN (password recovery) ══ -->
@@ -11358,7 +11342,7 @@ async function clearDemoData(){
     <button class="more-item" onclick="showScreen('world');hideMoreMenu()"><span class="more-icon">🌍</span><span class="more-lbl">Basketball World</span></button>
     <button class="more-item" onclick="showScreen('profile');hideMoreMenu()"><span class="more-icon">👤</span><span class="more-lbl">Profile</span></button>
     <button class="more-item" onclick="showScreen('settings');hideMoreMenu()"><span class="more-icon">⚙</span><span class="more-lbl">Settings</span></button>
-    <button class="more-item" onclick="showScreen('help-center');hideMoreMenu()"><span class="more-icon">📖</span><span class="more-lbl">Help Center</span></button>
+    <button class="more-item" onclick="openHelpCenter();hideMoreMenu()"><span class="more-icon">📖</span><span class="more-lbl">Help Center</span></button>
     <button class="more-item" onclick="openFeedback();hideMoreMenu()"><span class="more-icon">💬</span><span class="more-lbl">Feedback</span></button>
     <button class="more-item" onclick="inviteFriends();hideMoreMenu()"><span class="more-icon">🔗</span><span class="more-lbl">Invite Friends</span></button>
   </div>
