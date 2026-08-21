@@ -751,6 +751,7 @@ button.setting-row{width:100%;background:none;color:inherit;border-top:0;border-
 .player-card-top{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 10px}
 .player-ava{width:46px;height:46px;border-radius:50%;background:var(--cb);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;flex-shrink:0;overflow:hidden}
 .player-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.player-ava-fallback{width:100%;height:100%;align-items:center;justify-content:center}
 .player-main{flex:1;min-width:0}
 .player-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--text);line-height:1.1}
 .player-nick{font-size:11px;color:var(--muted);font-style:italic}
@@ -869,8 +870,9 @@ button.setting-row{width:100%;background:none;color:inherit;border-top:0;border-
 .chip-not-going{background:rgba(255,59,48,.12);color:var(--danger)}
 .chip-need-team{background:rgba(41,121,255,.14);color:var(--cb)}
 .chip-running-late{background:rgba(220,150,0,.12);color:#DCAF00}
-.evt-admin-row{padding:0 14px 12px;display:flex;justify-content:flex-end}
+.evt-admin-row{padding:0 14px 12px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .btn-evt-del{background:none;border:1px solid var(--danger);border-radius:8px;color:var(--danger);font-size:12px;padding:5px 12px;cursor:pointer}
+.btn-evt-edit{background:none;border:1px solid var(--border-strong);border-radius:8px;color:var(--text);font-size:12px;padding:5px 12px;cursor:pointer}
 .add-evt-form{background:var(--s1);border-radius:12px;border:1px solid var(--border);padding:14px;margin:0 14px 10px}
 .evt-type-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .evt-type-chip{padding:5px 10px;border:1.5px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;transition:all var(--t1)}
@@ -948,6 +950,10 @@ button.setting-row{width:100%;background:none;color:inherit;border-top:0;border-
 .btn-mc-role:active{background:var(--s3)}
 .btn-mc-remove{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r1);color:var(--danger);font:600 11px 'Inter',sans-serif;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:all var(--t1);min-height:32px}
 .btn-mc-remove:active{background:rgba(255,23,68,.15)}
+.member-role-select{min-height:40px;max-width:130px}
+.member-leave-row{padding-top:8px;border-top:1px solid var(--border)}
+.settings-owner-note{padding:10px 12px;border:1px solid var(--border);border-radius:var(--r1);color:var(--muted);font-size:12px;line-height:1.5}
+.react-btn:disabled,.btn-gal-like:disabled{opacity:.48;cursor:not-allowed}
 .cd-danger-zone{background:rgba(255,23,68,.05);border:1px solid rgba(255,23,68,.2);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:10px}
 .cd-danger-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--danger)}
 .btn-cd-danger{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r1);color:var(--danger);font:700 13px 'Inter',sans-serif;padding:12px 14px;cursor:pointer;min-height:44px;transition:all var(--t1);width:100%;display:flex;align-items:center;gap:10px;text-align:left}
@@ -1518,6 +1524,20 @@ body.modal-open{overflow:hidden}
 /* ── Community screens ─────────────────────────────────────────────── */
 .comm-list{padding:0 12px}
 .comm-form{padding:12px 12px 40px}
+@media(max-width:420px){
+  .gal-grid{grid-template-columns:1fr;padding-inline:12px}
+  .member-card{align-items:flex-start;flex-wrap:wrap}
+  .mc-actions{width:100%;flex-direction:row;align-items:center;padding-left:48px}
+  .member-role-select{flex:1;max-width:none}
+  .join-req-card{align-items:flex-start;flex-wrap:wrap}
+  .jrc-actions{width:100%;padding-left:44px}
+  .jrc-actions button{flex:1;min-height:40px}
+  .evt-rsvp-row{padding-inline:10px;gap:4px}
+  .btn-rsvp{min-width:0;font-size:11px}
+  .player-stats{padding-inline:6px}
+  .rate-attr-row{align-items:flex-start;flex-direction:column;gap:4px}
+  .rate-attr-lbl{width:auto}
+}
 
 /* ── Analytics & settings body ─────────────────────────────────────── */
 .analytics-body{padding:12px 12px 48px}
@@ -3118,6 +3138,7 @@ body.modal-open{overflow:hidden}
 
 <script src="./basketball-supa.js"></script>
 <script src="./courtcall-core.js"></script>
+<script src="./courtcall-communities.js?v=20260821"></script>
 <script src="./courtcall-notifications.js"></script>
 <script src="./courtcall-cloud-state.js"></script>
 <script>
@@ -3575,7 +3596,7 @@ let _settingHash=false;
 const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms','communities','world']);
 function _validScreen(name){return !!document.getElementById('s-'+name);}
 function _screenToHash(name){
-  if(name==='comm-detail'&&activeCommunityId)return `#/community/${activeCommunityId}`;
+  if(name==='comm-detail'&&activeCommunityId)return `#/community/${encodeURIComponent(activeCommunityId)}`;
   if(name==='tourn-detail'&&activeTournId)return `#/tournament/${encodeURIComponent(activeTournId)}`;
   return `#/${name}`;
 }
@@ -3596,10 +3617,22 @@ function _routeFromHash(){
   });
   if(!decision.handled)return false;
   if(decision.action==='open_community'){openCommunity(decision.communityId);return true}
+  if(decision.route==='community'&&decision.reason==='unknown_community'&&decision.communityId){
+    _hydrateCommunityDeepLink(decision.communityId);return true;
+  }
   if(decision.action==='open_tournament'){activeTournId=decision.tournamentId;showScreen('tourn-detail');return true}
   if(decision.action==='open_changelog'){openChangelog();return true}
   if(decision.action==='resume_game'){handleResume();return true}
   showScreen(decision.screen||'profile');return true;
+}
+async function _hydrateCommunityDeepLink(communityId){
+  showScreen('communities');
+  const result=await syncCommunitiesFromDB();
+  if(result?.state===CourtCallCloudState.VIEW.RESULTS&&getComms().some(community=>community.id===communityId)){
+    openCommunity(communityId);return true;
+  }
+  showToast(result?.state===CourtCallCloudState.VIEW.ERROR?'Community could not be loaded. Retry when your connection is available.':'Community not found or unavailable to this account',{type:'warning'});
+  return false;
 }
 window.addEventListener('hashchange',()=>{
   if(_settingHash){_settingHash=false;return;} // ignore hashes we wrote ourselves
@@ -7242,7 +7275,7 @@ async function _doSyncCommunitiesFromDB() {
 
 async function supaCreateCommunity(community, creatorMember) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaCreateCommunity skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaCreateCommunity skipped — cloud sync is not enabled'); return false; }
   try {
     const communityRow={
       id: community.id, creator_id: supaUser.id, name: community.name,
@@ -7261,7 +7294,12 @@ async function supaCreateCommunity(community, creatorMember) {
       community_id: community.id, user_id: supaUser.id,
       role: creatorMember.role || 'admin', profile_name: creatorMember.profileName || currentProfile?.name || ''
     }, { onConflict: 'community_id,user_id' });
-    if (me) { console.error('[Supa] supaCreateCommunity member UPSERT failed:', me.message, me); return false; }
+    if (me) {
+      console.error('[Supa] supaCreateCommunity member UPSERT failed:', me.message, me);
+      const rollback=await supa.from('communities').delete().eq('id',community.id).eq('creator_id',supaUser.id);
+      if(rollback.error)console.error('[Supa] supaCreateCommunity rollback failed:',rollback.error.message,rollback.error);
+      return false;
+    }
     console.log('[Supa] supaCreateCommunity: success, id=' + community.id);
     return true;
   } catch(e) { console.error('[Supa] supaCreateCommunity EXCEPTION:', e.message, e); return false; }
@@ -7269,7 +7307,7 @@ async function supaCreateCommunity(community, creatorMember) {
 
 async function supaJoinCommunity(communityId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaJoinCommunity skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaJoinCommunity skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_members').upsert({
       community_id: communityId, user_id: supaUser.id,
@@ -7283,13 +7321,13 @@ async function supaJoinCommunity(communityId) {
 
 async function supaSubmitPost(post) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaSubmitPost skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaSubmitPost skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_posts').upsert({
       id: post.id, community_id: post.communityId, user_id: supaUser.id,
       author_name: post.authorName || currentProfile?.name || '',
       title: post.title || null, content: post.body || post.text || post.content || '',
-      image_url: post.imageUrl || null, type: post.type || 'text',
+      image_url: /^data:/i.test(post.imageUrl||'')?null:(post.imageUrl || null), type: post.type || 'text',
       reactions: post.reactions || {}, comments: post.comments || []
     }, { onConflict: 'id' });
     if (error) { console.error('[Supa] supaSubmitPost FAILED:', error.message, error); return false; }
@@ -7337,10 +7375,10 @@ async function _doSyncPostsFromDB(communityId) {
     const merged = [...posts.map(p => {
       const local = localMap.get(p.id);
       return {
-        id: p.id, communityId: p.community_id, authorId: p.user_id,
-        authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || '', type: p.type,
+        ...(local||{}),id: p.id, communityId: p.community_id, authorId: p.user_id,
+        authorName: p.author_name, body: p.content, title: p.title || '', imageUrl: p.image_url || (/^data:/i.test(local?.imageUrl||'')?local.imageUrl:''), type: p.type,
         reactions: _mergeReactions(local?.reactions, p.reactions || {}),
-        comments: p.comments || [],
+        comments: p.comments || [],pinned:Boolean(p.pinned),
         createdAt: p.created_at,syncStatus:'synced'
       };
     }), ...localOnly, ...otherCommunities];
@@ -7351,10 +7389,9 @@ async function _doSyncPostsFromDB(communityId) {
 
 async function supaCreateEvent(event) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaCreateEvent skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaCreateEvent skipped — cloud sync is not enabled'); return false; }
   try {
-    const typeText=String(event.type||'').toLowerCase();
-    const eventType=typeText.includes('tournament')?'tournament':typeText.includes('train')?'training':typeText.includes('social')?'social':typeText.includes('other')?'other':'pickup';
+    const eventType=CommunityContract.eventTypeToDb(event.type);
     const eventRow={
       id: event.id, community_id: event.communityId, creator_id: supaUser.id,
       title: event.title, description: event.description || '',
@@ -7376,7 +7413,7 @@ async function supaCreateEvent(event) {
 
 async function supaUpdatePost(postId, fields) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpdatePost skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpdatePost skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_posts').update(fields).eq('id', postId);
     if (error) { console.error('[Supa] supaUpdatePost FAILED:', error.message, error); return false; }
@@ -7387,7 +7424,7 @@ async function supaUpdatePost(postId, fields) {
 
 async function supaHardDeletePost(postId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaHardDeletePost skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaHardDeletePost skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_posts').delete().eq('id', postId);
     if (error) { console.error('[Supa] supaHardDeletePost FAILED:', error.message, error); return false; }
@@ -7398,9 +7435,13 @@ async function supaHardDeletePost(postId) {
 
 async function supaUpdateEvent(eventId, fields) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpdateEvent skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpdateEvent skipped — cloud sync is not enabled'); return false; }
   try {
-    const { error } = await supa.from('community_events').update(fields).eq('id', eventId);
+    let { error } = await supa.from('community_events').update(fields).eq('id', eventId);
+    if(error&&/(event_time|event_type|max_attendees|creator_name|rsvps)/i.test(`${error.message||''} ${error.details||''}`)){
+      const legacyFields={};['title','description','event_date','location'].forEach(key=>{if(key in fields)legacyFields[key]=fields[key]});
+      ({error}=await supa.from('community_events').update(legacyFields).eq('id',eventId));
+    }
     if (error) { console.error('[Supa] supaUpdateEvent FAILED:', error.message, error); return false; }
     console.log('[Supa] supaUpdateEvent: success');
     return true;
@@ -7409,7 +7450,7 @@ async function supaUpdateEvent(eventId, fields) {
 
 async function supaUpsertCPlayer(player) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpsertCPlayer skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpsertCPlayer skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_players').upsert({
       id:           player.id,
@@ -7436,7 +7477,7 @@ async function supaUpsertCPlayer(player) {
 
 async function supaDeleteCPlayer(playerId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaDeleteCPlayer skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaDeleteCPlayer skipped — cloud sync is not enabled'); return false; }
   try {
     const { error: re } = await supa.from('community_ratings').delete().eq('player_id', playerId);
     if (re) console.error('[Supa] supaDeleteCPlayer ratings FAILED:', re.message, re);
@@ -7449,15 +7490,15 @@ async function supaDeleteCPlayer(playerId) {
 
 async function supaUpsertCRating(rating) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpsertCRating skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpsertCRating skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_ratings').upsert({
       id: rating.id, player_id: rating.playerId, community_id: rating.communityId,
       rater_id: supaUser.id,
-      shooting: rating.shooting || 0, defense: rating.defense || 0,
-      passing: rating.passing || 0, speed: rating.speed || 0,
-      teamwork: rating.teamwork || 0, clutch: rating.clutch || 0,
-      sportsmanship: rating.sportsmanship || 0,
+       shooting: rating.shooting || null, defense: rating.defense || null,
+       passing: rating.passing || null, speed: rating.speed || null,
+       teamwork: rating.teamwork || null, clutch: rating.clutch || null,
+       sportsmanship: rating.sportsmanship || null,
       created_at: rating.createdAt || new Date().toISOString(),
       updated_at: rating.updatedAt || new Date().toISOString()
     }, { onConflict: 'player_id,rater_id' });
@@ -7469,7 +7510,7 @@ async function supaUpsertCRating(rating) {
 
 async function supaSubmitGalleryItem(item) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaSubmitGalleryItem skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaSubmitGalleryItem skipped — cloud sync is not enabled'); return false; }
   // Skip base64 uploads — those are too large for DB; only sync URL-sourced images
   if (item.imageSourceType === 'upload' || !item.imageUrl) return false;
   try {
@@ -7494,7 +7535,7 @@ async function supaSubmitGalleryItem(item) {
 
 async function supaUpdateGalleryItem(itemId, fields) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpdateGalleryItem skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpdateGalleryItem skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_gallery').update(fields).eq('id', itemId);
     if (error) { console.error('[Supa] supaUpdateGalleryItem FAILED:', error.message, error); return false; }
@@ -7505,7 +7546,7 @@ async function supaUpdateGalleryItem(itemId, fields) {
 
 async function supaDeleteGalleryItem(itemId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaDeleteGalleryItem skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaDeleteGalleryItem skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_gallery').delete().eq('id', itemId);
     if (error) { console.error('[Supa] supaDeleteGalleryItem FAILED:', error.message, error); return false; }
@@ -7516,7 +7557,7 @@ async function supaDeleteGalleryItem(itemId) {
 
 async function supaCreateJoinRequest(req) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaCreateJoinRequest skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaCreateJoinRequest skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_join_requests').upsert({
       id: req.id, community_id: req.communityId, user_id: supaUser.id,
@@ -7531,7 +7572,7 @@ async function supaCreateJoinRequest(req) {
 
 async function supaCancelJoinRequest(communityId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaCancelJoinRequest skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaCancelJoinRequest skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_join_requests')
       .delete().eq('community_id', communityId).eq('user_id', supaUser.id).eq('status', 'pending');
@@ -7543,7 +7584,7 @@ async function supaCancelJoinRequest(communityId) {
 
 async function supaUpdateJoinRequest(reqId, status) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaUpdateJoinRequest skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaUpdateJoinRequest skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_join_requests')
       .update({ status, reviewed_at: new Date().toISOString() }).eq('id', reqId);
@@ -7555,7 +7596,7 @@ async function supaUpdateJoinRequest(reqId, status) {
           community_id: req.communityId, user_id: req.profileId,
           role: 'member', profile_name: req.profileName || ''
         }, { onConflict: 'community_id,user_id' });
-        if (me) console.error('[Supa] supaUpdateJoinRequest member FAILED:', me.message, me);
+        if (me) { console.error('[Supa] supaUpdateJoinRequest member FAILED:', me.message, me); return false; }
       }
     }
     console.log('[Supa] supaUpdateJoinRequest: success');
@@ -7565,7 +7606,7 @@ async function supaUpdateJoinRequest(reqId, status) {
 
 async function supaLeaveComm(communityId) {
   await ensureSupaUser();
-  if (!supa || !supaUser) { console.log('[Supa] supaLeaveComm skipped — not authenticated'); return false; }
+  if (!supa || !supaUser || !_communityCloudSyncEnabled()) { console.log('[Supa] supaLeaveComm skipped — cloud sync is not enabled'); return false; }
   try {
     const { error } = await supa.from('community_members').delete()
       .eq('community_id', communityId).eq('user_id', supaUser.id);
@@ -7633,6 +7674,100 @@ async function syncAllUserDataFromDB() {
   const cloudApproved=_getAccountSyncPreference(supaUser?.id)==='approved';
   setSyncState(ok?(cloudApproved?CourtCallCloudState.SYNC.ONLINE_SYNCED:CourtCallCloudState.SYNC.ONLINE_LOCAL):CourtCallCloudState.SYNC.FAILED);
   return ok;
+}
+
+async function _runCommunityCloudWrite(label,write){
+  await ensureSupaUser();
+  if(!_communityCloudSyncEnabled())return null;
+  if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false}
+  try{
+    setSyncState(CourtCallCloudState.SYNC.SYNCING);
+    const result=await write();
+    if(result?.error)throw result.error;
+    setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);return true;
+  }catch(error){
+    console.error(`[Supa] ${label} FAILED:`,error.message,error);setSyncState(CourtCallCloudState.SYNC.FAILED);return false;
+  }
+}
+
+function supaUpdateCommunity(community){
+  const row={
+    name:community.name,description:community.description||'',visibility:community.visibility,
+    join_policy:community.joinPolicy==='invite_only'?'invite':community.joinPolicy,
+    read_only:Boolean(community.readOnly),comments_locked:Boolean(community.commentsLocked),
+    ratings_disabled:Boolean(community.ratingsDisabled),logo:community.logo||'🏀',location:community.location||''
+  };
+  return _runCommunityCloudWrite('supaUpdateCommunity',async()=>{
+    let result=await supa.from('communities').update(row).eq('id',community.id);
+    if(result.error&&/join_policy/i.test(`${result.error.message||''} ${result.error.details||''}`)){
+      const {join_policy,...legacyRow}=row;result=await supa.from('communities').update(legacyRow).eq('id',community.id);
+    }
+    return result;
+  });
+}
+
+function supaDeleteCommunity(communityId){
+  return _runCommunityCloudWrite('supaDeleteCommunity',()=>supa.from('communities').delete().eq('id',communityId));
+}
+
+function supaUpdateMemberRole(communityId,profileId,role){
+  return _runCommunityCloudWrite('supaUpdateMemberRole',()=>supa.from('community_members').update({role}).eq('community_id',communityId).eq('user_id',profileId));
+}
+
+function supaRemoveCommunityMember(communityId,profileId){
+  return _runCommunityCloudWrite('supaRemoveCommunityMember',()=>supa.from('community_members').delete().eq('community_id',communityId).eq('user_id',profileId));
+}
+
+function supaDeleteEvent(eventId){
+  return _runCommunityCloudWrite('supaDeleteEvent',()=>supa.from('community_events').delete().eq('id',eventId));
+}
+
+async function _runCommunityRpc(label,name,args){
+  await ensureSupaUser();
+  if(!supa||!supaUser||!_communityCloudSyncEnabled())return null;
+  if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false}
+  try{
+    setSyncState(CourtCallCloudState.SYNC.SYNCING);
+    const {data,error}=await supa.rpc(name,args);
+    if(error)throw error;
+    setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);
+    return data===undefined?true:data;
+  }catch(error){
+    console.error(`[Supa] ${label} FAILED:`,error.message,error);
+    setSyncState(CourtCallCloudState.SYNC.FAILED);
+    return false;
+  }
+}
+
+function supaSetPostReaction(postId,reaction,active){
+  return _runCommunityRpc('supaSetPostReaction','set_community_post_reaction',{
+    p_post_id:postId,p_reaction:reaction,p_active:Boolean(active)
+  });
+}
+function supaAddPostComment(postId,comment){
+  return _runCommunityRpc('supaAddPostComment','add_community_post_comment',{
+    p_post_id:postId,p_comment_id:comment.id,p_body:comment.body,p_author_name:comment.authorName||''
+  });
+}
+function supaDeletePostComment(postId,commentId){
+  return _runCommunityRpc('supaDeletePostComment','delete_community_post_comment',{
+    p_post_id:postId,p_comment_id:commentId
+  });
+}
+function supaSetGalleryLike(itemId,active){
+  return _runCommunityRpc('supaSetGalleryLike','set_community_gallery_like',{
+    p_item_id:itemId,p_active:Boolean(active)
+  });
+}
+function supaAddGalleryComment(itemId,comment){
+  return _runCommunityRpc('supaAddGalleryComment','add_community_gallery_comment',{
+    p_item_id:itemId,p_comment_id:comment.id,p_body:comment.text||comment.body||'',p_author_name:comment.authorName||''
+  });
+}
+function supaDeleteGalleryComment(itemId,commentId){
+  return _runCommunityRpc('supaDeleteGalleryComment','delete_community_gallery_comment',{
+    p_item_id:itemId,p_comment_id:commentId
+  });
 }
 
 async function supaSetEventRsvp(eventId,status,profileName,fallbackRsvps){
@@ -7841,7 +7976,9 @@ async function _syncCPlayersFromDB() {
 async function _syncCRatingsFromDB() {
   if (!supa || !supaUser) return;
   try {
-    const { data,error } = await supa.from('community_ratings').select('*').eq('rater_id', supaUser.id);
+    const communityIds=_myCloudCommunityIds();
+    if(!communityIds.length)return true;
+    const { data,error } = await supa.from('community_ratings').select('*').in('community_id',communityIds);
     if(error)throw error;
     if (!data) return true;
     const local = getAllCRatings();
@@ -7915,7 +8052,7 @@ async function _syncEventsFromDB(){
     if(error)throw error;
     const local=getAllEvents();
     const dbIds=new Set((data||[]).map(event=>event.id));
-    const remote=(data||[]).map(event=>({
+    const remote=(data||[]).map(event=>CommunityContract.normalizeEvent({
       ...(local.find(item=>item.id===event.id)||{}),
       id:event.id,communityId:event.community_id,title:event.title||'',
       description:event.description||'',type:event.event_type||event.type||'Pickup Game',
@@ -7972,12 +8109,44 @@ const KC={
   ratings:'courtcall_community_ratings',
 };
 const COMM_DRAFT_KEY='cc_community_draft';
+const CommunityContract=window.CourtCallCommunities;
+const COMM_ACTION=CommunityContract.ACTIONS;
+const _communityActionLocks=new Set();
 
 // ── Helpers ──────────────────────────────────────────────
-function getComms(){try{return JSON.parse(localStorage.getItem(KC.communities)||'[]')}catch{return[]}}
-function setComms(arr,{source='local'}={}){localStorage.setItem(KC.communities,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
-function getCommMembers(){try{return JSON.parse(localStorage.getItem(KC.members)||'[]')}catch{return[]}}
-function setCommMembers(arr,{source='local'}={}){localStorage.setItem(KC.members,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function _readCommunityCollection(key,normalizer){
+  try{return CommunityContract.normalizeList(JSON.parse(localStorage.getItem(key)||'[]'),normalizer)}catch{return[]}
+}
+function _writeCommunityCollection(key,arr,{source='local'}={}){
+  try{localStorage.setItem(key,JSON.stringify(arr));if(source!=='cloud')markLocalSave();return true}
+  catch(error){console.error('[Communities] Local save failed:',error.message);showToast('This change could not be saved on this device. Free storage and try again.',{type:'error'});return false}
+}
+function getComms(){return _readCommunityCollection(KC.communities,CommunityContract.normalizeCommunity)}
+function setComms(arr,options){return _writeCommunityCollection(KC.communities,arr,options)}
+function getCommMembers(){return _readCommunityCollection(KC.members,CommunityContract.normalizeMember)}
+function setCommMembers(arr,options){return _writeCommunityCollection(KC.members,arr,options)}
+function _communityRole(communityId,userId=(currentProfile||{id:'guest'}).id){
+  const community=getComms().find(item=>item.id===communityId);
+  if(CommunityContract.isOwner(community,userId))return CommunityContract.ROLES.ADMIN;
+  return getCommMembers().find(member=>member.communityId===communityId&&member.profileId===userId)?.role||CommunityContract.ROLES.GUEST;
+}
+function _communityContext(communityId,{entity=null,targetMember=null,userId=(currentProfile||{id:'guest'}).id}={}){
+  const community=getComms().find(item=>item.id===communityId);
+  return{community,role:_communityRole(communityId,userId),userId,entity,targetMember};
+}
+function canCommunity(action,communityId,options={}){
+  return CommunityContract.can(action,_communityContext(communityId,options));
+}
+function requireCommunityAction(action,communityId,options={}){
+  if(canCommunity(action,communityId,options))return true;
+  showToast(options.message||'Your community role does not allow that action.',{type:'warning'});return false;
+}
+function _beginCommunityAction(key){if(_communityActionLocks.has(key))return false;_communityActionLocks.add(key);return true}
+function _endCommunityAction(key){_communityActionLocks.delete(key)}
+function _communityCloudSyncEnabled(){
+  return Boolean(isSupaAuthenticated()&&_getAccountSyncPreference(supaUser?.id)==='approved');
+}
+function _communityId(prefix,items){return CommunityContract.createId(prefix,(items||[]).map(item=>item.id))}
 
 function getCommChipVal(rowId){
   const el=document.querySelector(`#${rowId} .comm-chip.on`);
@@ -8045,15 +8214,18 @@ function restoreCommunityDraft(){
   const emoji=[...document.querySelectorAll('#cc-emoji-row .emoji-opt')].find(button=>button.dataset.v===draft.emoji);if(emoji)pickCommEmoji(emoji);
   applyCommunityVisibilityRules();return true;
 }
-function createCommunity(){
+async function createCommunity(){
+  const actionKey='create-community';
+  if(!_beginCommunityAction(actionKey))return;
   const name=document.getElementById('cc-name').value.trim();
-  if(!name){setCommCreateError('Enter a community name');document.getElementById('cc-name').focus();return}
-  if(getComms().some(community=>community.name?.trim().toLocaleLowerCase()===name.toLocaleLowerCase())){setCommCreateError('A community with this name already exists');document.getElementById('cc-name').focus();return}
+  if(!name){setCommCreateError('Enter a community name');document.getElementById('cc-name').focus();_endCommunityAction(actionKey);return}
+  if(CommunityContract.duplicateName(getComms(),name)){setCommCreateError('A community with this name already exists');document.getElementById('cc-name').focus();_endCommunityAction(actionKey);return}
   setCommCreateError('');
   const p=currentProfile||{id:'guest',name:'Guest'};
   const visibility=getCommChipVal('cc-vis-row')||'public';
+  const communities=getComms();
   const community={
-    id:'community_'+Date.now(),
+    id:_communityId('community',communities),
     name,
     type:getCommChipVal('cc-type-row')||'Pickup Group',
     country:document.getElementById('cc-country').value.trim()||'',
@@ -8072,19 +8244,18 @@ function createCommunity(){
     joinApproval:visibility==='public'?getCommChipVal('cc-approval-row')==='yes':true,
     joinPolicy:visibility==='hidden'?'invite_only':visibility==='private'?'approval':getCommChipVal('cc-approval-row')==='yes'?'approval':'open',
     inviteCode:Math.random().toString(36).slice(2,8).toUpperCase(),
-    localOnly:!isSupaAuthenticated(),
+    localOnly:!_communityCloudSyncEnabled(),
     createdBy:p.id,
     createdAt:new Date().toLocaleDateString(),
     memberCount:1,
   };
   community.location=[community.city,community.state,community.country].filter(Boolean).join(', ');
-  const communities=getComms();
   communities.push(community);
-  setComms(communities);
+  if(!setComms(communities)){_endCommunityAction(actionKey);return}
 
   // Creator becomes admin member
   const member={
-    id:'member_'+Date.now(),
+    id:_communityId('member',getCommMembers()),
     communityId:community.id,
     profileId:p.id,
     profileName:p.name,
@@ -8093,13 +8264,20 @@ function createCommunity(){
   };
   const members=getCommMembers();
   members.push(member);
-  setCommMembers(members);
+  if(!setCommMembers(members)){
+    setComms(communities.filter(item=>item.id!==community.id),{source:'cloud'});_endCommunityAction(actionKey);return;
+  }
   try{localStorage.removeItem(COMM_DRAFT_KEY)}catch{}
-  supaCreateCommunity(community, members.find(m=>m.communityId===community.id)||{role:'admin',profileName:currentProfile?.name});
-
   trackEvent('community_created');
-  showScreen('communities');
-  showToast(community.localOnly?`${community.logo} ${community.name} saved on this device`:`${community.logo} ${community.name} created and queued for sync`,{type:'success'});
+  openCommunity(community.id);
+  showToast(community.localOnly?`${community.logo} ${community.name} saved on this device`:`${community.logo} ${community.name} created — syncing…`,{type:'success'});
+  if(!community.localOnly){
+    const cloudSaved=await supaCreateCommunity(community,member);
+    const latest=getComms(),stored=latest.find(item=>item.id===community.id);
+    if(stored){stored.localOnly=!cloudSaved;stored.syncStatus=cloudSaved?'synced':'pending';setComms(latest,{source:'cloud'})}
+    if(!cloudSaved)showToast('Community is safe on this device; cloud creation failed and can be retried.',{type:'warning'});
+  }
+  _endCommunityAction(actionKey);
 }
 
 // ── Render Communities Screen ────────────────────────────
@@ -8168,12 +8346,13 @@ let activeCommTab='feed';
 function openCommunity(id){
   const c=getComms().find(x=>x.id===id);
   if(!c){showToast('Community not found');return}
+  if(!canCommunity(COMM_ACTION.VIEW,id)){showToast('This community is private or unavailable to this account.',{type:'warning'});showScreen('communities');return}
   activeCommunityId=id;
   activeCommTab='feed';
   feedFilter='all';showCreateForm=false;editingPostId=null;
   showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null;
   showAddGalleryForm=false;selectedTaggedPlayers=new Set();galleryFilter='all';
-  showAddEventForm=false;eventsFilter='upcoming';expandedEventRsvps=new Set();
+  showAddEventForm=false;editingEventId=null;eventsFilter='upcoming';expandedEventRsvps=new Set();
   lbCategory='rating';
   if(typeof expandedComments!=='undefined')expandedComments.clear();
   if(typeof expandedGalleryComments!=='undefined')expandedGalleryComments.clear();
@@ -8190,8 +8369,7 @@ function renderCommDetail(){
   if(!c)return;
   const allMembers=getCommMembers();
   const myId=(currentProfile||{id:'guest'}).id;
-  const myMember=allMembers.find(m=>m.communityId===c.id&&m.profileId===myId);
-  const myRole=(myMember&&myMember.role)||'guest';
+  const myRole=_communityRole(c.id,myId);
   const isAdmin=myRole==='admin';
 
   // Update nav title
@@ -8240,11 +8418,16 @@ function renderCommDetail(){
 }
 
 function setCommTab(tab){
+  const validTabs=new Set(['feed','members','players','gallery','events','leaderboard','settings']);
+  if(!validTabs.has(tab))return;
+  if(tab==='settings'&&!canCommunity(COMM_ACTION.EDIT_SETTINGS,activeCommunityId)){
+    showToast('Only community admins can access Settings.',{type:'warning'});tab='members';
+  }
   if(tab!=='feed'){showCreateForm=false;editingPostId=null}
   if(tab!=='players'){showAddPlayerForm=false;editingPlayerId=null;ratingPlayerId=null}
   if(tab!=='gallery'){showAddGalleryForm=false;selectedTaggedPlayers=new Set()}
-  if(tab!=='events'){showAddEventForm=false}
-  if(tab==='leaderboard')lbCategory='rating';
+  if(tab!=='events'){showAddEventForm=false;editingEventId=null}
+  if(tab==='leaderboard'&&activeCommTab!=='leaderboard')lbCategory='rating';
   activeCommTab=tab;
   const cdTabsCont=document.getElementById('cd-tabs');
   const activeTabBtn=cdTabsCont&&cdTabsCont.querySelector(`[data-tab="${tab}"]`);
@@ -8254,7 +8437,7 @@ function setCommTab(tab){
   const c=getComms().find(x=>x.id===activeCommunityId);
   if(!c){renderCommDetail();return}
   const members=getCommMembers().filter(m=>m.communityId===c.id);
-  const myRole=members.find(m=>m.profileId===(currentProfile||{id:'guest'}).id)?.role||'guest';
+  const myRole=_communityRole(c.id);
   _renderCommTabContent(c,members,myRole);
 }
 
@@ -8290,16 +8473,20 @@ function _buildMembersHTML(c,members,myRole){
   const ROLE_BG={admin:'rgba(255,87,34,.18)',contributor:'rgba(255,179,0,.15)',member:'rgba(0,230,118,.14)'};
   const items=members.map(m=>{
     const isMe=m.profileId===myId;
+    const isOwner=CommunityContract.isOwner(c,m.profileId);
     const initial=(m.profileName||'?')[0].toUpperCase();
-    const roleLabel=m.role==='admin'?'Admin':m.role==='contributor'?'Contributor':'Member';
+    const roleLabel=isOwner?'Owner · Admin':m.role==='admin'?'Admin':m.role==='contributor'?'Contributor':'Member';
     const rCol=ROLE_COLOR[m.role]||'var(--muted)';
     const rBg=ROLE_BG[m.role]||'var(--s2)';
     let actions='';
-    if(isAdmin&&!isMe){
-      const nextRole=m.role==='member'?'contributor':'member';
-      const nextLabel=m.role==='member'?'Make Contributor':'Make Member';
+    if(isAdmin&&!isMe&&!isOwner){
       actions=`<div class="mc-actions">
-        <button class="btn-mc-role" type="button" onclick="updateMemberRole(${jsArg(c.id)},${jsArg(m.id)},'${nextRole}')">${nextLabel}</button>
+        <label class="cc-sr-only" for="member-role-${escAttr(m.id)}">Role for ${escHtml(m.profileName||'member')}</label>
+        <select class="btn-mc-role member-role-select" id="member-role-${escAttr(m.id)}" aria-label="Role for ${escAttr(m.profileName||'member')}" onchange="updateMemberRole(${jsArg(c.id)},${jsArg(m.id)},this.value)">
+          <option value="member"${m.role==='member'?' selected':''}>Member</option>
+          <option value="contributor"${m.role==='contributor'?' selected':''}>Contributor</option>
+          <option value="admin"${m.role==='admin'?' selected':''}>Admin</option>
+        </select>
         <button class="btn-mc-remove" type="button" onclick="removeMemberFromComm(${jsArg(c.id)},${jsArg(m.id)})">Remove</button>
       </div>`;
     }
@@ -8326,7 +8513,8 @@ function _buildMembersHTML(c,members,myRole){
     </div>`).join('')}
   </div>`:'';
 
-  return`<div class="cd-panel">${pendingHTML}${items}</div>`;
+  const leaveHTML=CommunityContract.can(COMM_ACTION.LEAVE,{community:c,role:myRole,userId:myId})?`<div class="member-leave-row"><button class="btn-leave-comm" type="button" onclick="leaveComm(${jsArg(c.id)})"><span aria-hidden="true">🚪</span><span>Leave Community</span></button></div>`:'';
+  return`<div class="cd-panel">${pendingHTML}${items}${leaveHTML}</div>`;
 }
 
 function _buildSettingsHTML(c,myRole){
@@ -8337,6 +8525,7 @@ function _buildSettingsHTML(c,myRole){
     </div>`;
   }
   if(myRole!=='admin')return`<div class="cd-panel"><div class="cd-coming"><span style="font-size:28px">🔒</span><span>Only admins can access Settings.</span></div></div>`;
+  const isOwner=CommunityContract.isOwner(c,(currentProfile||{id:'guest'}).id);
   const selPub=c.visibility==='public'?'on':'';
   const selPriv=c.visibility==='private'?'on':'';
   const selHid=c.visibility==='hidden'?'on':'';
@@ -8381,21 +8570,25 @@ function _buildSettingsHTML(c,myRole){
         <span style="font-size:20px">${c.ratingsDisabled?'📊':'🚫'}</span>
         <div><div>${c.ratingsDisabled?'Enable Ratings':'Disable Ratings'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Hide the leaderboard and disable player ratings</div></div>
       </button>
-      <button class="btn-cd-danger" type="button" onclick="deleteComm(${jsArg(c.id)})">
+      ${isOwner?`<button class="btn-cd-danger" type="button" onclick="deleteComm(${jsArg(c.id)})">
         <span style="font-size:20px">🗑</span>
         <div><div>Delete Community</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Permanently removes all community data</div></div>
-      </button>
+      </button>`:`<div class="settings-owner-note">Only the community owner can permanently delete this community.</div>`}
     </div>
   </div>`;
 }
 
-function updateMemberRole(communityId,memberId,newRole){
+async function updateMemberRole(communityId,memberId,newRole){
   const members=getCommMembers();
   const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
   if(!m)return;
+  if(!['admin','contributor','member'].includes(newRole)||!requireCommunityAction(COMM_ACTION.CHANGE_ROLE,communityId,{targetMember:m}))return renderCommDetail();
+  if(m.role===newRole)return;
+  const cloudResult=await supaUpdateMemberRole(communityId,m.profileId,newRole);
+  if(cloudResult===false){showToast('Role was not changed because cloud authorization failed.',{type:'warning'});renderCommDetail();return}
   m.role=newRole;
   setCommMembers(members);
-  showToast(`${escHtml(m.profileName)} is now ${newRole==='contributor'?'a Contributor':'a Member'}`);
+  showToast(`${m.profileName} is now ${newRole==='admin'?'an Admin':newRole==='contributor'?'a Contributor':'a Member'}`);
   renderCommDetail();
 }
 
@@ -8403,7 +8596,10 @@ async function removeMemberFromComm(communityId,memberId){
   const members=getCommMembers();
   const m=members.find(x=>x.id===memberId&&x.communityId===communityId);
   if(!m)return;
+  if(!requireCommunityAction(COMM_ACTION.REMOVE_MEMBER,communityId,{targetMember:m}))return;
   if(!await uiConfirm(`Remove ${m.profileName} from this community?`))return;
+  const cloudResult=await supaRemoveCommunityMember(communityId,m.profileId);
+  if(cloudResult===false){showToast('Member was not removed because cloud authorization failed.',{type:'warning'});return}
   setCommMembers(members.filter(x=>!(x.id===memberId&&x.communityId===communityId)));
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
@@ -8412,67 +8608,85 @@ async function removeMemberFromComm(communityId,memberId){
   renderCommDetail();
 }
 
-function saveCommEdit(communityId){
+async function saveCommEdit(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_SETTINGS,communityId))return;
   const name=(document.getElementById('cds-name')?.value||'').trim();
   if(!name){showToast('Community name required');return}
+  if(CommunityContract.duplicateName(comms,name,undefined,c.id)){showToast('A community with this name already exists',{type:'warning'});return}
   c.name=name;
   c.description=(document.getElementById('cds-desc')?.value||'').trim();
   c.visibility=getCommChipVal('cds-vis-row')||c.visibility;
-  c.joinApproval=getCommChipVal('cds-approval-row')==='yes';
+  c.joinApproval=c.visibility==='public'?getCommChipVal('cds-approval-row')==='yes':true;
+  c.joinPolicy=c.visibility==='hidden'?'invite_only':c.visibility==='private'?'approval':c.joinApproval?'approval':'open';
+  c.syncStatus=_communityCloudSyncEnabled()?'pending':c.syncStatus;
   setComms(comms);
-  showToast('Community updated');
+  const cloudResult=await supaUpdateCommunity(c);
+  if(cloudResult===true){c.syncStatus='synced';setComms(comms,{source:'cloud'});showToast('Community updated',{type:'success'})}
+  else if(cloudResult===false)showToast('Changes are saved on this device; cloud update failed.',{type:'warning'});
+  else showToast('Community updated on this device',{type:'success'});
   renderCommDetail();
 }
 
-function toggleCommReadOnly(communityId){
+async function toggleCommReadOnly(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_SETTINGS,communityId))return;
   c.readOnly=!c.readOnly;
   setComms(comms);
-  showToast(c.readOnly?'Posting locked — read-only mode':'Posting unlocked');
+  const cloudResult=await supaUpdateCommunity(c);
+  showToast(cloudResult===false?'Moderation change saved locally; cloud sync failed.':c.readOnly?'Posting locked — read-only mode':'Posting unlocked',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
-function toggleCommentsLocked(communityId){
+async function toggleCommentsLocked(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_SETTINGS,communityId))return;
   c.commentsLocked=!c.commentsLocked;
   setComms(comms);
-  showToast(c.commentsLocked?'Comments locked':'Comments unlocked');
+  const cloudResult=await supaUpdateCommunity(c);
+  showToast(cloudResult===false?'Comment setting saved locally; cloud sync failed.':c.commentsLocked?'Comments locked':'Comments unlocked',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
-function toggleRatingsDisabled(communityId){
+async function toggleRatingsDisabled(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_SETTINGS,communityId))return;
   c.ratingsDisabled=!c.ratingsDisabled;
   setComms(comms);
-  showToast(c.ratingsDisabled?'Ratings disabled':'Ratings enabled');
+  const cloudResult=await supaUpdateCommunity(c);
+  showToast(cloudResult===false?'Ratings setting saved locally; cloud sync failed.':c.ratingsDisabled?'Ratings disabled':'Ratings enabled',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
 async function removePostPhoto(postId,communityId){
-  if(!await uiConfirm('Remove the photo from this post? The text will remain.'))return;
   const all=getAllPosts();
   const post=all.find(x=>x.id===postId);
   if(!post)return;
+  if(!requireCommunityAction(COMM_ACTION.REMOVE_POST_PHOTO,communityId,{entity:post,message:'Only admins can remove post photos.'}))return;
+  if(!await uiConfirm('Remove the photo from this post? The text will remain.'))return;
   post.imageUrl='';
   saveAllPosts(all);
+  const cloudResult=await supaUpdatePost(postId,{image_url:null});
   setCommTab('feed');
-  showToast('Photo removed');
+  showToast(cloudResult===false&&_communityCloudSyncEnabled()?'Photo removed locally; cloud sync failed.':'Photo removed',{type:cloudResult===false&&_communityCloudSyncEnabled()?'warning':'success'});
 }
 
 async function deleteComm(communityId){
   const comms=getComms();
   const c=comms.find(x=>x.id===communityId);
   if(!c)return;
-  if(!await uiConfirm(`Delete "${c.name}"? This cannot be undone.`))return;
+  if(!requireCommunityAction(COMM_ACTION.DELETE_COMMUNITY,communityId,{message:'Only the community owner can delete this community.'}))return;
+  if(!await uiConfirm(`Delete "${c.name}" and all of its local community data? This cannot be undone.`,{phrase:c.name}))return;
+  const cloudResult=await supaDeleteCommunity(communityId);
+  if(cloudResult===false){showToast('Community was not deleted because the cloud request failed.',{type:'warning'});return}
   setComms(comms.filter(x=>x.id!==communityId));
   setCommMembers(getCommMembers().filter(m=>m.communityId!==communityId));
   if(typeof saveAllPosts==='function')saveAllPosts(getAllPosts().filter(p=>p.communityId!==communityId));
@@ -8513,8 +8727,8 @@ let newPostType='General Post';
 let editingPostId=null;
 const expandedComments=new Set();
 
-function getAllPosts(){try{return JSON.parse(localStorage.getItem(KC.posts)||'[]')}catch{return[]}}
-function saveAllPosts(arr,{source='local'}={}){localStorage.setItem(KC.posts,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllPosts(){return _readCommunityCollection(KC.posts,CommunityContract.normalizePost)}
+function saveAllPosts(arr,options){return _writeCommunityCollection(KC.posts,arr,options)}
 function getPosts(cid){return getAllPosts().filter(p=>p.communityId===cid)}
 
 function fmtPostTime(iso){
@@ -8588,7 +8802,6 @@ function renderFeedTabHTML(c,myRole){
 
 function buildPostCardHTML(p,c,myRole,myId){
   const isAdmin=myRole==='admin';
-  const isAuthor=p.authorId===myId;
   const commLocked=c.commentsLocked&&!isAdmin;
   const typeInfo=POST_TYPES.find(x=>x.t===p.type)||{t:p.type,i:'💬'};
   const reactions=p.reactions||{like:[],fire:[],clap:[]};
@@ -8598,6 +8811,11 @@ function buildPostCardHTML(p,c,myRole,myId){
   const commentCount=(p.comments||[]).length;
   const commentsOpen=expandedComments.has(p.id);
   const isEditing=editingPostId===p.id;
+  const canReact=CommunityContract.can(COMM_ACTION.REACT,{community:c,role:myRole,userId:myId});
+  const canEdit=CommunityContract.can(COMM_ACTION.EDIT_POST,{community:c,role:myRole,userId:myId,entity:p});
+  const canDelete=CommunityContract.can(COMM_ACTION.DELETE_POST,{community:c,role:myRole,userId:myId,entity:p});
+  const canPin=CommunityContract.can(COMM_ACTION.PIN_POST,{community:c,role:myRole,userId:myId,entity:p});
+  const canRemovePhoto=CommunityContract.can(COMM_ACTION.REMOVE_POST_PHOTO,{community:c,role:myRole,userId:myId,entity:p});
   const pinCls=p.pinned?'post-card-pinned':'';
 
   // Body / edit form
@@ -8619,29 +8837,29 @@ function buildPostCardHTML(p,c,myRole,myId){
   // Reactions + comment toggle
   const reactRow=isEditing?'':
     `<div class="post-reactions" role="group" aria-label="Post reactions">
-  <button type="button" class="react-btn${myLike?' active':''}" aria-pressed="${myLike}" aria-label="Like this post, ${(reactions.like||[]).length} likes" onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'like')">👍 ${(reactions.like||[]).length}</button>
-  <button type="button" class="react-btn${myFire?' active':''}" aria-pressed="${myFire}" aria-label="Fire reaction, ${(reactions.fire||[]).length} reactions" onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'fire')">🔥 ${(reactions.fire||[]).length}</button>
-  <button type="button" class="react-btn${myClap?' active':''}" aria-pressed="${myClap}" aria-label="Applaud this post, ${(reactions.clap||[]).length} reactions" onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'clap')">👏 ${(reactions.clap||[]).length}</button>
+  <button type="button" class="react-btn${myLike?' active':''}" aria-pressed="${myLike}" aria-label="Like this post, ${(reactions.like||[]).length} likes" ${canReact?'':'disabled'} onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'like')">👍 ${(reactions.like||[]).length}</button>
+  <button type="button" class="react-btn${myFire?' active':''}" aria-pressed="${myFire}" aria-label="Fire reaction, ${(reactions.fire||[]).length} reactions" ${canReact?'':'disabled'} onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'fire')">🔥 ${(reactions.fire||[]).length}</button>
+  <button type="button" class="react-btn${myClap?' active':''}" aria-pressed="${myClap}" aria-label="Applaud this post, ${(reactions.clap||[]).length} reactions" ${canReact?'':'disabled'} onclick="reactPost(${jsArg(p.id)},${jsArg(c.id)},'clap')">👏 ${(reactions.clap||[]).length}</button>
   <button type="button" class="btn-post-action" style="margin-left:auto" aria-expanded="${commentsOpen}" aria-label="${commentsOpen?'Hide':'Show'} ${commentCount} comment${commentCount===1?'':'s'}" onclick="toggleComments(${jsArg(p.id)},${jsArg(c.id)})">💬 ${commentCount}${commLocked?' 🔒':''}${commentsOpen?' ▲':' ▼'}</button>
 </div>`;
 
   // Admin / author actions
   let actionsHTML='';
-  if((isAdmin||isAuthor)&&!isEditing){
+  if((canEdit||canDelete||canPin||(canRemovePhoto&&p.imageUrl))&&!isEditing){
     actionsHTML=`<div class="post-admin-row">
-  ${isAdmin?`<button class="btn-post-action" type="button" onclick="pinPost(${jsArg(p.id)},${jsArg(c.id)})">${p.pinned?'📌 Unpin':'📌 Pin'}</button>`:''}
-  ${isAdmin&&p.imageUrl?`<button class="btn-post-action" type="button" onclick="removePostPhoto(${jsArg(p.id)},${jsArg(c.id)})">🖼 Remove Photo</button>`:''}
-  ${isAuthor?`<button class="btn-post-action" type="button" onclick="editPostInline(${jsArg(p.id)},${jsArg(c.id)})">✏ Edit</button>`:''}
-  ${(isAdmin||isAuthor)?`<button class="btn-post-action danger" type="button" onclick="deletePost(${jsArg(p.id)},${jsArg(c.id)})">🗑 Delete</button>`:''}
+  ${canPin?`<button class="btn-post-action" type="button" onclick="pinPost(${jsArg(p.id)},${jsArg(c.id)})">${p.pinned?'📌 Unpin':'📌 Pin'}</button>`:''}
+  ${canRemovePhoto&&p.imageUrl?`<button class="btn-post-action" type="button" onclick="removePostPhoto(${jsArg(p.id)},${jsArg(c.id)})">🖼 Remove Photo</button>`:''}
+  ${canEdit?`<button class="btn-post-action" type="button" onclick="editPostInline(${jsArg(p.id)},${jsArg(c.id)})">✏ Edit</button>`:''}
+  ${canDelete?`<button class="btn-post-action danger" type="button" onclick="deletePost(${jsArg(p.id)},${jsArg(c.id)})">🗑 Delete</button>`:''}
 </div>`;
   }
 
   // Comments section
   let commentsHTML='';
   if(commentsOpen){
-    const canComment=['admin','contributor','member'].includes(myRole);
+    const canComment=CommunityContract.can(COMM_ACTION.COMMENT,{community:c,role:myRole,userId:myId});
     const cmtItems=(p.comments||[]).map(cm=>{
-      const canDel=isAdmin||cm.authorId===myId;
+      const canDel=CommunityContract.can(COMM_ACTION.DELETE_COMMENT,{community:c,role:myRole,userId:myId,entity:cm});
       return`<div class="comment-item">
   <div class="cmt-avatar">${escHtml((cm.authorName||'?')[0].toUpperCase())}</div>
   <div class="cmt-body-wrap">
@@ -8678,27 +8896,31 @@ function pickPostTypeChip(btn,type){
 }
 
 async function submitPost(communityId){
+  if(!requireCommunityAction(COMM_ACTION.POST,communityId))return;
+  const actionKey=`post:${communityId}`;if(!_beginCommunityAction(actionKey))return;
   const prof=currentProfile||{id:'guest',name:'Guest'};
   const body=(document.getElementById('pp-body')?.value||'').trim();
   const title=(document.getElementById('post-title')?.value||'').trim();
-  if(!body&&!title){showToast('Add a title or body text');return}
+  if(!body&&!title){showToast('Add a title or body text');_endCommunityAction(actionKey);return}
+  const all=getAllPosts();
   const post={
-    id:'post_'+Date.now(),communityId,
+    id:_communityId('post',all),communityId,
     authorId:prof.id,authorName:prof.name||prof.nickname||'Unknown',
     type:newPostType,title,body,
     imageUrl:(document.getElementById('pp-img')?.value||'').trim(),
     pinned:false,createdAt:new Date().toISOString(),
     reactions:{like:[],fire:[],clap:[]},comments:[],
-    syncStatus:isSupaAuthenticated()?'pending':'local_only',
+    syncStatus:_communityCloudSyncEnabled()?'pending':'local_only',
   };
-  const all=getAllPosts();all.push(post);saveAllPosts(all);
+  all.push(post);if(!saveAllPosts(all)){_endCommunityAction(actionKey);return}
   showCreateForm=false;newPostType='General Post';
-  setCommTab('feed');showToast(isSupaAuthenticated()?'Post saved — syncing…':'Post saved on this device',{type:'information'});
-  const cloudSaved=await supaSubmitPost(post);
+  setCommTab('feed');showToast(_communityCloudSyncEnabled()?'Post saved — syncing…':'Post saved on this device',{type:'information'});
+  const cloudSaved=_communityCloudSyncEnabled()?await supaSubmitPost(post):null;
   const latest=getAllPosts(),stored=latest.find(item=>item.id===post.id);
-  if(stored){stored.syncStatus=cloudSaved?'synced':(isSupaAuthenticated()?'pending':'local_only');saveAllPosts(latest)}
+  if(stored){stored.syncStatus=cloudSaved?'synced':(cloudSaved===false?'pending':'local_only');saveAllPosts(latest,{source:'cloud'})}
   if(cloudSaved)showToast('Post published',{type:'success'});
-  else if(isSupaAuthenticated())showToast('Post is safe on this device; cloud sync will retry',{type:'warning'});
+  else if(cloudSaved===false)showToast('Post is safe on this device; cloud sync will retry',{type:'warning'});
+  _endCommunityAction(actionKey);
 }
 
 function handlePostFileSelect(input,communityId){
@@ -8712,42 +8934,58 @@ function handlePostFileSelect(input,communityId){
   reader.onload=e=>{const imgEl=document.getElementById('pp-img');if(imgEl)imgEl.value=e.target.result};
   reader.readAsDataURL(file);
 }
-function editPostInline(postId){editingPostId=postId;setCommTab('feed')}
+function editPostInline(postId){
+  const post=getAllPosts().find(item=>item.id===postId);if(!post)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_POST,post.communityId,{entity:post,message:'You cannot edit this post.'}))return;
+  editingPostId=postId;setCommTab('feed');
+}
 function cancelPostEdit(){editingPostId=null;setCommTab('feed')}
-function savePostEdit(postId){
+async function savePostEdit(postId){
   const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_POST,p.communityId,{entity:p,message:'You cannot edit this post.'}))return;
   p.title=(document.getElementById(`edit-t-${postId}`)?.value||'').trim();
   p.body=(document.getElementById(`edit-b-${postId}`)?.value||'').trim();
+  if(!p.title&&!p.body){showToast('A post needs a title or body text');return}
   p.imageUrl=(document.getElementById(`edit-i-${postId}`)?.value||'').trim();
   saveAllPosts(all);editingPostId=null;setCommTab('feed');showToast('Post updated');
+  const imageUrl=/^data:/i.test(p.imageUrl)?null:(p.imageUrl||null);
+  const cloudResult=await supaUpdatePost(postId,{title:p.title||null,content:p.body,image_url:imageUrl,updated_at:new Date().toISOString()});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Post edit is saved locally; cloud sync failed.',{type:'warning'});
 }
 
-async function deletePost(postId){
+async function deletePost(postId,communityId){
+  const post=getAllPosts().find(item=>item.id===postId);if(!post)return;
+  if(!requireCommunityAction(COMM_ACTION.DELETE_POST,communityId,{entity:post,message:'You cannot delete this post.'}))return;
   if(!await uiConfirm('Delete this post?'))return;
+  if(_communityCloudSyncEnabled()&&await supaHardDeletePost(postId)===false){showToast('Post was not deleted because cloud deletion failed.',{type:'warning'});return}
   saveAllPosts(getAllPosts().filter(p=>p.id!==postId));
   expandedComments.delete(postId);
   if(editingPostId===postId)editingPostId=null;
-  supaHardDeletePost(postId);
   setCommTab('feed');showToast('Post deleted');
 }
 
-function pinPost(postId){
+async function pinPost(postId){
   const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
+  if(!requireCommunityAction(COMM_ACTION.PIN_POST,p.communityId,{entity:p,message:'Only admins can pin posts.'}))return;
   p.pinned=!p.pinned;saveAllPosts(all);
-  supaUpdatePost(postId,{pinned:p.pinned});
+  const cloudResult=await supaUpdatePost(postId,{pinned:p.pinned});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Pin state is saved locally; cloud sync failed.',{type:'warning'});
   setCommTab('feed');showToast(p.pinned?'Post pinned 📌':'Post unpinned');
 }
 
-function reactPost(postId,communityId,emoji){
+async function reactPost(postId,communityId,emoji){
+  if(!['like','fire','clap'].includes(emoji)||!requireCommunityAction(COMM_ACTION.REACT,communityId))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const all=getAllPosts();const p=all.find(x=>x.id===postId);if(!p)return;
   if(!p.reactions)p.reactions={like:[],fire:[],clap:[]};
   if(!p.reactions[emoji])p.reactions[emoji]=[];
   const idx=p.reactions[emoji].indexOf(myId);
-  if(idx>-1)p.reactions[emoji].splice(idx,1);else p.reactions[emoji].push(myId);
+  const active=idx===-1;
+  if(!active)p.reactions[emoji].splice(idx,1);else p.reactions[emoji].push(myId);
   saveAllPosts(all);
-  supaUpdatePost(postId,{reactions:p.reactions});
   setCommTab('feed');
+  const cloudResult=await supaSetPostReaction(postId,emoji,active);
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Reaction is saved locally; secure cloud sync failed.',{type:'warning'});
 }
 
 function toggleComments(postId){
@@ -8755,25 +8993,37 @@ function toggleComments(postId){
   setCommTab('feed');
 }
 
-function submitComment(postId){
+async function submitComment(postId){
   const inp=document.getElementById(`cmt-inp-${postId}`);
   const body=(inp?.value||'').trim();if(!body){showToast('Type a comment first');return}
   const prof=currentProfile||{id:'guest',name:'Guest'};
   const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
+  if(!requireCommunityAction(COMM_ACTION.COMMENT,post.communityId))return;
   const _commForLock=getComms().find(x=>x.id===post.communityId);
   const _myMbrRole=getCommMembers().find(m=>m.communityId===post.communityId&&m.profileId===prof.id)?.role||'guest';
   if(_commForLock&&_commForLock.commentsLocked&&_myMbrRole!=='admin'){showToast('Comments are locked by the admin');return}
-  if(!post.comments)post.comments=[];
-  post.comments.push({id:'cmt_'+Date.now(),authorId:prof.id,authorName:prof.name||'Unknown',body,createdAt:new Date().toISOString()});
-  saveAllPosts(all);
-  supaUpdatePost(postId,{comments:post.comments});
-  setCommTab('feed');
+  const actionKey=`post-comment:${postId}`;
+  if(!_beginCommunityAction(actionKey)){showToast('Comment is already being posted.');return}
+  try{
+    if(!post.comments)post.comments=[];
+    const comment={id:_communityId('cmt',post.comments),authorId:prof.id,authorName:prof.name||'Unknown',body,createdAt:new Date().toISOString()};
+    post.comments.push(comment);
+    if(!saveAllPosts(all))return;
+    setCommTab('feed');
+    const cloudResult=await supaAddPostComment(postId,comment);
+    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment is saved locally; secure cloud sync failed.',{type:'warning'});
+  }finally{_endCommunityAction(actionKey)}
 }
 
-function deleteComment(postId,communityId,commentId){
+async function deleteComment(postId,communityId,commentId){
   const all=getAllPosts();const post=all.find(x=>x.id===postId);if(!post)return;
+  const comment=(post.comments||[]).find(item=>item.id===commentId);
+  if(!comment||!requireCommunityAction(COMM_ACTION.DELETE_COMMENT,post.communityId,{entity:comment,message:'You cannot delete this comment.'}))return;
   post.comments=(post.comments||[]).filter(c=>c.id!==commentId);
-  saveAllPosts(all);setCommTab('feed');showToast('Comment removed');
+  if(!saveAllPosts(all))return;
+  setCommTab('feed');showToast('Comment removed');
+  const cloudResult=await supaDeletePostComment(postId,commentId);
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal is saved locally; secure cloud sync failed.',{type:'warning'});
 }
 
 /* ════════════════════════════════════════════════════════
@@ -8807,11 +9057,11 @@ let selectedBadges=new Set();
 let pendingRating={};
 
 // ── Storage ───────────────────────────────────────────────
-function getAllCPlayers(){try{return JSON.parse(localStorage.getItem(KC.players)||'[]')}catch{return[]}}
-function saveAllCPlayers(arr,{source='local'}={}){localStorage.setItem(KC.players,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllCPlayers(){return _readCommunityCollection(KC.players,CommunityContract.normalizePlayer)}
+function saveAllCPlayers(arr,options){return _writeCommunityCollection(KC.players,arr,options)}
 function getCPlayers(cid){return getAllCPlayers().filter(p=>p.communityId===cid)}
-function getAllCRatings(){try{return JSON.parse(localStorage.getItem(KC.ratings)||'[]')}catch{return[]}}
-function saveAllCRatings(arr,{source='local'}={}){localStorage.setItem(KC.ratings,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllCRatings(){return _readCommunityCollection(KC.ratings,CommunityContract.normalizeRating)}
+function saveAllCRatings(arr,options){return _writeCommunityCollection(KC.ratings,arr,options)}
 function getCRatingsByPlayer(pid){return getAllCRatings().filter(r=>r.playerId===pid)}
 
 function calcPlayerAvg(playerId){
@@ -8872,8 +9122,8 @@ function renderPlayersTabHTML(c,myRole){
 }
 
 function buildPlayerCardHTML(player,c,myRole,myId){
-  const canManage=['admin','contributor'].includes(myRole);
-  const canRate=['admin','contributor','member'].includes(myRole);
+  const canManage=CommunityContract.can(COMM_ACTION.EDIT_PLAYER,{community:c,role:myRole,userId:myId,entity:player});
+  const canRate=CommunityContract.can(COMM_ACTION.RATE,{community:c,role:myRole,userId:myId});
   const isEditing=editingPlayerId===player.id;
   const isRating=ratingPlayerId===player.id;
   const avg=calcPlayerAvg(player.id);
@@ -8884,9 +9134,10 @@ function buildPlayerCardHTML(player,c,myRole,myId){
     return b?`<span class="badge-chip">${b.icon} ${escHtml(b.label)}</span>`:'';
   }).join('');
 
+  const playerInitial=escHtml((player.name||'?')[0].toUpperCase());
   const avatarInner=player.photoUrl
-    ?`<img src="${escAttr(player.photoUrl)}" alt="${escAttr(player.name||'Player')} profile photo" onerror="this.style.display='none'">`
-    :escHtml((player.name||'?')[0].toUpperCase());
+    ?`<img src="${escAttr(player.photoUrl)}" alt="${escAttr(player.name||'Player')} profile photo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="player-ava-fallback" style="display:none">${playerInitial}</span>`
+    :`<span class="player-ava-fallback">${playerInitial}</span>`;
 
   const avgHTML=avg!==null
     ?`<div class="player-avg-score">${avg.toFixed(1)}★</div><div class="player-avg-sub">${raterCount} rating${raterCount===1?'':'s'}</div>`
@@ -8981,6 +9232,7 @@ function buildRatingFormHTML(player,c){
 
 // ── Player actions ────────────────────────────────────────
 function toggleAddCPlayer(){
+  if(!requireCommunityAction(COMM_ACTION.ADD_PLAYER,activeCommunityId))return;
   showAddPlayerForm=!showAddPlayerForm;
   if(showAddPlayerForm){selectedBadges=new Set();selectedPosition='PG';editingPlayerId=null;ratingPlayerId=null}
   setCommTab('players');
@@ -8998,12 +9250,15 @@ function pickPlayerBadge(btn,badgeId){
   else selectedBadges.add(badgeId);
 }
 
-function submitCPlayer(communityId){
+async function submitCPlayer(communityId){
+  if(!requireCommunityAction(COMM_ACTION.ADD_PLAYER,communityId))return;
   const name=(document.getElementById('ap-name')?.value||'').trim();
   if(!name){showToast('Enter player name');return}
+  const all=getAllCPlayers();
+  if(CommunityContract.duplicateName(all,name,communityId)){showToast('A player with this name already exists in the community.',{type:'warning'});return}
   const prof=currentProfile||{id:'guest',name:'Guest'};
   const player={
-    id:'player_'+Date.now(),communityId,
+    id:_communityId('player',all),communityId,
     name,
     nickname:(document.getElementById('ap-nick')?.value||'').trim(),
     jerseyNumber:(document.getElementById('ap-jers')?.value||'').trim(),
@@ -9017,25 +9272,31 @@ function submitCPlayer(communityId){
     badges:[...selectedBadges],
     createdBy:prof.id,createdAt:new Date().toISOString(),
   };
-  const all=getAllCPlayers();all.push(player);saveAllCPlayers(all);
-  supaUpsertCPlayer(player);
+  if(player.wins+player.losses>player.gamesPlayed){showToast('Wins and losses cannot exceed games played.',{type:'warning'});return}
+  const actionKey=`player-add:${communityId}`;if(!_beginCommunityAction(actionKey))return;
+  all.push(player);if(!saveAllCPlayers(all)){_endCommunityAction(actionKey);return}
+  const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCPlayer(player):null;
   trackEvent('player_added');
   showAddPlayerForm=false;selectedBadges=new Set();
-  setCommTab('players');showToast(`${player.name} added!`);
+  setCommTab('players');showToast(cloudResult===false?`${player.name} added locally; cloud sync failed.`:`${player.name} added!`,{type:cloudResult===false?'warning':'success'});
+  _endCommunityAction(actionKey);
 }
 
 function editCPlayerInline(playerId){
   const p=getAllCPlayers().find(x=>x.id===playerId);
+  if(!p||!requireCommunityAction(COMM_ACTION.EDIT_PLAYER,p.communityId,{entity:p}))return;
   if(p){selectedBadges=new Set(p.badges||[]);selectedPosition=p.position||'PG'}
   editingPlayerId=playerId;ratingPlayerId=null;showAddPlayerForm=false;
   setCommTab('players');
 }
 function cancelCPlayerEdit(){editingPlayerId=null;setCommTab('players')}
 
-function saveCPlayerEdit(playerId){
+async function saveCPlayerEdit(playerId){
   const all=getAllCPlayers();const p=all.find(x=>x.id===playerId);if(!p)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_PLAYER,p.communityId,{entity:p}))return;
   const name=(document.getElementById('ep-name')?.value||'').trim();
   if(!name){showToast('Player name required');return}
+  if(CommunityContract.duplicateName(all,name,p.communityId,p.id)){showToast('A player with this name already exists in the community.',{type:'warning'});return}
   p.name=name;
   p.nickname=(document.getElementById('ep-nick')?.value||'').trim();
   p.jerseyNumber=(document.getElementById('ep-jers')?.value||'').trim();
@@ -9046,22 +9307,31 @@ function saveCPlayerEdit(playerId){
   p.losses=parseInt(document.getElementById('ep-l')?.value)||0;
   p.points=parseInt(document.getElementById('ep-pts')?.value)||0;
   p.mvpCount=parseInt(document.getElementById('ep-mvp')?.value)||0;
+  if([p.gamesPlayed,p.wins,p.losses,p.points,p.mvpCount].some(value=>value<0)||p.wins+p.losses>p.gamesPlayed){showToast('Use non-negative stats; wins and losses cannot exceed games played.',{type:'warning'});return}
   p.badges=[...selectedBadges];
-  saveAllCPlayers(all);
-  supaUpsertCPlayer(p);
+  const actionKey=`player-edit:${playerId}`;if(!_beginCommunityAction(actionKey))return;
+  if(!saveAllCPlayers(all)){_endCommunityAction(actionKey);return}
+  const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCPlayer(p):null;
   editingPlayerId=null;
-  setCommTab('players');showToast('Player updated');
+  setCommTab('players');showToast(cloudResult===false?'Player updated locally; cloud sync failed.':'Player updated',{type:cloudResult===false?'warning':'success'});
+  _endCommunityAction(actionKey);
 }
 
 async function deleteCPlayer(playerId){
+  const player=getAllCPlayers().find(item=>item.id===playerId);if(!player)return;
+  if(!requireCommunityAction(COMM_ACTION.DELETE_PLAYER,player.communityId,{entity:player}))return;
   if(!await uiConfirm('Remove this player from the community?'))return;
+  if(_communityCloudSyncEnabled()&&await supaDeleteCPlayer(playerId)===false){showToast('Player was not removed because cloud deletion failed.',{type:'warning'});return}
   saveAllCPlayers(getAllCPlayers().filter(p=>p.id!==playerId));
   saveAllCRatings(getAllCRatings().filter(r=>r.playerId!==playerId));
-  supaDeleteCPlayer(playerId);
+  const gallery=getAllGalItems();let galleryChanged=false;
+  gallery.forEach(item=>{const next=(item.taggedPlayers||[]).filter(id=>id!==playerId);if(next.length!==(item.taggedPlayers||[]).length){item.taggedPlayers=next;galleryChanged=true}});
+  if(galleryChanged)saveAllGalItems(gallery);
   setCommTab('players');showToast('Player removed');
 }
 
 function toggleRateCPlayer(playerId){
+  const player=getAllCPlayers().find(item=>item.id===playerId);if(!player||!requireCommunityAction(COMM_ACTION.RATE,player.communityId))return;
   if(ratingPlayerId===playerId){ratingPlayerId=null;pendingRating={}}
   else{
     ratingPlayerId=playerId;
@@ -9080,31 +9350,34 @@ function setRatingStar(attr,val){
   });
 }
 
-function submitCRating(playerId,communityId){
+async function submitCRating(playerId,communityId){
+  if(!requireCommunityAction(COMM_ACTION.RATE,communityId))return;
   const hasAny=RATE_ATTRS.some(({k})=>(pendingRating[k]||0)>0);
   if(!hasAny){showToast('Rate at least one attribute ★');return}
+  const actionKey=`rating:${playerId}`;if(!_beginCommunityAction(actionKey))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const all=getAllCRatings();
   const idx=all.findIndex(r=>r.playerId===playerId&&r.raterProfileId===myId);
   const rating={
-    id:idx>-1?all[idx].id:'rating_'+Date.now(),
+    id:idx>-1?all[idx].id:_communityId('rating',all),
     playerId,communityId,raterProfileId:myId,
     updatedAt:new Date().toISOString(),
   };
   if(idx>-1)rating.createdAt=all[idx].createdAt;else rating.createdAt=rating.updatedAt;
   RATE_ATTRS.forEach(({k})=>{rating[k]=pendingRating[k]||0});
   if(idx>-1)all[idx]=rating;else all.push(rating);
-  saveAllCRatings(all);
-  supaUpsertCRating(rating);
+  if(!saveAllCRatings(all)){_endCommunityAction(actionKey);return}
+  const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCRating(rating):null;
   ratingPlayerId=null;pendingRating={};
-  setCommTab('players');showToast('Rating submitted! ⭐');
+  setCommTab('players');showToast(cloudResult===false?'Rating saved locally; cloud sync failed.':'Rating submitted! ⭐',{type:cloudResult===false?'warning':'success'});
+  _endCommunityAction(actionKey);
 }
 
 /* ════════════════════════════════════════════════════════
    Community Join / Leave (Phase C8)
 ════════════════════════════════════════════════════════ */
-function getAllJoinReqs(){try{return JSON.parse(localStorage.getItem(KC.joins)||'[]')}catch{return[]}}
-function saveAllJoinReqs(arr,{source='local'}={}){localStorage.setItem(KC.joins,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllJoinReqs(){return _readCommunityCollection(KC.joins,CommunityContract.normalizeJoinRequest)}
+function saveAllJoinReqs(arr,options){return _writeCommunityCollection(KC.joins,arr,options)}
 function getJoinReqs(cid){return getAllJoinReqs().filter(r=>r.communityId===cid&&r.status==='pending')}
 
 function _buildJoinBarHTML(c,myRole){
@@ -9166,7 +9439,7 @@ function _buildJoinBarHTML(c,myRole){
   </div>`;
 }
 
-function joinCommunity(communityId){
+async function joinCommunity(communityId){
   const c=getComms().find(x=>x.id===communityId);
   if(!c){showToast('Community not found');return}
   const myId=(currentProfile||{id:'guest'}).id;
@@ -9178,25 +9451,29 @@ function joinCommunity(communityId){
   if(c.visibility==='hidden'||c.joinPolicy==='invite_only'){
     showToast('This community is invite-only. Use an administrator’s invite link or code.',{type:'information'});return;
   }
+  const cloudCommunity=c.origin==='cloud'||c.localOnly===false;
+  if(cloudCommunity&&!_communityCloudSyncEnabled()){
+    showToast(isSupaAuthenticated()?'Enable cloud sync to join this online community.':'Sign in to join this online community.',{type:'warning'});return;
+  }
   const needsApproval=c.joinPolicy==='approval'||c.joinApproval||c.visibility==='private';
   if(needsApproval){
     const reqs=getAllJoinReqs();
     if(reqs.find(r=>r.communityId===communityId&&r.profileId===myId&&r.status==='pending')){
       showToast('Request already sent');return;
     }
-    const newReq={id:'join_'+Date.now(),communityId,profileId:myId,profileName:myName,requestedAt:new Date().toISOString(),status:'pending'};
+    const newReq={id:_communityId('join',reqs),communityId,profileId:myId,profileName:myName,requestedAt:new Date().toISOString(),status:'pending'};
+    if(cloudCommunity&&await supaCreateJoinRequest(newReq)===false){showToast('Join request was not sent. Nothing changed on this device.',{type:'warning'});return}
     reqs.push(newReq);
     saveAllJoinReqs(reqs);
-    supaCreateJoinRequest(newReq);
     showToast('Join request sent! ⏳');
   }else{
-    const newMember={id:'mem_'+Date.now(),communityId,profileId:myId,profileName:myName,role:'member',joinedAt:new Date().toISOString().split('T')[0]};
+    if(cloudCommunity&&await supaJoinCommunity(communityId)===false){showToast('The community could not be joined. Nothing changed on this device.',{type:'warning'});return}
+    const newMember={id:_communityId('mem',members),communityId,profileId:myId,profileName:myName,role:'member',joinedAt:new Date().toISOString().split('T')[0]};
     members.push(newMember);
     setCommMembers(members);
     const comms=getComms();
     const ci=comms.findIndex(x=>x.id===communityId);
     if(ci!==-1){comms[ci].memberCount=(comms[ci].memberCount||0)+1;setComms(comms)}
-    supaJoinCommunity(communityId);
     showToast('You joined '+c.name+' 🏀');
   }
   renderCommDetail();
@@ -9215,10 +9492,10 @@ async function joinCommunityByCode(){
 
   const profile=currentProfile||{id:'guest',name:'Guest'};
   const localCommunity=getComms().find(community=>(community.inviteCode||'').toUpperCase()===code);
-  if(localCommunity?.localOnly||(!isSupaAuthenticated()&&localCommunity)){
+  if(localCommunity&&(localCommunity.localOnly||localCommunity.origin!=='cloud')){
     const members=getCommMembers();
     if(!members.some(member=>member.communityId===localCommunity.id&&member.profileId===profile.id)){
-      members.push({id:`mem_${Date.now()}`,communityId:localCommunity.id,profileId:profile.id,profileName:profile.name,role:'member',joinedAt:new Date().toISOString().split('T')[0],localOnly:true});
+      members.push({id:_communityId('mem',members),communityId:localCommunity.id,profileId:profile.id,profileName:profile.name,role:'member',joinedAt:new Date().toISOString().split('T')[0],localOnly:true});
       setCommMembers(members);
     }
     if(input)input.value='';setMessage(`Joined ${localCommunity.name} on this device.`);renderCommunities();showToast(`Joined ${localCommunity.name}`,{type:'success'});return;
@@ -9252,10 +9529,10 @@ function copyCommunityInviteCode(code){
   }else fallback();
 }
 
-function cancelJoinReq(communityId){
+async function cancelJoinReq(communityId){
   const myId=(currentProfile||{id:'guest'}).id;
+  if(_communityCloudSyncEnabled()&&await supaCancelJoinRequest(communityId)===false){showToast('Request was not cancelled because cloud sync failed.',{type:'warning'});return}
   saveAllJoinReqs(getAllJoinReqs().filter(r=>!(r.communityId===communityId&&r.profileId===myId)));
-  supaCancelJoinRequest(communityId);
   showToast('Request cancelled');
   renderCommDetail();
 }
@@ -9268,20 +9545,22 @@ async function leaveComm(communityId){
   const members=getCommMembers();
   const myMember=members.find(m=>m.communityId===communityId&&m.profileId===myId);
   if(!myMember)return;
-  if(myMember.role==='admin'){showToast('Admins cannot leave. Transfer admin role first or delete the community.');return}
+  if(!requireCommunityAction(COMM_ACTION.LEAVE,communityId,{message:'Owners and admins cannot leave. Another admin must change your role first.'}))return;
+  if(_communityCloudSyncEnabled()&&await supaLeaveComm(communityId)===false){showToast('You were not removed because cloud sync failed.',{type:'warning'});return}
   setCommMembers(members.filter(m=>!(m.communityId===communityId&&m.profileId===myId)));
   const comms=getComms();
   const ci=comms.findIndex(x=>x.id===communityId);
   if(ci!==-1){comms[ci].memberCount=Math.max(0,(comms[ci].memberCount||1)-1);setComms(comms)}
-  supaLeaveComm(communityId);
   showToast('You left '+c.name);
   showScreen('communities');
 }
 
-function approveJoin(reqId,communityId){
+async function approveJoin(reqId,communityId){
+  if(!requireCommunityAction(COMM_ACTION.MANAGE_JOIN,communityId,{message:'Only admins can approve join requests.'}))return;
   const reqs=getAllJoinReqs();
   const req=reqs.find(r=>r.id===reqId);
   if(!req)return;
+  if(_communityCloudSyncEnabled()&&await supaUpdateJoinRequest(reqId,'approved')===false){showToast('Request was not approved because cloud sync failed.',{type:'warning'});return}
   req.status='approved';
   saveAllJoinReqs(reqs);
   const members=getCommMembers();
@@ -9292,18 +9571,18 @@ function approveJoin(reqId,communityId){
     const ci=comms.findIndex(x=>x.id===communityId);
     if(ci!==-1){comms[ci].memberCount=(comms[ci].memberCount||0)+1;setComms(comms)}
   }
-  supaUpdateJoinRequest(reqId,'approved');
   showToast(escHtml(req.profileName)+' approved ✅');
   setCommTab('members');
 }
 
-function rejectJoin(reqId,communityId){
+async function rejectJoin(reqId,communityId){
+  if(!requireCommunityAction(COMM_ACTION.MANAGE_JOIN,communityId,{message:'Only admins can reject join requests.'}))return;
   const reqs=getAllJoinReqs();
   const req=reqs.find(r=>r.id===reqId);
   if(!req)return;
+  if(_communityCloudSyncEnabled()&&await supaUpdateJoinRequest(reqId,'rejected')===false){showToast('Request was not rejected because cloud sync failed.',{type:'warning'});return}
   req.status='rejected';
   saveAllJoinReqs(reqs);
-  supaUpdateJoinRequest(reqId,'rejected');
   showToast('Request rejected');
   setCommTab('members');
 }
@@ -9346,7 +9625,7 @@ function renderLeaderboardTabHTML(c){
   const ranked=_rankPlayers(players,lbCategory);
 
   const rowsHTML=ranked.length
-    ?ranked.map((r,i)=>buildLbRowHTML(i+1,r.player,r.value,r.unit)).join('')
+    ?ranked.map(r=>buildLbRowHTML(r.rank,r.player,r.value,r.unit)).join('')
     :`<div class="lb-empty"><span style="font-size:28px">📊</span><span>No data yet for this category.</span></div>`;
 
   const catMeta=LB_CATS.find(x=>x.k===lbCategory)||{};
@@ -9359,51 +9638,7 @@ function renderLeaderboardTabHTML(c){
 }
 
 function _rankPlayers(players,cat){
-  const allRatings=getAllCRatings();
-  let scored=[];
-
-  if(cat==='rating'){
-    scored=players.map(p=>{
-      const pr=allRatings.filter(r=>r.playerId===p.id);
-      const attrs=['shooting','defense','passing','speed','teamwork','clutch','sportsmanship'];
-      const totals=attrs.map(a=>_calcAttrAvg(pr,a)).filter(v=>v!==null);
-      const avg=totals.length?totals.reduce((a,b)=>a+b,0)/totals.length:null;
-      return{player:p,value:avg,unit:'avg'};
-    }).filter(x=>x.value!==null);
-    scored.sort((a,b)=>b.value-a.value);
-    scored=scored.map(x=>({...x,value:x.value.toFixed(1)}));
-
-  }else if(cat==='scoring'){
-    scored=players.map(p=>({player:p,value:p.points||0,unit:'pts'}));
-    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
-
-  }else if(cat==='games'){
-    scored=players.map(p=>({player:p,value:p.gamesPlayed||0,unit:'games'}));
-    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
-
-  }else if(cat==='winrate'){
-    scored=players.map(p=>{
-      const g=p.gamesPlayed||0;
-      if(g<3)return null;
-      const wr=Math.round(((p.wins||0)/g)*100);
-      return{player:p,value:wr,unit:'%'};
-    }).filter(Boolean).sort((a,b)=>b.value-a.value);
-
-  }else if(cat==='mvp'){
-    scored=players.map(p=>({player:p,value:p.mvpCount||0,unit:'MVPs'}));
-    scored=scored.filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
-
-  }else if(cat==='sport'){
-    scored=players.map(p=>{
-      const pr=allRatings.filter(r=>r.playerId===p.id);
-      const avg=_calcAttrAvg(pr,'sportsmanship');
-      return{player:p,value:avg,unit:'avg'};
-    }).filter(x=>x.value!==null);
-    scored.sort((a,b)=>b.value-a.value);
-    scored=scored.map(x=>({...x,value:x.value.toFixed(1)}));
-  }
-
-  return scored.slice(0,10);
+  return CommunityContract.rankPlayers(players,getAllCRatings(),cat);
 }
 
 function buildLbRowHTML(rank,player,value,unit){
@@ -9442,24 +9677,26 @@ const EVT_TYPE_TEXT={
 };
 let eventsFilter='upcoming';
 let showAddEventForm=false;
+let editingEventId=null;
 let selectedEventType='Pickup Game';
 let expandedEventRsvps=new Set();
 
-function getAllEvents(){try{return JSON.parse(localStorage.getItem(KC.events)||'[]')}catch{return[]}}
-function saveAllEvents(arr,{source='local'}={}){localStorage.setItem(KC.events,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllEvents(){return _readCommunityCollection(KC.events,CommunityContract.normalizeEvent)}
+function saveAllEvents(arr,options){return _writeCommunityCollection(KC.events,arr,options)}
 function getEvents(cid){return getAllEvents().filter(e=>e.communityId===cid)}
 
 function renderEventsTabHTML(c,myRole){
   const myId=(currentProfile||{id:'guest'}).id;
-  const canAdd=myRole==='admin'||myRole==='contributor';
+  const canAdd=CommunityContract.can(COMM_ACTION.ADD_GALLERY,{community:c,role:myRole,userId:myId});
   const now=new Date();
   let events=getEvents(c.id);
-  if(eventsFilter==='upcoming')events=events.filter(e=>new Date(e.date+'T'+(e.time||'23:59'))>=now);
-  else if(eventsFilter==='past')events=events.filter(e=>new Date(e.date+'T'+(e.time||'23:59'))<now);
+  if(eventsFilter==='upcoming')events=events.filter(e=>{const date=CommunityContract.parseEventDateTime(e);return date&&date>=now});
+  else if(eventsFilter==='past')events=events.filter(e=>{const date=CommunityContract.parseEventDateTime(e);return date&&date<now});
   events=events.slice().sort((a,b)=>{
-    const da=new Date(a.date+'T'+(a.time||'00:00')),db=new Date(b.date+'T'+(b.time||'00:00'));
+    const da=CommunityContract.parseEventDateTime(a)||new Date(0),db=CommunityContract.parseEventDateTime(b)||new Date(0);
     return eventsFilter==='past'?db-da:da-db;
   });
+  const editingEvent=editingEventId?getEvents(c.id).find(event=>event.id===editingEventId):null;
 
   const filterChips=[{v:'upcoming',l:'Upcoming 📅'},{v:'past',l:'Past'},{v:'all',l:'All'}].map(({v,l})=>
     `<button class="ff-chip${eventsFilter===v?' on':''}" type="button" aria-pressed="${eventsFilter===v}" onclick="setEventsFilter('${v}')">${l}</button>`
@@ -9473,19 +9710,19 @@ function renderEventsTabHTML(c,myRole){
     <div class="form-label">Event Type</div>
     <div class="evt-type-chips">${typeChips}</div>
     <div class="form-label">Title</div>
-    <input class="add-gal-url" id="evt-title-input" type="text" placeholder="e.g. Saturday Pickup Run" aria-label="Event title" style="margin-bottom:8px">
+    <input class="add-gal-url" id="evt-title-input" type="text" value="${escAttr(editingEvent?.title||'')}" maxlength="80" placeholder="e.g. Saturday Pickup Run" aria-label="Event title" style="margin-bottom:8px">
     <div class="form-label">Description</div>
-    <textarea class="post-body-input" id="evt-desc-input" rows="2" placeholder="Details, rules, what to bring..." aria-label="Event description"></textarea>
+    <textarea class="post-body-input" id="evt-desc-input" rows="2" maxlength="500" placeholder="Details, rules, what to bring..." aria-label="Event description">${escHtml(editingEvent?.description||'')}</textarea>
     <div class="evt-date-time-row" style="margin-top:8px">
-      <div><div class="form-label">Date</div><input class="add-gal-url" id="evt-date-input" type="date" aria-label="Event date" style="margin-bottom:0"></div>
-      <div><div class="form-label">Time</div><input class="add-gal-url" id="evt-time-input" type="time" aria-label="Event time" style="margin-bottom:0"></div>
+      <div><div class="form-label">Date</div><input class="add-gal-url" id="evt-date-input" type="date" value="${escAttr(editingEvent?.date||'')}" aria-label="Event date" style="margin-bottom:0"></div>
+      <div><div class="form-label">Time</div><input class="add-gal-url" id="evt-time-input" type="time" value="${escAttr(CommunityContract.eventTimeInput(editingEvent?.time||''))}" aria-label="Event time" style="margin-bottom:0"></div>
     </div>
     <div class="form-label" style="margin-top:8px">Location / Court</div>
-    <input class="add-gal-url" id="evt-loc-input" type="text" placeholder="Court name or address" aria-label="Event location or court">
+    <input class="add-gal-url" id="evt-loc-input" type="text" value="${escAttr(editingEvent?.location||'')}" maxlength="160" placeholder="Court name or address" aria-label="Event location or court">
     <div class="form-label">Max Players <span style="color:var(--muted);font-weight:400">(0 = no limit)</span></div>
-    <input class="add-gal-url" id="evt-max-input" type="number" min="0" placeholder="0" aria-label="Maximum players, zero for no limit" style="margin-bottom:8px">
+    <input class="add-gal-url" id="evt-max-input" type="number" min="0" value="${editingEvent?.maxPlayers||0}" placeholder="0" aria-label="Maximum players, zero for no limit" style="margin-bottom:8px">
     <div class="post-form-actions" style="margin-top:4px">
-      <button class="btn-post-submit" type="button" onclick="submitEvent(${jsArg(c.id)})">📅 Create Event</button>
+      <button class="btn-post-submit" type="button" onclick="submitEvent(${jsArg(c.id)})">${editingEvent?'Save Changes':'📅 Create Event'}</button>
       <button class="btn-post-cancel" onclick="cancelAddEvent()">Cancel</button>
     </div>
   </div>`:'';
@@ -9507,10 +9744,12 @@ function renderEventsTabHTML(c,myRole){
 
 function buildEventCardHTML(evt,c,myRole,myId){
   const canDel=myRole==='admin'||evt.createdBy===myId;
+  const canEdit=CommunityContract.can(COMM_ACTION.EDIT_EVENT,{community:c,role:myRole,userId:myId,entity:evt});
   const isAdmin=myRole==='admin'||myRole==='contributor';
+  const canRsvp=CommunityContract.can(COMM_ACTION.RSVP,{community:c,role:myRole,userId:myId});
   const now=new Date();
-  const evtDt=new Date(evt.date+'T'+(evt.time||'23:59'));
-  const isPast=evtDt<now;
+  const evtDt=CommunityContract.parseEventDateTime(evt);
+  const isPast=Boolean(evtDt&&evtDt<now);
   const d=new Date(evt.date+'T12:00:00');
   const dayNum=d.getDate();
   const monStr=d.toLocaleString('default',{month:'short'}).toUpperCase();
@@ -9563,13 +9802,13 @@ function buildEventCardHTML(evt,c,myRole,myId){
   const s=myRsvp?.status;
   const rsvpHTML=isPast?'':`<div role="group" aria-label="Your RSVP status">
     <div class="evt-rsvp-row">
-      <button type="button" class="btn-rsvp${s==='going'?' going':''}" aria-pressed="${s==='going'}" ${isFull?'disabled title="Event full"':''} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'going')">✅<span>${isFull&&s!=='going'?'Full':'Going'}</span></button>
-      <button type="button" class="btn-rsvp${s==='maybe'?' maybe':''}" aria-pressed="${s==='maybe'}" onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'maybe')">🤔<span>Maybe</span></button>
-      <button type="button" class="btn-rsvp${s==='not_going'?' not-going':''}" aria-pressed="${s==='not_going'}" onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'not_going')">❌<span>Can't Go</span></button>
+      <button type="button" class="btn-rsvp${s==='going'?' going':''}" aria-pressed="${s==='going'}" ${isFull||!canRsvp?'disabled title="'+(isFull?'Event full':'Join the community to RSVP')+'"':''} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'going')">✅<span>${isFull&&s!=='going'?'Full':'Going'}</span></button>
+      <button type="button" class="btn-rsvp${s==='maybe'?' maybe':''}" aria-pressed="${s==='maybe'}" ${canRsvp?'':'disabled'} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'maybe')">🤔<span>Maybe</span></button>
+      <button type="button" class="btn-rsvp${s==='not_going'?' not-going':''}" aria-pressed="${s==='not_going'}" ${canRsvp?'':'disabled'} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'not_going')">❌<span>Can't Go</span></button>
     </div>
     <div class="evt-rsvp-row evt-rsvp-row-2">
-      <button type="button" class="btn-rsvp${s==='need_team'?' need-team':''}" aria-pressed="${s==='need_team'}" onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'need_team')">🏀<span>Need Team</span></button>
-      <button type="button" class="btn-rsvp${s==='running_late'?' running-late':''}" aria-pressed="${s==='running_late'}" onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'running_late')">⏰<span>Running Late</span></button>
+      <button type="button" class="btn-rsvp${s==='need_team'?' need-team':''}" aria-pressed="${s==='need_team'}" ${canRsvp?'':'disabled'} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'need_team')">🏀<span>Need Team</span></button>
+      <button type="button" class="btn-rsvp${s==='running_late'?' running-late':''}" aria-pressed="${s==='running_late'}" ${canRsvp?'':'disabled'} onclick="rsvpEvent(${jsArg(evt.id)},${jsArg(c.id)},'running_late')">⏰<span>Running Late</span></button>
       <div style="flex:2"></div>
     </div></div>`;
 
@@ -9599,13 +9838,14 @@ function buildEventCardHTML(evt,c,myRole,myId){
       <button type="button" class="btn-evt-attendees" aria-expanded="${rsvpOpen}" onclick="toggleEventRsvps(${jsArg(evt.id)},${jsArg(c.id)})">${rsvpOpen?'Hide':'Show'} attendees (${rsvps.length})</button>
     </div>`:''}
     ${rsvpListHTML}
-    ${canDel?`<div class="evt-admin-row"><button class="btn-evt-del" type="button" onclick="deleteEvent(${jsArg(evt.id)},${jsArg(c.id)})">🗑 Delete Event</button></div>`:''}
+    ${canEdit||canDel?`<div class="evt-admin-row">${canEdit?`<button class="btn-evt-edit" type="button" onclick="editEvent(${jsArg(evt.id)},${jsArg(c.id)})">✏ Edit Event</button>`:''}${canDel?`<button class="btn-evt-del" type="button" onclick="deleteEvent(${jsArg(evt.id)},${jsArg(c.id)})">🗑 Delete Event</button>`:''}</div>`:''}
   </div>`;
 }
 
 function toggleAddEvent(){
+  if(!requireCommunityAction(COMM_ACTION.CREATE_EVENT,activeCommunityId))return;
   showAddEventForm=!showAddEventForm;
-  if(showAddEventForm)selectedEventType='Pickup Game';
+  editingEventId=null;if(showAddEventForm)selectedEventType='Pickup Game';
   setCommTab('events');
   if(showAddEventForm){
     const location=document.getElementById('evt-loc-input');
@@ -9613,7 +9853,13 @@ function toggleAddEvent(){
     if(location&&!location.value&&preferred)location.value=preferred;
   }
 }
-function cancelAddEvent(){showAddEventForm=false;setCommTab('events')}
+function cancelAddEvent(){showAddEventForm=false;editingEventId=null;setCommTab('events')}
+
+function editEvent(eventId,communityId){
+  const event=getAllEvents().find(item=>item.id===eventId&&item.communityId===communityId);if(!event)return;
+  if(!requireCommunityAction(COMM_ACTION.EDIT_EVENT,communityId,{entity:event}))return;
+  editingEventId=eventId;selectedEventType=event.type;showAddEventForm=true;setCommTab('events');
+}
 
 function pickEventTypeChip(btn,type){
   document.querySelectorAll('.evt-type-chip').forEach(b=>{const selected=b===btn;b.classList.toggle('on',selected);b.setAttribute('aria-pressed',String(selected))});
@@ -9622,7 +9868,10 @@ function pickEventTypeChip(btn,type){
 
 function setEventsFilter(f){eventsFilter=f;setCommTab('events')}
 
-function submitEvent(communityId){
+async function submitEvent(communityId){
+  const existing=editingEventId?getAllEvents().find(item=>item.id===editingEventId&&item.communityId===communityId):null;
+  const action=existing?COMM_ACTION.EDIT_EVENT:COMM_ACTION.CREATE_EVENT;
+  if(!requireCommunityAction(action,communityId,{entity:existing}))return;
   const title=(document.getElementById('evt-title-input')||{}).value?.trim();
   const desc=(document.getElementById('evt-desc-input')||{}).value?.trim()||'';
   const date=(document.getElementById('evt-date-input')||{}).value?.trim();
@@ -9633,26 +9882,36 @@ function submitEvent(communityId){
   if(!date){showToast('Pick a date');return}
   const myId=(currentProfile||{id:'guest'}).id;
   const myName=(currentProfile||{name:'Guest'}).name;
+  const all=getAllEvents();
   const evt={
-    id:'event_'+Date.now(),
+    ...(existing||{}),id:existing?.id||_communityId('event',all),
     communityId,title,description:desc,type:selectedEventType,
     date,time,location,maxPlayers:parseInt(maxRaw)||0,
-    createdBy:myId,creatorName:myName,
-    createdAt:new Date().toISOString(),
-    rsvps:[]
+    createdBy:existing?.createdBy||myId,creatorName:existing?.creatorName||myName,
+    createdAt:existing?.createdAt||new Date().toISOString(),
+    rsvps:existing?.rsvps||[]
   };
-  const all=getAllEvents();
-  all.push(evt);
-  saveAllEvents(all);
-  supaCreateEvent(evt);
+  if(evt.maxPlayers>0&&evt.rsvps.filter(rsvp=>rsvp.status==='going').length>evt.maxPlayers){showToast('Capacity cannot be lower than the current Going count.',{type:'warning'});return}
+  const actionKey=`event-submit:${communityId}`;if(!_beginCommunityAction(actionKey))return;
+  if(existing)all[all.findIndex(item=>item.id===existing.id)]=evt;else all.push(evt);
+  if(!saveAllEvents(all)){_endCommunityAction(actionKey);return}
+  let cloudResult=null;
+  if(_communityCloudSyncEnabled()){
+    cloudResult=existing?await supaUpdateEvent(evt.id,{title:evt.title,description:evt.description,event_date:evt.date,event_time:evt.time,location:evt.location,event_type:CommunityContract.eventTypeToDb(evt.type),max_attendees:evt.maxPlayers||null}):await supaCreateEvent(evt);
+  }
   showAddEventForm=false;
+  editingEventId=null;
   eventsFilter='upcoming';
   setCommTab('events');
-  showToast('Event created! 📅');
+  showToast(cloudResult===false?`Event ${existing?'updated':'created'} locally; cloud sync failed.`:`Event ${existing?'updated':'created'}! 📅`,{type:cloudResult===false?'warning':'success'});
+  _endCommunityAction(actionKey);
 }
 
 async function deleteEvent(eventId,communityId){
+  const event=getAllEvents().find(item=>item.id===eventId&&item.communityId===communityId);if(!event)return;
+  if(!requireCommunityAction(COMM_ACTION.DELETE_EVENT,communityId,{entity:event}))return;
   if(!await uiConfirm('Delete this event?'))return;
+  if(_communityCloudSyncEnabled()&&await supaDeleteEvent(eventId)===false){showToast('Event was not deleted because cloud deletion failed.',{type:'warning'});return}
   saveAllEvents(getAllEvents().filter(e=>e.id!==eventId));
   expandedEventRsvps.delete(eventId);
   setCommTab('events');
@@ -9662,6 +9921,7 @@ async function deleteEvent(eventId,communityId){
 const VALID_RSVP_STATUSES=['going','maybe','not_going','need_team','running_late'];
 async function rsvpEvent(eventId,communityId,status){
   if(!VALID_RSVP_STATUSES.includes(status))return;
+  if(!requireCommunityAction(COMM_ACTION.RSVP,communityId))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const myName=(currentProfile||{name:'Guest'}).name||'Guest';
   const all=getAllEvents();
@@ -9720,8 +9980,8 @@ let galPendingFile='';
 let galPendingFileName='';
 let galPendingFileSize=0;
 
-function getAllGalItems(){try{return JSON.parse(localStorage.getItem(KC.gallery)||'[]')}catch{return[]}}
-function saveAllGalItems(arr,{source='local'}={}){localStorage.setItem(KC.gallery,JSON.stringify(arr));if(source!=='cloud')markLocalSave()}
+function getAllGalItems(){return _readCommunityCollection(KC.gallery,CommunityContract.normalizeGalleryItem)}
+function saveAllGalItems(arr,options){return _writeCommunityCollection(KC.gallery,arr,options)}
 function getGalItems(cid){return getAllGalItems().filter(g=>g.communityId===cid)}
 
 function renderGalleryTabHTML(c,myRole){
@@ -9800,9 +10060,11 @@ function renderGalleryTabHTML(c,myRole){
 function buildGalCardHTML(item,c,myRole,myId,players){
   if(!item||!item.id)return'';
   players=players||[];
-  const canDel=myRole==='admin'||item.uploadedBy===myId;
+  const canDel=CommunityContract.can(COMM_ACTION.DELETE_GALLERY,{community:c,role:myRole,userId:myId,entity:item});
   const liked=item.likes&&item.likes.includes(myId);
   const cmtsOpen=expandedGalleryComments.has(item.id);
+  const canInteract=CommunityContract.can(COMM_ACTION.REACT,{community:c,role:myRole,userId:myId});
+  const canComment=CommunityContract.can(COMM_ACTION.COMMENT,{community:c,role:myRole,userId:myId});
   const taggedNames=item.taggedPlayers&&item.taggedPlayers.length
     ?players.filter(p=>item.taggedPlayers.includes(p.id)).map(p=>`<span class="gal-tag">${escHtml(p.name||'')}</span>`).join('')
     :'';
@@ -9814,17 +10076,17 @@ function buildGalCardHTML(item,c,myRole,myId,players){
 
   const cmtsHTML=cmtsOpen?`<div class="gal-comments-wrap">
     ${(item.comments||[]).filter(Boolean).map(cm=>{
-      const canDelCmt=myRole==='admin'||cm.authorId===myId;
+      const canDelCmt=CommunityContract.can(COMM_ACTION.DELETE_COMMENT,{community:c,role:myRole,userId:myId,entity:cm});
       return`<div class="comment-item">
         <div class="cmt-avatar">${escHtml((cm.authorName||'?')[0].toUpperCase())}</div>
         <div class="cmt-body"><div class="cmt-author">${escHtml(cm.authorName||'?')}</div><div class="cmt-text">${escHtml(cm.text)}</div></div>
         ${canDelCmt?`<button class="btn-del-cmt" type="button" aria-label="Delete comment by ${escAttr(cm.authorName||'this member')}" onclick="deleteGalCmt(${jsArg(item.id)},${jsArg(c.id)},${jsArg(cm.id)})">✕</button>`:''}
       </div>`;
     }).join('')}
-    <div class="add-comment-row">
+    ${canComment?`<div class="add-comment-row">
       <input class="comment-input" id="gal-cmt-${escAttr(item.id)}" type="text" placeholder="Add a comment..." aria-label="Add a comment to this gallery photo">
       <button class="btn-cmt-send" type="button" onclick="submitGalCmt(${jsArg(item.id)},${jsArg(c.id)})">Send</button>
-    </div>
+    </div>`:c.commentsLocked?'<div class="cmt-locked-notice">🔒 Comments locked by admin</div>':''}
   </div>`:'';
 
   return`<div class="gal-card">
@@ -9835,7 +10097,7 @@ function buildGalCardHTML(item,c,myRole,myId,players){
       ${taggedNames?`<div class="gal-tags">${taggedNames}</div>`:''}
       <div class="gal-meta">By ${escHtml(item.uploaderName||'Unknown')} · ${fmtPostTime(item.createdAt)}</div>
       <div class="gal-actions">
-        <button type="button" class="btn-gal-like${liked?' liked':''}" aria-pressed="${liked}" aria-label="Like this photo, ${(item.likes||[]).length} likes" onclick="likeGalItem(${jsArg(item.id)},${jsArg(c.id)})">❤️ ${(item.likes||[]).length}</button>
+        <button type="button" class="btn-gal-like${liked?' liked':''}" aria-pressed="${liked}" aria-label="Like this photo, ${(item.likes||[]).length} likes" ${canInteract?'':'disabled'} onclick="likeGalItem(${jsArg(item.id)},${jsArg(c.id)})">❤️ ${(item.likes||[]).length}</button>
         <button type="button" class="btn-gal-cmt" aria-expanded="${cmtsOpen}" aria-label="${cmtsOpen?'Hide':'Show'} ${(item.comments||[]).length} photo comments" onclick="toggleGalCmts(${jsArg(item.id)},${jsArg(c.id)})">💬 ${(item.comments||[]).length}</button>
         ${canDel?`<button type="button" class="btn-gal-del" aria-label="Delete this photo" onclick="deleteGalItem(${jsArg(item.id)},${jsArg(c.id)})">🗑</button>`:''}
       </div>
@@ -9845,6 +10107,7 @@ function buildGalCardHTML(item,c,myRole,myId,players){
 }
 
 function toggleAddGallery(){
+  if(!requireCommunityAction(COMM_ACTION.ADD_GALLERY,activeCommunityId))return;
   showAddGalleryForm=!showAddGalleryForm;
   if(showAddGalleryForm){selectedAlbum=GAL_ALBUMS[0];selectedTaggedPlayers=new Set();galImageMode='upload';galPendingFile='';galPendingFileName='';galPendingFileSize=0;}
   setCommTab('gallery');
@@ -9918,7 +10181,8 @@ function formatFileSize(bytes){
 
 /* For production, use Firebase Storage, Supabase Storage, S3, or Cloudflare R2
    instead of localStorage for image uploads. Do not expose storage keys in frontend. */
-function submitGalleryItem(communityId){
+async function submitGalleryItem(communityId){
+  if(!requireCommunityAction(COMM_ACTION.ADD_GALLERY,communityId))return;
   const capEl=document.getElementById('gal-caption-input');
   const caption=(capEl?capEl.value.trim():'');
   const myId=(currentProfile||{id:'guest'}).id;
@@ -9931,10 +10195,12 @@ function submitGalleryItem(communityId){
     const urlEl=document.getElementById('gal-url-input');
     imageUrl=(urlEl?urlEl.value.trim():'');
     if(!imageUrl){showToast('Please enter an image URL');return}
+    try{const parsed=new URL(imageUrl);if(!['http:','https:'].includes(parsed.protocol))throw new Error('protocol')}catch{showToast('Use a valid http:// or https:// image URL',{type:'warning'});return}
     imageSourceType='url';
   }
+  const all=getAllGalItems();
   const item={
-    id:'gallery_'+Date.now(),
+    id:_communityId('gallery',all),
     communityId,
     imageSourceType,imageData,imageUrl,fileName,
     caption,
@@ -9946,28 +10212,32 @@ function submitGalleryItem(communityId){
     likes:[],
     comments:[]
   };
-  const all=getAllGalItems();
+  const actionKey=`gallery-submit:${communityId}`;if(!_beginCommunityAction(actionKey))return;
   all.push(item);
-  saveAllGalItems(all);
-  supaSubmitGalleryItem(item);
+  if(!saveAllGalItems(all)){_endCommunityAction(actionKey);return}
+  const cloudResult=item.imageSourceType==='url'&&_communityCloudSyncEnabled()?await supaSubmitGalleryItem(item):null;
   galPendingFile='';galPendingFileName='';galPendingFileSize=0;
   showAddGalleryForm=false;
   selectedAlbum=GAL_ALBUMS[0];
   selectedTaggedPlayers=new Set();
   setCommTab('gallery');
-  showToast('Photo added! 📸');
+  showToast(cloudResult===false?'Photo saved locally; cloud sync failed.':'Photo added! 📸',{type:cloudResult===false?'warning':'success'});
+  _endCommunityAction(actionKey);
 }
 
 async function deleteGalItem(itemId,communityId){
+  const item=getAllGalItems().find(entry=>entry.id===itemId&&entry.communityId===communityId);if(!item)return;
+  if(!requireCommunityAction(COMM_ACTION.DELETE_GALLERY,communityId,{entity:item}))return;
   if(!await uiConfirm('Delete this photo?'))return;
+  if(item.imageSourceType!=='upload'&&_communityCloudSyncEnabled()&&await supaDeleteGalleryItem(itemId)===false){showToast('Photo was not deleted because cloud deletion failed.',{type:'warning'});return}
   saveAllGalItems(getAllGalItems().filter(g=>g.id!==itemId));
   expandedGalleryComments.delete(itemId);
-  supaDeleteGalleryItem(itemId);
   setCommTab('gallery');
   showToast('Photo deleted');
 }
 
-function likeGalItem(itemId,communityId){
+async function likeGalItem(itemId,communityId){
+  if(!requireCommunityAction(COMM_ACTION.REACT,communityId))return;
   const myId=(currentProfile||{id:'guest'}).id;
   const all=getAllGalItems();
   const idx=all.findIndex(g=>g.id===itemId);
@@ -9977,8 +10247,9 @@ function likeGalItem(itemId,communityId){
   if(pos===-1)likes.push(myId);else likes.splice(pos,1);
   all[idx].likes=likes;
   saveAllGalItems(all);
-  supaUpdateGalleryItem(itemId,{likes});
   setCommTab('gallery');
+  const cloudResult=await supaSetGalleryLike(itemId,pos===-1);
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Like is saved locally; secure cloud sync failed.',{type:'warning'});
 }
 
 function toggleGalCmts(itemId,communityId){
@@ -9987,7 +10258,8 @@ function toggleGalCmts(itemId,communityId){
   setCommTab('gallery');
 }
 
-function submitGalCmt(itemId,communityId){
+async function submitGalCmt(itemId,communityId){
+  if(!requireCommunityAction(COMM_ACTION.COMMENT,communityId))return;
   const inp=document.getElementById('gal-cmt-'+itemId);
   if(!inp)return;
   const text=inp.value.trim();
@@ -9997,20 +10269,30 @@ function submitGalCmt(itemId,communityId){
   const all=getAllGalItems();
   const idx=all.findIndex(g=>g.id===itemId);
   if(idx===-1)return;
-  if(!all[idx].comments)all[idx].comments=[];
-  all[idx].comments.push({id:'gcmt_'+Date.now(),authorId:myId,authorName:myName,text,createdAt:new Date().toISOString()});
-  saveAllGalItems(all);
-  supaUpdateGalleryItem(itemId,{comments:all[idx].comments});
-  setCommTab('gallery');
+  const actionKey=`gallery-comment:${itemId}`;
+  if(!_beginCommunityAction(actionKey)){showToast('Comment is already being posted.');return}
+  try{
+    if(!all[idx].comments)all[idx].comments=[];
+    const comment={id:_communityId('gcmt',all[idx].comments),authorId:myId,authorName:myName,text:text.slice(0,200),createdAt:new Date().toISOString()};
+    all[idx].comments.push(comment);
+    if(!saveAllGalItems(all))return;
+    setCommTab('gallery');
+    const cloudResult=await supaAddGalleryComment(itemId,comment);
+    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment is saved locally; secure cloud sync failed.',{type:'warning'});
+  }finally{_endCommunityAction(actionKey)}
 }
 
-function deleteGalCmt(itemId,communityId,cmtId){
+async function deleteGalCmt(itemId,communityId,cmtId){
   const all=getAllGalItems();
   const idx=all.findIndex(g=>g.id===itemId);
   if(idx===-1)return;
+  const comment=(all[idx].comments||[]).find(item=>item.id===cmtId);
+  if(!comment||!requireCommunityAction(COMM_ACTION.DELETE_COMMENT,communityId,{entity:comment,message:'You cannot delete this comment.'}))return;
   all[idx].comments=(all[idx].comments||[]).filter(c=>c.id!==cmtId);
-  saveAllGalItems(all);
+  if(!saveAllGalItems(all))return;
   setCommTab('gallery');
+  const cloudResult=await supaDeleteGalleryComment(itemId,cmtId);
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal is saved locally; secure cloud sync failed.',{type:'warning'});
 }
 
 /* ════════════════════════════════════════════════════════

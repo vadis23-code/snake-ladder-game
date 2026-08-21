@@ -199,7 +199,7 @@ test('responsive bracket and standings movement is contained locally and availab
   assert.match(css, /@media \(max-width: 43\.75rem\)/);
   assert.match(css, /@media \(max-height: 31rem\) and \(orientation: landscape\)/);
   assert.match(css, /prefers-reduced-motion: reduce/);
-  assert.match(sw, /CACHE_VERSION = 'v44'/);
+  assert.match(sw, /CACHE_VERSION = 'v48'/);
   assert.match(html, /function cancelActiveGame\(\)[\s\S]*?showScreen\(wasTournament&&tournamentId\?'tourn-detail':'hub'\);[\s\S]*?clearSave\(\);/);
   assert.match(html, /const resumeCard=document\.getElementById\('resume-card'\);\s*if\(resumeCard\)resumeCard\.classList\.toggle/);
   assert.match(sw, /'\.\/courtcall-tournaments\.css'/);
