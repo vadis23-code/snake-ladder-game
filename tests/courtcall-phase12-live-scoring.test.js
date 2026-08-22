@@ -192,7 +192,7 @@ test('narrow screens show one roster with accessible team tabs; wide screens sho
   assert.match(html, /id="scorer-tab-a"[^>]*role="tab" aria-selected="true"/);
   assert.match(html, /id="scorer-tab-b"[^>]*role="tab" aria-selected="false" tabindex="-1"/);
   assert.match(gameCss, /@media \(max-width: 47\.9375rem\) \{[\s\S]*?\.score-zone--players\[data-scorer='a'\] #pad-b \{ display: none; \}/);
-  assert.match(gameCss, /@media \(min-width: 48rem\) \{\n  \.scorer-tabs \{ display: none; \}/);
+  assert.match(gameCss, /@media \(min-width: 48rem\) \{\r?\n  \.scorer-tabs \{ display: none; \}/);
   // Arrow-key roving tabindex reuses the shared tablist wiring.
   assert.match(html, /_wireTablist\(tabs\)/);
 });
@@ -221,9 +221,9 @@ test('scoring buttons are large, separated, and calm under reduced motion', () =
   assert.match(gameCss, /\.btn-pscore \{[\s\S]*?min-height: 3\.4rem/);
   assert.match(gameCss, /\.scorer-btns \{[\s\S]*?gap: 0\.55rem/);
   assert.match(gameCss, /\.scorer-tab \{[\s\S]*?min-height: 2\.9rem/);
-  assert.match(gameCss, /@media \(prefers-reduced-motion: reduce\) \{\n  \.scorer-row\.scored \{ animation: none; \}/);
+  assert.match(gameCss, /@media \(prefers-reduced-motion: reduce\) \{\r?\n  \.scorer-row\.scored \{ animation: none; \}/);
   assert.match(gameCss, /html\[data-reduced-motion='true'\] \.scorer-row\.scored \{ animation: none; \}/);
-  assert.match(gameCss, /@media \(forced-colors: active\) \{\n  \.btn-pscore, \.scorer-tab \{ background: Canvas; \}/);
+  assert.match(gameCss, /@media \(forced-colors: active\) \{\r?\n  \.btn-pscore, \.scorer-tab \{ background: Canvas; \}/);
 });
 
 // ── Compatibility: shell versioning stays coherent ───────
