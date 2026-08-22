@@ -152,7 +152,7 @@ test('production keeps every established localStorage key and caches the communi
     'courtcall_community_events', 'courtcall_community_ratings'
   ]) assert.match(html, new RegExp(key));
   assert.match(html, /<script src="\.\/courtcall-communities\.js\?v=20260821"><\/script>/);
-  assert.match(sw, /CACHE_VERSION = 'v53'/);
+  assert.match(sw, /CACHE_VERSION = 'v55'/);
   assert.match(sw, /'\.\/courtcall-communities\.js\?v=20260821'/);
 });
 
