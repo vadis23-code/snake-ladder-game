@@ -148,7 +148,7 @@ test('supporting surfaces collapse safely on phones and are cached for offline u
   assert.match(css, /@media\(max-width:520px\)[\s\S]*?\.pulse-loc-grid\{grid-template-columns:1fr\}/);
   assert.match(css, /\.an-table-wrap\{[^}]*overflow-x:auto/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(sw, /CACHE_VERSION = 'v53'/);
+  assert.match(sw, /CACHE_VERSION = 'v55'/);
   assert.match(sw, /courtcall-supporting-product\.css\?v=20260822/);
   assert.match(sw, /courtcall-supporting-product\.js\?v=20260822/);
   assert.match(html, /courtcall-supporting-product\.css\?v=20260822/);

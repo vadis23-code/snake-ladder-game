@@ -1746,6 +1746,16 @@
     }
 
     if (route === 'tournament' || route === 'tourn-detail') {
+      const tournamentSection = encodedParts.length > 1 ? String(safeDecodeRoutePart(encodedParts[1]) || '').trim().toLowerCase() : '';
+      if (route === 'tournament' && ['discover', 'following', 'host', 'my'].includes(tournamentSection)) {
+        if (tournamentSection === 'discover' && encodedParts.length > 2) {
+          const discoveryId = String(safeDecodeRoutePart(encodedParts[2]) || '').trim();
+          return discoveryId
+            ? routeDecision('open_tournament_discovery', 'tournament', route, 'tournament_discovery_deep_link', { tournamentMode: 'discover', discoveryId })
+            : routeDecision('open_tournament_mode', 'tournament', route, 'tournament_discovery_index', { tournamentMode: 'discover' });
+        }
+        return routeDecision('open_tournament_mode', 'tournament', route, 'tournament_mode_deep_link', { tournamentMode: tournamentSection });
+      }
       const encodedTournamentId = encodedParts.length > 1 ? encodedParts[1] : '';
       const decodedTournamentId = encodedTournamentId ? safeDecodeRoutePart(encodedTournamentId) : '';
       const tournamentId = decodedTournamentId === null ? '' : decodedTournamentId.trim();
