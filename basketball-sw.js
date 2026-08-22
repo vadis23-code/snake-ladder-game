@@ -1,17 +1,44 @@
 const CACHE_PREFIX = 'courtcall-';
-const CACHE_VERSION = 'v15';
+const CACHE_VERSION = 'v52';
 const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
 const NAVIGATION_TIMEOUT_MS = 4000;
 const RUNTIME_MAX_ENTRIES = 48;
 const SHELL = [
   './',
+  './courtcall-design-system.css',
+  './courtcall-core-game.css',
+  './courtcall-team-history.css',
+  './courtcall-motion-foundation.css',
+  './courtcall-cinematic.css?v=20260814b',
+  './courtcall-global-visual-system.css?v=20260814b',
+  './courtcall-tournaments.css',
+  './courtcall-supporting-product.css?v=20260822',
+  './courtcall-auth.css?v=20260822',
   './basketball-supa.js',
   './courtcall-core.js',
+  './courtcall-communities.js?v=20260821',
   './courtcall-notifications.js',
   './courtcall-cloud-state.js',
+  './courtcall-supporting-product.js?v=20260822',
+  './courtcall-auth.js?v=20260822',
+  './courtcall-motion-foundation.js',
+  './courtcall-cinematic.js?v=20260814b',
+  './courtcall-global-visual-system.js?v=20260814b',
   './basketball.manifest.json',
   './icons/basketball-3d.webp',
+  './assets/cinematic/courtcall-master.webp',
+  './assets/cinematic/courtcall-master-mobile.webp',
+  './assets/cinematic/01-empty-court-poster.webp',
+  './assets/cinematic/01-empty-court-mobile.webp',
+  './assets/cinematic/02-tip-off-poster.webp',
+  './assets/cinematic/02-tip-off-mobile.webp',
+  './assets/cinematic/03-the-run-poster.webp',
+  './assets/cinematic/03-the-run-mobile.webp',
+  './assets/cinematic/04-clutch-moment-poster.webp',
+  './assets/cinematic/04-clutch-moment-mobile.webp',
+  './assets/cinematic/05-victory-poster.webp',
+  './assets/cinematic/05-victory-mobile.webp',
 ];
 
 function isHtmlResponse(response) {

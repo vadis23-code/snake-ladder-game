@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const cinematic = fs.readFileSync(path.join(__dirname, '..', 'courtcall-cinematic.js'), 'utf8');
 
 test('settings expose and persist complete quick-game defaults', () => {
   for (const id of [
@@ -25,10 +26,11 @@ test('score sound has a real volume-controlled implementation on both score path
   assert.equal((html.match(/playScoreSound\(pts,s\);/g) || []).length, 2);
 });
 
-test('theme and reduced-motion preferences affect the document and 3D animation', () => {
+test('theme and reduced-motion preferences affect the document and motion systems', () => {
   assert.match(html, /document\.documentElement\.dataset\.theme=theme/);
   assert.match(html, /document\.documentElement\.dataset\.reducedMotion=String\(!!settings\.reducedMotion\)/);
-  assert.match(html, /const userReducedMotion=.*dataset\.reducedMotion==='true'/);
+  assert.match(cinematic, /document\.documentElement\.dataset\.reducedMotion==='true'/);
+  assert.match(cinematic, /prefers-reduced-motion: reduce/);
   assert.match(html, /courtcall-motion-change/);
 });
 

@@ -1,7 +1,7 @@
 # CourtCall — Complete Feature Testing Instructions for Claude Browser Extension
 
 ## How to Use These Instructions
-1. Open **https://vadis23-code.github.io/snake-ladder-game/basketball.html** in one browser tab
+1. Open the canonical production page, **https://vadis23-code.github.io/snake-ladder-game/**, in one browser tab
 2. Open **Claude.ai** (or the Claude browser extension) alongside it
 3. Paste this entire document into Claude and say: **"Execute this test plan step by step"**
 4. Claude will guide you through each test, tell you what to do in the app, what to check in Supabase, and record pass/fail
@@ -677,7 +677,7 @@ After completing all 22 tests, fill in and return this summary:
 # CourtCall QA Test Report
 Date: ___________
 Tester: Claude Browser Extension
-App URL: https://vadis23-code.github.io/snake-ladder-game/basketball.html
+App URL: https://vadis23-code.github.io/snake-ladder-game/
 Supabase Project: hoymciegbghfanzhnufy
 
 ## Results Summary

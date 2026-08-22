@@ -4,9 +4,9 @@
   "lang": "en",
   "dir": "ltr",
   "description": "Basketball pickup game scorer — score, build teams, run tournaments",
-  "id": "/",
-  "start_url": "/",
-  "scope": "/",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0F0F23",
   "theme_color": "#FF5722",
@@ -36,7 +36,7 @@
       "name": "Quick Game",
       "short_name": "Play",
       "description": "Jump straight into a new game",
-      "url": "/#/setup",
+      "url": "./#/setup",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]

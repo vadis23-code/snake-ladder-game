@@ -534,6 +534,7 @@ test('start-next creates a matchup and consumes only the selected queue entries'
 test('hash resolver maps direct private and public routes deterministically', () => {
   const privateRoute = core.resolveHashRoute('#/teams', { hasProfile: true });
   const publicRoute = core.resolveHashRoute('#/terms', { hasProfile: false });
+  const landingRoute = core.resolveHashRoute('#/landing', { hasProfile: false });
 
   assert.deepEqual(privateRoute, {
     handled: true,
@@ -546,6 +547,21 @@ test('hash resolver maps direct private and public routes deterministically', ()
   assert.equal(publicRoute.action, 'navigate');
   assert.equal(publicRoute.screen, 'terms');
   assert.equal(publicRoute.reason, 'direct_route');
+  assert.equal(landingRoute.screen, 'landing');
+  assert.equal(landingRoute.reason, 'direct_route');
+});
+
+test('hash resolver keeps hub private after landing is separated', () => {
+  const visitor = core.resolveHashRoute('#/hub', {
+    hasProfile: false,
+    publicScreens: ['landing', 'profile', 'privacy', 'terms', 'communities', 'world']
+  });
+  const returning = core.resolveHashRoute('#/hub', { hasProfile: true });
+
+  assert.equal(visitor.screen, 'profile');
+  assert.equal(visitor.reason, 'auth_required');
+  assert.equal(returning.screen, 'hub');
+  assert.equal(returning.reason, 'direct_route');
 });
 
 test('hash resolver gates visitors but permits a local guest profile', () => {
@@ -649,4 +665,14 @@ test('changelog hash resolves to a modal action only for a known identity', () =
   assert.equal(visitor.action, 'navigate');
   assert.equal(visitor.screen, 'profile');
   assert.equal(visitor.reason, 'auth_required');
+});
+
+test('legacy reset PIN links redirect to email-code authentication', () => {
+  const signedIn = core.resolveHashRoute('#/reset-pin', { hasProfile: true });
+  const visitor = core.resolveHashRoute('#/reset-pin', { hasProfile: false });
+
+  assert.equal(signedIn.screen, 'profile');
+  assert.equal(signedIn.reason, 'legacy_pin_retired');
+  assert.equal(visitor.screen, 'profile');
+  assert.equal(visitor.reason, 'legacy_pin_retired');
 });
