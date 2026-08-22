@@ -32,7 +32,7 @@ test('Phase 3 stylesheet is loaded after legacy inline styles and cached offline
 
   assert.ok(inlineEnd >= 0, 'legacy inline style block must remain present');
   assert.ok(foundationLink > inlineEnd, 'foundation stylesheet must load after legacy styles');
-  assert.match(serviceWorker, /CACHE_VERSION = 'v52'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v53'/);
   assert.match(serviceWorker, /'\.\/courtcall-design-system\.css'/);
 });
 

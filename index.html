@@ -3570,7 +3570,7 @@ function closeHelpCenter(){
 let _settingHash=false;
 // Screens that should NOT be deep-linked/restored from a cold URL because
 // they need live state or an auth identity we can't assume on first load.
-const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms','communities','world','help-center']);
+const _PUBLIC_SCREENS=new Set(['landing','profile','onboarding','privacy','terms','communities','world','help','help-center']);
 function _validScreen(name){return !!document.getElementById('s-'+name);}
 function _screenToHash(name){
   if(name==='comm-detail'&&activeCommunityId)return `#/community/${encodeURIComponent(activeCommunityId)}`;
@@ -3592,6 +3592,7 @@ function _routeFromHash(){
     hasActiveGame:Boolean(saved&&!saved.gameOver&&saved.teamA&&saved.teamB)
   });
   if(!decision.handled)return false;
+  if(decision.action!=='open_help'&&_hcOpen)closeHelpChat();
   if(decision.reason==='auth_required')_authRequestedHash=location.hash;
   if(decision.action==='open_community'){openCommunity(decision.communityId);return true}
   if(decision.route==='community'&&decision.reason==='unknown_community'&&decision.communityId){
@@ -3599,6 +3600,16 @@ function _routeFromHash(){
   }
   if(decision.action==='open_tournament'){activeTournId=decision.tournamentId;showScreen('tourn-detail');return true}
   if(decision.action==='open_changelog'){openChangelog();return true}
+  if(decision.action==='open_help'){
+    const active=document.querySelector('.screen.active');
+    _helpCenterReturnScreen=active&&active.id!=='s-help-center'
+      ?active.id.replace(/^s-/,'')
+      :(currentProfile?'hub':'landing');
+    history.replaceState(null,'','#/help-center');
+    showScreen('help-center');
+    openHelpChat();
+    return true;
+  }
   if(decision.action==='resume_game'){handleResume();return true}
   showScreen(decision.screen||'profile');return true;
 }
@@ -10819,7 +10830,8 @@ function closeHelpChat(){
   const wrap=document.getElementById('help-chat-wrap');
   wrap.classList.remove('open');_setModalBackground(wrap,false);wrap.setAttribute('inert','');wrap.setAttribute('aria-hidden','true');wrap.onkeydown=null;
   document.body.style.overflow='';
-  if(_helpReturnFocus?.isConnected)setTimeout(()=>_helpReturnFocus.focus(),0);_helpReturnFocus=null;
+  const returnFocus=_helpReturnFocus;_helpReturnFocus=null;
+  if(returnFocus?.isConnected)setTimeout(()=>returnFocus.focus(),0);
 }
 
 function clearHelpChat(){
