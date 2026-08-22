@@ -155,7 +155,7 @@ test('OTP UI is accessible, responsive, and cached in the offline shell', () => 
   assert.match(css, /@media \(max-width: 390px\)/);
   assert.match(css, /orientation: landscape/);
   assert.match(css, /prefers-reduced-motion: reduce/);
-  assert.match(sw, /CACHE_VERSION = 'v55'/);
+  assert.match(sw, /CACHE_VERSION = 'v56'/);
   assert.match(sw, /courtcall-auth\.css\?v=20260822/);
   assert.match(sw, /courtcall-auth\.js\?v=20260822/);
 });

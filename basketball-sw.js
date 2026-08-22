@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'courtcall-';
-const CACHE_VERSION = 'v55';
+const CACHE_VERSION = 'v56';
 const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
 const NAVIGATION_TIMEOUT_MS = 4000;
@@ -21,7 +21,7 @@ const SHELL = [
   './courtcall-discover-india.js?v=20260822',
   './courtcall-communities.js?v=20260821',
   './courtcall-notifications.js',
-  './courtcall-cloud-state.js',
+  './courtcall-cloud-state.js?v=20260823',
   './courtcall-supporting-product.js?v=20260822',
   './courtcall-auth.js?v=20260822',
   './courtcall-motion-foundation.js',
@@ -94,7 +94,14 @@ async function fetchWithTimeout(request, timeoutMs) {
 async function navigationResponse(request) {
   const cache = await caches.open(CACHE);
   try {
-    return await fetchWithTimeout(request, NAVIGATION_TIMEOUT_MS);
+    const response = await fetchWithTimeout(request, NAVIGATION_TIMEOUT_MS);
+    // A 5xx during a deployment must not blank the app: fall back to the
+    // cached shell. Real 404s pass through so the honest 404 page survives.
+    if (response.status >= 500) {
+      const shell = await cache.match('./');
+      if (shell) return shell;
+    }
+    return response;
   } catch {
     return (await cache.match('./'))
       || new Response('CourtCall is unavailable offline until its first successful load.', {
@@ -140,6 +147,14 @@ async function staleWhileRevalidate(request, event) {
   if (cached) {
     event.waitUntil(network);
     return cached;
+  }
+  // The runtime cache is bounded LRU, so a core script can be evicted while
+  // the version-pinned shell precache still holds it. Serve the precached
+  // copy before touching the network so the shell stays whole offline.
+  const shellCached = await (await caches.open(CACHE)).match(request);
+  if (shellCached) {
+    event.waitUntil(network);
+    return shellCached;
   }
   return (await network) || new Response('', { status: 504, statusText: 'Offline' });
 }

@@ -93,7 +93,7 @@ test('Midnight Arena presentation explicitly yields the landing layer', () => {
 });
 
 test('PWA shell versions every changed landing asset without touching navigation strategy', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v55'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v56'/);
   for (const asset of [
     'courtcall-cinematic.css?v=20260814b',
     'courtcall-cinematic.js?v=20260814b',
@@ -101,5 +101,8 @@ test('PWA shell versions every changed landing asset without touching navigation
     'courtcall-global-visual-system.js?v=20260814b'
   ]) assert.ok(serviceWorker.includes(asset), `${asset} is not precached`);
   assert.match(serviceWorker, /if \(request\.mode === 'navigate'\)[\s\S]*?navigationResponse\(request\)/);
-  assert.match(serviceWorker, /return await fetchWithTimeout\(request, NAVIGATION_TIMEOUT_MS\)/);
+  assert.match(serviceWorker, /await fetchWithTimeout\(request, NAVIGATION_TIMEOUT_MS\)/);
+  // Phase 11: a 5xx during deployment falls back to the cached shell, but
+  // navigation stays network-first and real 404s pass through untouched.
+  assert.match(serviceWorker, /response\.status >= 500/);
 });
