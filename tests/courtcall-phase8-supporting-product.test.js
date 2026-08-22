@@ -117,6 +117,12 @@ test('supporting routes, labels, Help behavior, and legal hierarchy are explicit
   const publicHelp = core.resolveHashRoute('#/help-center', { hasProfile: false });
   assert.equal(publicHelp.screen, 'help-center');
   assert.equal(publicHelp.reason, 'direct_route');
+  const assistantHelp = core.resolveHashRoute('#/help', { hasProfile: false });
+  assert.equal(assistantHelp.action, 'open_help');
+  assert.equal(assistantHelp.screen, 'help-center');
+  assert.match(html, /decision\.action!=='open_help'&&_hcOpen\)closeHelpChat\(\)/);
+  assert.match(html, /decision\.action==='open_help'[\s\S]*?history\.replaceState\(null,'','#\/help-center'\)[\s\S]*?showScreen\('help-center'\)[\s\S]*?openHelpChat\(\)/);
+  assert.match(html, /const returnFocus=_helpReturnFocus;_helpReturnFocus=null;[\s\S]*?returnFocus\.focus\(\)/);
 });
 
 test('Basketball World stays curated and does not promise unsupported live product data', () => {
@@ -142,7 +148,7 @@ test('supporting surfaces collapse safely on phones and are cached for offline u
   assert.match(css, /@media\(max-width:520px\)[\s\S]*?\.pulse-loc-grid\{grid-template-columns:1fr\}/);
   assert.match(css, /\.an-table-wrap\{[^}]*overflow-x:auto/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(sw, /CACHE_VERSION = 'v52'/);
+  assert.match(sw, /CACHE_VERSION = 'v53'/);
   assert.match(sw, /courtcall-supporting-product\.css\?v=20260822/);
   assert.match(sw, /courtcall-supporting-product\.js\?v=20260822/);
   assert.match(html, /courtcall-supporting-product\.css\?v=20260822/);

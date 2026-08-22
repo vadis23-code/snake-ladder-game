@@ -667,6 +667,19 @@ test('changelog hash resolves to a modal action only for a known identity', () =
   assert.equal(visitor.reason, 'auth_required');
 });
 
+test('help hash resolves to the public Help Center and assistant action', () => {
+  for (const options of [{ hasProfile: true }, { hasProfile: false }]) {
+    assert.deepEqual(core.resolveHashRoute('#/help', options), {
+      handled: true,
+      action: 'open_help',
+      screen: 'help-center',
+      route: 'help',
+      reason: 'help_deep_link',
+      communityId: null
+    });
+  }
+});
+
 test('legacy reset PIN links redirect to email-code authentication', () => {
   const signedIn = core.resolveHashRoute('#/reset-pin', { hasProfile: true });
   const visitor = core.resolveHashRoute('#/reset-pin', { hasProfile: false });

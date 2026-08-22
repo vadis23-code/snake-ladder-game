@@ -1649,6 +1649,7 @@
     'terms',
     'communities',
     'world',
+    'help',
     'help-center'
   ]);
 
@@ -1764,6 +1765,12 @@
 
     if (route === 'changelog') {
       return routeDecision('open_changelog', null, route, 'changelog_deep_link');
+    }
+
+    // Help is an action route: the durable Help Center remains the backing
+    // screen while the existing CourtCall Assistant dialog opens on top.
+    if (route === 'help') {
+      return routeDecision('open_help', 'help-center', route, 'help_deep_link');
     }
 
     if (!validScreens.has(route)) {

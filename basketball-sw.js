@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'courtcall-';
-const CACHE_VERSION = 'v52';
+const CACHE_VERSION = 'v53';
 const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
 const NAVIGATION_TIMEOUT_MS = 4000;
