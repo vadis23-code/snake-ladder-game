@@ -1373,6 +1373,7 @@ body.modal-open{overflow:hidden}
 .dash-sync-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 10px rgba(0,230,118,.55)}
 .dash-sync[data-state="syncing"] .dash-sync-dot,.dash-sync[data-state="saving_local"] .dash-sync-dot{background:var(--gold);box-shadow:0 0 10px rgba(255,179,0,.55)}
 .dash-sync[data-state="offline_saved"] .dash-sync-dot,.dash-sync[data-state="failed"] .dash-sync-dot{background:var(--danger);box-shadow:0 0 10px rgba(255,23,68,.55)}
+.dash-sync[data-state="auth_required"] .dash-sync-dot,.dash-sync[data-state="permission_denied"] .dash-sync-dot{background:var(--gold);box-shadow:0 0 10px rgba(255,179,0,.55)}
 .dash-sync[data-state="online_local"] .dash-sync-dot{background:var(--cb);box-shadow:0 0 10px rgba(41,121,255,.55)}
 .dash-primary{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.85fr);gap:14px;margin-bottom:14px}
 .dash-start,.dash-resume{min-width:0;min-height:150px;border-radius:24px;border:1px solid rgba(249,115,22,.34);padding:22px;text-align:left;cursor:pointer;color:#fff;position:relative;overflow:hidden}
@@ -1491,6 +1492,7 @@ body.modal-open{overflow:hidden}
 .sync-indicator[data-state="online_local"]{border-color:rgba(41,121,255,.38)}
 .sync-indicator[data-state="syncing"],.sync-indicator[data-state="saving_local"]{border-color:rgba(255,179,0,.45)}
 .sync-indicator[data-state="offline_saved"],.sync-indicator[data-state="failed"]{border-color:rgba(255,23,68,.55)}
+.sync-indicator[data-state="auth_required"],.sync-indicator[data-state="permission_denied"]{border-color:rgba(255,179,0,.45)}
 .sync-retry{background:none;border:none;color:var(--gold);font:800 11px 'Inter',sans-serif;text-decoration:underline;cursor:pointer;padding:2px}
 .pwa-update{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9998;display:flex;align-items:center;gap:10px;width:min(430px,calc(100vw - 24px));padding:11px 12px;background:#161b27;border:1px solid rgba(249,115,22,.6);border-radius:14px;box-shadow:0 10px 36px rgba(0,0,0,.55);font-size:12px;color:var(--text)}
 .pwa-update span{flex:1;line-height:1.4}.pwa-update button{border:0;border-radius:8px;padding:8px 10px;font:800 11px 'Inter',sans-serif;cursor:pointer}.pwa-update-apply{background:var(--ca);color:#fff}.pwa-update-later{background:var(--s3);color:var(--muted)}
@@ -3152,7 +3154,7 @@ body.modal-open{overflow:hidden}
 <script src="./courtcall-discover-india.js?v=20260822"></script>
 <script src="./courtcall-communities.js?v=20260821"></script>
 <script src="./courtcall-notifications.js"></script>
-<script src="./courtcall-cloud-state.js"></script>
+<script src="./courtcall-cloud-state.js?v=20260823"></script>
 <script src="./courtcall-supporting-product.js?v=20260822"></script>
 <script src="./courtcall-auth.js?v=20260822"></script>
 <script>
@@ -3212,6 +3214,10 @@ if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
     _setAuthFromSession(session);
     if (event === 'SIGNED_OUT') {
+      // A failed offline token refresh must not destroy the local profile
+      // view; explicit sign-out flows manage their own UI, and the next
+      // online restore re-evaluates the session honestly.
+      if (!navigator.onLine) return;
       setTimeout(()=>{
         if(currentProfile?.id&&currentProfile.id!=='guest'&&currentProfile.localOnly!==true){
           const active=document.querySelector('.screen.active')?.id?.replace(/^s-/,'')||'';
@@ -3328,7 +3334,7 @@ async function supaSaveGame(game) {
     const cloudWinner = game.outcome === CourtCallCore.OUTCOMES.NO_CONTEST
       ? 'No contest'
       : (game.winner?.name || game.winner || '');
-    const { error } = await supa.from('games').upsert({
+    const { error } = await CourtCallCloudState.withTimeout(supa.from('games').upsert({
       id:              game.id || ('g_' + Date.now()),
       user_id:         supaUser.id,
       team_a_name:     game.teamA?.name  || '',
@@ -3352,15 +3358,16 @@ async function supaSaveGame(game) {
       players_a:       game.teamA?.players?.length ? game.teamA.players : null,
       players_b:       game.teamB?.players?.length ? game.teamB.players : null,
       created_at:      game.date ? new Date(game.date).toISOString() : new Date().toISOString()
-    }, { onConflict: 'id' });
+    }, { onConflict: 'id' }), 12000, 'Game sync');
     if (error) throw error;
     console.log('[Supa] supaSaveGame: success');
     setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);
     return true;
   } catch(e) {
     console.error('[Supa] supaSaveGame FAILED:', e.message, e);
-    setSyncState(CourtCallCloudState.SYNC.FAILED);
-    if (typeof showToast === 'function') showToast('Game saved locally (cloud sync failed)', {type:'warning'});
+    const kind=CourtCallCloudState.classifyFailure(e,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));
+    if (typeof showToast === 'function') showToast('Game saved on this device — '+CourtCallCloudState.failureMessage(kind), {type:'warning'});
     return false;
   }
 }
@@ -3383,12 +3390,20 @@ async function supaDeleteGame(gameId) {
 
 async function supaFetchGames(limit = 10) {
   if (!supa || !supaUser) return [];
-  const { data } = await supa.from('games')
-    .select('*')
-    .eq('user_id', supaUser.id)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  return data || [];
+  // Returns null on failure so callers can distinguish "no games" from
+  // "the fetch failed" instead of rendering a failure as empty.
+  try {
+    const { data, error } = await CourtCallCloudState.withTimeout(supa.from('games')
+      .select('*')
+      .eq('user_id', supaUser.id)
+      .order('created_at', { ascending: false })
+      .limit(limit), 12000, 'Games fetch');
+    if (error) throw error;
+    return data || [];
+  } catch(e) {
+    console.error('[Supa] supaFetchGames FAILED:', e.message, e);
+    return null;
+  }
 }
 
 /* ════════════════════════════════════════════════════════
@@ -3398,10 +3413,36 @@ const COLORS={orange:{hex:'#FF5722',glow:'rgba(255,87,34,0.35)'},red:{hex:'#F443
 const QUARTERS=[1,2,3,4,'OT'];
 const TEAM_COLORS_ORDER=['orange','red','green','purple','blue','teal','gold','pink'];
 // ── Storage helpers ──────────────────────────────────────
-function getCol(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}}
-function setCol(key,val,{source='local'}={}){try{localStorage.setItem(key,JSON.stringify(val));if(source!=='cloud')markLocalSave()}catch{}}
-function getObj(key,def={}){try{const r=localStorage.getItem(key);return r?JSON.parse(r):def}catch{return def}}
-function setObj(key,val,{source='local'}={}){try{localStorage.setItem(key,JSON.stringify(val));if(source!=='cloud')markLocalSave()}catch{}}
+// Reads tolerate missing, corrupt, and wrong-shaped JSON; writes fail safely
+// with visible (throttled) feedback instead of silent data loss, and record a
+// per-key local-write timestamp so newer device data is identifiable.
+const LOCAL_WRITE_META_KEY='cc_local_write_meta';
+let _storageFailureToastAt=0;
+function _storageWriteFailed(error){
+  console.error('[Storage] Local save failed:',error?.message||error);
+  const now=Date.now();
+  if(now-_storageFailureToastAt>60000){
+    _storageFailureToastAt=now;
+    try{showToast('This change could not be saved on this device. Free up storage and try again.',{type:'error'})}catch{}
+  }
+}
+function _markLocalWriteMeta(key){
+  try{
+    const meta=CourtCallCloudState.safeJsonParse(localStorage.getItem(LOCAL_WRITE_META_KEY),{});
+    const clean=meta&&typeof meta==='object'&&!Array.isArray(meta)?meta:{};
+    clean[key]=new Date().toISOString();
+    localStorage.setItem(LOCAL_WRITE_META_KEY,JSON.stringify(clean));
+  }catch{}
+}
+function getCol(key){return CourtCallCloudState.dedupeById(CourtCallCloudState.safeJsonParse(localStorage.getItem(key),[]))}
+function setCol(key,val,{source='local'}={}){try{localStorage.setItem(key,JSON.stringify(val));_markLocalWriteMeta(key);if(source!=='cloud')markLocalSave();return true}catch(error){_storageWriteFailed(error);return false}}
+function getObj(key,def={}){
+  const v=CourtCallCloudState.safeJsonParse(localStorage.getItem(key),def);
+  if(v===null||typeof v!=='object')return def;
+  if(Array.isArray(v)&&!Array.isArray(def))return def;
+  return v;
+}
+function setObj(key,val,{source='local'}={}){try{localStorage.setItem(key,JSON.stringify(val));_markLocalWriteMeta(key);if(source!=='cloud')markLocalSave();return true}catch(error){_storageWriteFailed(error);return false}}
 // ── App constants ─────────────────────────────────────────
 const APP_VER={major:0,minor:12,patch:0,tag:'Beta',string:'v0.12 Beta',date:'July 2026'};
 const APP_VERSION=APP_VER.string;
@@ -3506,6 +3547,11 @@ function showToast(msg,durationOrOptions=4000,extraOptions={}){
   return notificationManager.notify(msg,options);
 }
 let currentSyncState=CourtCallCloudState.SYNC.ONLINE_LOCAL;
+// Screen readers only need meaningful transitions (offline, failure, auth,
+// success) — the rapid local-save flickers stay visual-only to avoid noise.
+const _QUIET_SYNC_STATES=new Set([
+  CourtCallCloudState.SYNC.SAVING_LOCAL,CourtCallCloudState.SYNC.SYNCING,CourtCallCloudState.SYNC.ONLINE_LOCAL
+]);
 function setSyncState(nextState){
   currentSyncState=nextState;
   if(nextState===CourtCallCloudState.SYNC.ONLINE_SYNCED){
@@ -3514,8 +3560,14 @@ function setSyncState(nextState){
   const wrap=document.getElementById('sync-indicator');
   const label=document.getElementById('sync-label');
   const retry=document.getElementById('sync-retry');
-  if(wrap)wrap.dataset.state=nextState;
-  if(label)label.textContent=CourtCallCloudState.syncCopy(nextState);
+  if(wrap){
+    wrap.dataset.state=nextState;
+    wrap.setAttribute('aria-live',_QUIET_SYNC_STATES.has(nextState)?'off':'polite');
+  }
+  if(label){
+    const copy=CourtCallCloudState.syncCopy(nextState);
+    if(label.textContent!==copy)label.textContent=copy;
+  }
   if(retry)retry.classList.toggle('hidden',nextState!==CourtCallCloudState.SYNC.FAILED);
   const dashboardSync=document.querySelector('.dash-sync');
   if(dashboardSync){
@@ -3533,7 +3585,15 @@ function markLocalSave(){
   setSyncState(navigator.onLine?CourtCallCloudState.SYNC.SAVING_LOCAL:CourtCallCloudState.SYNC.OFFLINE_SAVED);
   if(navigator.onLine)setTimeout(()=>{if(currentSyncState===CourtCallCloudState.SYNC.SAVING_LOCAL)setSyncState(CourtCallCloudState.SYNC.ONLINE_LOCAL);},250);
 }
-async function retryCloudSync(){
+let _retryCloudSyncInFlight=null;
+function retryCloudSync(){
+  // Single-flight: reconnect events, manual Retry taps, and screen renders
+  // share one sync pass instead of stacking concurrent full syncs.
+  if(_retryCloudSyncInFlight)return _retryCloudSyncInFlight;
+  _retryCloudSyncInFlight=_doRetryCloudSync().finally(()=>{_retryCloudSyncInFlight=null});
+  return _retryCloudSyncInFlight;
+}
+async function _doRetryCloudSync(){
   if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false;}
   if(!isSupaAuthenticated()){setSyncState(CourtCallCloudState.SYNC.ONLINE_LOCAL);return true;}
   setSyncState(CourtCallCloudState.SYNC.SYNCING);
@@ -3543,13 +3603,20 @@ async function retryCloudSync(){
     // for idempotent upserts, so a pull can never claim success while pending
     // approved local data has not first reached Supabase.
     const pushed=cloudApproved?await _pushLocalDataToCloud():true;
-    const pulled=await syncAllUserDataFromDB();
+    // The pull is idempotent, so a transient failure earns one bounded
+    // backoff retry; auth/permission/offline failures stop immediately.
+    const pulled=await CourtCallCloudState.runWithRetry(async()=>{
+      const ok=await syncAllUserDataFromDB();
+      if(!ok)throw new Error('Account sync did not complete');
+      return true;
+    },{attempts:2,baseDelayMs:1500,isOnline:()=>navigator.onLine}).catch(()=>false);
     const ok=pushed&&pulled;
     setSyncState(ok?(cloudApproved?CourtCallCloudState.SYNC.ONLINE_SYNCED:CourtCallCloudState.SYNC.ONLINE_LOCAL):CourtCallCloudState.SYNC.FAILED);
     return ok;
   }catch(e){
     console.error('[Supa] retryCloudSync FAILED:',e.message,e);
-    setSyncState(CourtCallCloudState.SYNC.FAILED);return false;
+    const kind=CourtCallCloudState.classifyFailure(e,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));return false;
   }
 }
 // ── Screen ───────────────────────────────────────────────
@@ -4134,6 +4201,9 @@ async function restoreAuthenticatedSession(){
   try{
     const session=await CourtCallAuth.restoreSession(supa);
     if(!session){
+      // Offline startup keeps the cached profile usable instead of forcing a
+      // sign-in loop the device cannot complete; online restore re-checks.
+      if(!navigator.onLine)return false;
       if(currentProfile?.id&&currentProfile.id!=='guest'&&currentProfile.localOnly!==true){
         const active=document.querySelector('.screen.active')?.id?.replace(/^s-/,'')||'';
         if(active&&!_PUBLIC_SCREENS.has(active))_authRequestedHash=location.hash;
@@ -4925,13 +4995,18 @@ let state=freshState();
 function freshState(){return Phase4GameCore.createState()}
 // Persistence
 function save(){
+  const status=document.getElementById('game-save-state');
   try{
     const gameClock=GC.snapshot();
     localStorage.setItem(K.game,JSON.stringify({...state,voiceActive:false,_gc:gameContext,_gce:gameClock.elapsed,_sc:SC.snapshot(),_gcc:gameClock}));
     markLocalSave();
-    const status=document.getElementById('game-save-state');
     if(status)status.innerHTML='<span aria-hidden="true">●</span> Saved on device';
-  }catch{}
+  }catch(error){
+    // A failed save must not keep advertising "Saved on device" from an
+    // earlier success — the scorer needs to know the game is memory-only.
+    _storageWriteFailed(error);
+    if(status)status.innerHTML='<span aria-hidden="true">●</span> Not saved — device storage is full';
+  }
 }
 function load(){try{const r=localStorage.getItem(K.game);return r?JSON.parse(r):null}catch{return null}}
 function clearSave(){localStorage.removeItem(K.game)}
@@ -6577,7 +6652,9 @@ async function deleteMatchFromDetail(){
   setCol(K.matches,matches);
   const leg=getCol(K.games).filter(m=>m.id!==detailMatchId);
   setCol(K.games,leg);
-  supaDeleteGame(detailMatchId);
+  supaDeleteGame(detailMatchId).then(ok=>{
+    if(ok===false&&isSupaAuthenticated()&&navigator.onLine)showToast('Deleted on this device · the cloud copy may reappear until sync succeeds',{type:'warning'});
+  });
   closeMd();renderHistory();showToast('Match deleted');
 }
 function shareMdMatch(){
@@ -6593,7 +6670,12 @@ function shareMdMatch(){
 ════════════════════════════════════════════════════════ */
 let tournamentMode='my',activeDiscoveredTournamentId=null,discoverUsesSamples=false;
 function discoverRead(key,fallback=[]){try{const value=JSON.parse(localStorage.getItem(key));return Array.isArray(value)?value:fallback}catch(_){return fallback}}
-function discoverWrite(key,value){localStorage.setItem(key,JSON.stringify(value))}
+// A full or blocked localStorage must fail visibly instead of crashing the
+// follow/submit/report/claim flows or faking a saved state.
+function discoverWrite(key,value){
+  try{localStorage.setItem(key,JSON.stringify(value));_markLocalWriteMeta(key);return true}
+  catch(error){_storageWriteFailed(error);return false}
+}
 function discoveredListings(){const local=CourtCallDiscoverIndia.normalizeCollection(discoverRead(CourtCallDiscoverIndia.STORAGE.listings));const followed=discoverFollowing();const samples=CourtCallDiscoverIndia.SAMPLE.filter(item=>discoverUsesSamples||followed.includes(item.id));return local.concat(samples)}
 function discoverFollowing(){return CourtCallDiscoverIndia.normalizeFollowing(discoverRead(CourtCallDiscoverIndia.STORAGE.following))}
 function discoverDate(value){if(!value)return'Date not supplied';const date=new Date(value);return Number.isNaN(date.getTime())?'Date not supplied':date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
@@ -6618,13 +6700,13 @@ function updateDiscoverCities(){const state=document.getElementById('discover-st
 function clearDiscoverFilters(){document.querySelectorAll('#tourn-discover-view input').forEach(input=>input.value='');document.querySelectorAll('#tourn-discover-view select').forEach(select=>select.value='');updateDiscoverCities();document.querySelectorAll('#discover-map button').forEach(btn=>btn.classList.remove('on'));renderDiscoverResults()}
 function selectDiscoverState(state){const input=document.getElementById('discover-state');if(!input)return;input.value=input.value===state?'':state;updateDiscoverCities();document.querySelectorAll('#discover-map button').forEach(btn=>btn.classList.toggle('on',btn.textContent===input.value));renderDiscoverResults()}
 function enableDiscoverSamples(){discoverUsesSamples=true;renderDiscoverMode();showToast('Showing unmistakably labelled sample listings',{type:'success'})}
-function toggleDiscoveredFollow(id){const next=CourtCallDiscoverIndia.toggleFollowing(discoverFollowing(),id);discoverWrite(CourtCallDiscoverIndia.STORAGE.following,next);renderDiscoverMode();showToast(next.includes(id)?'Tournament followed':'Tournament unfollowed',{type:'success'})}
+function toggleDiscoveredFollow(id){const next=CourtCallDiscoverIndia.toggleFollowing(discoverFollowing(),id);const saved=discoverWrite(CourtCallDiscoverIndia.STORAGE.following,next);renderDiscoverMode();if(saved)showToast(next.includes(id)?'Tournament followed':'Tournament unfollowed',{type:'success'})}
 function openDiscoveredTournament(id){activeDiscoveredTournamentId=id;setTournamentMode('discover',{id})}
 function renderDiscoveredDetail(view){const item=discoveredListings().find(x=>x.id===activeDiscoveredTournamentId);if(!item){view.innerHTML='<div class="discover-empty"><strong>Listing unavailable</strong>This local or sample listing could not be found.<div class="discover-actions"><button class="discover-btn" onclick="setTournamentMode(\'discover\')">Back to Discover</button></div></div>';return}const followed=discoverFollowing().includes(item.id),link=(url,label)=>url?`<a class="discover-btn secondary" href="${escAttr(url)}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`:'';view.innerHTML=`<div class="discover-detail"><button class="discover-btn secondary" type="button" onclick="setTournamentMode('discover')">← Discover India</button><section><div class="discover-badges">${discoverBadge(item)}</div><h2>${escHtml(item.name)}</h2><p>${escHtml(item.description||'No description supplied.')}</p><div class="discover-actions"><button class="discover-btn" aria-pressed="${followed}" onclick="toggleDiscoveredFollow(${jsArg(item.id)})">${followed?'Following ✓':'Follow tournament'}</button>${link(item.registrationUrl,'Register externally')}${link(item.sourceUrl,'Open source')}</div></section><section><h3>Overview</h3><p>${escHtml(item.eligibility||'Eligibility not supplied.')}</p></section><section><h3>Categories</h3><p>${escHtml(item.category||item.ageCategory)} · ${escHtml(item.gender)} · ${escHtml(item.level)} · ${escHtml(item.format)}${item.teamSize?` · ${item.teamSize} players/team`:''}${item.maxTeams?` · ${item.maxTeams} teams max`:''}</p></section><section><h3>Schedule</h3><p>${discoverDate(item.startDate)}${item.endDate?` – ${discoverDate(item.endDate)}`:''}. Registration ${escHtml(item.registrationStatus)}${item.registrationDeadline?` until ${discoverDate(item.registrationDeadline)}`:''}.</p></section><section><h3>Venue</h3><p>${escHtml(item.venue||'Not supplied')} · ${escHtml([item.city,item.state].filter(Boolean).join(', ')||'Location not supplied')}</p>${link(item.mapsUrl,'Open map')}</section><section><h3>Registration</h3><p>${escHtml(discoverMoney(item.fee))} · Prize: ${escHtml(item.prize||'Not supplied')}</p>${link(item.rulesUrl,'Rules')}${link(item.registrationUrl,'Register externally')}</section><section><h3>Organiser</h3><p>${escHtml(item.organiser)} · ${escHtml(item.contact||item.email||item.whatsapp||'Contact not supplied')}</p></section><section><h3>Trust & source</h3><p>${escHtml(CourtCallDiscoverIndia.verificationLabel(item))} · ${escHtml(item.sourceType)} · Listed by ${escHtml(item.sourceName)} · Last checked ${discoverDate(item.lastVerifiedAt)}.</p><div class="discover-notice">CourtCall discovery is informational. Verify eligibility, payment instructions, venue and schedule with the organiser before acting.</div></section><section><h3>Corrections and ownership</h3><div class="discover-actions"><button class="discover-btn secondary" onclick="showDiscoverIntent('report',${jsArg(item.id)})">Report incorrect info</button><button class="discover-btn secondary" onclick="showDiscoverIntent('claim',${jsArg(item.id)})">Claim this tournament</button></div><div id="discover-intent"></div></section></div>`}
 function showDiscoverIntent(kind,id){const target=document.getElementById('discover-intent');if(!target)return;target.innerHTML=`<form class="discover-form" onsubmit="event.preventDefault();saveDiscoverIntent('${kind}',${jsArg(id)},this)"><label>Your name<input name="name" required maxlength="80"></label><label>Email<input name="email" type="email" required maxlength="120"></label><label>${kind==='claim'?'How are you connected to this organiser?':'What information appears incorrect?'}<textarea name="note" required maxlength="500"></textarea></label><button class="discover-btn" type="submit">Submit ${kind==='claim'?'claim intent':'report'}</button><p class="discover-notice">Saved locally as PENDING. This does not verify a listing or grant ownership.</p></form>`}
-function saveDiscoverIntent(kind,tournamentId,form){const intent=CourtCallDiscoverIndia.normalizeIntent({tournamentId,name:form.name.value,email:form.email.value,note:form.note.value},kind);if(!CourtCallDiscoverIndia.validIntent(intent)){showToast('Enter a valid name, email and explanation',{type:'error'});return}const key=kind==='claim'?CourtCallDiscoverIndia.STORAGE.claims:CourtCallDiscoverIndia.STORAGE.reports;discoverWrite(key,discoverRead(key).concat(intent));form.innerHTML='<p class="discover-notice" role="status">Saved on this device as PENDING. No verification or ownership changed.</p>'}
+function saveDiscoverIntent(kind,tournamentId,form){const intent=CourtCallDiscoverIndia.normalizeIntent({tournamentId,name:form.name.value,email:form.email.value,note:form.note.value},kind);if(!CourtCallDiscoverIndia.validIntent(intent)){showToast('Enter a valid name, email and explanation',{type:'error'});return}const key=kind==='claim'?CourtCallDiscoverIndia.STORAGE.claims:CourtCallDiscoverIndia.STORAGE.reports;if(!discoverWrite(key,discoverRead(key).concat(intent)))return;form.innerHTML='<p class="discover-notice" role="status">Saved on this device as PENDING. No verification or ownership changed.</p>'}
 function renderDiscoverHost(view){view.innerHTML=`<header class="discover-hero"><span class="discover-kicker">Organiser pathway</span><h2>Host with CourtCall</h2><p>Create a real playable bracket with the existing CourtCall engine, or submit an external India listing for local review.</p></header><section class="discover-panel"><h3>Run it in CourtCall</h3><p>Uses the tested tournament creation, fixtures and scoring flow. CourtCall-created tournaments are identified as COURTCALL HOSTED; this is not an external verification badge.</p><button class="discover-btn" onclick="setTournamentMode('my');showTournForm()">Create playable tournament</button></section><section class="discover-panel"><h3>Submit a tournament</h3><form class="discover-form" onsubmit="event.preventDefault();submitDiscoverListing(this)"><label>Submitting as<select name="submitterRole"><option value="ORGANISER_LISTED">Organiser</option><option value="COMMUNITY_LISTED">Community member</option></select></label><label>Tournament name<input name="name" required maxlength="100"></label><label>Organiser<input name="organiser" required maxlength="100"></label><label>State<select name="state" required>${Object.keys(CourtCallDiscoverIndia.STATES).map(s=>`<option>${escHtml(s)}</option>`).join('')}</select></label><label>City<input name="city" required maxlength="80"></label><label>Venue<input name="venue" maxlength="120"></label><label>Start date<input name="startDate" type="date" required></label><label>End date<input name="endDate" type="date"></label><label>Format<select name="format"><option>3X3</option><option>5X5</option><option>1X1</option></select></label><label>Category<input name="category" maxlength="60" placeholder="Open, U18, corporate…"></label><label>Gender<select name="gender"><option>OPEN</option><option>MEN</option><option>WOMEN</option><option>MIXED</option></select></label><label>Level<select name="level"><option>OPEN</option><option>GRASSROOTS</option><option>AMATEUR</option><option>COLLEGIATE</option><option>ELITE</option></select></label><label>Registration status<select name="registrationStatus"><option>ANNOUNCED</option><option>OPEN</option><option>CLOSING SOON</option><option>CLOSED</option></select></label><label>Registration deadline<input name="registrationDeadline" type="date"></label><label>Entry fee<input name="fee" type="number" min="0"></label><label>Prize money<input name="prize" maxlength="80"></label><label>Contact<input name="contact" maxlength="120"></label><label>Registration link (HTTPS)<input name="registrationUrl" type="url" placeholder="https://…"></label><label>Rules link (HTTPS)<input name="rulesUrl" type="url" placeholder="https://…"></label><label>Source<input name="sourceName" required maxlength="100"></label><label>Source URL (HTTPS)<input name="sourceUrl" type="url" placeholder="https://…"></label><label>Optional notes<textarea name="description" maxlength="500"></textarea></label><button class="discover-btn">Submit locally for review</button><p class="discover-notice">Submissions remain PENDING and are never VERIFIED automatically. CourtCall does not claim central moderation has occurred.</p></form></section>`}
-function submitDiscoverListing(form){const role=form.submitterRole.value;const listing=CourtCallDiscoverIndia.normalizeTournament({id:`submitted_${Date.now()}`,name:form.name.value,organiser:form.organiser.value,state:form.state.value,city:form.city.value,venue:form.venue.value,startDate:form.startDate.value,endDate:form.endDate.value,format:form.format.value,category:form.category.value,ageCategory:form.category.value,gender:form.gender.value,level:form.level.value,registrationStatus:form.registrationStatus.value,registrationDeadline:form.registrationDeadline.value,fee:form.fee.value,prize:form.prize.value,contact:form.contact.value,registrationUrl:form.registrationUrl.value,rulesUrl:form.rulesUrl.value,sourceUrl:form.sourceUrl.value,sourceName:form.sourceName.value,sourceType:role==='ORGANISER_LISTED'?'ORGANISER':'COMMUNITY',description:form.description.value,verification:role,listingType:'DISCOVERED'});const submission={...listing,status:'PENDING',submittedAt:new Date().toISOString()};discoverWrite(CourtCallDiscoverIndia.STORAGE.submissions,discoverRead(CourtCallDiscoverIndia.STORAGE.submissions).concat(submission));form.reset();showToast('Submission saved locally as pending',{type:'success'})}
+function submitDiscoverListing(form){const role=form.submitterRole.value;const listing=CourtCallDiscoverIndia.normalizeTournament({id:`submitted_${Date.now()}`,name:form.name.value,organiser:form.organiser.value,state:form.state.value,city:form.city.value,venue:form.venue.value,startDate:form.startDate.value,endDate:form.endDate.value,format:form.format.value,category:form.category.value,ageCategory:form.category.value,gender:form.gender.value,level:form.level.value,registrationStatus:form.registrationStatus.value,registrationDeadline:form.registrationDeadline.value,fee:form.fee.value,prize:form.prize.value,contact:form.contact.value,registrationUrl:form.registrationUrl.value,rulesUrl:form.rulesUrl.value,sourceUrl:form.sourceUrl.value,sourceName:form.sourceName.value,sourceType:role==='ORGANISER_LISTED'?'ORGANISER':'COMMUNITY',description:form.description.value,verification:role,listingType:'DISCOVERED'});const submission={...listing,status:'PENDING',submittedAt:new Date().toISOString()};if(!discoverWrite(CourtCallDiscoverIndia.STORAGE.submissions,discoverRead(CourtCallDiscoverIndia.STORAGE.submissions).concat(submission)))return;form.reset();showToast('Submission saved locally as pending',{type:'success'})}
 
 /* ════════════════════════════════════════════════════════
    Tournament
@@ -6879,7 +6961,9 @@ async function deleteTournament(){
   const tid=activeTournId;
   const tours=getCol(K.tournaments).filter(t=>t.id!==tid);
   setCol(K.tournaments,tours);activeTournId=null;
-  supaDeleteTournament(tid);
+  supaDeleteTournament(tid).then(ok=>{
+    if(ok===false&&isSupaAuthenticated()&&navigator.onLine)showToast('Deleted on this device · the cloud copy may reappear until sync succeeds',{type:'warning'});
+  });
   showScreen('tournament');showToast('Tournament deleted');
 }
 /* ════════════════════════════════════════════════════════
@@ -7162,7 +7246,7 @@ function checkOnboarding(){
   if(!localStorage.getItem(OB_KEY)){showScreen('onboarding');}
 }
 function obAction(type){
-  localStorage.setItem(OB_KEY,'1');
+  try{localStorage.setItem(OB_KEY,'1')}catch{}
   renderHub();
   if(type==='game'){goSetup();}
   else if(type==='teams'){showScreen('teams');}
@@ -7170,7 +7254,7 @@ function obAction(type){
   else if(type==='community'){showScreen('communities');}
 }
 function skipOnboarding(){
-  localStorage.setItem(OB_KEY,'1');
+  try{localStorage.setItem(OB_KEY,'1')}catch{}
   renderHub();showScreen('hub');
 }
 function showOnboarding(){
@@ -7262,9 +7346,12 @@ let communityViewError=null;
 async function syncCommunitiesFromDB() {
   if (!navigator.onLine) return {state:CourtCallCloudState.VIEW.OFFLINE,count:0};
   if (!supa) return {state:CourtCallCloudState.VIEW.ERROR,count:0};
-  // Deduplicate concurrent calls — share the in-flight promise
+  // Deduplicate concurrent calls — share the in-flight promise. The timeout
+  // guarantees the communities screen can never sit in "Loading…" forever.
   if (_syncCommInFlight) return _syncCommInFlight;
-  _syncCommInFlight = _doSyncCommunitiesFromDB().finally(() => { _syncCommInFlight = null; });
+  _syncCommInFlight = CourtCallCloudState.withTimeout(_doSyncCommunitiesFromDB(), 15000, 'Community sync')
+    .catch(error => ({ state: CourtCallCloudState.classifyError(error), count: 0, error }))
+    .finally(() => { _syncCommInFlight = null; });
   return _syncCommInFlight;
 }
 async function _doSyncCommunitiesFromDB() {
@@ -7749,6 +7836,16 @@ async function supaDeleteTournament(tournamentId) {
 async function syncAllUserDataFromDB() {
   if (!supa || !supaUser) return false;
   setSyncState(CourtCallCloudState.SYNC.SYNCING);
+  try {
+    return await CourtCallCloudState.withTimeout(_doSyncAllUserDataFromDB(), 45000, 'Account sync');
+  } catch(e) {
+    console.error('[Supa] syncAllUserDataFromDB FAILED:', e.message, e);
+    const kind=CourtCallCloudState.classifyFailure(e,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));
+    return false;
+  }
+}
+async function _doSyncAllUserDataFromDB() {
   // Membership must arrive first on a new device so community content queries
   // are scoped only to communities this account is authorized to read.
   const communityResult=await syncCommunitiesFromDB();
@@ -7775,11 +7872,13 @@ async function _runCommunityCloudWrite(label,write){
   if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false}
   try{
     setSyncState(CourtCallCloudState.SYNC.SYNCING);
-    const result=await write();
+    const result=await CourtCallCloudState.withTimeout(write(),12000,label);
     if(result?.error)throw result.error;
     setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);return true;
   }catch(error){
-    console.error(`[Supa] ${label} FAILED:`,error.message,error);setSyncState(CourtCallCloudState.SYNC.FAILED);return false;
+    console.error(`[Supa] ${label} FAILED:`,error.message,error);
+    const kind=CourtCallCloudState.classifyFailure(error,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));return false;
   }
 }
 
@@ -7821,13 +7920,14 @@ async function _runCommunityRpc(label,name,args){
   if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false}
   try{
     setSyncState(CourtCallCloudState.SYNC.SYNCING);
-    const {data,error}=await supa.rpc(name,args);
+    const {data,error}=await CourtCallCloudState.withTimeout(supa.rpc(name,args),12000,label);
     if(error)throw error;
     setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);
     return data===undefined?true:data;
   }catch(error){
     console.error(`[Supa] ${label} FAILED:`,error.message,error);
-    setSyncState(CourtCallCloudState.SYNC.FAILED);
+    const kind=CourtCallCloudState.classifyFailure(error,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));
     return false;
   }
 }
@@ -7869,11 +7969,11 @@ async function supaSetEventRsvp(eventId,status,profileName,fallbackRsvps){
   if(!navigator.onLine){setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);return false;}
   try{
     setSyncState(CourtCallCloudState.SYNC.SYNCING);
-    const {error}=await supa.rpc('set_community_event_rsvp',{
+    const {error}=await CourtCallCloudState.withTimeout(supa.rpc('set_community_event_rsvp',{
       p_event_id:eventId,
       p_status:status||null,
       p_profile_name:profileName||''
-    });
+    }),12000,'Event RSVP');
     if(error){
       const details=`${error.code||''} ${error.message||''} ${error.details||''}`;
       const rpcUnavailable=/PGRST202|set_community_event_rsvp|schema cache|function .* does not exist/i.test(details);
@@ -7895,7 +7995,8 @@ async function supaSetEventRsvp(eventId,status,profileName,fallbackRsvps){
       setSyncState(CourtCallCloudState.SYNC.ONLINE_SYNCED);
       return 'rejected';
     }
-    setSyncState(CourtCallCloudState.SYNC.FAILED);
+    const kind=CourtCallCloudState.classifyFailure(error,{online:navigator.onLine});
+    setSyncState(CourtCallCloudState.syncStateForFailure(kind));
     return false;
   }
 }
@@ -7941,7 +8042,11 @@ async function _pushLocalDataToCloud() {
     console.log('[Supa] _pushLocalDataToCloud: done (%d games, %d communities, %d gallery, %d posts, %d tournaments, %d events, %d players, %d ratings, %d joins)',localGames.length,localComms.length,localGallery.length,localPosts.length,localTournaments.length,localEvents.length,localPlayers.length,localRatings.length,localJoinRequests.length);
     setSyncState(ok?CourtCallCloudState.SYNC.ONLINE_SYNCED:CourtCallCloudState.SYNC.FAILED);
     return ok;
-  } catch(e) { console.warn('[Supa] _pushLocalDataToCloud error:', e.message); setSyncState(CourtCallCloudState.SYNC.FAILED); return false; }
+  } catch(e) {
+    console.warn('[Supa] _pushLocalDataToCloud error:', e.message);
+    setSyncState(CourtCallCloudState.syncStateForFailure(CourtCallCloudState.classifyFailure(e,{online:navigator.onLine})));
+    return false;
+  }
 }
 
 async function _syncProfileFromDB(){
@@ -8409,7 +8514,11 @@ async function renderCommunities(force=false){
   communityViewState=result?.state||CourtCallCloudState.VIEW.ERROR;
   communityViewError=result?.error||null;
   _renderCommunitiesDOM();
-  if(isSupaAuthenticated())setSyncState(communityViewState===CourtCallCloudState.VIEW.ERROR||communityViewState===CourtCallCloudState.VIEW.PERMISSION_DENIED?CourtCallCloudState.SYNC.FAILED:CourtCallCloudState.SYNC.ONLINE_SYNCED);
+  if(isSupaAuthenticated())setSyncState(
+    communityViewState===CourtCallCloudState.VIEW.ERROR?CourtCallCloudState.SYNC.FAILED:
+    communityViewState===CourtCallCloudState.VIEW.PERMISSION_DENIED?CourtCallCloudState.SYNC.PERMISSION_DENIED:
+    communityViewState===CourtCallCloudState.VIEW.AUTH_REQUIRED?CourtCallCloudState.SYNC.AUTH_REQUIRED:
+    CourtCallCloudState.SYNC.ONLINE_SYNCED);
   return communityViewState===CourtCallCloudState.VIEW.RESULTS||communityViewState===CourtCallCloudState.VIEW.EMPTY;
 }
 
@@ -10424,7 +10533,8 @@ function savePulseLocation(){
     area:(document.getElementById('pulse-area').value.trim()||''),
     court:(document.getElementById('pulse-court').value.trim()||''),
   };
-  localStorage.setItem(K_PULSE,JSON.stringify(loc));markLocalSave();
+  try{localStorage.setItem(K_PULSE,JSON.stringify(loc));markLocalSave()}
+  catch(error){_storageWriteFailed(error);return}
   renderPulse();
   showToast('Location saved!');
 }
@@ -10577,15 +10687,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(seenVer&&seenVer!==APP_VERSION){
     setTimeout(()=>showToast(`Updated to ${APP_VERSION} — tap Settings › What's New`,3500),800);
   }
-  if(!seenVer||seenVer!==APP_VERSION)localStorage.setItem('cc_seen_version',APP_VERSION);
+  if(!seenVer||seenVer!==APP_VERSION)try{localStorage.setItem('cc_seen_version',APP_VERSION)}catch{}
 });
 
 // ── Offline Indicator ─────────────────────────────────────────
+let _reconnectSyncTimer=null;
 function _updateOnlineStatus(){
   const offline=!navigator.onLine;
   _updateAuthNetwork();
+  clearTimeout(_reconnectSyncTimer);
   if(offline)setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);
-  else retryCloudSync();
+  // A flapping connection must not fire a sync burst per transition — settle
+  // briefly, then run one (single-flight) reconnect sync.
+  else _reconnectSyncTimer=setTimeout(()=>{if(navigator.onLine)retryCloudSync()},800);
   if(document.getElementById('s-communities')?.classList.contains('active'))renderCommunities();
   if(document.getElementById('s-pulse')?.classList.contains('active'))renderPulse();
   if(document.getElementById('s-settings')?.classList.contains('active'))renderSettings();
@@ -10676,7 +10790,7 @@ function dismissInstall(e){
   e.stopPropagation();
   const bar=document.getElementById('pwa-install-bar');
   if(bar)bar.classList.add('hidden');
-  localStorage.setItem('pwa_dismissed',String(Date.now()));
+  try{localStorage.setItem('pwa_dismissed',String(Date.now()))}catch{}
 }
 
 // ── Invite Friends ────────────────────────────────────
