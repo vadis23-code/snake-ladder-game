@@ -23,28 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Build minimal public artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist/icons
-          cp index.html basketball-supa.js basketball-sw.js basketball.manifest.json \
-             courtcall-core.js courtcall-notifications.js courtcall-cloud-state.js \
-             robots.txt sitemap.xml dist/
-          cp icons/apple-touch-icon.png icons/basketball-3d.webp icons/icon-192.png \
-             icons/icon-512.png icons/icon-maskable-512.png icons/social-card.png dist/icons/
-
-          required=(
-            index.html basketball-supa.js basketball-sw.js basketball.manifest.json
-            courtcall-core.js courtcall-notifications.js courtcall-cloud-state.js
-            icons/apple-touch-icon.png icons/basketball-3d.webp icons/icon-192.png
-            icons/icon-512.png icons/icon-maskable-512.png icons/social-card.png
-          )
-          for asset in "${required[@]}"; do test -s "dist/$asset"; done
-          if find dist -type f \( -name '*.sql' -o -name '*.zip' -o -path '*/tests/*' \) | grep -q .; then
-            echo 'Private development files leaked into the Pages artifact.' >&2
-            exit 1
-          fi
+      - name: Build and validate public artifact
+        run: node tools/build-public-artifact.mjs dist
       - uses: actions/upload-pages-artifact@v3
         with:
           path: 'dist'
