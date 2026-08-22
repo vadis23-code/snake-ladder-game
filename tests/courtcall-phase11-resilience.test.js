@@ -206,7 +206,7 @@ test('rapid local-save flickers are not announced; meaningful states are', () =>
 // ── D/E: service worker hardening ────────────────────────
 
 test('Phase 11 advances the cache version atomically', () => {
-  assert.match(sw, /CACHE_VERSION = 'v56'/);
+  assert.match(sw, /CACHE_VERSION = 'v57'/);
   assert.match(sw, /await caches\.delete\(CACHE\);\s*throw error;/);
 });
 

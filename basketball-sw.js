@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'courtcall-';
-const CACHE_VERSION = 'v56';
+const CACHE_VERSION = 'v57';
 const CACHE = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-${CACHE_VERSION}`;
 const NAVIGATION_TIMEOUT_MS = 4000;
@@ -7,7 +7,7 @@ const RUNTIME_MAX_ENTRIES = 48;
 const SHELL = [
   './',
   './courtcall-design-system.css',
-  './courtcall-core-game.css',
+  './courtcall-core-game.css?v=20260824',
   './courtcall-team-history.css',
   './courtcall-motion-foundation.css',
   './courtcall-cinematic.css?v=20260814b',
