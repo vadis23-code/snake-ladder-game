@@ -39,7 +39,7 @@ test('all approved production media variants exist',()=>{
 });
 
 test('offline shell keeps the controller and still fallbacks available',()=>{
-  assert.match(sw,/courtcall-cinematic\.css\?v=20260814b/);
+  assert.match(sw,/courtcall-cinematic\.css\?v=20260825/);
   assert.match(sw,/courtcall-cinematic\.js\?v=20260814b/);
   for(const stem of STILL_STEMS()){
     assert.match(sw,new RegExp(`${stem.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}-mobile\\.webp`));

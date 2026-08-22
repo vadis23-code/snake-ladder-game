@@ -152,7 +152,7 @@ test('production keeps every established localStorage key and caches the communi
     'courtcall_community_events', 'courtcall_community_ratings'
   ]) assert.match(html, new RegExp(key));
   assert.match(html, /<script src="\.\/courtcall-communities\.js\?v=20260821"><\/script>/);
-  assert.match(sw, /CACHE_VERSION = 'v57'/);
+  assert.match(sw, /CACHE_VERSION = 'v58'/);
   assert.match(sw, /'\.\/courtcall-communities\.js\?v=20260821'/);
 });
 
@@ -198,7 +198,7 @@ test('gallery and event writes keep optimistic UX while surfacing cloud failures
   assert.match(html, /async function submitEvent/);
   assert.match(html, /supaUpdateEvent\(evt\.id/);
   assert.match(html, /CommunityContract\.parseEventDateTime\((?:e|evt)\)/);
-  assert.match(html, /secure cloud sync failed/);
+  assert.match(html, /on this device · cloud sync failed/);
 });
 
 test('community deep links hydrate an unknown cloud record before falling back', () => {

@@ -147,7 +147,7 @@ test('Phase 4 remains functional while an older cached core module is being repl
 });
 
 test('Phase 4 stylesheet is cached and defines every required game surface', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v57'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v58'/);
   assert.match(serviceWorker, /'\.\/courtcall-core-game\.css\?v=\d+'/);
   [
     '.setup-hero', '.setup-advanced', '#s-game.active', '.team-leader-label',
