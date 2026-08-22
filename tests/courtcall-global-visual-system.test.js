@@ -13,7 +13,7 @@ const sw = read('basketball-sw.js');
 test('global visual layer loads after cinematic styles and remains in the offline shell', () => {
   assert.ok(html.indexOf('courtcall-global-visual-system.css') > html.indexOf('courtcall-cinematic.css'));
   assert.ok(html.indexOf('courtcall-global-visual-system.js') > html.indexOf('courtcall-cinematic.js'));
-  assert.match(sw, /CACHE_VERSION = 'v51'/);
+  assert.match(sw, /CACHE_VERSION = 'v52'/);
   assert.match(sw, /courtcall-global-visual-system\.css/);
   assert.match(sw, /courtcall-global-visual-system\.js/);
 });

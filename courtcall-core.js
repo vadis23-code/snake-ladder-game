@@ -1734,6 +1734,12 @@
       return routeDecision('open_community', 'comm-detail', route, 'community_deep_link', { communityId });
     }
 
+    // Phase 9 retires password/PIN recovery. Old bookmarks and recovery links
+    // resolve to the email-code sign-in screen instead of a dead PIN form.
+    if (route === 'reset-pin') {
+      return routeDecision('navigate', 'profile', route, 'legacy_pin_retired');
+    }
+
     if (!hasProfile && !publicScreens.has(route)) {
       return routeDecision('navigate', 'profile', route, 'auth_required');
     }
@@ -1754,10 +1760,6 @@
         }
         return routeDecision('open_tournament', 'tourn-detail', route, 'tournament_deep_link', { tournamentId });
       }
-    }
-
-    if (route === 'reset-pin' && !asBoolean(config.hasRecoverySession)) {
-      return routeDecision('navigate', fallbackScreen, route, 'recovery_required');
     }
 
     if (route === 'changelog') {

@@ -667,24 +667,12 @@ test('changelog hash resolves to a modal action only for a known identity', () =
   assert.equal(visitor.reason, 'auth_required');
 });
 
-test('reset PIN route requires an active recovery session', () => {
-  const guestWithoutRecovery = core.resolveHashRoute('#/reset-pin', {
-    hasProfile: true,
-    hasRecoverySession: false
-  });
-  const visitorWithoutRecovery = core.resolveHashRoute('#/reset-pin', {
-    hasProfile: false,
-    hasRecoverySession: false
-  });
-  const activeRecovery = core.resolveHashRoute('#/reset-pin', {
-    hasProfile: true,
-    hasRecoverySession: true
-  });
+test('legacy reset PIN links redirect to email-code authentication', () => {
+  const signedIn = core.resolveHashRoute('#/reset-pin', { hasProfile: true });
+  const visitor = core.resolveHashRoute('#/reset-pin', { hasProfile: false });
 
-  assert.equal(guestWithoutRecovery.screen, 'hub');
-  assert.equal(guestWithoutRecovery.reason, 'recovery_required');
-  assert.equal(visitorWithoutRecovery.screen, 'profile');
-  assert.equal(visitorWithoutRecovery.reason, 'auth_required');
-  assert.equal(activeRecovery.screen, 'reset-pin');
-  assert.equal(activeRecovery.reason, 'direct_route');
+  assert.equal(signedIn.screen, 'profile');
+  assert.equal(signedIn.reason, 'legacy_pin_retired');
+  assert.equal(visitor.screen, 'profile');
+  assert.equal(visitor.reason, 'legacy_pin_retired');
 });

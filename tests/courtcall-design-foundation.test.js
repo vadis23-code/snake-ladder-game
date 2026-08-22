@@ -32,7 +32,7 @@ test('Phase 3 stylesheet is loaded after legacy inline styles and cached offline
 
   assert.ok(inlineEnd >= 0, 'legacy inline style block must remain present');
   assert.ok(foundationLink > inlineEnd, 'foundation stylesheet must load after legacy styles');
-  assert.match(serviceWorker, /CACHE_VERSION = 'v51'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v52'/);
   assert.match(serviceWorker, /'\.\/courtcall-design-system\.css'/);
 });
 
@@ -76,11 +76,10 @@ test('route foundation maintains one active landmark and tears down stale change
   assert.match(html, /_syncActiveScreenA11y\(name\);/);
 });
 
-test('recovery UI is activated only by the Supabase recovery event', () => {
-  assert.match(html, /let _hasRecoverySession = false;/);
-  assert.match(html, /event === 'PASSWORD_RECOVERY'[\s\S]*?_hasRecoverySession = true;/);
-  assert.match(html, /hasRecoverySession:_hasRecoverySession/);
-  assert.match(html, /_hasRecoverySession=false;_clearPin\('pin-rs'\)/);
+test('legacy password recovery is retired in favor of the OTP identity path', () => {
+  assert.doesNotMatch(html, /id="s-reset-pin"|resetPasswordForEmail|updateUser\(\{password/);
+  assert.match(html, /event === 'SIGNED_IN' \|\| event === 'PASSWORD_RECOVERY'/);
+  assert.match(html, /CourtCallAuth\.verifyEmailOtp/);
 });
 
 test('design foundation has balanced block braces', () => {

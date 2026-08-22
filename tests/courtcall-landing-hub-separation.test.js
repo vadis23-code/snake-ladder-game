@@ -60,7 +60,7 @@ test('CTA continuation is memory-only and routes setup after identity creation',
   assert.match(fromLanding, /showScreen\('profile'\)/);
   assert.match(afterIdentity, /if\(target==='setup'\)return goSetup\(\)/);
   assert.doesNotMatch(`${fromLanding}\n${afterIdentity}`, /localStorage|sessionStorage|setObj|getObj|Supabase|supa/i);
-  assert.ok((html.match(/routeAfterIdentity\(\)/g) || []).length >= 6);
+  assert.ok((html.match(/routeAfterIdentity\(\)/g) || []).length >= 4);
 });
 
 test('cinematic lifecycle is bound only to landing and fully tears down', () => {
@@ -93,7 +93,7 @@ test('Midnight Arena presentation explicitly yields the landing layer', () => {
 });
 
 test('PWA shell versions every changed landing asset without touching navigation strategy', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v51'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v52'/);
   for (const asset of [
     'courtcall-cinematic.css?v=20260814b',
     'courtcall-cinematic.js?v=20260814b',

@@ -1699,6 +1699,7 @@ body.modal-open{overflow:hidden}
 <link rel="stylesheet" href="./courtcall-global-visual-system.css?v=20260814b">
 <link rel="stylesheet" href="./courtcall-tournaments.css">
 <link rel="stylesheet" href="./courtcall-supporting-product.css?v=20260822">
+<link rel="stylesheet" href="./courtcall-auth.css?v=20260822">
 </head>
 <body>
 <a class="skip-link" id="skip-link" href="#s-landing">Skip to content</a>
@@ -1753,63 +1754,39 @@ body.modal-open{overflow:hidden}
     <div class="ph-title">CourtCall</div>
     <div class="ph-sub">Voice-first pickup basketball OS</div>
     <div class="auth-card">
-      <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
-        <button class="auth-tab on" id="auth-tab-signin" role="tab" aria-selected="true" aria-controls="auth-signin-form" onclick="switchAuthMode('signin')">Sign In</button>
-        <button class="auth-tab" id="auth-tab-create" role="tab" aria-selected="false" tabindex="-1" aria-controls="auth-create-form" onclick="switchAuthMode('create')">Create Account</button>
-      </div>
-
-      <!-- Sign In form -->
-      <form class="auth-form" id="auth-signin-form" role="tabpanel" aria-labelledby="auth-tab-signin" onsubmit="event.preventDefault();signIn()">
-        <label class="sr-only" for="inp-si-email">Email address</label><input id="inp-si-email" class="auth-input" type="email" placeholder="Email address" autocomplete="username email" required>
-        <div class="pin-label-row"><span class="pin-label">6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-si',this)" aria-label="Show PIN">👁</button></div>
-        <div class="pin-row" id="pin-si" role="group" aria-label="Enter your 6-digit PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
-        </div>
-        <div id="auth-err-si" class="auth-error hidden"></div>
-        <div class="auth-device-note" style="margin-top:6px;margin-bottom:0">🔒 Your PIN unlocks this device — data syncs to the cloud when signed in</div>
-        <button class="auth-btn" type="submit">Sign In</button>
-        <button class="auth-forgot" type="button" onclick="forgotPin()">Forgot PIN?</button>
-      </form>
-
-      <!-- Create Account form -->
-      <form class="auth-form hidden" id="auth-create-form" role="tabpanel" aria-labelledby="auth-tab-create" onsubmit="event.preventDefault();createAccount()">
-        <label class="sr-only" for="inp-cr-name">Display name</label><input id="inp-cr-name" class="auth-input" type="text" placeholder="Your name" maxlength="24" autocomplete="name" required>
-        <label class="sr-only" for="inp-cr-email">Email address</label><input id="inp-cr-email" class="auth-input" type="email" placeholder="Email address" autocomplete="username email" required>
-        <div class="pin-label-row"><span class="pin-label">Choose a 6-digit PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cr',this)" aria-label="Show PIN">👁</button></div>
-        <div class="pin-row" id="pin-cr" role="group" aria-label="Choose a 6-digit PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Digit 6">
-        </div>
-        <div class="pin-label-row"><span class="pin-label">Confirm PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-cf',this)" aria-label="Show PIN">👁</button></div>
-        <div class="pin-row" id="pin-cf" role="group" aria-label="Confirm PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
-        </div>
+      <form class="auth-form" id="auth-email-form" onsubmit="event.preventDefault();sendOtpCode()">
+        <h1 class="otp-heading">Sign in to CourtCall</h1>
+        <p class="otp-copy">New and returning players use the same secure email-code flow.</p>
+        <label class="otp-field-label" for="inp-si-email">Email</label>
+        <input id="inp-si-email" class="auth-input" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="auth-status auth-network-note" required>
         <div class="consent-row">
-          <input type="checkbox" id="consent-cr" aria-label="Agree to Privacy Policy and Terms of Service">
-          <label for="consent-cr">I agree to the <a href="#/privacy" onclick="openLegal('privacy')">Privacy Policy</a> and <a href="#/terms" onclick="openLegal('terms')">Terms of Service</a>.</label>
+          <input type="checkbox" id="consent-otp" aria-describedby="auth-status" required>
+          <label for="consent-otp">I agree to the <a href="#/privacy" onclick="openLegal('privacy')">Privacy Policy</a> and <a href="#/terms" onclick="openLegal('terms')">Terms of Service</a>.</label>
         </div>
-        <div id="auth-err-cr" class="auth-error hidden"></div>
-        <button class="auth-btn" type="submit">Create Account</button>
+        <button class="auth-btn" id="otp-send-btn" type="submit">Send Code</button>
       </form>
 
-      <div class="auth-device-note">🔒 Local by default · Cloud sync when signed in</div>
-      <div class="legal-links"><a href="#/privacy" onclick="openLegal('privacy')">Privacy</a><a href="#/terms" onclick="openLegal('terms')">Terms</a></div>
+      <form class="auth-form hidden" id="auth-verify-form" onsubmit="event.preventDefault();verifyOtpCode()">
+        <h1 class="otp-heading">Enter your code</h1>
+        <p class="otp-delivery-copy">We sent a verification code to:<strong id="otp-email-display"></strong></p>
+        <label class="otp-field-label" for="inp-otp-code">6-digit verification code</label>
+        <input id="inp-otp-code" class="auth-input otp-code-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-describedby="auth-status otp-code-help" aria-invalid="false" required>
+        <p class="otp-copy" id="otp-code-help">Paste or enter the full code from your email.</p>
+        <button class="auth-btn" id="otp-verify-btn" type="submit">Verify</button>
+        <div class="otp-actions">
+          <button class="otp-text-action" id="otp-change-email" type="button" onclick="changeOtpEmail()">← Change email</button>
+          <button class="otp-text-action" id="otp-resend-btn" type="button" onclick="resendOtpCode()" disabled>Resend in 60s</button>
+        </div>
+      </form>
+
+      <p class="otp-status" id="auth-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="otp-network-note" id="auth-network-note" data-online="true">Online · Email delivery is required for account sign-in</p>
+      <p class="otp-privacy-copy">CourtCall never stores or logs your verification code.</p>
       <div class="divider-or">or</div>
-      <button class="btn-secondary" id="guest-profile-toggle" type="button" aria-expanded="false" aria-controls="guest-profile-form" onclick="openGuestProfile()">Set Up Local Profile</button>
+      <div class="auth-secondary-stack">
+        <button class="btn-secondary auth-guest-primary" id="guest-continue-btn" type="button" onclick="guestLogin()">Continue as Guest</button>
+        <button class="btn-secondary" id="guest-profile-toggle" type="button" aria-expanded="false" aria-controls="guest-profile-form" onclick="openGuestProfile()">Customize Local Profile</button>
+      </div>
       <form class="guest-local-panel hidden" id="guest-profile-form" onsubmit="event.preventDefault();saveGuestProfile()">
         <div class="guest-local-note">Play without an account. This profile and your games stay on this device until you choose to sync them.</div>
         <label class="sr-only" for="guest-name">Display name</label><input id="guest-name" class="auth-input" type="text" placeholder="Display name" maxlength="24" autocomplete="nickname" required>
@@ -1823,7 +1800,24 @@ body.modal-open{overflow:hidden}
         <div id="guest-profile-error" class="auth-error hidden" role="alert"></div>
         <button class="auth-btn" type="submit">Save Local Profile</button>
       </form>
-      <button class="auth-forgot" type="button" onclick="guestLogin()">Continue without profile details</button>
+      <button class="auth-forgot hidden" id="legacy-local-toggle" type="button" aria-expanded="false" aria-controls="legacy-local-panel" onclick="openLegacyLocalPin()">Use a legacy local-profile PIN</button>
+      <form class="legacy-local-panel hidden" id="legacy-local-panel" onsubmit="event.preventDefault();legacyLocalSignIn()">
+        <p class="legacy-local-copy">For a device-only profile created before email codes. This does not sign in to Supabase.</p>
+        <label class="otp-field-label" for="inp-legacy-email">Legacy profile email</label>
+        <input id="inp-legacy-email" class="auth-input" type="email" autocomplete="username email" autocapitalize="none" spellcheck="false" required>
+        <div class="pin-label-row"><span class="pin-label">6-digit local PIN</span><button type="button" class="pin-eye" onclick="togglePinVis('pin-legacy',this)" aria-label="Show PIN">👁</button></div>
+        <div class="pin-row" id="pin-legacy" role="group" aria-label="Enter your legacy local-profile PIN">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 1">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 2">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 3">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 4">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 5">
+          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Legacy PIN digit 6">
+        </div>
+        <div id="legacy-local-error" class="auth-error hidden" role="alert"></div>
+        <button class="btn-secondary" type="submit">Open Local Profile</button>
+      </form>
+      <div class="legal-links"><a href="#/privacy" onclick="openLegal('privacy')">Privacy</a><a href="#/terms" onclick="openLegal('terms')">Terms</a></div>
     </div>
   </div>
 </div>
@@ -3151,6 +3145,7 @@ body.modal-open{overflow:hidden}
 <script src="./courtcall-notifications.js"></script>
 <script src="./courtcall-cloud-state.js"></script>
 <script src="./courtcall-supporting-product.js?v=20260822"></script>
+<script src="./courtcall-auth.js?v=20260822"></script>
 <script>
 // ── Supabase ─────────────────────────────────────────────
 const SUPA_URL = 'https://jfeegcocynozbjpzbjae.supabase.co';
@@ -3161,8 +3156,9 @@ let supaSession = null; // the active Supabase session object
 let _deferLocalPush = false;
 let _pendingLocalProfileForSync = null;
 let _accountSyncOfferOpen = false;
-let _accountCreationInProgress = false;
-let _hasRecoverySession = false;
+let _otpVerificationInProgress = false;
+let _identityHydrationPromise = null;
+let _authRequestedHash = '';
 
 // Validates that a session is real: has access_token and user.id.
 function _isValidSession(s) {
@@ -3200,107 +3196,67 @@ function isSupaAuthenticated() {
 }
 
 
-// Listen for auth state changes
+// Keep the in-memory session authoritative. OTP verification and startup
+// restoration hydrate the CourtCall profile outside this callback so a
+// Supabase auth callback never waits on another Supabase request.
 if (supa) {
   supa.auth.onAuthStateChange((event, session) => {
-    const wasAuthenticated = isSupaAuthenticated();
     _setAuthFromSession(session);
-    console.log('[Supa] Auth event:', event, supaUser ? 'user=' + supaUser.id : 'no user', _isValidSession(session) ? 'session=valid (has access_token)' : 'session=INVALID/null');
-    if (event === 'PASSWORD_RECOVERY') {
-      _hasRecoverySession = true;
-      if (typeof showScreen === 'function') showScreen('reset-pin');
+    if (event === 'SIGNED_OUT') {
+      setTimeout(()=>{
+        if(currentProfile?.id&&currentProfile.id!=='guest'&&currentProfile.localOnly!==true){
+          const active=document.querySelector('.screen.active')?.id?.replace(/^s-/,'')||'';
+          if(active&&!_PUBLIC_SCREENS.has(active))_authRequestedHash=location.hash;
+          currentProfile=null;try{localStorage.removeItem(K.profile)}catch{}
+          renderLanding();
+          if(active&&!_PUBLIC_SCREENS.has(active))showScreen('profile');
+        }
+      },0);
       return;
     }
-    if (event === 'SIGNED_OUT') _hasRecoverySession = false;
-    if (!_isValidSession(session)) return;
-    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-      // First confirmed sign-in: sync only after the user has explicitly
-      // consented to move device-local data into this account.
-      if (!wasAuthenticated && event === 'SIGNED_IN') {
-        const pending = _readPendingAccountSync();
-        if (_pendingSyncMatchesCurrentUser(pending)) setSyncState(CourtCallCloudState.SYNC.ONLINE_LOCAL);
-        else if (currentProfile?.id===session.user.id&&_getAccountSyncPreference(session.user.id)==='approved') _pushLocalDataToCloud().then(ok => {
-          if (typeof showToast === 'function') showToast(ok?'Cloud sync complete ☁️':'Some data is still saved locally — retry sync',{type:ok?'success':'warning'});
-        });
-        else setSyncState(CourtCallCloudState.SYNC.ONLINE_LOCAL);
-      }
-      syncAllUserDataFromDB().then(async () => {
-        const active = document.querySelector('.screen.active')?.id;
-        if (active === 's-profile' || active === 's-onboarding') {
-          if (currentProfile?.id && currentProfile.id !== 'guest') {
-            renderHub();
-            showScreen('hub');
-          }
-        } else if (active === 's-communities') renderCommunities();
-        else if (active === 's-comm-detail' && typeof activeCommunityId !== 'undefined' && activeCommunityId) {
-          const _cid=activeCommunityId;
-          syncPostsFromDB(_cid).then(() => { if(activeCommunityId===_cid&&document.getElementById('s-comm-detail')?.classList.contains('active')) renderCommDetail(); });
-          renderCommDetail();
-        }
-        if (!_accountCreationInProgress) await _resumePendingAccountSync();
-      });
+    if (!_isValidSession(session) || _otpVerificationInProgress || event === 'INITIAL_SESSION') return;
+    if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+      setTimeout(() => _finishAuthenticatedIdentity(session.user, { route: true, source: event }), 0);
     }
   });
 }
 
-async function supaSignUp(email, pin, name) {
-  if (!supa) return { error: { message: 'Supabase not configured' } };
-  const { data, error } = await supa.auth.signUp({
-    email,
-    password: pin,
-    options: { data: { name } }
+function supaSendOtp(email) {
+  if (!supa) return Promise.resolve({ data: null, error: { message: 'Supabase not configured' } });
+  return CourtCallAuth.requestEmailOtp(supa, email, {
+    emailRedirectTo: location.href.split('#')[0]
   });
-  if (error) {
-    console.warn('[Supa] signUp error:', error.message);
-    return { data, error };
-  }
-  // Profile row is created server-side by the handle_new_user trigger.
-  // Only set supaUser if signup returned a real session (email confirm OFF).
-  if (_setAuthFromSession(data.session)) {
-    console.log('[Supa] signUp: session active, user=' + supaUser.id);
-  } else {
-    // Email confirmation is enabled — no session until user confirms.
-    console.log('[Supa] signUp: no session (email confirmation required). Cloud writes disabled until confirmed sign-in.');
-  }
-  // data.user is always returned (the auth record), but we expose
-  // needsEmailConfirmation so the UI can show the right toast.
-  data._needsEmailConfirmation = !_isValidSession(data.session);
-  return { data, error };
 }
 
-async function supaSignIn(email, pin) {
-  if (!supa) return { error: { message: 'Supabase not configured' } };
-  const { data, error } = await supa.auth.signInWithPassword({ email, password: pin });
-  if (error) {
-    console.warn('[Supa] signIn error:', error.message);
-    if (error.message?.includes('Email not confirmed')) {
-      return { data, error: { message: 'Please check your email and click the confirmation link first, then sign in again.' } };
-    }
-    return { data, error };
-  }
-  if (_setAuthFromSession(data.session)) {
-    console.log('[Supa] signIn: session active, user=' + supaUser.id + ', access_token present');
-  } else {
-    console.warn('[Supa] signIn: succeeded but no valid session returned');
-  }
-  return { data, error };
+function supaVerifyOtp(email, token) {
+  if (!supa) return Promise.resolve({ data: null, error: { message: 'Supabase not configured' } });
+  return CourtCallAuth.verifyEmailOtp(supa, email, token);
+}
+
+function _removeLocalSupaSession() {
+  try {
+    const projectRef = new URL(SUPA_URL).hostname.split('.')[0];
+    const storagePrefix = `sb-${projectRef}-auth-token`;
+    Object.keys(localStorage)
+      .filter(key => key === storagePrefix || key.startsWith(`${storagePrefix}.`))
+      .forEach(key => localStorage.removeItem(key));
+  } catch {}
 }
 
 async function supaSignOut() {
   try{
-    if (supa) await supa.auth.signOut();
+    if (supa) await CourtCallAuth.signOut(supa);
   }finally{
-    // Remote sign-out may fail while offline; the device must still stop using
-    // the in-memory identity immediately.
+    // A failed network revocation must not leave this browser using the old
+    // session. Remove only this project's auth record, never CourtCall data.
+    _removeLocalSupaSession();
     supaUser = null;
     supaSession = null;
-    _hasRecoverySession = false;
-    console.log('[Supa] Signed out locally');
   }
 }
 
-// Clears every CourtCall + Supabase key from localStorage.
-// Used by logOut() and clearAllData() so no token or PII survives.
+// Clears every CourtCall + Supabase key from localStorage. This is reserved
+// for the explicit Clear All Data action; ordinary logout is non-destructive.
 function _wipeLocalStorage() {
   // Known app keys
   [K.profile,K.profiles,K.players,K.builder,K.matches,K.tournaments,K.settings,K.game,K.games,K.lastSync,K.lastBackup,
@@ -3329,6 +3285,7 @@ async function switchProfile() {
   if(currentProfile?.id==='guest'){exitGuestMode();return}
   try{await supaSignOut()}catch{}
   currentProfile=null;
+  try{localStorage.removeItem(K.profile)}catch{}
   _clearCommunityMirror();
   showScreen('profile');
 }
@@ -3342,16 +3299,16 @@ function exitGuestMode(){
   showToast('Guest mode closed — local data was kept on this device',{type:'information'});
 }
 
-// Full logout: end Supabase session, wipe local state, return to landing.
+// Logout ends authentication but preserves matches, tournaments, communities,
+// preferences and backups. Clear All Data remains the only full-device wipe.
 async function logOut() {
   if(currentProfile?.id==='guest'){exitGuestMode();return}
-  if(!await uiConfirm('Log out of CourtCall? Unsynced local data will be cleared from this device.'))return;
+  if(!await uiConfirm('Log out of CourtCall on this device? Your saved CourtCall data and preferences will be kept.'))return;
   try{await supaSignOut()}catch{}
-  _wipeLocalStorage();
+  try{localStorage.removeItem(K.profile)}catch{}
   currentProfile=null;
-  builderState={players:[],teams:[],queue:[],queueMode:'winners-stay',queuePointer:0};
-  showToast('Logged out');
-  showScreen('profile');
+  showToast('Logged out · saved CourtCall data was kept',{type:'success'});
+  showScreen('landing');
 }
 
 async function supaSaveGame(game) {
@@ -3632,10 +3589,10 @@ function _routeFromHash(){
     validScreens:[...document.querySelectorAll('.screen[id^="s-"]')].map(screen=>screen.id.replace(/^s-/,'')),
     publicScreens:[..._PUBLIC_SCREENS],communityIds:getComms().map(community=>community.id),
     tournamentIds:getCol(K.tournaments).map(tournament=>tournament.id),
-    hasActiveGame:Boolean(saved&&!saved.gameOver&&saved.teamA&&saved.teamB),
-    hasRecoverySession:_hasRecoverySession
+    hasActiveGame:Boolean(saved&&!saved.gameOver&&saved.teamA&&saved.teamB)
   });
   if(!decision.handled)return false;
+  if(decision.reason==='auth_required')_authRequestedHash=location.hash;
   if(decision.action==='open_community'){openCommunity(decision.communityId);return true}
   if(decision.route==='community'&&decision.reason==='unknown_community'&&decision.communityId){
     _hydrateCommunityDeepLink(decision.communityId);return true;
@@ -3767,14 +3724,11 @@ function showScreen(name){
   if(name==='comm-create')resetCommCreateForm();
   if(name==='comm-detail')renderCommDetail();
   if(name==='profile'){
-    _clearAllPins();_clearAuthErrs();
+    resetOtpAuthView({preserveEmail:true});
     const si=document.getElementById('inp-si-email');if(si)si.value=currentProfile?.email||'';
-    const cn=document.getElementById('inp-cr-name');if(cn)cn.value=currentProfile?.id==='guest'&&currentProfile.name!=='Guest'?currentProfile.name:'';
-    const ce=document.getElementById('inp-cr-email');if(ce)ce.value='';
-    switchAuthMode('signin');['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
-    openGuestProfile(currentProfile?.id==='guest');
+    renderLegacyLocalPinAvailability();
+    openGuestProfile(false);
   }
-  if(name==='reset-pin'){_setAuthErr('auth-err-rs','');['pin-rs','pin-rsc'].forEach(_initPinRow);}
   if(name==='help-center'){hcActiveCat='All';renderHelpCenter();}
   // Hide floating help button during live game
   const fab=document.getElementById('help-fab');
@@ -3787,8 +3741,11 @@ function showScreen(name){
 }
 // ── Profile / Auth ────────────────────────────────────────
 let currentProfile=null;
-let _authMode='signin';
 let _landingIntent=null;
+let _identityNeedsOnboarding=false;
+let _otpEmail='';
+let _otpCooldownTimer=null;
+const _otpGate=CourtCallAuth.createRequestGate({cooldownMs:60000});
 function renderLanding(){
   const enter=document.getElementById('landing-enter-btn');
   if(enter)enter.textContent=currentProfile?.id?'Continue to CourtCall':'Enter CourtCall';
@@ -3803,20 +3760,18 @@ function routeFromLanding(target='hub'){
   showScreen('profile');
 }
 function routeAfterIdentity(defaultRoute='hub'){
+  if(_authRequestedHash){
+    const requested=_authRequestedHash;_authRequestedHash='';
+    _identityNeedsOnboarding=false;
+    history.replaceState(null,'',requested);
+    if(_routeFromHash())return;
+  }
   const target=_landingIntent||defaultRoute;
   _landingIntent=null;
   if(target==='setup')return goSetup();
+  if(target==='hub'&&_identityNeedsOnboarding){_identityNeedsOnboarding=false;return showScreen('onboarding');}
+  _identityNeedsOnboarding=false;
   showScreen(target);
-}
-function switchAuthMode(mode){
-  _authMode=mode;
-  const si=document.getElementById('auth-tab-signin'),cr=document.getElementById('auth-tab-create');
-  si.classList.toggle('on',mode==='signin');
-  cr.classList.toggle('on',mode==='create');
-  document.getElementById('auth-signin-form').classList.toggle('hidden',mode!=='signin');
-  document.getElementById('auth-create-form').classList.toggle('hidden',mode!=='create');
-  _setTabSelected(si.parentElement,mode==='signin'?si:cr);
-  _clearAuthErrs();_clearAllPins();
 }
 function _initPinRow(rowId){
   const row=document.getElementById(rowId);if(!row)return;
@@ -3858,35 +3813,133 @@ function togglePinVis(rowId,btn){
   boxes.forEach(b=>b.type=reveal?'text':'password');
   if(btn){btn.classList.toggle('on',reveal);btn.setAttribute('aria-label',reveal?'Hide PIN':'Show PIN');}
 }
-// Forgot PIN → send a Supabase recovery email (magic link).
-async function forgotPin(){
-  const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
-  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter your email above, then tap Forgot PIN');return;}
-  if(!supa){_setAuthErr('auth-err-si','PIN reset needs an internet connection');return;}
-  const btn=document.querySelector('#auth-signin-form .auth-forgot');
-  if(btn){btn.disabled=true;btn.textContent='Sending…';}
-  try{
-    const {error}=await supa.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});
-    if(error)_setAuthErr('auth-err-si',error.message);
-    else{_setAuthErr('auth-err-si','');showToast('Check your email for a reset link',3200);}
-  }catch{_setAuthErr('auth-err-si','Could not send reset email — try again');}
-  if(btn){btn.disabled=false;btn.textContent='Forgot PIN?';}
+function _setAuthStatus(message,state='information'){
+  const status=document.getElementById('auth-status');
+  if(!status)return;
+  status.textContent=message||'';
+  status.dataset.state=message?(state||'information'):'';
 }
-// Set a new PIN after arriving via the recovery link (PASSWORD_RECOVERY event).
-async function submitNewPin(){
-  const pin=_getPinVal('pin-rs'),pinC=_getPinVal('pin-rsc');
-  if(pin.length<6){_setAuthErr('auth-err-rs','Enter a 6-digit PIN');return;}
-  if(_isTrivialPin(pin)){_setAuthErr('auth-err-rs','That PIN is too easy to guess — pick another');_clearPin('pin-rs');_clearPin('pin-rsc');return;}
-  if(pin!==pinC){_setAuthErr('auth-err-rs','PINs don\'t match — try again');_clearPin('pin-rsc');return;}
-  if(!supa){_setAuthErr('auth-err-rs','Reset needs an internet connection');return;}
-  const btn=document.querySelector('#s-reset-pin .auth-btn');
-  if(btn){btn.disabled=true;btn.textContent='Updating…';}
+function _updateAuthNetwork(){
+  const note=document.getElementById('auth-network-note');
+  if(!note)return;
+  const online=navigator.onLine;
+  note.dataset.online=String(online);
+  note.textContent=online?'Online · Email delivery is required for account sign-in':'Offline · Guest play and saved local data remain available';
+}
+function _setOtpStep(step){
+  const emailForm=document.getElementById('auth-email-form');
+  const verifyForm=document.getElementById('auth-verify-form');
+  if(!emailForm||!verifyForm)return;
+  const verifying=step==='verify';
+  emailForm.classList.toggle('hidden',verifying);
+  verifyForm.classList.toggle('hidden',!verifying);
+  if(verifying){
+    const display=document.getElementById('otp-email-display');if(display)display.textContent=CourtCallAuth.maskEmail(_otpEmail);
+    document.getElementById('inp-otp-code')?.focus();
+  }else document.getElementById('inp-si-email')?.focus();
+}
+function _updateOtpCooldown(){
+  const button=document.getElementById('otp-resend-btn');if(!button)return;
+  const remaining=Math.ceil(_otpGate.remainingMs()/1000);
+  button.disabled=remaining>0||_otpGate.snapshot().sendInFlight;
+  button.textContent=remaining>0?`Resend in ${remaining}s`:'Resend code';
+  if(remaining<=0&&_otpCooldownTimer){clearInterval(_otpCooldownTimer);_otpCooldownTimer=null;}
+}
+function _startOtpCooldownUi(){
+  _updateOtpCooldown();
+  if(_otpCooldownTimer)clearInterval(_otpCooldownTimer);
+  _otpCooldownTimer=setInterval(_updateOtpCooldown,1000);
+}
+function _prepareGuestSyncForOtp(email){
+  const saved=getObj(K.profile,null);
+  const guest=currentProfile?.id==='guest'?currentProfile:saved?.id==='guest'?saved:null;
+  if(!_hasDeviceData(guest))return;
+  const existing=_readPendingAccountSync();
+  if(existing?.email===email)return;
+  _storePendingAccountSync({email,profile:guest,createdAt:new Date().toISOString(),consent:false});
+}
+async function sendOtpCode(options={}){
+  const email=CourtCallAuth.normalizeEmail(document.getElementById('inp-si-email')?.value);
+  if(!CourtCallAuth.isValidEmail(email)){_setAuthStatus('Enter a valid email address.','error');document.getElementById('inp-si-email')?.focus();return false;}
+  if(!document.getElementById('consent-otp')?.checked){_setAuthStatus('Agree to the Privacy Policy and Terms to continue.','error');return false;}
+  if(!navigator.onLine){_setAuthStatus(CourtCallAuth.mapAuthError(null,'send',false),'error');return false;}
+  if(!supa){_setAuthStatus('Email sign-in is unavailable in this build. Continue as Guest instead.','error');return false;}
+  if(!_otpGate.beginSend()){
+    const seconds=Math.ceil(_otpGate.remainingMs()/1000);
+    _setAuthStatus(seconds?`Please wait ${seconds}s before requesting another code.`:'A code request is already in progress.','error');
+    return false;
+  }
+  const button=options.resend?document.getElementById('otp-resend-btn'):document.getElementById('otp-send-btn');
+  if(button){button.disabled=true;button.textContent=options.resend?'Sending…':'Sending code…';}
+  _setAuthStatus('Requesting a secure code…');
+  _prepareGuestSyncForOtp(email);
   try{
-    const {error}=await supa.auth.updateUser({password:pin});
-    if(error)_setAuthErr('auth-err-rs',error.message);
-    else{_hasRecoverySession=false;_clearPin('pin-rs');_clearPin('pin-rsc');showToast('PIN updated — you\'re signed in');renderHub();showScreen('hub');}
-  }catch{_setAuthErr('auth-err-rs','Could not update PIN — try again');}
-  if(btn){btn.disabled=false;btn.textContent='Update PIN';}
+    const {error}=await supaSendOtp(email);
+    _otpGate.finishSend(!error||Number(error?.status)===429);
+    if(error){
+      _setAuthStatus(CourtCallAuth.mapAuthError(error,'send',navigator.onLine),'error');
+      _updateOtpCooldown();return false;
+    }
+    _otpEmail=email;
+    _setOtpStep('verify');
+    _setAuthStatus(options.resend?'A fresh code was requested. Check your email.':'Code requested. Check your email.','success');
+    _startOtpCooldownUi();
+    return true;
+  }catch(error){
+    _otpGate.finishSend(false);
+    _setAuthStatus(CourtCallAuth.mapAuthError(error,'send',navigator.onLine),'error');
+    return false;
+  }finally{
+    if(button&&button.id==='otp-send-btn'){button.disabled=false;button.textContent='Send Code';}
+    _updateOtpCooldown();
+  }
+}
+function resendOtpCode(){return sendOtpCode({resend:true})}
+function changeOtpEmail(){
+  const code=document.getElementById('inp-otp-code');if(code){code.value='';code.setAttribute('aria-invalid','false');}
+  _setAuthStatus('Update your email, then request another code.');
+  _setOtpStep('email');
+  const input=document.getElementById('inp-si-email');if(input){input.focus();input.select();}
+}
+function resetOtpAuthView(options={}){
+  _setOtpStep('email');
+  _setAuthStatus('');
+  _updateAuthNetwork();
+  const code=document.getElementById('inp-otp-code');if(code){code.value='';code.setAttribute('aria-invalid','false');}
+  if(!options.preserveEmail){const email=document.getElementById('inp-si-email');if(email)email.value='';}
+  _clearPin('pin-legacy');
+  const legacy=document.getElementById('legacy-local-panel');if(legacy)legacy.classList.add('hidden');
+  const toggle=document.getElementById('legacy-local-toggle');if(toggle)toggle.setAttribute('aria-expanded','false');
+}
+async function verifyOtpCode(){
+  const input=document.getElementById('inp-otp-code');
+  const token=CourtCallAuth.normalizeOtp(input?.value);
+  if(token.length!==6){if(input)input.setAttribute('aria-invalid','true');_setAuthStatus('Enter the complete 6-digit code.','error');input?.focus();return false;}
+  if(!navigator.onLine){_setAuthStatus(CourtCallAuth.mapAuthError(null,'verify',false),'error');return false;}
+  if(!_otpGate.beginVerify()){_setAuthStatus('Verification is already in progress.');return false;}
+  const button=document.getElementById('otp-verify-btn');if(button){button.disabled=true;button.textContent='Verifying…';}
+  if(input)input.setAttribute('aria-invalid','false');
+  _setAuthStatus('Verifying code…');
+  _otpVerificationInProgress=true;
+  try{
+    const {data,error}=await supaVerifyOtp(_otpEmail,token);
+    if(input)input.value='';
+    if(error||!_setAuthFromSession(data?.session)){
+      if(input)input.setAttribute('aria-invalid','true');
+      _setAuthStatus(CourtCallAuth.mapAuthError(error||{},'verify',navigator.onLine),'error');
+      input?.focus();return false;
+    }
+    _setAuthStatus('Code verified. Opening CourtCall…','success');
+    await _finishAuthenticatedIdentity(data.session.user,{route:true,source:'otp'});
+    return true;
+  }catch(error){
+    if(input){input.value='';input.setAttribute('aria-invalid','true');input.focus();}
+    _setAuthStatus(CourtCallAuth.mapAuthError(error,'verify',navigator.onLine),'error');
+    return false;
+  }finally{
+    _otpVerificationInProgress=false;_otpGate.finishVerify();
+    if(button){button.disabled=false;button.textContent='Verify';}
+  }
 }
 function _clearPin(rowId){
   const row=document.getElementById(rowId);if(!row)return;
@@ -3895,8 +3948,8 @@ function _clearPin(rowId){
   const eye=row.parentElement?.querySelector('.pin-label-row .pin-eye');
   if(eye){eye.classList.remove('on');eye.setAttribute('aria-label','Show PIN');}
 }
-function _clearAllPins(){['pin-si','pin-cr','pin-cf'].forEach(_clearPin);}
-function _clearAuthErrs(){['auth-err-si','auth-err-cr'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.classList.add('hidden');}});}
+function _clearAllPins(){['pin-legacy'].forEach(_clearPin);}
+function _clearAuthErrs(){_setAuthStatus('');_setAuthErr('legacy-local-error','');}
 function _setAuthErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.classList.toggle('hidden',!msg);}}
 // Legacy v1 verifier retained only so existing local accounts can be upgraded
 // after one successful sign-in. New local accounts use salted PBKDF2.
@@ -3931,14 +3984,9 @@ async function _verifyLocalPin(profile,pin,email){
   return !!profile?.pinHash&&profile.pinHash===_hashPin(pin,email);
 }
 // Single source of truth for email validity (used by Sign In + Create Account).
-function _validEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
-// Reject easily-guessed PINs at account creation.
-function _isTrivialPin(pin){
-  if(/^(\d)\1{5}$/.test(pin))return true;            // all same digit
-  if('0123456789'.includes(pin)||'9876543210'.includes(pin))return true; // sequential
-  return ['123456','654321','000000','121212','112233','123123','159753','147258','696969','420420'].includes(pin);
-}
-// Client-side sign-in throttling (UX speed-bump; Supabase enforces server-side too).
+function _validEmail(email){return CourtCallAuth.isValidEmail(email);}
+// Legacy device-only PIN throttling. Supabase OTP uses its own server limits
+// plus the separate in-memory resend gate above.
 const _AUTH_LOCK_KEY='cc_auth_lock';
 function _lockFor(email){const all=getObj(_AUTH_LOCK_KEY,{});return all[email]||{fails:0,until:0};}
 function _saveLock(email,st){const all=getObj(_AUTH_LOCK_KEY,{});all[email]=st;setObj(_AUTH_LOCK_KEY,all);}
@@ -3951,73 +3999,42 @@ function _recordAuthFail(email){
 }
 function _clearAuthFail(email){const all=getObj(_AUTH_LOCK_KEY,{});delete all[email];setObj(_AUTH_LOCK_KEY,all);}
 function _fmtLockMsg(ms){const s=Math.ceil(ms/1000);return s>=60?`${Math.ceil(s/60)} min`:`${s}s`;}
-async function signIn(){
-  const email=(document.getElementById('inp-si-email')?.value||'').trim().toLowerCase();
-  const pin=_getPinVal('pin-si');
-  if(!_validEmail(email)){_setAuthErr('auth-err-si','Enter a valid email address');return;}
-  if(pin.length<6){_setAuthErr('auth-err-si','Enter your 6-digit PIN');return;}
-
-  // Rate limit: refuse while locked out after repeated failures.
-  const locked=_lockRemaining(email);
-  if(locked){_setAuthErr('auth-err-si',`Too many attempts. Try again in ${_fmtLockMsg(locked)}.`);_clearPin('pin-si');return;}
-
-  // If Supabase not configured, fall back to local
-  if(!supa||SUPA_URL==='YOUR_SUPABASE_URL'){
-    await _localSignIn(email,pin);return;
-  }
-
-  const btn=document.querySelector('#auth-signin-form .auth-btn');
-  if(btn){btn.disabled=true;btn.textContent='Signing in…';}
-
-  const {data,error}=await supaSignIn(email,pin);
-
-  if(btn){btn.disabled=false;btn.textContent='Sign In';}
-
-  if(error){
-    _recordAuthFail(email);
-    const left=_lockRemaining(email);
-    const base=error.message==='Invalid login credentials'?'Incorrect email or PIN':error.message;
-    _setAuthErr('auth-err-si',left?`${base}. Too many attempts — locked for ${_fmtLockMsg(left)}.`:base);
-    _clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;
-  }
-  _clearAuthFail(email);
-
-  // Scope storage to the current user only — never cache other accounts' PII.
-  // Reuse the cached profile if it's the same user (keeps createdAt/gamesPlayed).
-  const cached=getObj(K.profile,null);
-  const same=cached&&cached.id===data.user.id;
-  let p={
-    id:data.user.id,
-    name:data.user.user_metadata?.name||(same?cached.name:email),
-    email,
-    nickname:data.user.user_metadata?.name||(same?cached.nickname:email),
-    createdAt:same?cached.createdAt:new Date().toLocaleDateString(),
-    gamesPlayed:same?(cached.gamesPlayed||0):0
-  };
-  const pending=_readPendingAccountSync();
-  if(pending&&(!pending.email||pending.email===email))p=_mergeLocalProfile(p,pending.profile);
-  setObj(K.profile,p);currentProfile=p;
-  _clearAllPins();trackEvent('signed_in');renderHub();
-  routeAfterIdentity();
-  if(isSupaAuthenticated()){setSyncState(CourtCallCloudState.SYNC.SYNCING);showToast('Signed in — syncing cloud data…',{type:'information'});}
-  else{showToast('Signed in — local only (cloud sync unavailable)',{type:'warning'});}
-  await _resumePendingAccountSync();
+function renderLegacyLocalPinAvailability(){
+  const legacyProfiles=getCol(K.profiles).filter(profile=>profile?.localOnly===true&&(profile.pinVerifier||profile.pinHash));
+  const toggle=document.getElementById('legacy-local-toggle');if(!toggle)return;
+  toggle.classList.toggle('hidden',legacyProfiles.length===0);
+  if(legacyProfiles.length){const email=document.getElementById('inp-legacy-email');if(email&&!email.value)email.value=legacyProfiles[0].email||'';}
+}
+function openLegacyLocalPin(){
+  const panel=document.getElementById('legacy-local-panel'),toggle=document.getElementById('legacy-local-toggle');
+  if(!panel||!toggle)return;
+  const open=panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);toggle.setAttribute('aria-expanded',String(open));
+  if(open){_initPinRow('pin-legacy');document.getElementById('inp-legacy-email')?.focus();}
+}
+async function legacyLocalSignIn(){
+  const email=CourtCallAuth.normalizeEmail(document.getElementById('inp-legacy-email')?.value);
+  const pin=_getPinVal('pin-legacy');
+  if(!_validEmail(email)){_setAuthErr('legacy-local-error','Enter the email saved with this local profile');return;}
+  if(pin.length!==6){_setAuthErr('legacy-local-error','Enter the 6-digit local PIN');return;}
+  await _localSignIn(email,pin);
 }
 
 async function _localSignIn(email,pin){
   // Offline fallback: only the single most-recent local account is kept on-device.
   const p=getCol(K.profiles).find(x=>x.email&&x.email.toLowerCase()===email);
-  if(!p){_setAuthErr('auth-err-si','No account found — create one below');return;}
-  let verified=false;try{verified=await _verifyLocalPin(p,pin,email)}catch(error){_setAuthErr('auth-err-si',error.message);return}
-  if(!verified){_recordAuthFail(email);const left=_lockRemaining(email);_setAuthErr('auth-err-si',left?`Incorrect PIN. Locked for ${_fmtLockMsg(left)}.`:'Incorrect PIN');_clearPin('pin-si');document.getElementById('pin-si').querySelector('.pin-box').focus();return;}
+  if(!p){_setAuthErr('legacy-local-error','No legacy local profile was found for that email');return;}
+  const locked=_lockRemaining(email);
+  if(locked){_setAuthErr('legacy-local-error',`Too many attempts. Try again in ${_fmtLockMsg(locked)}.`);_clearPin('pin-legacy');return;}
+  let verified=false;try{verified=await _verifyLocalPin(p,pin,email)}catch(error){_setAuthErr('legacy-local-error',error.message);return}
+  if(!verified){_recordAuthFail(email);const left=_lockRemaining(email);_setAuthErr('legacy-local-error',left?`Incorrect PIN. Locked for ${_fmtLockMsg(left)}.`:'Incorrect PIN');_clearPin('pin-legacy');document.getElementById('pin-legacy')?.querySelector('.pin-box')?.focus();return;}
   if(!p.pinVerifier){
     try{
       p.pinVerifier=await _createPinVerifier(pin,email);delete p.pinHash;
       setCol(K.profiles,getCol(K.profiles).map(profile=>profile.id===p.id?p:profile));
     }catch(error){console.warn('Could not upgrade legacy local PIN verifier:',error.message)}
   }
-  _clearAuthFail(email);_clearAllPins();setObj(K.profile,p);currentProfile=p;
-  trackEvent('signed_in');renderHub();
+  _clearAuthFail(email);_clearAllPins();_setAuthErr('legacy-local-error','');setObj(K.profile,p);currentProfile=p;
+  trackEvent('signed_in');renderHub();showToast('Legacy local profile opened · cloud sync is off',{type:'information'});
   routeAfterIdentity();
 }
 
@@ -4034,6 +4051,83 @@ function _guestProfileFields(profile){
 function _mergeLocalProfile(account,localProfile){
   if(!localProfile)return account;
   return {...account,..._guestProfileFields(localProfile),gamesPlayed:Math.max(account?.gamesPlayed||0,localProfile.gamesPlayed||0)};
+}
+async function _readAuthenticatedProfileRow(userId){
+  if(!supa||!userId)return{row:null,querySucceeded:false};
+  const legacyFields='id,name,nickname,games_played,created_at';
+  const hardenedFields=`${legacyFields},avatar,jersey_number,position,preferred_game_type,skill_info`;
+  try{
+    let result=await supa.from('profiles').select(hardenedFields).eq('id',userId).maybeSingle();
+    if(result.error&&/(jersey_number|preferred_game_type|skill_info|avatar|position)/i.test(`${result.error.message||''} ${result.error.details||''}`)){
+      result=await supa.from('profiles').select(legacyFields).eq('id',userId).maybeSingle();
+    }
+    if(result.error)throw result.error;
+    return{row:result.data||null,querySucceeded:true};
+  }catch(error){
+    console.warn('[Supa] CourtCall profile could not be loaded:',error.message);
+    return{row:null,querySucceeded:false};
+  }
+}
+async function _hydrateAuthenticatedProfile(user){
+  const cached=getObj(K.profile,null);
+  const remote=await _readAuthenticatedProfileRow(user.id);
+  const resolved=CourtCallAuth.resolveProfile({user,remoteProfile:remote.row,cachedProfile:cached});
+  currentProfile={...resolved.profile};
+  setObj(K.profile,currentProfile,{source:'cloud'});
+  if(resolved.needsRemoteCreate&&remote.querySucceeded){
+    const row={id:user.id,name:currentProfile.name,nickname:currentProfile.nickname};
+    try{
+      const {error}=await supa.from('profiles').upsert(row,{onConflict:'id'});
+      if(error)console.warn('[Supa] CourtCall profile creation is pending:',error.message);
+    }catch(error){console.warn('[Supa] CourtCall profile creation is pending:',error.message)}
+  }
+  if(!_readPendingAccountSync()&&_getAccountSyncPreference(user.id)==='unset')_setAccountSyncPreference(user.id,'approved');
+  return resolved;
+}
+async function _finishAuthenticatedIdentity(user,options){
+  options=options||{};
+  if(!user?.id)return false;
+  if(_identityHydrationPromise)return _identityHydrationPromise;
+  _identityHydrationPromise=(async()=>{
+    const resolved=await _hydrateAuthenticatedProfile(user);
+    renderHub();renderLanding();
+    if(options.source==='otp'){
+      _identityNeedsOnboarding=!localStorage.getItem(OB_KEY);
+      trackEvent(resolved.reusedExisting?'signed_in':'account_created');
+    }
+    if(options.route)routeAfterIdentity();
+    setSyncState(navigator.onLine?CourtCallCloudState.SYNC.SYNCING:CourtCallCloudState.SYNC.OFFLINE_SAVED);
+    syncAllUserDataFromDB().then(ok=>{
+      if(!ok&&navigator.onLine)showToast('Signed in · some cloud data could not sync yet',{type:'warning'});
+      else if(ok)showToast('Signed in to CourtCall',{type:'success'});
+    });
+    setTimeout(()=>_resumePendingAccountSync(),0);
+    return resolved;
+  })().finally(()=>{_identityHydrationPromise=null});
+  return _identityHydrationPromise;
+}
+async function restoreAuthenticatedSession(){
+  if(!supa)return false;
+  try{
+    const session=await CourtCallAuth.restoreSession(supa);
+    if(!session){
+      if(currentProfile?.id&&currentProfile.id!=='guest'&&currentProfile.localOnly!==true){
+        const active=document.querySelector('.screen.active')?.id?.replace(/^s-/,'')||'';
+        if(active&&!_PUBLIC_SCREENS.has(active))_authRequestedHash=location.hash;
+        currentProfile=null;try{localStorage.removeItem(K.profile)}catch{}
+        if(active&&!_PUBLIC_SCREENS.has(active))showScreen('profile');
+      }
+      return false;
+    }
+    _setAuthFromSession(session);
+    const active=document.querySelector('.screen.active')?.id;
+    const shouldRoute=Boolean(_authRequestedHash)||active==='s-profile';
+    await _finishAuthenticatedIdentity(session.user,{route:shouldRoute,source:'restore'});
+    return true;
+  }catch(error){
+    if(navigator.onLine)console.warn('[Supa] Session restoration is unavailable:',error.message);
+    return false;
+  }
 }
 function _hasDeviceData(profile){
   const hasProfile=!!(profile&&profile.id==='guest'&&(
@@ -4127,17 +4221,17 @@ async function _completeLocalDataSync(pending=_readPendingAccountSync()){
 async function offerLocalDataSync(accountProfile,pending=_readPendingAccountSync()){
   if(!pending||_accountSyncOfferOpen)return false;
   _accountSyncOfferOpen=true;
-  const merged=_mergeLocalProfile(accountProfile,pending.profile);
-  setObj(K.profile,merged);currentProfile=merged;renderHub();
   const accepted=await uiConfirm('Sync this device’s local profile and game history to your account?',{okText:'Sync Now',cancelText:'Keep Local Only',danger:false});
   _accountSyncOfferOpen=false;
   if(!accepted){
-    _setAccountSyncPreference(supaUser?.id||merged.id,'local_only');
+    _setAccountSyncPreference(supaUser?.id||accountProfile.id,'local_only');
     _clearPendingAccountSync();
     if(isSupaAuthenticated())setSyncState(CourtCallCloudState.SYNC.ONLINE_LOCAL);
     showToast('Local data will stay only on this device',{type:'information'});
     return false;
   }
+  const merged=_mergeLocalProfile(accountProfile,pending.profile);
+  setObj(K.profile,merged);currentProfile=merged;renderHub();
   _setAccountSyncPreference(supaUser?.id||merged.id,'approved');
   pending.consent=true;pending.accountName=merged.name;_storePendingAccountSync(pending);
   _remapLocalIdentity('guest',supaUser?.id||merged.id,merged.name);
@@ -4149,73 +4243,10 @@ async function _resumePendingAccountSync(){
   const pending=_readPendingAccountSync();
   if(!pending||!_pendingSyncMatchesCurrentUser(pending)||_accountSyncOfferOpen)return false;
   if(pending.consent)return _completeLocalDataSync(pending);
-  const account=_mergeLocalProfile({...(currentProfile||{}),id:supaUser.id,email:supaUser.email||pending.email,localOnly:false},pending.profile);
+  const account={...(currentProfile||{}),id:supaUser.id,email:supaUser.email||pending.email,localOnly:false};
   return offerLocalDataSync(account,pending);
 }
 
-async function createAccount(){
-  const name=(document.getElementById('inp-cr-name')?.value||'').trim();
-  const email=(document.getElementById('inp-cr-email')?.value||'').trim().toLowerCase();
-  const pin=_getPinVal('pin-cr');
-  const pinC=_getPinVal('pin-cf');
-  if(!name){_setAuthErr('auth-err-cr','Enter your name');return;}
-  if(!_validEmail(email)){_setAuthErr('auth-err-cr','Enter a valid email address');return;}
-  if(pin.length<6){_setAuthErr('auth-err-cr','Choose a 6-digit PIN');return;}
-  if(_isTrivialPin(pin)){_setAuthErr('auth-err-cr','That PIN is too easy to guess — avoid 123456, 111111, etc.');_clearPin('pin-cr');_clearPin('pin-cf');document.getElementById('pin-cr').querySelector('.pin-box').focus();return;}
-  if(pin!==pinC){_setAuthErr('auth-err-cr','PINs don\'t match — try again');_clearPin('pin-cf');document.getElementById('pin-cf').querySelector('.pin-box').focus();return;}
-  if(!document.getElementById('consent-cr')?.checked){_setAuthErr('auth-err-cr','Please agree to the Privacy Policy and Terms to continue');return;}
-
-  const guestSnapshot=currentProfile?.id==='guest'?{...currentProfile}:null;
-  const shouldOfferSync=_hasDeviceData(guestSnapshot);
-  if(shouldOfferSync)_storePendingAccountSync({email,profile:guestSnapshot,createdAt:new Date().toISOString(),consent:false});
-  _accountCreationInProgress=true;
-
-  // Disable button while processing
-  const btn=document.querySelector('#auth-create-form .auth-btn');
-  if(btn){btn.disabled=true;btn.textContent='Creating…';}
-
-  const {data,error}=await supaSignUp(email,pin,name);
-  _accountCreationInProgress=false;
-
-  if(btn){btn.disabled=false;btn.textContent='Create Account';}
-
-  if(error){
-    // Fall back to local-only if Supabase not configured
-    if(error.message==='Supabase not configured'||SUPA_URL==='YOUR_SUPABASE_URL'){
-      await _localCreateAccount(name,email,pin);return;
-    }
-    if(shouldOfferSync)_clearPendingAccountSync();
-    _setAuthErr('auth-err-cr',error.message||'Could not create account — try again');return;
-  }
-
-  // Save profile locally (always — works offline and while awaiting email confirmation).
-  const p=_mergeLocalProfile({id:data.user.id,name,email,nickname:name,createdAt:new Date().toLocaleDateString(),gamesPlayed:0,localOnly:!isSupaAuthenticated()},guestSnapshot);
-  if(!shouldOfferSync)_setAccountSyncPreference(data.user.id,'approved');
-  setObj(K.profile,p);currentProfile=p;
-  _clearAllPins();trackEvent('account_created');renderHub();
-  routeAfterIdentity();
-  if(isSupaAuthenticated()){
-    setSyncState(CourtCallCloudState.SYNC.SYNCING);showToast('Account created — syncing cloud data…',{type:'information'});
-  }else if(data._needsEmailConfirmation){
-    showToast('Check your email to activate cloud sync. Until then, data is saved locally.',5000);
-  }else{
-    showToast('Account created — local only',4000);
-  }
-  if(shouldOfferSync)await offerLocalDataSync(p);
-}
-
-async function _localCreateAccount(name,email,pin){
-  // Offline fallback: store ONLY this account locally (single-entry, no foreign PII).
-  const existing=getCol(K.profiles);
-  if(existing.find(x=>x.email&&x.email.toLowerCase()===email&&x.id!=='p_'+email)){/* allow overwrite of same email */}
-  const guestSnapshot=_pendingLocalProfileForSync||(currentProfile?.id==='guest'?currentProfile:null);
-  let pinVerifier;try{pinVerifier=await _createPinVerifier(pin,email)}catch(error){_setAuthErr('auth-err-cr',error.message);return}
-  const p=_mergeLocalProfile({id:'p_'+Date.now(),name,email,nickname:name,pinVerifier,createdAt:new Date().toLocaleDateString(),gamesPlayed:0,localOnly:true},guestSnapshot);
-  _clearPendingAccountSync();
-  setCol(K.profiles,[p]);setObj(K.profile,p);currentProfile=p;
-  _clearAllPins();trackEvent('account_created');renderHub();
-  routeAfterIdentity();
-}
 function _setGuestProfileError(message){
   const error=document.getElementById('guest-profile-error');
   if(!error)return;
@@ -6803,7 +6834,7 @@ function renderSettings(){
   if(switchLabel)switchLabel.textContent=guest?'Sign In or Create Account':'Switch Profile';
   if(switchSub)switchSub.textContent=guest?'Optionally sync your local data after consent':'Change or create profile';
   if(logoutLabel)logoutLabel.textContent=guest?'Exit Guest Mode':'Log Out';
-  if(logoutSub)logoutSub.textContent=guest?'Return to sign in; local data is retained':'End session & clear this device';
+  if(logoutSub)logoutSub.textContent=guest?'Return to sign in; local data is retained':'End session; keep saved CourtCall data on this device';
   if(logoutLabel)logoutLabel.style.color=guest?'var(--text)':'var(--danger)';
   if(logoutRow)logoutRow.onclick=guest?exitGuestMode:logOut;
   const s=getSettings();
@@ -7862,7 +7893,8 @@ async function _syncProfileFromDB(){
     if(result.error)throw result.error;
     if(!result.data)return true;
     const row=result.data;
-    const local=currentProfile||getObj(K.profile,{});
+    const stored=getObj(K.profile,{});
+    const local=currentProfile?.id===supaUser.id?currentProfile:stored?.id===supaUser.id?stored:{};
     const preferLocal=_getAccountSyncPreference(supaUser.id)==='local_only';
     const choose=(localValue,remoteValue)=>preferLocal?(localValue||remoteValue||''):(remoteValue||localValue||'');
     const merged={...local,id:supaUser.id,email:supaUser.email||local.email||'',localOnly:false,
@@ -10435,8 +10467,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const year=document.getElementById('copyright-year');if(year)year.textContent=String(new Date().getFullYear());
   // Load saved profile
   const p=getObj(K.profile,null);
-  // Always init pin rows — both returning users and first-timers land on profile screen.
-  ['pin-si','pin-cr','pin-cf'].forEach(_initPinRow);
+  // Legacy local PIN support remains isolated from Supabase authentication.
+  _initPinRow('pin-legacy');
+  document.getElementById('inp-otp-code')?.addEventListener('input',event=>{
+    event.target.value=CourtCallAuth.normalizeOtp(event.target.value);
+    event.target.setAttribute('aria-invalid','false');
+    if(event.target.value.length===6)_setAuthStatus('Code ready to verify.');
+  });
   if(p&&p.id){
     currentProfile=p;
     const saved=load();
@@ -10465,11 +10502,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       showScreen('landing');
     }
   }
+  restoreAuthenticatedSession();
   // Load builder state from storage
   const bs=getObj('cc_builder',null);
   if(bs)builderState=normalizeBuilderState(bs);
   // Wire ARIA roving-tabindex on all tablist containers
-  _wireTablist(document.querySelector('.auth-tabs'));
   _wireTablist(document.getElementById('tc-tabs'));
   _wireTablist(document.getElementById('cd-tabs'));
   _wireTablist(document.getElementById('history-filter-bar'));
@@ -10485,6 +10522,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ── Offline Indicator ─────────────────────────────────────────
 function _updateOnlineStatus(){
   const offline=!navigator.onLine;
+  _updateAuthNetwork();
   if(offline)setSyncState(CourtCallCloudState.SYNC.OFFLINE_SAVED);
   else retryCloudSync();
   if(document.getElementById('s-communities')?.classList.contains('active'))renderCommunities();
@@ -11251,43 +11289,6 @@ async function clearDemoData(){
     <h2>Contact</h2>
     <p>Questions about these terms: <a href="mailto:vadi.s23@gmail.com">vadi.s23@gmail.com</a></p>
   </main>
-</div>
-
-<!-- ══ SET NEW PIN (password recovery) ══ -->
-<div id="s-reset-pin" class="screen">
-  <div class="profile-hero">
-    <span class="ph-ball">🔑</span>
-    <div class="ph-title">Set a New PIN</div>
-    <div class="ph-sub">Choose a new 6-digit PIN for your account</div>
-    <div class="auth-card">
-      <div class="auth-form">
-        <div class="pin-label-row">
-          <span class="pin-label">New 6-digit PIN</span>
-          <button type="button" class="pin-eye" onclick="togglePinVis('pin-rs',this)" aria-label="Show or hide PIN">👁</button>
-        </div>
-        <div class="pin-row" id="pin-rs" role="group" aria-label="Choose a new 6-digit PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="New digit 6">
-        </div>
-        <div class="pin-label">Confirm new PIN</div>
-        <div class="pin-row" id="pin-rsc" role="group" aria-label="Confirm new PIN">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 1">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 2">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 3">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 4">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 5">
-          <input class="pin-box" type="password" inputmode="numeric" maxlength="1" aria-label="Confirm digit 6">
-        </div>
-        <div id="auth-err-rs" class="auth-error hidden"></div>
-        <button class="auth-btn" onclick="submitNewPin()">Update PIN</button>
-        <button class="auth-forgot" onclick="showScreen('profile')">Cancel</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ── Bottom Navigation ─────────────────────────────── -->
