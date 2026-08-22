@@ -1694,7 +1694,7 @@ body.modal-open{overflow:hidden}
 }
 </style>
 <link rel="stylesheet" href="./courtcall-design-system.css">
-<link rel="stylesheet" href="./courtcall-core-game.css">
+<link rel="stylesheet" href="./courtcall-core-game.css?v=20260824">
 <link rel="stylesheet" href="./courtcall-team-history.css">
 <link rel="stylesheet" href="./courtcall-motion-foundation.css">
 <link rel="stylesheet" href="./courtcall-cinematic.css?v=20260814b">
@@ -2275,13 +2275,17 @@ body.modal-open{overflow:hidden}
       <button class="gc-btn" id="gc-toggle-btn" type="button" onclick="GC.toggle()" aria-label="Start game clock" aria-pressed="false">▶</button>
     </div>
   </div>
-  <div class="score-zone" id="score-zone">
+  <div class="scorer-tabs hidden" id="scorer-tabs" role="tablist" aria-label="Choose which team's players to score">
+    <button class="scorer-tab on" id="scorer-tab-a" type="button" role="tab" aria-selected="true" aria-controls="pad-a" onclick="setScorerTeam('a')"><span class="scorer-tab-dot" aria-hidden="true"></span><span id="scorer-tab-label-a">Team A</span></button>
+    <button class="scorer-tab" id="scorer-tab-b" type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="pad-b" onclick="setScorerTeam('b')"><span class="scorer-tab-dot" aria-hidden="true"></span><span id="scorer-tab-label-b">Team B</span></button>
+  </div>
+  <div class="score-zone" id="score-zone" data-scorer="a">
     <div class="score-pad" id="pad-a" data-t="a"></div>
     <div class="score-zone-divider"></div>
     <div class="score-pad" id="pad-b" data-t="b"></div>
   </div>
   <div class="last-action hidden" id="last-action">
-    <span class="last-action-kicker">Last call</span>
+    <span class="last-action-kicker" id="last-action-kicker">Last call</span>
     <span class="last-action-text" id="last-action-text" role="status" aria-live="polite"></span>
     <button type="button" onclick="undoScore()" aria-label="Undo the last recorded game action">Undo</button>
   </div>
@@ -5081,22 +5085,92 @@ function renderGame(){
   document.getElementById('poss-label').textContent=possessionTeam;
   renderScorePads();if(state.withPlayers)renderPlayerRosters();updateLeadUI();updateMomentumBar();updateRunBanner();renderFeed();updateVoiceHint();renderTimeouts();renderLastAction();
 }
+// The most common basket for the active rule set gets visual emphasis
+// (+2 in a 2s-and-3s game, +1 in streetball 1s-and-2s).
+function _emphasisScoreValue(pts){
+  if(pts.includes(state.ptsSmall)&&state.ptsSmall>1)return state.ptsSmall;
+  return pts.includes(2)?2:state.ptsSmall;
+}
+// One scorer row: identity + personal score on top, always-visible one-tap
+// +1/+2/+3 beneath. playerId '' renders the unattributed team-basket row that
+// replaces the old picker's "Team (no player attribution)" escape hatch.
+function _scorerRowHTML(team,tName,player,pts,emphasis){
+  const pid=player?player.id:'';
+  const label=player?player.name:'Team basket';
+  const buttons=pts.map(p=>`<button class="btn-pscore${p===emphasis?' emph':''}" data-t="${team}" data-player="${escAttr(pid)}" data-p="${p}" aria-label="Add ${p} point${p>1?'s':''} to ${escAttr(label)} (${escAttr(tName)})">+${p}</button>`).join('');
+  return`<div class="scorer-row${player?'':' scorer-row--team'}" data-player="${escAttr(pid)}">
+    <div class="scorer-row-head"><span class="scorer-name">${escHtml(label)}${player?'':'<span class="scorer-team-hint">no player attribution</span>'}</span>${player?`<span class="scorer-pts" data-role="pts">0 PTS</span><span class="scorer-fouls" data-role="fouls" hidden></span>`:''}</div>
+    <div class="scorer-btns">${buttons}</div>
+  </div>`;
+}
 function renderScorePads(){
   const pts=Phase4GameCore.scoreValues(state);
+  const emphasis=_emphasisScoreValue(pts);
+  let anyRoster=false;
   ['a','b'].forEach(t=>{
-    const tName=t==='a'?state.teamA.name:state.teamB.name;
+    const T=t==='a'?state.teamA:state.teamB;
+    const players=state.withPlayers?(T.players||[]):[];
     const pad=document.getElementById(`pad-${t}`);
-    const signature=JSON.stringify([t,tName,pts]);
-    if(pad.dataset.scoreControls===signature)return;
-    pad.innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}" aria-label="Add ${p} point${p>1?'s':''} to ${tName}">+${p}</button>`).join('');
-    pad.dataset.scoreControls=signature;
+    const signature=JSON.stringify([t,T.name,pts,players.map(p=>[p.id,p.name])]);
+    if(players.length)anyRoster=true;
+    if(pad.dataset.scoreControls!==signature){
+      if(players.length){
+        // Direct per-player scoring: no "pick the player" modal step.
+        pad.innerHTML=players.map(p=>_scorerRowHTML(t,T.name,p,pts,emphasis)).join('')+_scorerRowHTML(t,T.name,null,pts,emphasis);
+        pad.classList.add('score-pad--players');
+      }else{
+        pad.innerHTML=pts.map(p=>`<button class="btn-score" data-t="${t}" data-p="${p}" aria-label="Add ${p} point${p>1?'s':''} to ${escAttr(T.name)}">+${p}</button>`).join('');
+        pad.classList.remove('score-pad--players');
+      }
+      pad.dataset.scoreControls=signature;
+    }
+    if(players.length)pad.setAttribute('role','tabpanel');else pad.removeAttribute('role');
   });
+  const zone=document.getElementById('score-zone');
+  zone.classList.toggle('score-zone--players',anyRoster);
+  const tabs=document.getElementById('scorer-tabs');
+  if(tabs){
+    tabs.classList.toggle('hidden',!anyRoster);
+    const labelA=document.getElementById('scorer-tab-label-a'),labelB=document.getElementById('scorer-tab-label-b');
+    if(labelA)labelA.textContent=state.teamA.name;
+    if(labelB)labelB.textContent=state.teamB.name;
+    _wireTablist(tabs);
+  }
   wireScorePads();
+}
+// Narrow-portrait roster switcher. Pure view state: it changes which roster is
+// visible on small screens and never touches possession or any game state.
+function setScorerTeam(team){
+  if(!['a','b'].includes(team))return;
+  const zone=document.getElementById('score-zone');
+  if(zone)zone.dataset.scorer=team;
+  ['a','b'].forEach(t=>{
+    const tab=document.getElementById(`scorer-tab-${t}`);
+    if(!tab)return;
+    const on=t===team;
+    tab.classList.toggle('on',on);
+    tab.setAttribute('aria-selected',String(on));
+    tab.tabIndex=on?0:-1;
+  });
 }
 let _padWired=false;
 function wireScorePads(){
   if(_padWired)return;_padWired=true;
-  document.getElementById('score-zone').addEventListener('click',e=>{const b=e.target.closest('.btn-score');if(!b||state.gameOver)return;const team=b.dataset.t,pts=parseInt(b.dataset.p,10);const hasPlayers=state.withPlayers&&state[`team${team.toUpperCase()}`].players.length>0;if(hasPlayers){openPlayerPicker(team,pts,'score');}else{addScore(team,pts);}});
+  document.getElementById('score-zone').addEventListener('click',e=>{
+    if(state.gameOver)return;
+    const playerButton=e.target.closest('.btn-pscore');
+    if(playerButton){
+      const team=playerButton.dataset.t,pts=parseInt(playerButton.dataset.p,10);
+      if(playerButton.dataset.player)_addScorePlayer(team,pts,playerButton.dataset.player);
+      else addScore(team,pts);
+      return;
+    }
+    const b=e.target.closest('.btn-score');
+    if(!b)return;
+    const team=b.dataset.t,pts=parseInt(b.dataset.p,10);
+    const hasPlayers=state.withPlayers&&state[`team${team.toUpperCase()}`].players.length>0;
+    if(hasPlayers){openPlayerPicker(team,pts,'score');}else{addScore(team,pts);}
+  });
 }
 function updateLeadUI(){
   const a=state.teamA.score,bv=state.teamB.score;
@@ -5149,12 +5223,27 @@ function addTimeout(t){
   const teamName=t==='a'?state.teamA.name:state.teamB.name;
   showToast(`⏱ ${teamName} timeout — ${newRem} left`);announceGameAction(`${teamName} timeout. ${newRem} remaining.`);
 }
+// Structured last-call copy: team, player, and value are always explicit so
+// the scorer can verify an entry at a glance (never encoded by color alone).
+function describeLastCall(action,teams){
+  const teamName=action.team==='a'?(teams.a?.name||'Team A'):(teams.b?.name||'Team B');
+  const parts=[teamName];
+  if(action.playerName)parts.push(action.playerName);
+  if(action.type==='foul')parts.push('Foul');
+  else if(action.type==='timeout')parts.push('Timeout');
+  else parts.push(`+${action.pts}`);
+  return{kicker:(!action.type||action.type==='score')?'Last score':'Last call',text:parts.join(' · ')};
+}
 function renderLastAction(){
   const bar=document.getElementById('last-action'),text=document.getElementById('last-action-text');
+  const kicker=document.getElementById('last-action-kicker');
   const latest=state.history[0];
   if(!bar||!text)return;
   bar.classList.toggle('hidden',!latest||state.gameOver);
-  if(latest)text.textContent=Phase4GameCore.describeAction(latest,{a:state.teamA,b:state.teamB});
+  if(!latest)return;
+  const call=describeLastCall(latest,{a:state.teamA,b:state.teamB});
+  if(kicker)kicker.textContent=call.kicker;
+  text.textContent=call.text;
 }
 function renderFeed(){
   const list=document.getElementById('feed-list');
@@ -5168,14 +5257,16 @@ function renderFeed(){
     const name=e.team==='a'?state.teamA.name:state.teamB.name;
     const col=e.team==='a'?'var(--ca)':'var(--cb)';
     if(e.quarter!==lastQ){items.push(`<li class="feed-divider">── ${qLabel} ──</li>`);lastQ=e.quarter}
+    // Attributed events name both team and player in text, so the team is
+    // never conveyed by color alone.
     if(e.type==='foul'){
-      const fouler=e.playerName?escHtml(e.playerName):escHtml(name);
+      const fouler=e.playerName?`${escHtml(name)} · ${escHtml(e.playerName)}`:escHtml(name);
       items.push(`<li class="feed-entry feed-entry--urgent"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${fouler}</span><span class="fe-pts">Foul</span></li>`);
     } else if(e.type==='timeout'){
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${escHtml(name)}</span><span class="fe-pts" style="color:var(--muted)">⏱ Timeout</span></li>`);
     } else {
       const inRun=run&&e.team===run.team;
-      const scorer=e.playerName?escHtml(e.playerName):escHtml(name);
+      const scorer=e.playerName?`${escHtml(name)} · ${escHtml(e.playerName)}`:escHtml(name);
       items.push(`<li class="feed-entry"><span class="fe-q">${qLabel}</span><span class="fe-team" style="color:${col}">${scorer}</span><span class="fe-pts" style="color:${col}">+${e.pts}</span>${inRun?'<span class="fe-run">🔥</span>':''}</li>`);
     }
   });
@@ -5218,7 +5309,7 @@ function ensureGameStarted(){
   state.startTime=Date.now();
   if(state.gameClockMode!=='off')GC.start();
 }
-function runScoreFeedback(team,points){
+function runScoreFeedback(team,points,playerId){
   const panel=document.getElementById(`tp-${team}`),fx=document.getElementById(`score-fx-${team}`);
   if(!panel)return;
   panel.classList.remove('score-call');void panel.offsetWidth;panel.classList.add('score-call');
@@ -5234,7 +5325,16 @@ function runScoreFeedback(team,points){
     setTimeout(()=>{fx.innerHTML=''},520);
   }
   const name=team==='a'?state.teamA.name:state.teamB.name;
-  announceGameAction(`${name} scores ${points}. ${state.teamA.score} to ${state.teamB.score}.`);
+  let playerName='';
+  if(playerId&&!gameReducedMotion()){
+    const row=document.querySelector(`#pad-${team} .scorer-row[data-player="${CSS.escape(playerId)}"]`);
+    if(row){row.classList.remove('scored');void row.offsetWidth;row.classList.add('scored');setTimeout(()=>row.classList.remove('scored'),480);}
+  }
+  if(playerId){
+    const player=(team==='a'?state.teamA:state.teamB).players?.find(p=>p.id===playerId);
+    playerName=player?.name||'';
+  }
+  announceGameAction(`${playerName?`${playerName} scores ${points} for ${name}`:`${name} scores ${points}`}. ${state.teamA.score} to ${state.teamB.score}.`);
 }
 function runFoulFeedback(team,playerName){
   const panel=document.getElementById(`tp-${team}`),badge=document.getElementById(`foul-${team}`);
@@ -5913,7 +6013,7 @@ function _addScorePlayer(team,pts,playerId){
   if(s.vibration&&navigator.vibrate)navigator.vibrate(Phase4GameCore.haptic(pts));
   playScoreSound(pts,s);
   if(state.shotClockDuration>0&&state.shotClockAutoReset)SC.reset(SC.running);
-  save();renderGame();runScoreFeedback(team,pts);checkWin();
+  save();renderGame();runScoreFeedback(team,pts,playerId);checkWin();
 }
 
 function _addFoulPlayer(team,playerId){
@@ -5933,15 +6033,33 @@ function handleFoulTap(team){
   else addFoul(team);
 }
 
+// Updates the live numbers inside the scorer rows in place. The row structure
+// is only rebuilt when the roster itself changes (see renderScorePads), so
+// rapid taps never race a full innerHTML replacement.
 function renderPlayerRosters(){
   ['a','b'].forEach(team=>{
     const T=`team${team.toUpperCase()}`;
     const players=(state[T].players||[]);
     const pad=document.getElementById(`pad-${team}`);
     if(!pad||!players.length)return;
-    let roster=pad.querySelector('.player-roster');
-    if(!roster){roster=document.createElement('div');roster.className='player-roster';pad.appendChild(roster);}
-    roster.innerHTML=players.map(p=>`<div class="player-roster-row${p.fouls>=5?' foul-limit':''}"><span class="pr-name">${escHtml(p.name)}${p.fouls>=5?'<span class="foul-out-tag">LIMIT</span>':''}</span><span class="pr-stats">${p.score}pts${p.fouls?' &middot; <span class="pr-fouls">'+p.fouls+'F</span>':''}</span></div>`).join('');
+    players.forEach(p=>{
+      const row=pad.querySelector(`.scorer-row[data-player="${CSS.escape(p.id)}"]`);
+      if(!row)return;
+      const fouls=Number(p.fouls)||0;
+      const atLimit=fouls>=5;
+      row.classList.toggle('foul-limit',atLimit);
+      const ptsEl=row.querySelector('[data-role="pts"]');
+      if(ptsEl){
+        const copy=`${Number(p.score)||0} PTS`;
+        if(ptsEl.textContent!==copy)ptsEl.textContent=copy;
+      }
+      const foulsEl=row.querySelector('[data-role="fouls"]');
+      if(foulsEl){
+        foulsEl.hidden=fouls===0;
+        const copy=atLimit?`${fouls}F · LIMIT`:`${fouls}F`;
+        if(foulsEl.textContent!==copy)foulsEl.textContent=copy;
+      }
+    });
   });
 }
 

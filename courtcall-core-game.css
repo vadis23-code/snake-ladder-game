@@ -912,7 +912,7 @@
   }
 
   #s-game .game-nav { grid-column: 1 / -1; }
-  #s-game :is(.momentum-bar, .run-banner, .scoreboard, .game-status, .clock-bar, .score-zone, .last-action, .controls-bar, .voice-panel) { grid-column: 1; }
+  #s-game :is(.momentum-bar, .run-banner, .scoreboard, .game-status, .clock-bar, .scorer-tabs, .score-zone, .last-action, .controls-bar, .voice-panel) { grid-column: 1; }
   #s-game .feed-wrap {
     grid-column: 2;
     grid-row: 2 / -1;
@@ -936,7 +936,7 @@
   }
 
   #s-game .game-nav { grid-column: 1 / -1; height: 2.5rem; min-height: 2.5rem; }
-  #s-game :is(.momentum-bar, .run-banner, .scoreboard, .game-status, .clock-bar, .score-zone, .last-action, .controls-bar, .voice-panel) { grid-column: 1; }
+  #s-game :is(.momentum-bar, .run-banner, .scoreboard, .game-status, .clock-bar, .scorer-tabs, .score-zone, .last-action, .controls-bar, .voice-panel) { grid-column: 1; }
   #s-game .feed-wrap {
     grid-column: 2;
     grid-row: 2 / -1;
@@ -1015,4 +1015,234 @@ html[data-reduced-motion='true'] :is(.team-panel.score-call .t-score, .team-pane
   #s-game .team-panel[data-t='b'],
   #s-game .btn-score { background: Canvas; }
   .team-leader-label.is-leading { outline: 1px solid currentColor; }
+}
+
+/* ── Phase 12: direct player scoring (courtside score table) ───────────── */
+
+.scorer-tabs {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem 0;
+  background: var(--cc-color-surface-1);
+}
+
+.scorer-tab {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.9rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--cc-color-border-strong);
+  border-radius: var(--cc-radius-sm);
+  overflow: hidden;
+  color: var(--cc-color-text-secondary);
+  background: var(--cc-color-surface-2);
+  font-family: var(--cc-font-ui);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.scorer-tab .scorer-tab-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--cc-color-border-strong);
+}
+
+.scorer-tab:first-child .scorer-tab-dot { background: var(--ca); }
+.scorer-tab:last-child .scorer-tab-dot { background: var(--cb); }
+
+.scorer-tab.on {
+  border-color: color-mix(in srgb, currentColor 30%, var(--cc-color-border-strong));
+  color: var(--cc-color-text);
+  background: color-mix(in srgb, var(--cc-color-surface-3) 88%, #ffffff);
+  box-shadow: inset 0 -2px 0 var(--cc-color-focus);
+}
+
+.scorer-tab:first-child.on { box-shadow: inset 0 -2px 0 var(--ca); }
+.scorer-tab:last-child.on { box-shadow: inset 0 -2px 0 var(--cb); }
+
+/* Roster pads: the player rows ARE the scoring surface. */
+.score-pad--players {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  align-items: stretch;
+}
+
+.scorer-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--tc) 26%, var(--cc-color-border));
+  border-radius: var(--cc-radius-md);
+  background: color-mix(in srgb, var(--tc) 6%, var(--cc-color-surface-1));
+}
+
+.scorer-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.scorer-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--cc-color-text);
+  font-family: var(--cc-font-ui);
+  font-size: 0.9rem;
+  font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.scorer-pts {
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--tc) 72%, #ffffff);
+  font-family: var(--cc-font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+}
+
+.scorer-fouls {
+  flex-shrink: 0;
+  color: var(--cc-color-danger);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+}
+
+.scorer-row.foul-limit { border-color: color-mix(in srgb, #ef4444 45%, var(--cc-color-border)); }
+
+.scorer-btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-auto-flow: column;
+  gap: 0.55rem;
+}
+
+.btn-pscore {
+  min-width: 0;
+  min-height: 3.4rem;
+  border: 1px solid color-mix(in srgb, var(--tc) 52%, var(--cc-color-border));
+  border-radius: var(--cc-radius-sm);
+  color: #ffffff;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--tc) 24%, var(--cc-color-surface-2)), color-mix(in srgb, var(--tc) 8%, var(--cc-color-surface-2)));
+  box-shadow: 0 0.22rem 0 color-mix(in srgb, var(--cc-color-canvas) 82%, #000000);
+  font-family: var(--cc-font-ui);
+  font-size: 1.25rem;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* The rule set's common basket reads slightly stronger (+2 in 2s-and-3s). */
+.btn-pscore.emph {
+  min-height: 3.8rem;
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--tc) 78%, #ffffff);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--tc) 40%, var(--cc-color-surface-2)), color-mix(in srgb, var(--tc) 16%, var(--cc-color-surface-2)));
+  box-shadow: 0 0.22rem 0 color-mix(in srgb, var(--cc-color-canvas) 82%, #000000), 0 0 1.1rem color-mix(in srgb, var(--tc) 22%, transparent);
+  font-size: 1.5rem;
+}
+
+.btn-pscore:active { transform: translateY(0.18rem); box-shadow: 0 0 0 transparent; }
+
+/* Unattributed team basket keeps the old picker's escape hatch, one tap. */
+.scorer-row--team {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--tc) 3%, var(--cc-color-surface-1));
+}
+
+.scorer-row--team .scorer-name { color: var(--cc-color-text-secondary); font-size: 0.78rem; }
+
+.scorer-team-hint {
+  margin-left: 0.4rem;
+  color: var(--cc-color-text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.scorer-row--team .btn-pscore,
+.scorer-row--team .btn-pscore.emph {
+  min-height: 2.9rem;
+  border-width: 1px;
+  font-size: 1.05rem;
+  box-shadow: 0 0.16rem 0 color-mix(in srgb, var(--cc-color-canvas) 82%, #000000);
+}
+
+@keyframes scorerRowPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tc) 55%, transparent); }
+  100% { box-shadow: 0 0 0 0.7rem transparent; }
+}
+
+.scorer-row.scored { animation: scorerRowPulse 0.45s ease-out; }
+
+.scorer-row.scored .scorer-pts {
+  color: #ffffff;
+  text-shadow: 0 0 0.7rem color-mix(in srgb, var(--tc) 70%, transparent);
+}
+
+/* Structured last call keeps team · player · value explicit. */
+#s-game .last-action-text { font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; }
+
+/* The LAST SCORE / LAST CALL label is what separates a basket from a foul, so
+   it stays on narrow screens too — compacted rather than dropped. */
+@media (max-width: 29.9375rem) {
+  #s-game .last-action { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.45rem; }
+  #s-game .last-action-kicker { display: block; font-size: 0.5rem; }
+}
+
+/* Narrow screens: one clear roster at a time via the team tabs — the giant
+   scoreboard above always shows both teams, and switching never scrolls
+   sideways or changes possession. */
+@media (max-width: 47.9375rem) {
+  .score-zone--players { grid-template-columns: minmax(0, 1fr); }
+  .score-zone--players .score-zone-divider { display: none; }
+  .score-zone--players[data-scorer='a'] #pad-b { display: none; }
+  .score-zone--players[data-scorer='b'] #pad-a { display: none; }
+}
+
+/* Wide screens: both rosters visible, no switcher needed. */
+@media (min-width: 48rem) {
+  .scorer-tabs { display: none; }
+}
+
+@media (orientation: landscape) and (min-width: 37.5rem) and (max-height: 31.25rem) {
+  .scorer-tabs { padding-top: 0.25rem; }
+  .scorer-tab { min-height: 2.4rem; }
+  .score-pad--players { gap: 0.3rem; }
+  .scorer-row { padding: 0.3rem 0.4rem 0.35rem; }
+  .btn-pscore { min-height: 2.6rem; font-size: 1.05rem; }
+  .btn-pscore.emph { min-height: 2.9rem; font-size: 1.2rem; }
+  .scorer-row--team .btn-pscore { min-height: 2.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scorer-row.scored { animation: none; }
+}
+
+html[data-reduced-motion='true'] .scorer-row.scored { animation: none; }
+
+@media (forced-colors: active) {
+  .btn-pscore, .scorer-tab { background: Canvas; }
+  .scorer-tab.on { outline: 2px solid currentColor; }
 }

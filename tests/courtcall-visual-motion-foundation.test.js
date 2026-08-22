@@ -11,14 +11,14 @@ const serviceWorker = fs.readFileSync(path.join(root, 'basketball-sw.js'), 'utf8
 
 test('motion foundation loads last and is available offline', () => {
   const design = html.indexOf('<link rel="stylesheet" href="./courtcall-design-system.css">');
-  const game = html.indexOf('<link rel="stylesheet" href="./courtcall-core-game.css">');
+  const game = html.indexOf('<link rel="stylesheet" href="./courtcall-core-game.css?v=');
   const teamHistory = html.indexOf('<link rel="stylesheet" href="./courtcall-team-history.css">');
   const motionCss = html.indexOf('<link rel="stylesheet" href="./courtcall-motion-foundation.css">');
   const motionJs = html.indexOf('<script src="./courtcall-motion-foundation.js"></script>');
 
   assert.ok(design < game && game < teamHistory && teamHistory < motionCss);
   assert.ok(motionJs > html.lastIndexOf('</script>', motionJs - 1));
-  assert.match(serviceWorker, /CACHE_VERSION = 'v56'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v57'/);
   assert.match(serviceWorker, /'\.\/courtcall-motion-foundation\.css'/);
   assert.match(serviceWorker, /'\.\/courtcall-motion-foundation\.js'/);
 });
@@ -43,7 +43,9 @@ test('live-game motion covers score, lead, foul, possession, period and feed', (
   assert.match(css, /translateY\(-\.625rem\)/);
   assert.match(motion, /index \* 40/);
   assert.doesNotMatch(motion, /preventDefault\(/);
-  assert.match(html, /if\(pad\.dataset\.scoreControls===signature\)return/);
+  // Phase 12: pads rebuild only when the roster/signature changes so rapid
+  // taps never race an innerHTML replacement.
+  assert.match(html, /if\(pad\.dataset\.scoreControls!==signature\)\{/);
   assert.match(html, /pad\.dataset\.scoreControls=signature/);
 });
 

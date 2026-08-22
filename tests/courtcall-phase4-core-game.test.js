@@ -105,7 +105,7 @@ test('last-action copy identifies scores, fouls and timeouts without color alone
 
 test('Phase 4 markup exposes the complete core-game interaction contract', () => {
   const designLink = html.indexOf('<link rel="stylesheet" href="./courtcall-design-system.css">');
-  const gameLink = html.indexOf('<link rel="stylesheet" href="./courtcall-core-game.css">');
+  const gameLink = html.indexOf('<link rel="stylesheet" href="./courtcall-core-game.css?v=');
 
   assert.ok(gameLink > designLink);
   assert.match(html, /<details class="setup-advanced" id="setup-advanced"/);
@@ -147,8 +147,8 @@ test('Phase 4 remains functional while an older cached core module is being repl
 });
 
 test('Phase 4 stylesheet is cached and defines every required game surface', () => {
-  assert.match(serviceWorker, /CACHE_VERSION = 'v56'/);
-  assert.match(serviceWorker, /'\.\/courtcall-core-game\.css'/);
+  assert.match(serviceWorker, /CACHE_VERSION = 'v57'/);
+  assert.match(serviceWorker, /'\.\/courtcall-core-game\.css\?v=\d+'/);
   [
     '.setup-hero', '.setup-advanced', '#s-game.active', '.team-leader-label',
     '.last-action', '.score-fx', '.team-rename-dialog', '#pg-overlay',
