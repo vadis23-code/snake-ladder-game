@@ -89,6 +89,8 @@ Against the live v58 worker, with a temporary `v59-test` worker deployed **only 
 
 ## H. Supabase / Auth real-world QA — **NOT PERFORMED (blocked)**
 
+> **Re-attempted in a dedicated backend-validation pass — still blocked. See "Backend release gate" below for the authoritative result.**
+
 `https://jfeegcocynozbjpzbjae.supabase.co` is **unreachable from this environment**: the egress proxy returns `403 CONNECT` (16 recorded denials). Per the "if network access permits" condition, **no real OTP, session, sync, or RLS testing was possible.** This is a genuine gap, not a pass.
 
 What was verified **at contract level only** (no network) — 31/31:
@@ -117,3 +119,63 @@ What was verified **at contract level only** (no network) — 31/31:
 2. Real-device pass (iOS Safari + Android Chrome): scoring ergonomics, haptics, install/update prompt.
 3. A Windows CI run to close the cross-platform question at runtime, not just at assertion level.
 4. Optional: revisit **F-1** if long sessions become common — cap or virtualise the live feed.
+
+
+---
+
+# Backend Release Gate — Real Supabase Validation Attempt
+
+**Outcome: GATE REMAINS OPEN. Sections 1–6 of the backend validation were NOT executed.**
+
+## Real Supabase connectivity result — BLOCKED
+
+The project `https://jfeegcocynozbjpzbjae.supabase.co` is unreachable from this environment. Verified across four independent paths so the conclusion does not rest on one tool:
+
+| Probe | Result |
+|---|---|
+| `curl $SUPA/auth/v1/health` | `curl (56) CONNECT tunnel failed, response 403` → HTTP 000 |
+| `curl $SUPA/rest/v1/` with the anon key | `curl (56) CONNECT tunnel failed, response 403` → HTTP 000 |
+| DNS resolution of the project host | **Resolves** — so this is policy denial, not a DNS/typo failure |
+| Real `supabase-js` client in the loaded app (browser) | `getSession()` returns in 1 ms with no session (local read, no network); `from('communities').select()` → **`TypeError: Failed to fetch`** |
+| Control: `https://example.com` | HTTP 000 — **blanket egress policy**, not Supabase-specific |
+
+Egress proxy record: **20 recorded denials, 15 against the Supabase host**, most recent `connect_rejected — gateway answered 403 to CONNECT (policy denial or upstream failure)`. Policy is non-selective (`selective: false`, `toolScoped: false`).
+
+Per the standing environment rules, organisation egress denials must be reported rather than routed around, so no workaround was attempted.
+
+## Results for the requested backend checks
+
+| # | Area | Result |
+|---|---|---|
+| 1 | OTP auth (request, invalid code, valid sign-in, restore, logout, re-login, resend cooldown, no token leakage) | **NOT PERFORMED — backend unreachable** |
+| 2 | Profile / account sync (cloud save, restore, `ONLINE_SYNCED` only after real success) | **NOT PERFORMED — backend unreachable** |
+| 3 | Game sync (single cloud record, history restore, offline→reconnect, no duplicates) | **NOT PERFORMED — backend unreachable** |
+| 4 | **RLS / server-side permission enforcement** | **NOT PERFORMED — backend unreachable** |
+| 5 | Session / failure behaviour against real error responses | **NOT PERFORMED — backend unreachable** |
+| 6 | Cleanup of test data | **Nothing created, so nothing to clean up** |
+
+No test account was created, no OTP was requested, and no data was written or deleted. No OTP, token, secret, invite code, or private record was accessed, logged, or persisted.
+
+## Defects found / fixes made
+
+**None found; none made.** No code was changed. The working tree carries only this report; every production file remains byte-identical to the deployed release `86333d5…`, and the service worker stays at v58.
+
+## What this gap does and does not mean
+
+- The client-side permission contract was verified earlier (13/13, including *admin cannot demote the owner* and *unknown actions fail closed*). That is **not** evidence that the database enforces the same rules — client checks shape the UI; RLS is what actually protects data.
+- Equally, **no RLS defect was observed** — nothing was observable at all. This is an unverified control, not a known-broken one.
+- Everything testable without the backend passed comprehensively: routes 42/42, end-to-end game 26/26, endurance 10/10, offline/reconnect 18/18, PWA update 11/11, regression 249/249.
+
+## Final release recommendation
+
+### RELEASE WITH KNOWN LIMITATIONS
+
+Justification: the build already deployed at `86333d5…` passes every check that can be executed here, and the frontend, offline, local-first, scoring, and PWA layers are thoroughly evidenced. The limitation is that **server-side authorization has not been independently verified in this gate**.
+
+Conditions attached:
+
+1. **Before treating community privacy or role boundaries as assured**, run backend items 1–5 from a network-permitted environment, using ordinary client sessions only — never service-role credentials. The bundled `supabase-rls-audit.sql` is the natural starting point.
+2. Treat item 4 (RLS) as the **highest-priority** outstanding check: it is the only gap with a security, rather than functional, consequence.
+3. The remaining Phase 14 limitations still stand — no real-device pass, no Safari/iOS or Firefox, and no Windows runtime verification.
+
+**This recommendation should not be read as backend sign-off.** It reflects a product whose verifiable surfaces are in good shape, with one genuinely unverified control that a reviewer with network access must close.
