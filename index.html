@@ -582,7 +582,7 @@ button.setting-row{width:100%;background:none;color:inherit;border-top:0;border-
 .toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform var(--t2);pointer-events:none}
 .toggle-sw.on .toggle-thumb{transform:translateX(18px)}
 .settings-select,.settings-text{width:min(170px,44vw);min-height:40px;border:1px solid var(--border);border-radius:9px;background:var(--s2);color:var(--text);padding:8px 10px;font:600 13px 'Inter',sans-serif}
-.settings-range-wrap{width:min(180px,46vw);display:flex;align-items:center;gap:8px}.settings-range{min-width:0;flex:1;accent-color:var(--ca)}.settings-range-value{min-width:34px;text-align:right;font-size:12px;color:var(--muted);font-weight:700}
+.settings-range-wrap{width:min(180px,46vw);display:flex;align-items:center;gap:8px}.settings-range{min-width:0;flex:1;min-height:44px;accent-color:var(--ca)}.settings-range-value{min-width:34px;text-align:right;font-size:12px;color:var(--muted);font-weight:700}
 .settings-pair{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}.settings-pair label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}.settings-pair .settings-select{width:92px}
 .danger-btn{background:rgba(255,23,68,.08);border:none;color:var(--danger);font:700 14px 'Inter',sans-serif;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;text-align:left}
 .danger-btn:active{background:rgba(255,23,68,.15)}
@@ -1450,7 +1450,7 @@ body.modal-open{overflow:hidden}
 .legal-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .legal-links a{color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer}
 .consent-row{display:flex;align-items:flex-start;gap:9px;margin:4px 0 10px;text-align:left}
-.consent-row input{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--ca)}
+.consent-row input{margin-top:1px;width:24px;height:24px;flex-shrink:0;accent-color:var(--ca)}
 .consent-row label{font-size:12px;color:var(--muted);line-height:1.5}
 .consent-row label a{color:var(--ca);text-decoration:none}
 .hc-search-row{position:relative;margin-bottom:12px}
@@ -1697,10 +1697,10 @@ body.modal-open{overflow:hidden}
 <link rel="stylesheet" href="./courtcall-core-game.css?v=20260824">
 <link rel="stylesheet" href="./courtcall-team-history.css">
 <link rel="stylesheet" href="./courtcall-motion-foundation.css">
-<link rel="stylesheet" href="./courtcall-cinematic.css?v=20260814b">
+<link rel="stylesheet" href="./courtcall-cinematic.css?v=20260825">
 <link rel="stylesheet" href="./courtcall-global-visual-system.css?v=20260814b">
 <link rel="stylesheet" href="./courtcall-tournaments.css">
-<link rel="stylesheet" href="./courtcall-discover-india.css?v=20260822">
+<link rel="stylesheet" href="./courtcall-discover-india.css?v=20260825">
 <link rel="stylesheet" href="./courtcall-supporting-product.css?v=20260822">
 <link rel="stylesheet" href="./courtcall-auth.css?v=20260822">
 </head>
@@ -2229,6 +2229,7 @@ body.modal-open{overflow:hidden}
 
 <!-- ══ GAME ══ -->
 <div id="s-game" class="screen">
+  <h1 class="cc-sr-only">Live game scoreboard</h1>
   <div class="game-nav">
     <button class="btn-back" onclick="handleBackFromGame()">← Hub</button>
     <button class="q-chip" id="q-chip" type="button" onclick="nextQuarter()" aria-label="Game has no periods" disabled><span class="q-dot"></span><span id="q-label">Game</span><span class="q-next" aria-hidden="true">›</span></button>
@@ -2693,7 +2694,7 @@ body.modal-open{overflow:hidden}
 <div id="s-communities" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('hub')">← Hub</button>
-    <div class="page-title">Communities</div>
+    <h1 class="page-title">Communities</h1>
     <div style="width:60px"></div>
   </div>
   <div class="comm-hero">
@@ -2715,7 +2716,7 @@ body.modal-open{overflow:hidden}
 <div id="s-comm-create" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('communities')">← Communities</button>
-    <h1 class="page-title">New Community</h1>
+    <div class="page-title">New Community</div>
     <div style="width:60px"></div>
   </div>
   <form class="comm-invite-join" aria-label="Join a community by invite code" onsubmit="event.preventDefault();joinCommunityByCode()">
@@ -3096,7 +3097,7 @@ body.modal-open{overflow:hidden}
 <div id="s-analytics" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="showScreen('settings')">← Settings</button>
-    <h1 class="page-title">Analytics</h1>
+    <div class="page-title">Analytics</div>
     <div style="width:60px"></div>
   </div>
   <div class="analytics-body" id="analytics-body" aria-live="polite"></div>
@@ -6824,7 +6825,7 @@ function renderDiscoveredDetail(view){const item=discoveredListings().find(x=>x.
 function showDiscoverIntent(kind,id){const target=document.getElementById('discover-intent');if(!target)return;target.innerHTML=`<form class="discover-form" onsubmit="event.preventDefault();saveDiscoverIntent('${kind}',${jsArg(id)},this)"><label>Your name<input name="name" required maxlength="80"></label><label>Email<input name="email" type="email" required maxlength="120"></label><label>${kind==='claim'?'How are you connected to this organiser?':'What information appears incorrect?'}<textarea name="note" required maxlength="500"></textarea></label><button class="discover-btn" type="submit">Submit ${kind==='claim'?'claim intent':'report'}</button><p class="discover-notice">Saved locally as PENDING. This does not verify a listing or grant ownership.</p></form>`}
 function saveDiscoverIntent(kind,tournamentId,form){const intent=CourtCallDiscoverIndia.normalizeIntent({tournamentId,name:form.name.value,email:form.email.value,note:form.note.value},kind);if(!CourtCallDiscoverIndia.validIntent(intent)){showToast('Enter a valid name, email and explanation',{type:'error'});return}const key=kind==='claim'?CourtCallDiscoverIndia.STORAGE.claims:CourtCallDiscoverIndia.STORAGE.reports;if(!discoverWrite(key,discoverRead(key).concat(intent)))return;form.innerHTML='<p class="discover-notice" role="status">Saved on this device as PENDING. No verification or ownership changed.</p>'}
 function renderDiscoverHost(view){view.innerHTML=`<header class="discover-hero"><span class="discover-kicker">Organiser pathway</span><h2>Host with CourtCall</h2><p>Create a real playable bracket with the existing CourtCall engine, or submit an external India listing for local review.</p></header><section class="discover-panel"><h3>Run it in CourtCall</h3><p>Uses the tested tournament creation, fixtures and scoring flow. CourtCall-created tournaments are identified as COURTCALL HOSTED; this is not an external verification badge.</p><button class="discover-btn" onclick="setTournamentMode('my');showTournForm()">Create playable tournament</button></section><section class="discover-panel"><h3>Submit a tournament</h3><form class="discover-form" onsubmit="event.preventDefault();submitDiscoverListing(this)"><label>Submitting as<select name="submitterRole"><option value="ORGANISER_LISTED">Organiser</option><option value="COMMUNITY_LISTED">Community member</option></select></label><label>Tournament name<input name="name" required maxlength="100"></label><label>Organiser<input name="organiser" required maxlength="100"></label><label>State<select name="state" required>${Object.keys(CourtCallDiscoverIndia.STATES).map(s=>`<option>${escHtml(s)}</option>`).join('')}</select></label><label>City<input name="city" required maxlength="80"></label><label>Venue<input name="venue" maxlength="120"></label><label>Start date<input name="startDate" type="date" required></label><label>End date<input name="endDate" type="date"></label><label>Format<select name="format"><option>3X3</option><option>5X5</option><option>1X1</option></select></label><label>Category<input name="category" maxlength="60" placeholder="Open, U18, corporate…"></label><label>Gender<select name="gender"><option>OPEN</option><option>MEN</option><option>WOMEN</option><option>MIXED</option></select></label><label>Level<select name="level"><option>OPEN</option><option>GRASSROOTS</option><option>AMATEUR</option><option>COLLEGIATE</option><option>ELITE</option></select></label><label>Registration status<select name="registrationStatus"><option>ANNOUNCED</option><option>OPEN</option><option>CLOSING SOON</option><option>CLOSED</option></select></label><label>Registration deadline<input name="registrationDeadline" type="date"></label><label>Entry fee<input name="fee" type="number" min="0"></label><label>Prize money<input name="prize" maxlength="80"></label><label>Contact<input name="contact" maxlength="120"></label><label>Registration link (HTTPS)<input name="registrationUrl" type="url" placeholder="https://…"></label><label>Rules link (HTTPS)<input name="rulesUrl" type="url" placeholder="https://…"></label><label>Source<input name="sourceName" required maxlength="100"></label><label>Source URL (HTTPS)<input name="sourceUrl" type="url" placeholder="https://…"></label><label>Optional notes<textarea name="description" maxlength="500"></textarea></label><button class="discover-btn">Submit locally for review</button><p class="discover-notice">Submissions remain PENDING and are never VERIFIED automatically. CourtCall does not claim central moderation has occurred.</p></form></section>`}
-function submitDiscoverListing(form){const role=form.submitterRole.value;const listing=CourtCallDiscoverIndia.normalizeTournament({id:`submitted_${Date.now()}`,name:form.name.value,organiser:form.organiser.value,state:form.state.value,city:form.city.value,venue:form.venue.value,startDate:form.startDate.value,endDate:form.endDate.value,format:form.format.value,category:form.category.value,ageCategory:form.category.value,gender:form.gender.value,level:form.level.value,registrationStatus:form.registrationStatus.value,registrationDeadline:form.registrationDeadline.value,fee:form.fee.value,prize:form.prize.value,contact:form.contact.value,registrationUrl:form.registrationUrl.value,rulesUrl:form.rulesUrl.value,sourceUrl:form.sourceUrl.value,sourceName:form.sourceName.value,sourceType:role==='ORGANISER_LISTED'?'ORGANISER':'COMMUNITY',description:form.description.value,verification:role,listingType:'DISCOVERED'});const submission={...listing,status:'PENDING',submittedAt:new Date().toISOString()};if(!discoverWrite(CourtCallDiscoverIndia.STORAGE.submissions,discoverRead(CourtCallDiscoverIndia.STORAGE.submissions).concat(submission)))return;form.reset();showToast('Submission saved locally as pending',{type:'success'})}
+function submitDiscoverListing(form){const role=form.submitterRole.value;const listing=CourtCallDiscoverIndia.normalizeTournament({id:`submitted_${Date.now()}`,name:form.name.value,organiser:form.organiser.value,state:form.state.value,city:form.city.value,venue:form.venue.value,startDate:form.startDate.value,endDate:form.endDate.value,format:form.format.value,category:form.category.value,ageCategory:form.category.value,gender:form.gender.value,level:form.level.value,registrationStatus:form.registrationStatus.value,registrationDeadline:form.registrationDeadline.value,fee:form.fee.value,prize:form.prize.value,contact:form.contact.value,registrationUrl:form.registrationUrl.value,rulesUrl:form.rulesUrl.value,sourceUrl:form.sourceUrl.value,sourceName:form.sourceName.value,sourceType:role==='ORGANISER_LISTED'?'ORGANISER':'COMMUNITY',description:form.description.value,verification:role,listingType:'DISCOVERED'});const submission={...listing,status:'PENDING',submittedAt:new Date().toISOString()};if(!discoverWrite(CourtCallDiscoverIndia.STORAGE.submissions,discoverRead(CourtCallDiscoverIndia.STORAGE.submissions).concat(submission)))return;form.reset();showToast('Submission saved on this device as pending',{type:'success'})}
 
 /* ════════════════════════════════════════════════════════
    Tournament
@@ -8959,7 +8960,7 @@ async function toggleCommReadOnly(communityId){
   c.readOnly=!c.readOnly;
   setComms(comms);
   const cloudResult=await supaUpdateCommunity(c);
-  showToast(cloudResult===false?'Moderation change saved locally; cloud sync failed.':c.readOnly?'Posting locked — read-only mode':'Posting unlocked',{type:cloudResult===false?'warning':'information'});
+  showToast(cloudResult===false?'Moderation change saved on this device · cloud sync failed':c.readOnly?'Posting locked — read-only mode':'Posting unlocked',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
@@ -8971,7 +8972,7 @@ async function toggleCommentsLocked(communityId){
   c.commentsLocked=!c.commentsLocked;
   setComms(comms);
   const cloudResult=await supaUpdateCommunity(c);
-  showToast(cloudResult===false?'Comment setting saved locally; cloud sync failed.':c.commentsLocked?'Comments locked':'Comments unlocked',{type:cloudResult===false?'warning':'information'});
+  showToast(cloudResult===false?'Comment setting saved on this device · cloud sync failed':c.commentsLocked?'Comments locked':'Comments unlocked',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
@@ -8983,7 +8984,7 @@ async function toggleRatingsDisabled(communityId){
   c.ratingsDisabled=!c.ratingsDisabled;
   setComms(comms);
   const cloudResult=await supaUpdateCommunity(c);
-  showToast(cloudResult===false?'Ratings setting saved locally; cloud sync failed.':c.ratingsDisabled?'Ratings disabled':'Ratings enabled',{type:cloudResult===false?'warning':'information'});
+  showToast(cloudResult===false?'Ratings setting saved on this device · cloud sync failed':c.ratingsDisabled?'Ratings disabled':'Ratings enabled',{type:cloudResult===false?'warning':'information'});
   renderCommDetail();
 }
 
@@ -8997,7 +8998,7 @@ async function removePostPhoto(postId,communityId){
   saveAllPosts(all);
   const cloudResult=await supaUpdatePost(postId,{image_url:null});
   setCommTab('feed');
-  showToast(cloudResult===false&&_communityCloudSyncEnabled()?'Photo removed locally; cloud sync failed.':'Photo removed',{type:cloudResult===false&&_communityCloudSyncEnabled()?'warning':'success'});
+  showToast(cloudResult===false&&_communityCloudSyncEnabled()?'Photo removed on this device · cloud sync failed':'Photo removed',{type:cloudResult===false&&_communityCloudSyncEnabled()?'warning':'success'});
 }
 
 async function deleteComm(communityId){
@@ -9029,7 +9030,7 @@ function resetCommCreateForm({restoreDraft=true}={}){
   const firstEmoji=document.querySelector('#cc-emoji-row .emoji-opt');if(firstEmoji)pickCommEmoji(firstEmoji);
   setCommCreateError('');if(restoreDraft)restoreCommunityDraft();applyCommunityVisibilityRules();
   const note=document.getElementById('comm-create-account-note');
-  if(note)note.textContent=currentProfile?.id==='guest'?'Guest community: saved locally on this device. You can choose to sync it after creating an account.':'Signed-in community: saved locally first, then synced when cloud access is available.';
+  if(note)note.textContent=currentProfile?.id==='guest'?'Guest community: saved on this device. You can choose to sync it after creating an account.':'Signed-in community: saved on this device first, then synced when cloud access is available.';
   _suspendCommunityDraft=false;
 }
 
@@ -9271,7 +9272,7 @@ async function savePostEdit(postId){
   saveAllPosts(all);editingPostId=null;setCommTab('feed');showToast('Post updated');
   const imageUrl=/^data:/i.test(p.imageUrl)?null:(p.imageUrl||null);
   const cloudResult=await supaUpdatePost(postId,{title:p.title||null,content:p.body,image_url:imageUrl,updated_at:new Date().toISOString()});
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Post edit is saved locally; cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Post edit saved on this device · cloud sync failed',{type:'warning'});
 }
 
 async function deletePost(postId,communityId){
@@ -9290,7 +9291,7 @@ async function pinPost(postId){
   if(!requireCommunityAction(COMM_ACTION.PIN_POST,p.communityId,{entity:p,message:'Only admins can pin posts.'}))return;
   p.pinned=!p.pinned;saveAllPosts(all);
   const cloudResult=await supaUpdatePost(postId,{pinned:p.pinned});
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Pin state is saved locally; cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Pin state saved on this device · cloud sync failed',{type:'warning'});
   setCommTab('feed');showToast(p.pinned?'Post pinned 📌':'Post unpinned');
 }
 
@@ -9306,7 +9307,7 @@ async function reactPost(postId,communityId,emoji){
   saveAllPosts(all);
   setCommTab('feed');
   const cloudResult=await supaSetPostReaction(postId,emoji,active);
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Reaction is saved locally; secure cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Reaction saved on this device · cloud sync failed',{type:'warning'});
 }
 
 function toggleComments(postId){
@@ -9332,7 +9333,7 @@ async function submitComment(postId){
     if(!saveAllPosts(all))return;
     setCommTab('feed');
     const cloudResult=await supaAddPostComment(postId,comment);
-    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment is saved locally; secure cloud sync failed.',{type:'warning'});
+    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment saved on this device · cloud sync failed',{type:'warning'});
   }finally{_endCommunityAction(actionKey)}
 }
 
@@ -9344,7 +9345,7 @@ async function deleteComment(postId,communityId,commentId){
   if(!saveAllPosts(all))return;
   setCommTab('feed');showToast('Comment removed');
   const cloudResult=await supaDeletePostComment(postId,commentId);
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal is saved locally; secure cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal saved on this device · cloud sync failed',{type:'warning'});
 }
 
 /* ════════════════════════════════════════════════════════
@@ -9599,7 +9600,7 @@ async function submitCPlayer(communityId){
   const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCPlayer(player):null;
   trackEvent('player_added');
   showAddPlayerForm=false;selectedBadges=new Set();
-  setCommTab('players');showToast(cloudResult===false?`${player.name} added locally; cloud sync failed.`:`${player.name} added!`,{type:cloudResult===false?'warning':'success'});
+  setCommTab('players');showToast(cloudResult===false?`${player.name} added on this device · cloud sync failed`:`${player.name} added!`,{type:cloudResult===false?'warning':'success'});
   _endCommunityAction(actionKey);
 }
 
@@ -9634,7 +9635,7 @@ async function saveCPlayerEdit(playerId){
   if(!saveAllCPlayers(all)){_endCommunityAction(actionKey);return}
   const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCPlayer(p):null;
   editingPlayerId=null;
-  setCommTab('players');showToast(cloudResult===false?'Player updated locally; cloud sync failed.':'Player updated',{type:cloudResult===false?'warning':'success'});
+  setCommTab('players');showToast(cloudResult===false?'Player updated on this device · cloud sync failed':'Player updated',{type:cloudResult===false?'warning':'success'});
   _endCommunityAction(actionKey);
 }
 
@@ -9690,7 +9691,7 @@ async function submitCRating(playerId,communityId){
   if(!saveAllCRatings(all)){_endCommunityAction(actionKey);return}
   const cloudResult=_communityCloudSyncEnabled()?await supaUpsertCRating(rating):null;
   ratingPlayerId=null;pendingRating={};
-  setCommTab('players');showToast(cloudResult===false?'Rating saved locally; cloud sync failed.':'Rating submitted! ⭐',{type:cloudResult===false?'warning':'success'});
+  setCommTab('players');showToast(cloudResult===false?'Rating saved on this device · cloud sync failed':'Rating submitted! ⭐',{type:cloudResult===false?'warning':'success'});
   _endCommunityAction(actionKey);
 }
 
@@ -10224,7 +10225,7 @@ async function submitEvent(communityId){
   editingEventId=null;
   eventsFilter='upcoming';
   setCommTab('events');
-  showToast(cloudResult===false?`Event ${existing?'updated':'created'} locally; cloud sync failed.`:`Event ${existing?'updated':'created'}! 📅`,{type:cloudResult===false?'warning':'success'});
+  showToast(cloudResult===false?`Event ${existing?'updated':'created'} on this device · cloud sync failed`:`Event ${existing?'updated':'created'}! 📅`,{type:cloudResult===false?'warning':'success'});
   _endCommunityAction(actionKey);
 }
 
@@ -10542,7 +10543,7 @@ async function submitGalleryItem(communityId){
   selectedAlbum=GAL_ALBUMS[0];
   selectedTaggedPlayers=new Set();
   setCommTab('gallery');
-  showToast(cloudResult===false?'Photo saved locally; cloud sync failed.':'Photo added! 📸',{type:cloudResult===false?'warning':'success'});
+  showToast(cloudResult===false?'Photo saved on this device · cloud sync failed':'Photo added! 📸',{type:cloudResult===false?'warning':'success'});
   _endCommunityAction(actionKey);
 }
 
@@ -10570,7 +10571,7 @@ async function likeGalItem(itemId,communityId){
   saveAllGalItems(all);
   setCommTab('gallery');
   const cloudResult=await supaSetGalleryLike(itemId,pos===-1);
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Like is saved locally; secure cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Like saved on this device · cloud sync failed',{type:'warning'});
 }
 
 function toggleGalCmts(itemId,communityId){
@@ -10599,7 +10600,7 @@ async function submitGalCmt(itemId,communityId){
     if(!saveAllGalItems(all))return;
     setCommTab('gallery');
     const cloudResult=await supaAddGalleryComment(itemId,comment);
-    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment is saved locally; secure cloud sync failed.',{type:'warning'});
+    if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Comment saved on this device · cloud sync failed',{type:'warning'});
   }finally{_endCommunityAction(actionKey)}
 }
 
@@ -10613,7 +10614,7 @@ async function deleteGalCmt(itemId,communityId,cmtId){
   if(!saveAllGalItems(all))return;
   setCommTab('gallery');
   const cloudResult=await supaDeleteGalleryComment(itemId,cmtId);
-  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal is saved locally; secure cloud sync failed.',{type:'warning'});
+  if(cloudResult===false&&_communityCloudSyncEnabled())showToast('Removal saved on this device · cloud sync failed',{type:'warning'});
 }
 
 /* ════════════════════════════════════════════════════════
@@ -11504,7 +11505,7 @@ async function clearDemoData(){
 <div id="s-help-center" class="screen">
   <div class="page-nav">
     <button class="btn-back" onclick="closeHelpCenter()">← Back</button>
-    <h1 class="page-title">Help Center</h1>
+    <div class="page-title">Help Center</div>
     <div style="width:60px"></div>
   </div>
   <div class="hc-body">

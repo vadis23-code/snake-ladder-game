@@ -44,5 +44,5 @@ test('new tournament subroutes coexist with existing tournament deep links',()=>
 test('canonical HTML and service worker include Phase 10 assets',()=>{
   const root=path.join(__dirname,'..'); const html=fs.readFileSync(path.join(root,'index.html'),'utf8'); const sw=fs.readFileSync(path.join(root,'basketball-sw.js'),'utf8');
   assert.match(html,/courtcall-discover-india\.js/); assert.match(html,/MY TOURNAMENTS/); assert.match(html,/DISCOVER INDIA/);
-  assert.match(sw,/CACHE_VERSION = 'v57'/); assert.match(sw,/courtcall-discover-india\.css/); assert.match(sw,/courtcall-discover-india\.js/);
+  assert.match(sw,/CACHE_VERSION = 'v58'/); assert.match(sw,/courtcall-discover-india\.css/); assert.match(sw,/courtcall-discover-india\.js/);
 });

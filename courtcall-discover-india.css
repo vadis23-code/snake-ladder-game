@@ -2,3 +2,13 @@
 @media(min-width:700px){.tourn-mode-tabs{justify-content:center}.discover-filters{grid-template-columns:repeat(4,minmax(0,1fr))}.india-map{grid-template-columns:repeat(5,1fr)}.discover-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:1050px){.discover-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.discover-filters{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media(max-width:360px){.discover-filters{grid-template-columns:1fr}.discover-filters .wide{grid-column:auto}.discover-actions .discover-btn{flex:1 1 100%}}
+
+/* Phase 13: below the desktop breakpoint the four tournament sections were a
+   horizontal scroller, leaving Following and Host off-screen on phones. A 2x2
+   grid keeps every section reachable without sideways scrolling, and the pills
+   meet the 44px touch target used elsewhere in the product. */
+@media(max-width:699px){
+  .tourn-mode-tabs{display:grid;grid-template-columns:1fr 1fr;overflow-x:visible}
+  .tourn-mode-tab{width:100%;text-align:center}
+}
+.tourn-mode-tab{min-height:44px}

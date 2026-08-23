@@ -232,7 +232,7 @@ test('the changed game stylesheet is version-pinned and precached exactly as req
   const tag = html.match(/<link rel="stylesheet" href="\.\/(courtcall-core-game\.css[^"]*)">/);
   assert.ok(tag && tag[1].includes('?v='), 'game css link must be version-pinned');
   assert.ok(sw.includes(`'./${tag[1]}'`), `service worker must precache ${tag[1]}`);
-  assert.match(sw, /CACHE_VERSION = 'v57'/);
+  assert.match(sw, /CACHE_VERSION = 'v58'/);
 });
 
 test('desktop broadcast rail keeps the scorer tabs in the main column', () => {
