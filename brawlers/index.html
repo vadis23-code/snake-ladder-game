@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Brawlers Basketball Experience</title>
+
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  padding: 16px;
+  margin: 0 auto;
+  max-width: 560px;
+  color: #1a1a1a;
+  background:
+    linear-gradient(rgba(245,245,245,0.9), rgba(245,245,245,0.9)),
+    url("logo.jpeg") center center / 420px no-repeat fixed;
+  background-color: #f5f5f5;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.header img { height: 42px; }
+.header h1 { font-size: 22px; margin: 8px 0; text-align: center; }
+.subhead { text-align: center; color: #555; font-size: 14px; margin-bottom: 8px; }
+
+/* Inputs */
+input, select, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 6px 0;
+  font-size: 16px;
+  min-height: 44px;
+}
+input, select { border: 1px solid #bbb; border-radius: 6px; background: #fff; }
+
+button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:disabled { opacity: .6; cursor: default; }
+button.admin { background: #455a64; }
+button.danger { background: #c62828; }
+button.ghost { background: #fff; color: #1976d2; border: 1px solid #1976d2; }
+
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+
+/* Status + messages */
+.status {
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+.status.info { background: #fff8e1; color: #6d4c00; }
+.status.error { background: #ffebee; color: #b71c1c; }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  background: #263238;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: calc(100% - 32px);
+  z-index: 10;
+}
+
+/* Admin UI */
+.banner {
+  background: #e3f2fd;
+  color: #0d47a1;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-align: center;
+  font-weight: 600;
+}
+.admin-hint {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-top: 6px;
+}
+.panel {
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 12px;
+}
+.panel h2 { font-size: 16px; margin: 4px 0 8px; }
+.uid {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  word-break: break-all;
+  background: #eceff1;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+/* Player list */
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 10px;
+  font-weight: 600;
+}
+.list-head small { font-weight: 400; color: #666; }
+ul { list-style: none; padding: 0; margin: 4px 0; }
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+li .who { flex: 1; overflow-wrap: anywhere; }
+li .num { color: #888; margin-right: 6px; font-variant-numeric: tabular-nums; }
+li .you { font-size: 12px; color: #1976d2; margin-left: 6px; }
+li select { width: auto; min-width: 72px; margin: 2px 0; padding: 6px; }
+.empty { color: #666; font-size: 14px; padding: 8px 0; }
+
+/* Subtle remove button with a full-size touch target */
+.remove {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 18px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  color: #555;
+  flex: none;
+}
+.remove:hover { background: #eee; }
+
+/* Teams */
+.team {
+  background: rgba(255,255,255,0.95);
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+.team-title { font-weight: 700; display: flex; justify-content: space-between; }
+.team-title small { font-weight: 400; color: #666; }
+.teams-meta { font-size: 13px; color: #555; margin-top: 8px; }
+.stale {
+  background: #fff3e0;
+  color: #8a4b00;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+.hidden { display: none !important; }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <img src="logo.jpeg" alt="Brawlers logo" onerror="this.remove()">
+  <h1>Brawlers Basketball Experience</h1>
+</div>
+<div class="subhead" id="dayLabel"></div>
+
+<div id="status" class="status info" role="status" aria-live="polite">Connecting…</div>
+
+<div id="adminBanner" class="banner hidden">👑 Admin mode</div>
+
+<select id="sessionType" aria-label="Session type">
+  <option>Half Court</option>
+  <option>Full Court</option>
+</select>
+
+<form id="addForm" autocomplete="off">
+  <input id="nameInput" placeholder="Player name" maxlength="30" aria-label="Player name" enterkeyhint="done">
+  <button id="addBtn" type="submit">Add Player</button>
+</form>
+
+<div class="list-head">
+  <span>Today's players</span>
+  <small id="playerCount">0</small>
+</div>
+<ul id="players"></ul>
+
+<select id="teamCount" aria-label="Number of teams">
+  <option value="2">2 Teams</option>
+  <option value="3">3 Teams</option>
+  <option value="4">4 Teams</option>
+</select>
+
+<button id="genBtn" type="button">⚖️ Generate Balanced Teams</button>
+<button id="shareBtn" type="button">📤 Share on WhatsApp</button>
+
+<div id="teams"></div>
+
+<!-- Admin area -->
+<div class="panel" id="adminArea">
+  <div id="guestAdmin">
+    <div class="admin-hint">Admins sign in with Google. Ask an existing admin to add you.</div>
+    <button id="signInBtn" class="admin" type="button">Admin sign-in (Google)</button>
+  </div>
+
+  <div id="pendingAdmin" class="hidden">
+    <h2>Not an admin yet</h2>
+    <div class="admin-hint">Signed in as <span id="pendingEmail"></span>. Send this ID to an existing admin:</div>
+    <div class="uid" id="pendingUid"></div>
+    <div class="row">
+      <button id="copyUidBtn" class="ghost" type="button">Copy ID</button>
+      <button class="admin signOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+
+  <div id="adminTools" class="hidden">
+    <h2>Admin tools</h2>
+    <div class="admin-hint">Skill ratings (1 = beginner, 5 = strongest) are only shown to admins. Unrated players count as 3.</div>
+    <button id="resetBtn" class="danger" type="button">♻ Reset today's list</button>
+
+    <h2>Admins</h2>
+    <ul id="adminList"></ul>
+    <form id="addAdminForm" autocomplete="off">
+      <input id="adminUidInput" placeholder="New admin's ID" aria-label="New admin's ID">
+      <input id="adminNameInput" placeholder="Their name" maxlength="30" aria-label="New admin's name">
+      <button type="submit" class="admin">Add admin</button>
+    </form>
+    <button class="admin signOutBtn" type="button">Sign out</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden" role="alert"></div>
+
+<script src="brawlers-core.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInAnonymously,
+  signInWithPopup, GoogleAuthProvider, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, collection, query, orderBy,
+  onSnapshot, setDoc, deleteDoc, getDocs, writeBatch, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const C = window.BrawlersCore;
+const TITLE = "Brawlers Basketball Experience";
+
+/* Firebase — this config is public by design; access is enforced by firestore.rules. */
+const firebaseConfig = {
+  apiKey: "AIzaSyCnxQH_omBAdqDZ1rnXN2yvGnI4j2CGKGA",
+  authDomain: "brawlers-basketball-exp-8a6c3.firebaseapp.com",
+  projectId: "brawlers-basketball-exp-8a6c3",
+  storageBucket: "brawlers-basketball-exp-8a6c3.appspot.com",
+  messagingSenderId: "567296105362",
+  appId: "1:567296105362:web:414ae8e8969577eca0ff4b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* State */
+const state = {
+  user: null,
+  isAdmin: false,
+  day: C.sessionDay(),
+  players: [],
+  roster: new Map(),   // nameKey -> { name, skill }
+  dayDoc: null,        // { teams: [{ names }], teamCount, sessionType, generatedAt }
+  admins: []
+};
+let dayUnsubs = [];
+let userUnsubs = [];
+let adminsUnsub = null;
+
+const $ = (id) => document.getElementById(id);
+
+/* Messages */
+function setStatus(text, kind = "info") {
+  const el = $("status");
+  el.textContent = text;
+  el.className = `status ${kind}`;
+  el.classList.toggle("hidden", !text);
+}
+
+let toastTimer;
+function toast(text) {
+  const el = $("toast");
+  el.textContent = text;
+  el.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
+}
+
+function friendlyError(err) {
+  const code = err && err.code ? err.code : "";
+  if (code === "permission-denied") return "Not allowed. Admin access may be needed.";
+  if (code === "unavailable") return "Offline. Your change will sync when you reconnect.";
+  return "Something went wrong. Please try again.";
+}
+
+function onListenError(err) {
+  console.error(err);
+  setStatus("Live updates stopped. Reload the page to reconnect.", "error");
+}
+
+/* Subscriptions */
+function subscribeDay() {
+  dayUnsubs.forEach((u) => u());
+  dayUnsubs = [];
+  state.players = [];
+  state.dayDoc = null;
+  const dayRef = doc(db, "days", state.day);
+  dayUnsubs.push(onSnapshot(
+    query(collection(dayRef, "players"), orderBy("addedAt")),
+    (snap) => {
+      state.players = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      render();
+    },
+    onListenError
+  ));
+  dayUnsubs.push(onSnapshot(
+    dayRef,
+    (snap) => {
+      state.dayDoc = snap.exists() ? snap.data() : null;
+      render();
+    },
+    onListenError
+  ));
+}
+
+function subscribeAdmins(on) {
+  if (adminsUnsub) { adminsUnsub(); adminsUnsub = null; }
+  state.admins = [];
+  if (!on) return;
+  adminsUnsub = onSnapshot(collection(db, "admins"), (snap) => {
+    state.admins = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+    render();
+  }, (err) => console.error(err));
+}
+
+onAuthStateChanged(auth, async (user) => {
+  userUnsubs.forEach((u) => u());
+  userUnsubs = [];
+  subscribeAdmins(false);
+  state.user = user;
+  state.isAdmin = false;
+
+  if (!user) {
+    try {
+      await signInAnonymously(auth);
+    } catch (err) {
+      console.error(err);
+      setStatus("Could not connect. Check your internet and reload.", "error");
+    }
+    return;
+  }
+
+  setStatus(navigator.onLine ? "" : "Offline. Changes will sync when you reconnect.", "info");
+
+  userUnsubs.push(onSnapshot(doc(db, "admins", user.uid), (snap) => {
+    const nowAdmin = snap.exists();
+    if (nowAdmin !== state.isAdmin) subscribeAdmins(nowAdmin);
+    state.isAdmin = nowAdmin;
+    render();
+  }, () => { state.isAdmin = false; render(); }));
+
+  userUnsubs.push(onSnapshot(collection(db, "roster"), (snap) => {
+    state.roster = new Map(snap.docs.map((d) => [d.id, d.data()]));
+    render();
+  }, (err) => console.error(err)));
+
+  subscribeDay();
+  render();
+});
+
+/* Roll over to a fresh list at midnight India time, even if the tab stays open. */
+function checkDay() {
+  const today = C.sessionDay();
+  if (today === state.day) return;
+  state.day = today;
+  if (state.user) subscribeDay();
+  render();
+  toast("New day. Fresh list started.");
+}
+setInterval(checkDay, 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkDay(); });
+
+window.addEventListener("offline", () => setStatus("Offline. Changes will sync when you reconnect.", "info"));
+window.addEventListener("online", () => setStatus(""));
+
+/* Helpers */
+function skillFor(name) {
+  const entry = state.roster.get(C.nameKey(name));
+  return entry ? C.normalizeSkill(entry.skill) : null;
+}
+
+function currentTeams() {
+  const teams = state.dayDoc && Array.isArray(state.dayDoc.teams) ? state.dayDoc.teams : [];
+  return teams.map((t) => (Array.isArray(t.names) ? t.names.map(String) : []));
+}
+
+/* Actions */
+$("addForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!state.user) return;
+  const name = C.cleanName($("nameInput").value);
+  const problem = C.validateName(name);
+  if (problem) { toast(problem); return; }
+
+  const key = C.nameKey(name);
+  if (state.players.some((p) => C.nameKey(p.name) === key)) {
+    toast(`${name} is already on today's list.`);
+    return;
+  }
+
+  $("nameInput").value = "";
+  try {
+    // Document id = normalised name, so the database itself rejects duplicates.
+    await setDoc(doc(db, "days", state.day, "players", key), {
+      name, uid: state.user.uid, addedAt: serverTimestamp()
+    });
+  } catch (err) {
+    console.error(err);
+    toast(err.code === "permission-denied" ? `${name} is already on today's list.` : friendlyError(err));
+  }
+});
+
+async function removePlayer(p) {
+  const mine = state.user && p.uid === state.user.uid;
+  const ask = mine ? `Take ${p.name} off today's list?` : `Remove ${p.name} from today's list?`;
+  if (!confirm(ask)) return;
+  try {
+    await deleteDoc(doc(db, "days", state.day, "players", p.id));
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  }
+}
+
+async function setSkill(name, value) {
+  const key = C.nameKey(name);
+  try {
+    const skill = C.normalizeSkill(value);
+    if (skill === null) await deleteDoc(doc(db, "roster", key));
+    else await setDoc(doc(db, "roster", key), { name, skill, updatedAt: serverTimestamp() });
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  }
+}
+
+$("genBtn").addEventListener("click", async () => {
+  if (!state.user) return;
+  const count = C.clampTeamCount($("teamCount").value);
+  if (state.players.length < count) {
+    toast(`Need at least ${count} players for ${count} teams.`);
+    return;
+  }
+  if (currentTeams().length && !confirm("Replace the current teams for everyone?")) return;
+
+  const pool = state.players.map((p) => ({ name: p.name, skill: skillFor(p.name) }));
+  const { teams } = C.balanceTeams(pool, count);
+  const sessionType = C.SESSION_TYPES.includes($("sessionType").value) ? $("sessionType").value : C.SESSION_TYPES[0];
+  $("genBtn").disabled = true;
+  try {
+    await setDoc(doc(db, "days", state.day), {
+      teams: teams.map((t) => ({ names: t.map((p) => p.name) })),
+      teamCount: count,
+      sessionType,
+      generatedAt: serverTimestamp()
+    });
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  } finally {
+    $("genBtn").disabled = false;
+  }
+});
+
+$("resetBtn").addEventListener("click", async () => {
+  if (!state.isAdmin) return;
+  if (!confirm("Remove all players and teams for today?")) return;
+  try {
+    const dayRef = doc(db, "days", state.day);
+    const snap = await getDocs(collection(dayRef, "players"));
+    const refs = [...snap.docs.map((d) => d.ref), dayRef];
+    for (let i = 0; i < refs.length; i += 400) {
+      const batch = writeBatch(db);
+      refs.slice(i, i + 400).forEach((r) => batch.delete(r));
+      await batch.commit();
+    }
+    toast("Today's list has been reset.");
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  }
+});
+
+$("shareBtn").addEventListener("click", () => {
+  const msg = C.buildShareMessage({
+    title: TITLE,
+    dateLabel: C.sessionDayLabel(),
+    sessionType: (state.dayDoc && state.dayDoc.sessionType) || $("sessionType").value,
+    players: state.players.map((p) => p.name),
+    teams: currentTeams(),
+    link: location.origin + location.pathname
+  });
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+});
+
+$("signInBtn").addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch (err) {
+    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
+    console.error(err);
+    if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") {
+      toast("Sign-in was blocked. Open this page in Chrome or Safari (not inside WhatsApp) and try again.");
+    } else {
+      toast("Sign-in failed. Please try again.");
+    }
+  }
+});
+
+document.querySelectorAll(".signOutBtn").forEach((b) => b.addEventListener("click", () => signOut(auth)));
+
+$("copyUidBtn").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(state.user.uid);
+    toast("ID copied.");
+  } catch {
+    toast("Copy failed. Select the ID and copy it manually.");
+  }
+});
+
+$("addAdminForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!state.isAdmin) return;
+  const uid = $("adminUidInput").value.trim();
+  const name = C.cleanName($("adminNameInput").value);
+  if (!/^[A-Za-z0-9]{20,128}$/.test(uid)) { toast("That doesn't look like a valid ID."); return; }
+  const problem = C.validateName(name);
+  if (problem) { toast(problem.replace("player ", "")); return; }
+  try {
+    await setDoc(doc(db, "admins", uid), { name, addedBy: state.user.uid, addedAt: serverTimestamp() });
+    $("adminUidInput").value = "";
+    $("adminNameInput").value = "";
+    toast(`${name} is now an admin.`);
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  }
+});
+
+async function removeAdmin(a) {
+  if (!confirm(`Remove ${a.name || "this person"} as admin?`)) return;
+  try {
+    await deleteDoc(doc(db, "admins", a.uid));
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err));
+  }
+}
+
+/* Render. Every user-provided string goes through textContent, never innerHTML. */
+function el(tag, props = {}, ...children) {
+  const node = document.createElement(tag);
+  Object.assign(node, props);
+  children.forEach((c) => node.append(c));
+  return node;
+}
+
+function renderPlayers() {
+  const list = $("players");
+  list.replaceChildren();
+  $("playerCount").textContent = `${state.players.length} ${state.players.length === 1 ? "player" : "players"}`;
+  if (!state.players.length) {
+    list.append(el("li", { className: "empty", textContent: "No one yet. Add the first name!" }));
+    return;
+  }
+  state.players.forEach((p, i) => {
+    const mine = state.user && p.uid === state.user.uid;
+    const who = el("span", { className: "who" },
+      el("span", { className: "num", textContent: `${i + 1}.` }),
+      p.name
+    );
+    if (mine) who.append(el("span", { className: "you", textContent: "(added by you)" }));
+    const li = el("li", {}, who);
+
+    if (state.isAdmin) {
+      const select = el("select", { title: "Skill rating" });
+      select.setAttribute("aria-label", `Skill rating for ${p.name}`);
+      select.append(el("option", { value: "", textContent: "– ★" }));
+      for (let s = C.MIN_SKILL; s <= C.MAX_SKILL; s++) select.append(el("option", { value: String(s), textContent: `${s} ★` }));
+      const skill = skillFor(p.name);
+      select.value = skill === null ? "" : String(skill);
+      select.addEventListener("change", () => setSkill(p.name, select.value));
+      li.append(select);
+    }
+    if (state.isAdmin || mine) {
+      const b = el("button", { type: "button", className: "remove", textContent: "×" });
+      b.setAttribute("aria-label", `Remove ${p.name}`);
+      b.addEventListener("click", () => removePlayer(p));
+      li.append(b);
+    }
+    list.append(li);
+  });
+}
+
+function renderTeams() {
+  const box = $("teams");
+  box.replaceChildren();
+  const teams = currentTeams();
+  if (!teams.length) return;
+
+  const meta = [state.dayDoc.sessionType, `${teams.length} teams`];
+  const at = state.dayDoc.generatedAt && state.dayDoc.generatedAt.toDate ? state.dayDoc.generatedAt.toDate() : null;
+  if (at) meta.push(`made ${at.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}`);
+  box.append(el("div", { className: "teams-meta", textContent: `Shared teams · ${meta.filter(Boolean).join(" · ")}` }));
+
+  const totals = teams.map((t) => t.reduce((s, n) => s + (skillFor(n) ?? C.DEFAULT_SKILL), 0));
+  teams.forEach((t, i) => {
+    const title = el("div", { className: "team-title" }, el("span", { textContent: `Team ${i + 1}` }));
+    title.append(el("small", { textContent: state.isAdmin ? `${t.length} players · strength ${totals[i]}` : `${t.length} players` }));
+    const card = el("div", { className: "team" }, title);
+    t.forEach((n) => card.append(el("div", { textContent: n })));
+    box.append(card);
+  });
+
+  const listNames = state.players.map((p) => p.name);
+  const joined = C.playersMissingFromTeams(listNames, teams);
+  const left = C.playersMissingFromTeams(teams.flat(), [listNames]);
+  if (joined.length || left.length) {
+    const parts = [];
+    if (joined.length) parts.push(`${joined.length} joined since`);
+    if (left.length) parts.push(`${left.length} left since`);
+    box.append(el("div", { className: "stale", textContent: `Teams are out of date (${parts.join(", ")}). Tap Generate to rebalance.` }));
+  }
+}
+
+function renderAdmin() {
+  const user = state.user;
+  const google = !!(user && !user.isAnonymous);
+  $("adminBanner").classList.toggle("hidden", !state.isAdmin);
+  $("guestAdmin").classList.toggle("hidden", google);
+  $("pendingAdmin").classList.toggle("hidden", !google || state.isAdmin);
+  $("adminTools").classList.toggle("hidden", !state.isAdmin);
+  if (google && !state.isAdmin) {
+    $("pendingEmail").textContent = user.email || user.displayName || "Google account";
+    $("pendingUid").textContent = user.uid;
+  }
+
+  const list = $("adminList");
+  list.replaceChildren();
+  state.admins
+    .slice()
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))
+    .forEach((a) => {
+      const isMe = user && a.uid === user.uid;
+      const li = el("li", {}, el("span", { className: "who", textContent: `${a.name || a.uid}${isMe ? " (you)" : ""}` }));
+      if (!isMe) {
+        const b = el("button", { type: "button", className: "remove", textContent: "×" });
+        b.setAttribute("aria-label", `Remove admin ${a.name || a.uid}`);
+        b.addEventListener("click", () => removeAdmin(a));
+        li.append(b);
+      }
+      list.append(li);
+    });
+}
+
+function render() {
+  $("dayLabel").textContent = C.sessionDayLabel();
+  const ready = !!state.user;
+  $("addBtn").disabled = !ready;
+  $("genBtn").disabled = !ready;
+  renderPlayers();
+  renderTeams();
+  renderAdmin();
+}
+
+render();
+</script>
+
+</body>
+</html>

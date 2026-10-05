@@ -21,3 +21,5 @@
 /supabase-rls-audit.sql / 308
 /supabase-schema.sql / 308
 /backup-* / 308
+/brawlers / 308
+/brawlers/* / 308
